@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="b99263ab-4a5f-43a9-9375-bc608fabb1a9" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/open-suite-webapp/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/open-suite-webapp/build.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/open-suite-webapp/gradle.properties" beforeDir="false" afterPath="$PROJECT_DIR$/open-suite-webapp/gradle.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/open-suite-webapp/modules/axelor-open-suite" beforeDir="false" afterPath="$PROJECT_DIR$/open-suite-webapp/modules/axelor-open-suite" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/open-suite-webapp/modules/axelor-open-suite/axelor-purchase/src/main/resources/views/PurchaseOrderLine.xml" beforeDir="false" afterPath="$PROJECT_DIR$/open-suite-webapp/modules/axelor-open-suite/axelor-purchase/src/main/resources/views/PurchaseOrderLine.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/open-suite-webapp/modules/axelor-open-suite/axelor-stock/src/main/resources/domains/StockMove.xml" beforeDir="false" afterPath="$PROJECT_DIR$/open-suite-webapp/modules/axelor-open-suite/axelor-stock/src/main/resources/domains/StockMove.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/open-suite-webapp/modules/axelor-open-suite/axelor-stock/src/main/resources/views/Selects.xml" beforeDir="false" afterPath="$PROJECT_DIR$/open-suite-webapp/modules/axelor-open-suite/axelor-stock/src/main/resources/views/Selects.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/open-suite-webapp/modules/axelor-open-suite/axelor-stock/src/main/resources/views/StockMove.xml" beforeDir="false" afterPath="$PROJECT_DIR$/open-suite-webapp/modules/axelor-open-suite/axelor-stock/src/main/resources/views/StockMove.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/open-suite-webapp/settings.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/open-suite-webapp/settings.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/open-suite-webapp/src/main/resources/axelor-config.properties" beforeDir="false" afterPath="$PROJECT_DIR$/open-suite-webapp/src/main/resources/axelor-config.properties" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/open-suite-webapp/modules/axelor-open-suite" />
+  </component>
+  <component name="KubernetesApiPersistence">{}</component>
+  <component name="KubernetesApiProvider">{
+  &quot;isMigrated&quot;: true
+}</component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 3
+}</component>
+  <component name="ProjectId" id="36FGWIHMyTtpwrfGafuzkiNUJ37" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/zakar/axelor-LVME&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="RunManager">
+    <configuration default="true" type="JetRunConfigurationType">
+      <module name="axelor-LVME" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
+      <module name="axelor-LVME" />
+      <option name="filePath" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-9823dce3aa75-28b599e66164-intellij.indexing.shared.core-IU-242.24807.4" />
+        <option value="bundled-js-predefined-d6986cc7102b-5c90d61e3bab-JavaScript-IU-242.24807.4" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="b99263ab-4a5f-43a9-9375-bc608fabb1a9" name="Changes" comment="" />
+      <created>1764594935802</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1764594935802</updated>
+      <workItem from="1764594937357" duration="8326000" />
+      <workItem from="1764664481686" duration="39000" />
+      <workItem from="1764664568295" duration="514000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>
