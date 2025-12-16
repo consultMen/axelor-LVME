@@ -5,16 +5,17 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b99263ab-4a5f-43a9-9375-bc608fabb1a9" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/open-suite-webapp/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/open-suite-webapp/build.gradle" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/open-suite-webapp/gradle.properties" beforeDir="false" afterPath="$PROJECT_DIR$/open-suite-webapp/gradle.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/open-suite-webapp" beforeDir="false" afterPath="$PROJECT_DIR$/open-suite-webapp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/open-suite-webapp/modules/axelor-open-suite" beforeDir="false" afterPath="$PROJECT_DIR$/open-suite-webapp/modules/axelor-open-suite" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/open-suite-webapp/modules/axelor-open-suite/axelor-purchase/src/main/java/com/axelor/apps/purchase/service/PurchaseOrderLineServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/open-suite-webapp/modules/axelor-open-suite/axelor-purchase/src/main/java/com/axelor/apps/purchase/service/PurchaseOrderLineServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/open-suite-webapp/modules/axelor-open-suite/axelor-purchase/src/main/java/com/axelor/apps/purchase/web/PurchaseOrderLineController.java" beforeDir="false" afterPath="$PROJECT_DIR$/open-suite-webapp/modules/axelor-open-suite/axelor-purchase/src/main/java/com/axelor/apps/purchase/web/PurchaseOrderLineController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/open-suite-webapp/modules/axelor-open-suite/axelor-purchase/src/main/resources/domains/PurchaseOrderLine.xml" beforeDir="false" afterPath="$PROJECT_DIR$/open-suite-webapp/modules/axelor-open-suite/axelor-purchase/src/main/resources/domains/PurchaseOrderLine.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/open-suite-webapp/modules/axelor-open-suite/axelor-purchase/src/main/resources/views/PurchaseOrderLine.xml" beforeDir="false" afterPath="$PROJECT_DIR$/open-suite-webapp/modules/axelor-open-suite/axelor-purchase/src/main/resources/views/PurchaseOrderLine.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/open-suite-webapp/modules/axelor-open-suite/axelor-purchase/src/main/resources/views/Selects.xml" beforeDir="false" afterPath="$PROJECT_DIR$/open-suite-webapp/modules/axelor-open-suite/axelor-purchase/src/main/resources/views/Selects.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/open-suite-webapp/modules/axelor-open-suite/axelor-stock/src/main/resources/domains/StockMove.xml" beforeDir="false" afterPath="$PROJECT_DIR$/open-suite-webapp/modules/axelor-open-suite/axelor-stock/src/main/resources/domains/StockMove.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/open-suite-webapp/modules/axelor-open-suite/axelor-stock/src/main/resources/views/Selects.xml" beforeDir="false" afterPath="$PROJECT_DIR$/open-suite-webapp/modules/axelor-open-suite/axelor-stock/src/main/resources/views/Selects.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/open-suite-webapp/modules/axelor-open-suite/axelor-stock/src/main/resources/views/StockMove.xml" beforeDir="false" afterPath="$PROJECT_DIR$/open-suite-webapp/modules/axelor-open-suite/axelor-stock/src/main/resources/views/StockMove.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/open-suite-webapp/settings.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/open-suite-webapp/settings.gradle" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/open-suite-webapp/src/main/resources/axelor-config.properties" beforeDir="false" afterPath="$PROJECT_DIR$/open-suite-webapp/src/main/resources/axelor-config.properties" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -41,7 +42,7 @@
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;git-widget-placeholder&quot;: &quot;master&quot;,
     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/zakar/axelor-LVME&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/zakar/OneDrive - Université Côte d'Azur/Bureau/support TD Note GR2&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
@@ -83,7 +84,12 @@
       <updated>1764594935802</updated>
       <workItem from="1764594937357" duration="8326000" />
       <workItem from="1764664481686" duration="39000" />
-      <workItem from="1764664568295" duration="514000" />
+      <workItem from="1764664568295" duration="20109000" />
+      <workItem from="1764758561851" duration="1622000" />
+      <workItem from="1765200440752" duration="19860000" />
+      <workItem from="1765359224265" duration="1967000" />
+      <workItem from="1765464634497" duration="167000" />
+      <workItem from="1765800058488" duration="27346000" />
     </task>
     <servers />
   </component>
