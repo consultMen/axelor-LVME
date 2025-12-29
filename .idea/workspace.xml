@@ -5,10 +5,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b99263ab-4a5f-43a9-9375-bc608fabb1a9" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/copilot.data.migration.agent.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/axelor-LVME.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/axelor-LVME.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/open-suite-webapp" beforeDir="false" afterPath="$PROJECT_DIR$/open-suite-webapp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/open-suite-webapp/modules/axelor-open-suite" beforeDir="false" afterPath="$PROJECT_DIR$/open-suite-webapp/modules/axelor-open-suite" afterDir="false" />
@@ -85,7 +81,7 @@
       <workItem from="1765464634497" duration="167000" />
       <workItem from="1765800058488" duration="30457000" />
       <workItem from="1765976035082" duration="765000" />
-      <workItem from="1766335853159" duration="41299000" />
+      <workItem from="1766335853159" duration="44446000" />
     </task>
     <servers />
   </component>
