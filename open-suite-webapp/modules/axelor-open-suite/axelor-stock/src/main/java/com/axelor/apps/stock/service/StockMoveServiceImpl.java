@@ -182,6 +182,7 @@ public class StockMoveServiceImpl implements StockMoveService {
     }
     stockMove.setNote(note);
     stockMove.setIsIspmRequired(stockMoveToolService.getDefaultISPM(clientPartner, toAddress));
+    stockMove.setIsIspmRequired(stockMoveToolService.getDefaultISPM(clientPartner, toAddress));
 
     return stockMove;
   }
@@ -364,11 +365,11 @@ public class StockMoveServiceImpl implements StockMoveService {
 
     switch (stockMove.getStatusSelect()) {
       case StockMoveRepository.STATUS_DRAFT:
-        stockMove.setNature(Nature.EN_COURS_DE_PRODUCTION);
+        stockMove.setNature(Nature.DRAFT);
         break;
 
       case StockMoveRepository.STATUS_PLANNED:
-        stockMove.setNature(Nature.FLOTTANT);
+        stockMove.setNature(Nature.EN_COURS_DE_PRODUCTION);
         break;
 
       case StockMoveRepository.STATUS_REALIZED:
@@ -926,7 +927,7 @@ public class StockMoveServiceImpl implements StockMoveService {
     reverseStockMoveLineStockLocation(stockMove, newStockMoveLineList);
 
     fillNewStockMoveFields(newStockMove, stockMove);
-
+    syncNatureFromStatus(newStockMove);
     return Optional.of(stockMoveRepo.save(newStockMove));
   }
 

@@ -191,6 +191,7 @@
 
   </enum>
   <enum name="Nature" numeric="true">
+    <item name="DRAFT" value="0"/>
     <item name="EN_COURS_DE_PRODUCTION" value="1"/>
     <item name="FLOTTANT" value="2"/>
     <item name="REEL" value="3"/>

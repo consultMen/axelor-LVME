@@ -29,8 +29,8 @@
 
     <many-to-one name="team" ref="com.axelor.team.db.Team" title="Team"/>
     <many-to-one name="buyerUser" ref="com.axelor.auth.db.User" title="Buyer"/>
-    <many-to-one name="currency" ref="com.axelor.apps.base.db.Currency" title="Currency"
-      required="true"/>
+    <many-to-one name="currency" ref="com.axelor.apps.base.db.Currency"
+      title="Devise comptabe" required="true"/>
     <date name="estimatedReceiptDate" title="Estimated receipt date"/>
     <date name="orderDate" title="Order Date"/>
     <one-to-many name="purchaseOrderLineList" mappedBy="purchaseOrder"
@@ -89,6 +89,8 @@
     <many-to-one name="printingSettings" ref="com.axelor.apps.base.db.PrintingSettings"/>
     <boolean name="groupProductsOnPrintings" title="Group products on printings"
       default="false"/>
+    <date name="supplierShipmentDate" title="Supplier shipment date"/>
+
 
     <many-to-one name="companyCurrency" transient="true"
       ref="com.axelor.apps.base.db.Currency">
