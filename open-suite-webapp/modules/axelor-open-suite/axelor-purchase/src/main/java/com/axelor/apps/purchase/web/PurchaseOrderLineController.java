@@ -291,31 +291,37 @@ public class PurchaseOrderLineController {
   public void computePackaging(ActionRequest request, ActionResponse response) {
 
     PurchaseOrderLine line = request.getContext().asType(PurchaseOrderLine.class);
-
     Conditionnement c = line.getConditionnement();
+
     BigDecimal nbColis = line.getNbColis() == null ? BigDecimal.ZERO : line.getNbColis();
 
     if (c == null) {
       response.setValue("poidsParColis", BigDecimal.ZERO);
+      response.setValue("poidsParColisNet", BigDecimal.ZERO);
       response.setValue("nbUnitesParColis", BigDecimal.ZERO);
+      response.setValue("coefPoidsNet", BigDecimal.ONE);
       response.setValue("qty", BigDecimal.ZERO);
       response.setValue("unitesTot", BigDecimal.ZERO);
+      response.setValue("poidsTotalNet", BigDecimal.ZERO);
       return;
     }
-
-    // Adapt these getters to YOUR Conditionnement fields names
     BigDecimal poidsParColis =
         c.getPoidsParColis() == null ? BigDecimal.ZERO : c.getPoidsParColis();
     BigDecimal nbUnitesParColis =
         c.getUnitesParColis() == null ? BigDecimal.ZERO : c.getUnitesParColis();
-
-    BigDecimal poidsTotal = nbColis.multiply(poidsParColis).setScale(2, RoundingMode.HALF_UP);
+    BigDecimal coefPoidsNet = c.getCoefPoidsNet() == null ? BigDecimal.ONE : c.getCoefPoidsNet();
+    BigDecimal poidsTotalBrut = nbColis.multiply(poidsParColis).setScale(2, RoundingMode.HALF_UP);
     BigDecimal unitesTot = nbColis.multiply(nbUnitesParColis).setScale(2, RoundingMode.HALF_UP);
-
+    BigDecimal poidsParColisNet =
+        poidsParColis.multiply(coefPoidsNet).setScale(3, RoundingMode.HALF_UP);
+    BigDecimal poidsTotalNet = nbColis.multiply(poidsParColisNet).setScale(3, RoundingMode.HALF_UP);
     response.setValue("poidsParColis", poidsParColis);
     response.setValue("nbUnitesParColis", nbUnitesParColis);
-    response.setValue("qty", poidsTotal);
+    response.setValue("coefPoidsNet", coefPoidsNet);
+    response.setValue("poidsParColisNet", poidsParColisNet);
+    response.setValue("qty", poidsTotalBrut);
     response.setValue("unitesTot", unitesTot);
+    response.setValue("poidsTotalNet", poidsTotalNet);
   }
 
   public PurchaseOrder getPurchaseOrder(Context context) {

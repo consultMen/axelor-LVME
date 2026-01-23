@@ -141,9 +141,11 @@ public class StockMoveLineServiceSupplychainImpl extends StockMoveLineServiceImp
 
     sml.setNbColis(pol.getNbColis());
     sml.setPoidsParColis(pol.getPoidsParColis());
+    sml.setPoidsParColisNet(pol.getPoidsParColisNet());
+    sml.setCoefPoidsNet(pol.getCoefPoidsNet());
+    sml.setPoidsTotalNet(pol.getPoidsTotalNet());
     sml.setNbUnitesParColis(pol.getNbUnitesParColis());
     sml.setUnitesTot(pol.getUnitesTot());
-
     sml.setFraisApprocheKg(pol.getFraisApprocheKg());
     sml.setPrKg(pol.getPrKg());
     sml.setPaDevise(pol.getPaDevise());

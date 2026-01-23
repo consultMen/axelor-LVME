@@ -218,6 +218,20 @@ public class StockMoveServiceSupplychainImpl extends StockMoveServiceImpl
     return newStockSeq;
   }
 
+  private void copyHeaderFieldsFromPurchase(StockMove stockMove) {
+
+    if (stockMove == null || stockMove.getPurchaseOrderSet() == null) {
+      return;
+    }
+    PurchaseOrder purchaseOrder = stockMove.getPurchaseOrderSet().stream().findFirst().orElse(null);
+
+    if (purchaseOrder == null) {
+      return;
+    }
+
+    stockMove.setSupplierShipmentDate(purchaseOrder.getSupplierShipmentDate());
+  }
+
   protected void updateFixedAssets(StockMove stockMove) {
     List<StockMoveLine> stockMoveLineList =
         stockMove.getStockMoveLineList().stream()
@@ -677,7 +691,7 @@ public class StockMoveServiceSupplychainImpl extends StockMoveServiceImpl
             estimatedDate,
             note,
             typeSelect);
-
+    copyHeaderFieldsFromPurchase(stockMove);
     if (appAccountService.isApp("account")
         && pfpService.isManagePassedForPayment(company)
         && stockMove.getTypeSelect() == StockMoveRepository.TYPE_INCOMING

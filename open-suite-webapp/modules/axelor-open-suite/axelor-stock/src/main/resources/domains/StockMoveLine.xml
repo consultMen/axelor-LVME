@@ -55,9 +55,13 @@
     <decimal name="nbColis" title="Nb colis" precision="20" scale="3" default="0"/>
     <decimal name="poidsParColis" title="Poids/colis (Kg)" precision="20" scale="3"
       default="0"/>
+    <decimal name="poidsParColisNet" title="Poids/colis-NET (Kg)" precision="20" scale="3"/>
+    <decimal name="coefPoidsNet" title="Coefficient poids net" precision="10" scale="4"
+      default="1"/>
+    <decimal name="poidsTotalNet" title="Poids total net (Kg)" precision="20" scale="3"/>
     <decimal name="nbUnitesParColis" title="Nb unités/colis" precision="20" scale="3"
       default="0"/>
-    <decimal name="unitesTot" title="Unités Tot" precision="20" scale="3" default="0"/>
+    <decimal name="unitesTot" title="Unités Total" precision="20" scale="3" default="0"/>
 
     <!-- Cost / purchase metrics (optional in receipt UI, but you asked for them) -->
     <decimal name="fraisApprocheKg" title="Frais d'approche au kg" precision="20" scale="10"

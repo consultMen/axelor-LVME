@@ -89,7 +89,7 @@
     <many-to-one name="printingSettings" ref="com.axelor.apps.base.db.PrintingSettings"/>
     <boolean name="groupProductsOnPrintings" title="Group products on printings"
       default="false"/>
-    <date name="supplierShipmentDate" title="Supplier shipment date"/>
+    <date name="supplierShipmentDate" title="Heure réelle d'arrivée"/>
 
 
     <many-to-one name="companyCurrency" transient="true"
