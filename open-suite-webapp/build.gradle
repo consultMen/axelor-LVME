@@ -47,10 +47,9 @@ ext {
 }
 ext {
     axelorBiVersion = '3.3.0'
-    axelorConnectVersion = '3.0.0' // Replace with actual version
-    axelorOffice365Version = '8.2.0' // Replace with actual version
-    axelorAdminVersion = '6.5.48' // Replace with actual version
-    // Add other modules as needed
+    axelorConnectVersion = '3.0.0'
+    axelorOffice365Version = '8.2.0'
+    axelorAdminVersion = '6.5.48'
 }
 
 tasks.withType(PublishToMavenRepository).configureEach { it.enabled = false }
