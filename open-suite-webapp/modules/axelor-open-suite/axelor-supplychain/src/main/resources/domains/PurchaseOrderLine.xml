@@ -36,6 +36,11 @@
     <many-to-one name="stockLocation" ref="com.axelor.apps.stock.db.StockLocation"
       title="Stock location"/>
 
+    <decimal name="qtyAllocatedToSales" readonly="true" precision="20" scale="4"
+      title="Qté allouée aux ventes" default="0"/>
+    <decimal name="qtyAvailableToPromise" readonly="true" precision="20" scale="4"
+      title="ATP disponible"/>
+
     <extra-code>
   		<![CDATA[
 

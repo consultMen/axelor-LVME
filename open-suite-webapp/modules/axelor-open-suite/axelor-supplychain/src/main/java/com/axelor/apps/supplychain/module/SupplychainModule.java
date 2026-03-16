@@ -188,6 +188,8 @@ import com.axelor.apps.supplychain.service.ReservedQtyService;
 import com.axelor.apps.supplychain.service.ReservedQtyServiceImpl;
 import com.axelor.apps.supplychain.service.SaleInvoicingStateService;
 import com.axelor.apps.supplychain.service.SaleInvoicingStateServiceImpl;
+import com.axelor.apps.supplychain.service.SaleOrderLineArrivageService;
+import com.axelor.apps.supplychain.service.SaleOrderLineArrivageServiceImpl;
 import com.axelor.apps.supplychain.service.ShippingService;
 import com.axelor.apps.supplychain.service.ShippingServiceImpl;
 import com.axelor.apps.supplychain.service.StockCorrectionServiceSupplychainImpl;
@@ -324,6 +326,8 @@ import com.axelor.apps.supplychain.service.saleorderline.view.SaleOrderLineOnSal
 import com.axelor.apps.supplychain.service.saleorderline.view.SaleOrderLineOnSaleSupplyChangeServiceImpl;
 import com.axelor.apps.supplychain.service.saleorderline.view.SaleOrderLineSupplychainOnLoadService;
 import com.axelor.apps.supplychain.service.saleorderline.view.SaleOrderLineSupplychainOnLoadServiceImpl;
+import com.axelor.apps.supplychain.service.saleorderline.view.SaleOrderLineSupplychainOnNewService;
+import com.axelor.apps.supplychain.service.saleorderline.view.SaleOrderLineSupplychainOnNewServiceImpl;
 import com.axelor.apps.supplychain.service.saleorderline.view.SaleOrderLineViewSupplychainService;
 import com.axelor.apps.supplychain.service.saleorderline.view.SaleOrderLineViewSupplychainServiceImpl;
 import com.axelor.apps.supplychain.service.workflow.WorkflowCancelServiceSupplychainImpl;
@@ -492,6 +496,8 @@ public class SupplychainModule extends AxelorModule {
         .to(SaleOrderLineDomainSupplychainServiceImpl.class);
     bind(SaleOrderLineSupplychainOnLoadService.class)
         .to(SaleOrderLineSupplychainOnLoadServiceImpl.class);
+    bind(SaleOrderLineSupplychainOnNewService.class)
+        .to(SaleOrderLineSupplychainOnNewServiceImpl.class);
     bind(SaleOrderLineOnSaleSupplyChangeService.class)
         .to(SaleOrderLineOnSaleSupplyChangeServiceImpl.class);
     bind(SaleOrderTaxNumberService.class).to(SaleOrderTaxNumberServiceImpl.class);
@@ -538,5 +544,6 @@ public class SupplychainModule extends AxelorModule {
 
     bind(AnalyticMoveLineParentServiceImpl.class)
         .to(AnalyticMoveLineParentSupplychainServiceImpl.class);
+    bind(SaleOrderLineArrivageService.class).to(SaleOrderLineArrivageServiceImpl.class);
   }
 }

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<object-views xmlns="http://axelor.com/xml/ns/object-views"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://axelor.com/xml/ns/object-views http://axelor.com/xml/ns/object-views/object-views_7.4.xsd">
+
+  <grid name="sale-order-line-arrivage-grid" title="Arrivages"
+    model="com.axelor.apps.supplychain.db.SaleOrderLineArrivage">
+    <field name="purchaseOrderLine.purchaseOrder.purchaseOrderSeq" readonly="true"
+      title="N° Commande Achat"/>
+    <field name="purchaseOrderLine.supplierPartner" readonly="true" title="Fournisseur"/>
+    <field name="purchaseOrderLine.estimatedReceiptDate" readonly="true"
+      title="Date arrivage estimée"/>
+    <field name="purchaseOrderLine.qty" readonly="true" title="Qté commandée"/>
+    <field name="purchaseOrderLine.receivedQty" readonly="true" title="Qté reçue"/>
+    <field name="purchaseOrderLine.qtyAvailableToPromise" readonly="true" title="ATP"/>
+    <field name="qtyAllocated" x-scale="4"/>
+    <field name="qtyReceived" readonly="true" x-scale="4"/>
+  </grid>
+
+  <form name="sale-order-line-arrivage-form" title="Arrivage"
+    model="com.axelor.apps.supplychain.db.SaleOrderLineArrivage">
+    <panel name="mainPanel">
+      <field name="purchaseOrderLine" title="Ligne commande achat" canEdit="false"
+        grid-view="purchase-order-line-grid" form-view="purchase-order-line-form"/>
+      <field name="qtyAllocated" title="Qté allouée"/>
+      <field name="qtyReceived" title="Qté reçue" readonly="true"/>
+    </panel>
+  </form>
+
+  <form name="sale-order-line-add-arrivage-wizard" title="Ajouter un arrivage"
+    model="com.axelor.apps.supplychain.db.SaleOrderLineArrivage">
+    <panel name="mainPanel">
+      <field name="purchaseOrderLine" title="Commande achat (arrivage)" colSpan="12"
+        domain="self.product.id = :_productId AND self.purchaseOrder.statusSelect IN (2,3,4) AND self.qtyAvailableToPromise > 0"
+        grid-view="purchase-order-line-grid" form-view="purchase-order-line-form"/>
+      <field name="qtyAllocated" title="Qté à allouer" colSpan="6" min="0"/>
+      <field name="saleOrderLine" hidden="true"/>
+      <button name="validateBtn" title="Valider" colSpan="6"
+        onClick="action-sale-order-line-arrivage-add,close"/>
+    </panel>
+  </form>
+
+  <!-- ACTION VIEW -->
+
+  <action-view name="action-view-sale-order-line-add-arrivage"
+    title="Ajouter un arrivage" model="com.axelor.apps.supplychain.db.SaleOrderLineArrivage">
+    <view type="form" name="sale-order-line-add-arrivage-wizard"/>
+    <view-param name="popup" value="reload"/>
+    <view-param name="forceEdit" value="true"/>
+    <view-param name="show-confirm" value="false"/>
+    <view-param name="show-toolbar" value="false"/>
+    <context name="_productId" expr="eval: product?.id"/>
+    <context name="_saleOrderLineId" expr="eval: id"/>
+  </action-view>
+
+  <!-- ACTION METHOD -->
+
+  <action-method name="action-sale-order-line-arrivage-add">
+    <call class="com.axelor.apps.supplychain.web.SaleOrderLineArrivageController"
+      method="addArrivage"/>
+  </action-method>
+
+  <action-method name="action-sale-order-line-arrivage-transfer-to-stock">
+    <call class="com.axelor.apps.supplychain.web.SaleOrderLineArrivageController"
+      method="transferArrivagesToStock"/>
+  </action-method>
+
+</object-views>

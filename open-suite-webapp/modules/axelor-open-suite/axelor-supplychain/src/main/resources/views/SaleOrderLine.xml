@@ -85,6 +85,28 @@
         </panel>
       </insert>
     </extend>
+    <!-- insérTION dans informationsPanel -->
+    <extend target="//panel[@name='informationsPanel']">
+      <insert position="inside">
+        <panel name="stockPhysiquePanel" title="Stock Physique Disponible" colSpan="12"
+          showIf="product != null">
+          <field name="availableStatus" widget="badge" colSpan="3" readonly="true"/>
+          <field name="qtyFromStock" colSpan="6"
+            onChange="action-sale-order-line-on-qty-from-stock-change"/>
+          <panel-dashlet name="stockLocationDashlet" colSpan="12" height="200"
+            action="action-view-stock-location-line-for-product" canSearch="true"/>
+        </panel>
+        <panel name="arrivagesPanel" title="Arrivages (Commandes Achat)" colSpan="12"
+          showIf="product != null">
+          <field name="qtyFromArrivage" readonly="true" colSpan="5"/>
+          <panel-related name="saleOrderLineArrivageListPanel"
+            field="saleOrderLineArrivageList" grid-view="sale-order-line-arrivage-grid"
+            form-view="sale-order-line-add-arrivage-wizard" colSpan="12" canNew="true"
+            canRemove="true" onChange="action-sale-order-line-arrivage-recompute"/>
+        </panel>
+
+      </insert>
+    </extend>
   </form>
 
   <form name="sale-order-line-template-form" id="supplychain-sale-order-line-template-form"
@@ -397,5 +419,30 @@
     <call class="com.axelor.apps.supplychain.web.SaleOrderLineController"
       method="setDistributionLineReadonly"/>
   </action-method>
+
+  <!-- ACTION VIEW -->
+
+  <action-view name="action-view-stock-location-line-for-product"
+    title="Stock par emplacement" model="com.axelor.apps.stock.db.StockLocationLine">
+    <view type="grid" name="stock-location-line-product-grid"/>
+    <view type="form" name="stock-location-line-product-form"/>
+    <domain>self.product.id = :_productId AND self.stockLocation.typeSelect != 3
+      AND self.currentQty
+      > 0</domain>
+    <context name="_productId" expr="eval: product?.id"/>
+  </action-view>
+
+  <!-- ACTION METHOD -->
+
+  <action-method name="action-sale-order-line-on-qty-from-stock-change">
+    <call class="com.axelor.apps.supplychain.web.SaleOrderLineArrivageController"
+      method="onQtyFromStockChange"/>
+  </action-method>
+
+  <action-method name="action-sale-order-line-arrivage-recompute">
+    <call class="com.axelor.apps.supplychain.web.SaleOrderLineArrivageController"
+      method="recomputeQties"/>
+  </action-method>
+
 
 </object-views>

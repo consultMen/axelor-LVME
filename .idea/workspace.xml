@@ -4,30 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b99263ab-4a5f-43a9-9375-bc608fabb1a9" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/open-suite-webapp" beforeDir="false" afterPath="$PROJECT_DIR$/open-suite-webapp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/open-suite-webapp/modules/axelor-open-suite" beforeDir="false" afterPath="$PROJECT_DIR$/open-suite-webapp/modules/axelor-open-suite" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/open-suite-webapp/modules/axelor-open-suite/axelor-purchase/src/main/java/com/axelor/apps/purchase/service/PurchaseOrderLineServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/open-suite-webapp/modules/axelor-open-suite/axelor-purchase/src/main/java/com/axelor/apps/purchase/service/PurchaseOrderLineServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/open-suite-webapp/modules/axelor-open-suite/axelor-purchase/src/main/java/com/axelor/apps/purchase/web/PurchaseOrderLineController.java" beforeDir="false" afterPath="$PROJECT_DIR$/open-suite-webapp/modules/axelor-open-suite/axelor-purchase/src/main/java/com/axelor/apps/purchase/web/PurchaseOrderLineController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/open-suite-webapp/modules/axelor-open-suite/axelor-purchase/src/main/resources/domains/PurchaseOrderLine.xml" beforeDir="false" afterPath="$PROJECT_DIR$/open-suite-webapp/modules/axelor-open-suite/axelor-purchase/src/main/resources/domains/PurchaseOrderLine.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/open-suite-webapp/modules/axelor-open-suite/axelor-purchase/src/main/resources/views/PurchaseOrderLine.xml" beforeDir="false" afterPath="$PROJECT_DIR$/open-suite-webapp/modules/axelor-open-suite/axelor-purchase/src/main/resources/views/PurchaseOrderLine.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/open-suite-webapp/modules/axelor-open-suite/axelor-purchase/src/main/resources/views/Selects.xml" beforeDir="false" afterPath="$PROJECT_DIR$/open-suite-webapp/modules/axelor-open-suite/axelor-purchase/src/main/resources/views/Selects.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/open-suite-webapp/modules/axelor-open-suite/axelor-stock/src/main/java/com/axelor/apps/stock/service/StockMoveServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/open-suite-webapp/modules/axelor-open-suite/axelor-stock/src/main/java/com/axelor/apps/stock/service/StockMoveServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/open-suite-webapp/modules/axelor-open-suite/axelor-stock/src/main/resources/domains/StockMove.xml" beforeDir="false" afterPath="$PROJECT_DIR$/open-suite-webapp/modules/axelor-open-suite/axelor-stock/src/main/resources/domains/StockMove.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/open-suite-webapp/modules/axelor-open-suite/axelor-stock/src/main/resources/domains/StockMoveLine.xml" beforeDir="false" afterPath="$PROJECT_DIR$/open-suite-webapp/modules/axelor-open-suite/axelor-stock/src/main/resources/domains/StockMoveLine.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/open-suite-webapp/modules/axelor-open-suite/axelor-stock/src/main/resources/views/Selects.xml" beforeDir="false" afterPath="$PROJECT_DIR$/open-suite-webapp/modules/axelor-open-suite/axelor-stock/src/main/resources/views/Selects.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/open-suite-webapp/modules/axelor-open-suite/axelor-stock/src/main/resources/views/StockMove.xml" beforeDir="false" afterPath="$PROJECT_DIR$/open-suite-webapp/modules/axelor-open-suite/axelor-stock/src/main/resources/views/StockMove.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/open-suite-webapp/modules/axelor-open-suite/axelor-supplychain/src/main/java/com/axelor/apps/supplychain/service/PurchaseOrderStockServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/open-suite-webapp/modules/axelor-open-suite/axelor-supplychain/src/main/java/com/axelor/apps/supplychain/service/PurchaseOrderStockServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/open-suite-webapp/modules/axelor-open-suite/axelor-supplychain/src/main/java/com/axelor/apps/supplychain/service/StockMoveLineServiceSupplychainImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/open-suite-webapp/modules/axelor-open-suite/axelor-supplychain/src/main/java/com/axelor/apps/supplychain/service/StockMoveLineServiceSupplychainImpl.java" afterDir="false" />
-    </list>
+    <list default="true" id="b99263ab-4a5f-43a9-9375-bc608fabb1a9" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="Git.Settings">
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/open-suite-webapp/modules/axelor-open-suite" />
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="KubernetesApiPersistence">{}</component>
   <component name="KubernetesApiProvider">{
@@ -45,9 +29,9 @@
   &quot;keyToString&quot;: {
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/zakar/OneDrive - Université Côte d'Azur/Bureau/support TD Note GR2&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/zakar/Downloads/axelor-LVME&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
@@ -56,6 +40,11 @@
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\zakar\Downloads\axelor-LVME" />
+    </key>
+  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -82,6 +71,10 @@
       <workItem from="1765800058488" duration="30457000" />
       <workItem from="1765976035082" duration="765000" />
       <workItem from="1766335853159" duration="44446000" />
+      <workItem from="1772462589972" duration="3191000" />
+      <workItem from="1772928101880" duration="42684000" />
+      <workItem from="1773243860206" duration="9047000" />
+      <workItem from="1773669157188" duration="13280000" />
     </task>
     <servers />
   </component>

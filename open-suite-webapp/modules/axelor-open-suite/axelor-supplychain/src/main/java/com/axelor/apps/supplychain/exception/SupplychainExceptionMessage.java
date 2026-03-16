@@ -426,4 +426,13 @@ public final class SupplychainExceptionMessage {
 
   public static final String SALE_ORDER_ESTIMATED_SHIPPING_DATE_NOT_UPDATED = /*$$(*/
       "Warning : Estimated shipping date isn't updated due to pricing set on sale order." /*)*/;
+
+  public static final String ARRIVAGE_QTY_EXCEEDS_ATP = /*$$(*/
+      "La quantité demandée (%s) dépasse l'ATP disponible (%s) sur cette commande achat." /*)*/;
+
+  public static final String ARRIVAGE_QTY_EXCEEDS_SOL_QTY = /*$$(*/
+      "Le total alloué depuis les arrivages dépasse la quantité de la ligne de vente." /*)*/;
+
+  public static final String ARRIVAGE_COVERAGE_CONSTRAINT = /*$$(*/
+      "Stock (%s) + Arrivages (%s) ≠ quantité totale (%s). Ligne : %s" /*)*/;
 }

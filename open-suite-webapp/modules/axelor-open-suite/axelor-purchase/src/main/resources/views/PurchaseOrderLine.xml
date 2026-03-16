@@ -329,6 +329,25 @@
     <panel-include view="purchase-order-line-form"/>
   </form>
 
+  <grid name="purchase-order-line-mini-grid" title="PO lines (sélection légère)"
+    model="com.axelor.apps.purchase.db.PurchaseOrderLine" canNew="false" canDelete="false"
+    canEdit="false">
+    <field name="purchaseOrder.purchaseOrderSeq" width="120"/>
+    <field name="purchaseOrder.supplierPartner" form-view="partner-form"
+      grid-view="partner-grid"/>
+    <field name="productCode"/>
+    <field name="product.code" title="Code" width="120"/>
+    <field name="productName"/>
+    <field name="qty" aggregate="sum" x-scale="$nbDecimalDigitForQty"/>
+    <field name="unit" form-view="unit-form" grid-view="unit-grid"/>
+    <!-- note: conditionnement intentionally omitted to avoid serialisation issues in wizard -->
+    <field name="priceDiscounted" title="Unit price W.T." x-scale="2"/>
+    <field name="purchaseOrder.currency"/>
+    <field name="desiredReceiptDate"/>
+    <field name="estimatedReceiptDate"/>
+    <field name="$nbDecimalDigitForQty" hidden="true"/>
+  </grid>
+
   <!-- ACTION VIEW -->
 
   <action-view name="action-purchase-order-line-view-show-invoice-lines"

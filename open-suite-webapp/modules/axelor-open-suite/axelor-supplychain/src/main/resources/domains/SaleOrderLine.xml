@@ -63,7 +63,13 @@
       title="Delivery blocking done by"/>
     <string name="commentDeliveryBlocking" title="Blocking comment for delivery" large="true"/>
 
-
+    <decimal name="qtyFromStock" min="0" precision="20" scale="4"
+      title="Qté depuis stock physique" default="0"/>
+    <decimal name="qtyFromArrivage" readonly="true" precision="20" scale="4"
+      title="Qté depuis arrivages" default="0"/>
+    <one-to-many name="saleOrderLineArrivageList"
+      ref="com.axelor.apps.supplychain.db.SaleOrderLineArrivage" mappedBy="saleOrderLine"
+      title="Allocations arrivages"/>
 
     <extra-code>
   		<![CDATA[
