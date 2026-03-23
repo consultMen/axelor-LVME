@@ -48,6 +48,7 @@ import com.axelor.apps.stock.service.app.AppStockService;
 import com.axelor.apps.stock.service.config.StockConfigService;
 import com.axelor.apps.supplychain.service.PartnerSupplychainService;
 import com.axelor.apps.supplychain.service.ReservedQtyService;
+import com.axelor.apps.supplychain.service.SaleOrderLineArrivageService;
 import com.axelor.apps.supplychain.service.StockMoveLineServiceSupplychain;
 import com.axelor.apps.supplychain.service.StockMoveServiceSupplychainImpl;
 import com.axelor.apps.supplychain.service.app.AppSupplychainService;
@@ -85,6 +86,7 @@ public class StockMoveServiceProductionImpl extends StockMoveServiceSupplychainI
       PfpService pfpService,
       SaleOrderConfirmService saleOrderConfirmService,
       StockMoveLineServiceSupplychain stockMoveLineServiceSupplychain,
+      SaleOrderLineArrivageService saleOrderLineArrivageService,
       SaleOrderLineRepository saleOrderLineRepository) {
     super(
         stockMoveLineService,
@@ -108,7 +110,8 @@ public class StockMoveServiceProductionImpl extends StockMoveServiceSupplychainI
         fixedAssetRepository,
         pfpService,
         saleOrderConfirmService,
-        stockMoveLineServiceSupplychain);
+        stockMoveLineServiceSupplychain,
+        saleOrderLineArrivageService);
     this.saleOrderLineRepository = saleOrderLineRepository;
   }
 

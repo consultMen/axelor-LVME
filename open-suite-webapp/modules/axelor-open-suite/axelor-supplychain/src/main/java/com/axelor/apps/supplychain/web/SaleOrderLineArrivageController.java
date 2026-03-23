@@ -2,11 +2,11 @@ package com.axelor.apps.supplychain.web;
 
 import com.axelor.apps.base.service.exception.TraceBackService;
 import com.axelor.apps.purchase.db.PurchaseOrderLine;
-import com.axelor.apps.purchase.db.repo.PurchaseOrderLineRepository;
 import com.axelor.apps.sale.db.SaleOrderLine;
 import com.axelor.apps.sale.db.repo.SaleOrderLineRepository;
 import com.axelor.apps.stock.db.StockMove;
 import com.axelor.apps.stock.db.StockMoveLine;
+import com.axelor.apps.stock.db.repo.StockMoveLineStockRepository;
 import com.axelor.apps.stock.db.repo.StockMoveRepository;
 import com.axelor.apps.supplychain.db.SaleOrderLineArrivage;
 import com.axelor.apps.supplychain.service.ReservedQtyService;
@@ -24,19 +24,32 @@ public class SaleOrderLineArrivageController {
     try {
       SaleOrderLineArrivage arrivage = request.getContext().asType(SaleOrderLineArrivage.class);
 
-      // POL sélectionnée dans le wizard → find depuis repo
-      PurchaseOrderLine pol =
-          Beans.get(PurchaseOrderLineRepository.class)
-              .find(arrivage.getPurchaseOrderLine().getId());
+      // SML sélectionnée dans le wizard
+      Object smlObj = request.getContext().get("stockMoveLine");
+      if (smlObj == null) {
+        response.setError("Veuillez sélectionner une ligne BR.");
+        return;
+      }
 
-      // SOL parente via _saleOrderLineId passé dans le contexte du popup
+      Long smlId = Long.parseLong(((java.util.Map<?, ?>) smlObj).get("id").toString());
+
+      StockMoveLine sml = Beans.get(StockMoveLineStockRepository.class).find(smlId);
+
+      if (sml == null || sml.getPurchaseOrderLine() == null) {
+        response.setError("Ligne BR introuvable ou sans lien avec une commande achat.");
+        return;
+      }
+
+      // Récupérer la POL depuis la SML
+      PurchaseOrderLine pol = sml.getPurchaseOrderLine();
+
+      // SOL parente
       Object solIdObj = request.getContext().get("_saleOrderLineId");
       if (solIdObj == null) {
         response.setError("Veuillez sauvegarder la commande vente avant d'ajouter un arrivage.");
         return;
       }
 
-      // Gérer les cas String, Integer, Long
       Long solId;
       if (solIdObj instanceof Number) {
         solId = ((Number) solIdObj).longValue();

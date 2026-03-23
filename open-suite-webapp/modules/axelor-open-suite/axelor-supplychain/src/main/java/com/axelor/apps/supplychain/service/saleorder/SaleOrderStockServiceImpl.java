@@ -193,7 +193,39 @@ public class SaleOrderStockServiceImpl implements SaleOrderStockService {
         if (saleOrderLineBlockingSupplychainService.isDeliveryBlocked(saleOrderLine)) {
           continue;
         }
-        BigDecimal qty = saleOrderLineServiceSupplyChain.computeUndeliveredQty(saleOrderLine);
+        BigDecimal undelivered =
+            saleOrderLineServiceSupplyChain.computeUndeliveredQty(saleOrderLine);
+        BigDecimal qtyFromStock =
+            saleOrderLine.getQtyFromStock() == null
+                ? BigDecimal.ZERO
+                : saleOrderLine.getQtyFromStock();
+        BigDecimal qtyFromArriv =
+            saleOrderLine.getQtyFromArrivage() == null
+                ? BigDecimal.ZERO
+                : saleOrderLine.getQtyFromArrivage();
+
+        BigDecimal qty;
+        if (qtyFromStock.signum() > 0 || qtyFromArriv.signum() > 0) {
+          // Calculer la qty déjà couverte par les BL existants
+          BigDecimal alreadyPlanned =
+              stockMoveLineRepository
+                  .all()
+                  .filter(
+                      "self.saleOrderLine.id = ?1 AND self.stockMove.statusSelect in (?2,?3)",
+                      saleOrderLine.getId(),
+                      StockMoveRepository.STATUS_DRAFT,
+                      StockMoveRepository.STATUS_PLANNED)
+                  .fetch()
+                  .stream()
+                  .map(StockMoveLine::getQty)
+                  .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+          qty = qtyFromStock.subtract(alreadyPlanned).min(undelivered);
+          if (qty.signum() <= 0) continue;
+        } else {
+          qty = undelivered;
+        }
+
         if (qty.signum() > 0 && !existActiveStockMoveForSaleOrderLine(saleOrderLine)) {
           createStockMoveLine(
               stockMove, saleOrderLine, qty, saleOrder.getStockLocation(), toStockLocation);
@@ -547,8 +579,7 @@ public class SaleOrderStockServiceImpl implements SaleOrderStockService {
   }
 
   protected boolean existActiveStockMoveForSaleOrderLine(SaleOrderLine saleOrderLine) {
-
-    long stockMoveLineCount =
+    List<StockMoveLine> activeLines =
         stockMoveLineRepository
             .all()
             .filter(
@@ -556,9 +587,19 @@ public class SaleOrderStockServiceImpl implements SaleOrderStockService {
                 saleOrderLine.getId(),
                 StockMoveRepository.STATUS_DRAFT,
                 StockMoveRepository.STATUS_PLANNED)
-            .count();
+            .fetch();
 
-    return stockMoveLineCount > 0;
+    if (activeLines.isEmpty()) return false;
+
+    BigDecimal existingQty =
+        activeLines.stream().map(StockMoveLine::getQty).reduce(BigDecimal.ZERO, BigDecimal::add);
+
+    BigDecimal qtyFromStock =
+        saleOrderLine.getQtyFromStock() == null ? BigDecimal.ZERO : saleOrderLine.getQtyFromStock();
+
+    if (qtyFromStock.signum() == 0) return !activeLines.isEmpty();
+
+    return existingQty.compareTo(qtyFromStock) >= 0;
   }
 
   @Override

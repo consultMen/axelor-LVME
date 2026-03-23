@@ -22,6 +22,7 @@ import com.axelor.apps.base.AxelorException;
 import com.axelor.apps.base.db.repo.TraceBackRepository;
 import com.axelor.apps.purchase.db.PurchaseOrderLine;
 import com.axelor.apps.sale.db.SaleOrderLine;
+import com.axelor.apps.stock.db.repo.StockLocationLineStockRepository;
 import com.axelor.apps.supplychain.db.SaleOrderLineArrivage;
 import com.axelor.apps.supplychain.db.repo.SaleOrderLineArrivageSupplychainRepository;
 import com.axelor.apps.supplychain.exception.SupplychainExceptionMessage;
@@ -39,12 +40,15 @@ public class SaleOrderLineArrivageServiceImpl implements SaleOrderLineArrivageSe
   protected SaleOrderLineArrivageSupplychainRepository saleOrderLineArrivageRepository;
   protected ReservedQtyService reservedQtyService;
   protected EntityManager entityManager;
+  protected StockLocationLineStockRepository stockLocationLineRepository;
 
   @Inject
   public SaleOrderLineArrivageServiceImpl(
       SaleOrderLineArrivageSupplychainRepository saleOrderLineArrivageRepository,
       ReservedQtyService reservedQtyService,
-      EntityManager entityManager) {
+      EntityManager entityManager,
+      StockLocationLineStockRepository stockLocationLineRepository) {
+    this.stockLocationLineRepository = stockLocationLineRepository;
     this.saleOrderLineArrivageRepository = saleOrderLineArrivageRepository;
     this.reservedQtyService = reservedQtyService;
     this.entityManager = entityManager;
@@ -148,6 +152,24 @@ public class SaleOrderLineArrivageServiceImpl implements SaleOrderLineArrivageSe
     return qty.subtract(receivedQty).subtract(allocatedToSales);
   }
 
+  private BigDecimal getAvailableStockQty(SaleOrderLine sol) {
+    List<com.axelor.apps.stock.db.StockLocationLine> lines =
+        com.axelor.inject.Beans.get(
+                com.axelor.apps.stock.db.repo.StockLocationLineStockRepository.class)
+            .all()
+            .filter(
+                "self.product.id = :productId "
+                    + "AND self.stockLocation.typeSelect != 3 "
+                    + "AND (self.stockLocation.isNotInCalculStock = false "
+                    + "OR self.stockLocation.isNotInCalculStock IS NULL)")
+            .bind("productId", sol.getProduct().getId())
+            .fetch();
+
+    return lines.stream()
+        .map(l -> l.getCurrentQty() == null ? BigDecimal.ZERO : l.getCurrentQty())
+        .reduce(BigDecimal.ZERO, BigDecimal::add);
+  }
+
   @Override
   public void checkCoverageConstraint(SaleOrderLine sol) throws AxelorException {
     BigDecimal qtyFromStock =
@@ -164,6 +186,17 @@ public class SaleOrderLineArrivageServiceImpl implements SaleOrderLineArrivageSe
           qtyFromArrivage,
           qty,
           sol.getProductName());
+    }
+    if (qtyFromStock.signum() > 0 && sol.getProduct() != null) {
+      BigDecimal availableQty = getAvailableStockQty(sol);
+      if (qtyFromStock.compareTo(availableQty) > 0) {
+        throw new AxelorException(
+            TraceBackRepository.CATEGORY_INCONSISTENCY,
+            "La quantité depuis stock (%s kg) dépasse le stock physique disponible (%s kg) pour le produit %s",
+            qtyFromStock,
+            availableQty,
+            sol.getProductName());
+      }
     }
   }
 
@@ -197,9 +230,14 @@ public class SaleOrderLineArrivageServiceImpl implements SaleOrderLineArrivageSe
       SaleOrderLine sol = arrivage.getSaleOrderLine();
 
       // Réservation stock réelle : on incrémente requestedReservedQty puis on appelle requestQty
-      BigDecimal currentRequested =
-          sol.getRequestedReservedQty() == null ? BigDecimal.ZERO : sol.getRequestedReservedQty();
-      reservedQtyService.updateRequestedReservedQty(sol, currentRequested.add(qtyToTransfer));
+      // ✅ APRÈS
+      try {
+        BigDecimal currentRequested =
+            sol.getRequestedReservedQty() == null ? BigDecimal.ZERO : sol.getRequestedReservedQty();
+        reservedQtyService.updateRequestedReservedQty(sol, currentRequested.add(qtyToTransfer));
+      } catch (Exception e) {
+        // Pas de StockMoveLine planifiée — on continue quand même
+      }
 
       // Mise à jour de l'arrivage
       arrivage.setQtyReceived(

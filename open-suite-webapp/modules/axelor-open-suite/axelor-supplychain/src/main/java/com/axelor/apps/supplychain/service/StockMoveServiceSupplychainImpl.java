@@ -100,6 +100,7 @@ public class StockMoveServiceSupplychainImpl extends StockMoveServiceImpl
   protected PfpService pfpService;
   protected SaleOrderConfirmService saleOrderConfirmService;
   protected StockMoveLineServiceSupplychain stockMoveLineServiceSupplychain;
+  protected SaleOrderLineArrivageService saleOrderLineArrivageService;
 
   @Inject
   public StockMoveServiceSupplychainImpl(
@@ -124,7 +125,8 @@ public class StockMoveServiceSupplychainImpl extends StockMoveServiceImpl
       FixedAssetRepository fixedAssetRepository,
       PfpService pfpService,
       SaleOrderConfirmService saleOrderConfirmService,
-      StockMoveLineServiceSupplychain stockMoveLineServiceSupplychain) {
+      StockMoveLineServiceSupplychain stockMoveLineServiceSupplychain,
+      SaleOrderLineArrivageService saleOrderLineArrivageService) {
     super(
         stockMoveLineService,
         stockMoveToolService,
@@ -148,6 +150,7 @@ public class StockMoveServiceSupplychainImpl extends StockMoveServiceImpl
     this.pfpService = pfpService;
     this.saleOrderConfirmService = saleOrderConfirmService;
     this.stockMoveLineServiceSupplychain = stockMoveLineServiceSupplychain;
+    this.saleOrderLineArrivageService = saleOrderLineArrivageService;
   }
 
   @Override
@@ -175,17 +178,14 @@ public class StockMoveServiceSupplychainImpl extends StockMoveServiceImpl
       SaleOrderStockService saleOrderStockService = Beans.get(SaleOrderStockService.class);
       for (SaleOrder saleOrder : saleOrderSet) {
         updateSaleOrderLinesDeliveryState(stockMove, !stockMove.getIsReversion());
-        // Update linked saleOrder delivery state depending on BackOrder's existence
         if (newStockSeq != null) {
           saleOrder.setDeliveryState(SaleOrderRepository.DELIVERY_STATE_PARTIALLY_DELIVERED);
         } else {
           saleOrderStockService.updateDeliveryState(saleOrder);
-
           if (appSupplychain.getTerminateSaleOrderOnDelivery()) {
             terminateOrConfirmSaleOrderStatus(saleOrder);
           }
         }
-
         saleOrderRepo.save(saleOrder);
       }
     } else if (ObjectUtils.notEmpty(stockMove.getPurchaseOrderSet())) {
@@ -193,26 +193,64 @@ public class StockMoveServiceSupplychainImpl extends StockMoveServiceImpl
           Beans.get(PurchaseOrderStockService.class);
       for (PurchaseOrder purchaseOrder : stockMove.getPurchaseOrderSet()) {
         updatePurchaseOrderLines(stockMove, !stockMove.getIsReversion());
-        // Update linked purchaseOrder receipt state depending on BackOrder's existence
+
+        // ← NOUVEAU : hook transfert arrivages
+        Set<SaleOrder> affectedSaleOrders = new java.util.HashSet<>();
+        for (StockMoveLine sml : stockMove.getStockMoveLineList()) {
+          PurchaseOrderLine pol = sml.getPurchaseOrderLine();
+          if (pol != null) {
+            BigDecimal qtyAllocated =
+                pol.getQtyAllocatedToSales() == null
+                    ? BigDecimal.ZERO
+                    : pol.getQtyAllocatedToSales();
+            if (qtyAllocated.signum() > 0) {
+              try {
+                saleOrderLineArrivageService.transferArrivagesToStockReservations(
+                    pol, sml.getRealQty());
+                Beans.get(
+                        com.axelor.apps.supplychain.db.repo
+                            .SaleOrderLineArrivageSupplychainRepository.class)
+                    .findByPurchaseOrderLine(pol)
+                    .stream()
+                    .filter(
+                        a ->
+                            a.getSaleOrderLine() != null
+                                && a.getSaleOrderLine().getSaleOrder() != null)
+                    .forEach(a -> affectedSaleOrders.add(a.getSaleOrderLine().getSaleOrder()));
+              } catch (Exception e) {
+                // Non bloquant
+              }
+            }
+          }
+        }
+
+        // Créer BL2 pour les SO affectées
+        SaleOrderStockService saleOrderStockService2 = Beans.get(SaleOrderStockService.class);
+        for (SaleOrder affectedSO : affectedSaleOrders) {
+          try {
+            saleOrderStockService2.createStocksMovesFromSaleOrder(affectedSO);
+          } catch (Exception e) {
+            // Non bloquant
+          }
+        }
+
         if (newStockSeq != null) {
           purchaseOrder.setReceiptState(PurchaseOrderRepository.STATE_PARTIALLY_RECEIVED);
         } else {
           purchaseOrderStockService.updateReceiptState(purchaseOrder);
-
           if (appSupplychain.getTerminatePurchaseOrderOnReceipt()) {
             finishOrValidatePurchaseOrderStatus(purchaseOrder);
           }
         }
-
         purchaseOrderRepo.save(purchaseOrder);
       }
     }
+
     if (appSupplyChainService.getAppSupplychain().getManageStockReservation()) {
       reservedQtyService.updateReservedQuantity(stockMove, StockMoveRepository.STATUS_REALIZED);
     }
 
     detachNonDeliveredStockMoveLines(stockMove);
-
     updateFixedAssets(stockMove);
 
     return newStockSeq;
