@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<domain-models xmlns="http://axelor.com/xml/ns/domain-models"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://axelor.com/xml/ns/domain-models
+  https://axelor.com/xml/ns/domain-models/domain-models_7.1.xsd">
+
+  <module name="supplychain" package="com.axelor.apps.supplychain.db"/>
+
+  <entity name="SaleOrderLineStockLocation">
+
+    <many-to-one name="saleOrderLine" ref="com.axelor.apps.sale.db.SaleOrderLine"
+      required="true" title="Ligne de vente"/>
+
+    <many-to-one name="stockLocation" ref="com.axelor.apps.stock.db.StockLocation"
+      required="true" title="Emplacement de stock"/>
+
+    <decimal name="qty" min="0" precision="20" scale="4" title="Quantité sélectionnée"/>
+
+    <boolean name="transferred" default="false" readonly="true"
+      title="Transféré vers physique"/>
+
+  </entity>
+
+</domain-models>

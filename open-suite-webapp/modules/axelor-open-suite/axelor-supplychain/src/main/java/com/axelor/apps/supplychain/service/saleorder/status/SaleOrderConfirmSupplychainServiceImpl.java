@@ -30,6 +30,7 @@ import com.axelor.apps.supplychain.service.AccountingSituationSupplychainService
 import com.axelor.apps.supplychain.service.IntercoService;
 import com.axelor.apps.supplychain.service.PartnerSupplychainService;
 import com.axelor.apps.supplychain.service.SaleOrderLineArrivageService;
+import com.axelor.apps.supplychain.service.SaleOrderLineStockLocationService;
 import com.axelor.apps.supplychain.service.analytic.AnalyticToolSupplychainService;
 import com.axelor.apps.supplychain.service.app.AppSupplychainService;
 import com.axelor.apps.supplychain.service.saleorder.SaleOrderPurchaseService;
@@ -40,8 +41,13 @@ import com.axelor.studio.db.AppSupplychain;
 import com.google.inject.Inject;
 import com.google.inject.persist.Transactional;
 import java.math.BigDecimal;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SaleOrderConfirmSupplychainServiceImpl implements SaleOrderConfirmSupplychainService {
+
+  private static final Logger LOG =
+      LoggerFactory.getLogger(SaleOrderConfirmSupplychainServiceImpl.class);
 
   protected AppSupplychainService appSupplychainService;
   protected AnalyticToolSupplychainService analyticToolSupplychainService;
@@ -52,6 +58,7 @@ public class SaleOrderConfirmSupplychainServiceImpl implements SaleOrderConfirmS
   protected StockMoveRepository stockMoveRepository;
   protected AccountingSituationSupplychainService accountingSituationSupplychainService;
   protected SaleOrderLineArrivageService saleOrderLineArrivageService;
+  protected SaleOrderLineStockLocationService saleOrderLineStockLocationService;
 
   @Inject
   public SaleOrderConfirmSupplychainServiceImpl(
@@ -63,7 +70,8 @@ public class SaleOrderConfirmSupplychainServiceImpl implements SaleOrderConfirmS
       IntercoService intercoService,
       StockMoveRepository stockMoveRepository,
       AccountingSituationSupplychainService accountingSituationSupplychainService,
-      SaleOrderLineArrivageService saleOrderLineArrivageService) {
+      SaleOrderLineArrivageService saleOrderLineArrivageService,
+      SaleOrderLineStockLocationService saleOrderLineStockLocationService) {
     this.appSupplychainService = appSupplychainService;
     this.analyticToolSupplychainService = analyticToolSupplychainService;
     this.partnerSupplychainService = partnerSupplychainService;
@@ -73,6 +81,7 @@ public class SaleOrderConfirmSupplychainServiceImpl implements SaleOrderConfirmS
     this.stockMoveRepository = stockMoveRepository;
     this.accountingSituationSupplychainService = accountingSituationSupplychainService;
     this.saleOrderLineArrivageService = saleOrderLineArrivageService;
+    this.saleOrderLineStockLocationService = saleOrderLineStockLocationService;
   }
 
   @Override
@@ -101,7 +110,26 @@ public class SaleOrderConfirmSupplychainServiceImpl implements SaleOrderConfirmS
     }
 
     AppSupplychain appSupplychain = appSupplychainService.getAppSupplychain();
-
+    // transfert virtuel → physique AVANT création BL pour éviter de créer des BL non liés à une SOL
+    for (SaleOrderLine sol : saleOrder.getSaleOrderLineList()) {
+      BigDecimal qtyFromStock =
+          sol.getQtyFromStock() == null ? BigDecimal.ZERO : sol.getQtyFromStock();
+      if (qtyFromStock.signum() > 0 && saleOrder.getStockLocation() != null) {
+        try {
+          System.out.println("=== DEBUT transferVirtualToPhysical ===");
+          System.out.println("SOL id=" + sol.getId());
+          System.out.println("StockLocation=" + saleOrder.getStockLocation().getName());
+          saleOrderLineStockLocationService.transferVirtualToPhysical(
+              sol, saleOrder.getStockLocation());
+          System.out.println("=== FIN transferVirtualToPhysical OK ===");
+        } catch (Exception e) {
+          System.out.println("=== ERREUR transferVirtualToPhysical ===");
+          System.out.println("Message: " + e.getMessage());
+          System.out.println("Cause: " + e.getCause());
+          e.printStackTrace();
+        }
+      }
+    }
     if (appSupplychain.getPurchaseOrderGenerationAuto()) {
       saleOrderPurchaseService.createPurchaseOrders(saleOrder);
     }

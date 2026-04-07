@@ -70,6 +70,9 @@
     <one-to-many name="saleOrderLineArrivageList"
       ref="com.axelor.apps.supplychain.db.SaleOrderLineArrivage" mappedBy="saleOrderLine"
       title="Allocations arrivages"/>
+    <one-to-many name="saleOrderLineStockLocationList"
+      ref="com.axelor.apps.supplychain.db.SaleOrderLineStockLocation" mappedBy="saleOrderLine"
+      title="Sélection emplacements stock"/>
 
     <extra-code>
   		<![CDATA[
