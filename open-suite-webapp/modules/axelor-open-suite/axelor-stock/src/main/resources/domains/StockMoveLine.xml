@@ -34,7 +34,9 @@
     <decimal name="totalNetMass" title="Total net mass"/>
 
     <many-to-one name="trackingNumber" ref="com.axelor.apps.stock.db.TrackingNumber"
-      title="Tracking Nbr."/>
+      title="N° Lot Interne"/>
+    <many-to-one name="lotFournisseur" ref="com.axelor.apps.stock.db.LotFournisseur"
+      title="Lot Fournisseur"/>
     <string name="modePeche" title="Mode de pêche"
       selection="purchase.purchase.order.line.modePeche.select"/>
 
@@ -109,6 +111,7 @@
 		 }
 	    ]]>
     </string>
+
 
     <many-to-one name="customsCodeNomenclature"
       ref="com.axelor.apps.stock.db.CustomsCodeNomenclature"/>

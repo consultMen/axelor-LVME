@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<domain-models xmlns="http://axelor.com/xml/ns/domain-models"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://axelor.com/xml/ns/domain-models http://axelor.com/xml/ns/domain-models/domain-models_7.4.xsd">
+
+  <module name="supplychain" package="com.axelor.apps.supplychain.db"/>
+
+  <entity name="SaleOrderLineLot">
+    <many-to-one name="saleOrderLine" ref="com.axelor.apps.sale.db.SaleOrderLine"
+      title="Ligne de commande"/>
+
+    <!-- Le N° Lot Interne (TrackingNumber) sélectionné -->
+    <many-to-one name="trackingNumber" ref="com.axelor.apps.stock.db.TrackingNumber"
+      title="N° Lot Interne" required="true"/>
+
+    <!-- Quantité prélevée de ce lot -->
+    <decimal name="qtyToShip" title="Quantité à livrer" precision="20" scale="3"
+      required="true"/>
+
+    <!-- Champs auto-remplis pour affichage (depuis trackingNumber) -->
+    <many-to-one name="lotFournisseur" ref="com.axelor.apps.stock.db.LotFournisseur"
+      title="Lot Fournisseur"/>
+
+    <date name="perishableExpirationDate" title="DLUO"/>
+
+    <decimal name="availableQty" title="Quantité disponible" precision="20" scale="3"/>
+
+  </entity>
+
+</domain-models>

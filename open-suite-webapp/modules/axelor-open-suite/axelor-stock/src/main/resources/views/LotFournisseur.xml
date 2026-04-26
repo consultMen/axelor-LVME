@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<object-views xmlns="http://axelor.com/xml/ns/object-views"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://axelor.com/xml/ns/object-views
+  http://axelor.com/xml/ns/object-views/object-views_7.4.xsd">
+
+  <!-- ==================== GRID ==================== -->
+  <grid name="lot-fournisseur-grid" title="Lots Fournisseur"
+    model="com.axelor.apps.stock.db.LotFournisseur" orderBy="supplierLotNumber">
+    <field name="supplierLotNumber" title="N° Lot Fournisseur" width="200"/>
+    <field name="dateProduction" title="Date de production" width="150"/>
+    <field name="supplier" title="Fournisseur" width="200"/>
+  </grid>
+
+  <!-- ==================== FORM ==================== -->
+  <form name="lot-fournisseur-form" title="Lot Fournisseur"
+    model="com.axelor.apps.stock.db.LotFournisseur">
+    <panel name="mainPanel" title="Informations Lot Fournisseur">
+      <field name="supplierLotNumber" title="N° Lot Fournisseur" colSpan="6"/>
+      <field name="dateProduction" title="Date de production" colSpan="6"/>
+      <field name="supplier" title="Fournisseur" colSpan="12" domain="self.isSupplier IS TRUE"
+        form-view="partner-supplier-form" grid-view="partner-supplier-grid"/>
+    </panel>
+    <panel name="trackingNumbersPanel" title="Lots Internes liés" colSpan="12">
+      <panel-related field="trackingNumbers" grid-view="tracking-number-grid"
+        form-view="tracking-number-form" colSpan="12"/>
+    </panel>
+  </form>
+
+</object-views>

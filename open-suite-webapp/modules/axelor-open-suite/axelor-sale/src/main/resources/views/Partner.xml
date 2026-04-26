@@ -6,6 +6,16 @@
   <form id="sale-partner-form" model="com.axelor.apps.base.db.Partner" title="Partner"
     name="partner-form" extension="true">
 
+    <!-- M1 - Ajout Remise/Fact. et RFA dans l'onglet Client -->
+    <extend target="//panel[@name='customerPanel']//field[@name='salePartnerPriceList']">
+      <insert position="after">
+        <panel name="conditionsCommercialesPanel" title="Conditions commerciales" colSpan="12">
+          <field name="remiseFacture" colSpan="3" widget="Decimal"/>
+          <field name="tauxRFA" colSpan="3" widget="Decimal"/>
+        </panel>
+      </insert>
+    </extend>
+
     <extend target="//panel[@name='saleOrderCommentsPanel']">
       <insert position="after">
         <panel-related field="$saleDetailsByProduct" type="one-to-many"

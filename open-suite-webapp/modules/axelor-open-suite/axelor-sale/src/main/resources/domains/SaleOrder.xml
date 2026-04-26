@@ -69,6 +69,17 @@
     <integer name="statusSelect" title="Status" selection="sale.order.status.select"
       readonly="true"/>
 
+    <!-- M1 - Conditions commerciales recopiées depuis le client -->
+    <decimal name="remiseFacture" title="Remise/Fact. (%)" precision="5" scale="2" min="0"
+      max="100"/>
+    <decimal name="tauxRFA" title="RFA (%)" precision="5" scale="2" min="0" max="100"/>
+    <!-- M3 - Frais de Commission -->
+    <decimal name="tauxCommission" title="Taux Commission (%)" precision="5" scale="2"
+      min="0" max="100"/>
+    <many-to-one name="commercial" ref="com.axelor.auth.db.User" title="Commercial"/>
+    <boolean name="portPaye" title="Port Payé"/>
+    <decimal name="coutPortKg" title="Coût port/kg (€/kg)" precision="10" scale="4"/>
+
     <!-- Margins -->
     <decimal name="accountedRevenue" title="Accounted Revenue" precision="20" scale="3"/>
     <decimal name="totalCostPrice" title="Total cost price" precision="20" scale="3"/>

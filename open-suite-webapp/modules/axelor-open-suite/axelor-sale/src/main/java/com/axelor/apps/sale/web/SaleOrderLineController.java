@@ -189,6 +189,15 @@ public class SaleOrderLineController {
           }
         }
         response.setValues(saleOrderLineMap);
+
+        // M2 - Frais congélation depuis le produit
+        Product productReloaded = saleOrderLine.getProduct();
+        if (productReloaded != null && productReloaded.getId() != null) {
+          productReloaded =
+              Beans.get(com.axelor.apps.base.db.repo.ProductRepository.class)
+                  .find(productReloaded.getId());
+          response.setValue("fraisCongelation", productReloaded.getFraisCongelation());
+        }
       } catch (Exception e) {
         response.setValues(saleOrderLineProductService.resetProductInformation(saleOrderLine));
         TraceBackService.trace(response, e);
@@ -442,6 +451,28 @@ public class SaleOrderLineController {
     if (Beans.get(ConfiguratorCheckService.class)
         .isConfiguratorVersionDifferent(saleOrderLine.getConfigurator())) {
       response.setError(I18n.get(SaleExceptionMessage.CONFIGURATOR_VERSION_IS_DIFFERENT));
+    }
+  }
+
+  // M2 - Recopie des frais de congélation depuis le produit vers la ligne de commande
+  public void setFraisCongelation(ActionRequest request, ActionResponse response) {
+    try {
+      SaleOrderLine line = request.getContext().asType(SaleOrderLine.class);
+      Product product = line.getProduct();
+      if (product != null && product.getId() != null) {
+        product =
+            Beans.get(com.axelor.apps.base.db.repo.ProductRepository.class).find(product.getId());
+        System.out.println(
+            "=== FRAIS DEBUG === productId="
+                + product.getId()
+                + " fraisCongelation="
+                + product.getFraisCongelation());
+        response.setValue("fraisCongelation", product.getFraisCongelation());
+      } else {
+        response.setValue("fraisCongelation", null);
+      }
+    } catch (Exception e) {
+      TraceBackService.trace(response, e);
     }
   }
 }

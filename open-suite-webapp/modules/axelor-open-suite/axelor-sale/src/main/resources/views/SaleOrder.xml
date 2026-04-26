@@ -439,13 +439,20 @@
           form-view="price-list-form" grid-view="price-list-grid" hideIf="company == null"
           colSpan="3"/>
         <field name="clientPartner" required="true" hideIf="company == null"
-          readonlyIf="statusSelect > 1" onChange="action-sale-order-method-client-partner-onchange"
+          readonlyIf="statusSelect > 1"
+          onChange="action-sale-order-method-client-partner-onchange,action-sale-order-record-set-remise-rfa"
           onSelect="action-sale-order-method-set-client-partner-domain" form-view="partner-form"
           grid-view="partner-grid" colSpan="3" x-image-field="picture"/>
         <field name="contactPartner" colSpan="3" x-image-field="picture"
           onChange="action-record-so-contact-partner-change"
           onSelect="action-sale-order-domain-on-contact-partner" domain="self.isContact = true"
           canEdit="false" form-view="partner-contact-form" grid-view="partner-contact-grid"/>
+
+        <!-- M1 - Conditions commerciales recopiées depuis le client -->
+        <field name="remiseFacture" colSpan="2" readonlyIf="statusSelect > 1"
+          hideIf="clientPartner == null"/>
+        <field name="tauxRFA" colSpan="2" readonlyIf="statusSelect > 1"
+          hideIf="clientPartner == null"/>
 
         <field name="invoicedPartner" x-image-field="picture"
           if="__config__.app.getApp('base')?.activatePartnerRelations" required="true"
@@ -2390,5 +2397,12 @@
     <view type="form" name="sale-order-form"/>
     <domain>self.originSaleQuotation.id = :id</domain>
   </action-view>
+
+  <!-- M1 - Recopie des conditions commerciales depuis le client -->
+  <action-record name="action-sale-order-record-set-remise-rfa"
+    model="com.axelor.apps.sale.db.SaleOrder">
+    <field name="remiseFacture" expr="eval: clientPartner?.remiseFacture ?: BigDecimal.ZERO"/>
+    <field name="tauxRFA" expr="eval: clientPartner?.tauxRFA ?: BigDecimal.ZERO"/>
+  </action-record>
 
 </object-views>

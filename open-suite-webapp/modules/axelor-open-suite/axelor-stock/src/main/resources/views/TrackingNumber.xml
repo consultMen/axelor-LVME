@@ -15,6 +15,9 @@
       if="$moment(perishableExpirationDate).isAfter($moment(_datePlusTwoMonths)) || $moment(warrantyExpirationDate).isAfter($moment(_datePlusTwoMonths))"
       color="success"/>
     <field name="trackingNumberSeq" width="120"/>
+    <field name="dateArrivage"/>
+    <field name="supplierLotNumber"/>
+    <field name="dateProduction"/>
     <field name="product" form-view="product-form" grid-view="product-grid"/>
     <field name="hasWarranty"/>
     <field name="warrantyExpirationDate"/>

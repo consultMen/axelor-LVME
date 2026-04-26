@@ -81,6 +81,10 @@
       mappedBy="mainSaleOrderLine"/>
     <many-to-one name="mainSaleOrderLine" ref="com.axelor.apps.sale.db.SaleOrderLine"/>
 
+    <!-- M2 - Frais Congélation recopiés depuis le produit -->
+    <decimal name="fraisCongelation" title="Frais Congélation" precision="20" scale="10"
+      min="0"/>
+
     <!-- Margins -->
     <decimal name="subTotalCostPrice" title="SubTotal cost price" precision="20" scale="3"/>
     <decimal name="subTotalGrossMargin" title="Sub Total gross profit" precision="20"

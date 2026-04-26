@@ -73,6 +73,9 @@
     <one-to-many name="saleOrderLineStockLocationList"
       ref="com.axelor.apps.supplychain.db.SaleOrderLineStockLocation" mappedBy="saleOrderLine"
       title="Sélection emplacements stock"/>
+    <one-to-many name="saleOrderLineLotList"
+      ref="com.axelor.apps.supplychain.db.SaleOrderLineLot" mappedBy="saleOrderLine"
+      title="Lots sélectionnés"/>
 
     <extra-code>
   		<![CDATA[

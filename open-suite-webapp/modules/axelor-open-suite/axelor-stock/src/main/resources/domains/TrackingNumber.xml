@@ -14,7 +14,7 @@
     <date name="perishableExpirationDate" title="Perishable expiration date" readonly="true"/>
     <boolean name="checkExpirationDateAtStockMoveRealization"
       title="Check expiration date at stock move realization"/>
-    <string name="trackingNumberSeq" namecolumn="true" title="Tracking Nbr." required="true"/>
+    <string name="trackingNumberSeq" namecolumn="true" title="N° Lot Interne" required="true"/>
     <string name="origin" title="Origin"/>
     <many-to-one ref="com.axelor.apps.base.db.Partner" name="supplier" title="Supplier"/>
     <string name="note" title="Note" large="true"/>
@@ -23,6 +23,9 @@
     <string name="serialNumber" title="Serial Nbr"/>
     <many-to-one name="barcodeTypeConfig" title="Barcode Type"
       ref="com.axelor.apps.base.db.BarcodeTypeConfig"/>
+    <many-to-one name="lotFournisseur" ref="com.axelor.apps.stock.db.LotFournisseur"
+      title="Lot Fournisseur"/>
+    <date name="dateArrivage" title="Date d'arrivage"/>
 
     <integer name="originMoveTypeSelect" title="Move origin type"
       selection="stock.tracking.number.origin.move.type.select" default="0"
@@ -78,6 +81,7 @@
       <field name="dimension2"/>
       <field name="dimension3"/>
     </track>
+
 
 
   </entity>

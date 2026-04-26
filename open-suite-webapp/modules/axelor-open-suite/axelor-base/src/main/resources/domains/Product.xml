@@ -58,6 +58,10 @@
 
     <decimal name="managPriceCoef" title="Management coef." min="0"/>
     <decimal name="shippingCoef" title="Shipping Coef." min="0"/>
+
+    <!-- M2 - Frais Congélation -->
+    <decimal name="fraisCongelation" title="Frais Congélation" precision="20" scale="10"
+      min="0"/>
     <boolean name="defShipCoefByPartner" title="Define the shipping coef by partner"/>
 
     <date name="startDate" title="Product launch Date" initParam="true"/>

@@ -22,11 +22,20 @@
     <string name="rack" title="Rack"/>
     <many-to-one name="trackingNumber" ref="com.axelor.apps.stock.db.TrackingNumber"
       title="Tracking Nbr" readonly="true"/>
+
     <many-to-one name="detailsStockLocation"
       ref="com.axelor.apps.stock.db.StockLocation" title="Stock location details" readonly="true"/>
 
     <decimal name="lastInventoryRealQty" precision="20" scale="10"/>
     <datetime name="lastInventoryDateT" tz="true" title="Last inventory date"/>
+    <string name="fullName" namecolumn="true" formula="true">
+      <![CDATA[
+    (SELECT CONCAT(p.full_name, ' - ', sl.name)
+    FROM base_product p
+    JOIN stock_stock_location sl ON sl.id = stock_location
+    WHERE p.id = product)
+  ]]>
+    </string>
 
   </entity>
 </domain-models>

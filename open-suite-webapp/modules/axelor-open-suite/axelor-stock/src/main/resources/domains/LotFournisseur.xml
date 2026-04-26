@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<domain-models xmlns="http://axelor.com/xml/ns/domain-models"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://axelor.com/xml/ns/domain-models
+  http://axelor.com/xml/ns/domain-models/domain-models_7.4.xsd">
+
+  <module name="stock" package="com.axelor.apps.stock.db"/>
+
+  <entity name="LotFournisseur">
+    <many-to-one name="product" ref="com.axelor.apps.base.db.Product" title="Produit"/>
+
+    <string name="supplierLotNumber" title="N° Lot Fournisseur" required="true"
+      namecolumn="true"/>
+    <date name="dateProduction" title="Date de production"/>
+    <many-to-one ref="com.axelor.apps.base.db.Partner" name="supplier" title="Supplier"/>
+
+
+
+    <finder-method name="findBySupplierLotNumber" using="supplierLotNumber"/>
+
+  </entity>
+
+</domain-models>

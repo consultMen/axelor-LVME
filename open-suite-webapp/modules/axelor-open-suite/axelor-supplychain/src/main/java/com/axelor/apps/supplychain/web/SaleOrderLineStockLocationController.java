@@ -21,7 +21,7 @@ public class SaleOrderLineStockLocationController {
     try {
       // Comme l'arrivage — asType sur le model du wizard
       SaleOrderLineStockLocation item =
-              request.getContext().asType(SaleOrderLineStockLocation.class);
+          request.getContext().asType(SaleOrderLineStockLocation.class);
 
       // Récupérer stockLocation
       Object slObj = request.getContext().get("stockLocation");
@@ -37,8 +37,7 @@ public class SaleOrderLineStockLocationController {
       } else {
         slId = Long.valueOf(slObj.toString().replaceAll("[^0-9]", ""));
       }
-      StockLocation stockLocation =
-              Beans.get(StockLocationRepository.class).find(slId);
+      StockLocation stockLocation = Beans.get(StockLocationRepository.class).find(slId);
       if (stockLocation == null) {
         response.setError("Emplacement introuvable.");
         return;
@@ -47,8 +46,7 @@ public class SaleOrderLineStockLocationController {
       // Récupérer SOL via _saleOrderLineId
       Object solIdObj = request.getContext().get("_saleOrderLineId");
       if (solIdObj == null) {
-        response.setError(
-                "Veuillez sauvegarder la commande avant d'ajouter un emplacement.");
+        response.setError("Veuillez sauvegarder la commande avant d'ajouter un emplacement.");
         return;
       }
       Long solId;
@@ -57,8 +55,7 @@ public class SaleOrderLineStockLocationController {
       } else {
         solId = Long.valueOf(solIdObj.toString().replaceAll("[^0-9]", ""));
       }
-      SaleOrderLine sol =
-              Beans.get(SaleOrderLineRepository.class).find(solId);
+      SaleOrderLine sol = Beans.get(SaleOrderLineRepository.class).find(solId);
       if (sol == null) {
         response.setError("Ligne de vente introuvable.");
         return;
@@ -73,8 +70,7 @@ public class SaleOrderLineStockLocationController {
 
       // Allocate
       Beans.get(SaleOrderLineStockLocationService.class)
-              .allocate(sol, stockLocation,
-                      qty.setScale(4, java.math.RoundingMode.HALF_UP));
+          .allocate(sol, stockLocation, qty.setScale(4, java.math.RoundingMode.HALF_UP));
 
       // ✅ Comme l'arrivage — juste setReload !
       response.setReload(true);
@@ -89,8 +85,7 @@ public class SaleOrderLineStockLocationController {
       SaleOrderLine sol = request.getContext().asType(SaleOrderLine.class);
       if (sol != null && sol.getId() != null) {
         sol = Beans.get(SaleOrderLineRepository.class).find(sol.getId());
-        Beans.get(SaleOrderLineStockLocationService.class)
-                .recomputeQtyFromStock(sol);
+        Beans.get(SaleOrderLineStockLocationService.class).recomputeQtyFromStock(sol);
         response.setValue("qtyFromStock", sol.getQtyFromStock());
       }
     } catch (Exception e) {

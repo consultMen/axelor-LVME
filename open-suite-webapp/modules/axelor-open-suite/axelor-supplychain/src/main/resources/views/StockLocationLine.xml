@@ -8,6 +8,10 @@
     canDelete="false">
     <field name="product" width="300"/>
     <field name="product.unit" width="100"/>
+    <field name="lotFournisseur.numeroLot" title="N° Lot Fournisseur" width="150"/>
+    <field name="lotFournisseur.dateArrivee" title="Date Arrivée" width="120"/>
+    <field name="lotFournisseur.statutFrigo" title="Frigo" width="80"/>
+    <field name="trackingNumber" title="N° Suivi" width="120"/>
     <field name="stockLocation.company" width="120"/>
     <field name="stockLocation.name" title="Stock location"/>
     <field name="stockLocation.parentStockLocation.name" title="Parent Stock location"/>
