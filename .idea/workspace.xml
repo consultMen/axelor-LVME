@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b99263ab-4a5f-43a9-9375-bc608fabb1a9" name="Changes" comment="" />
+    <list default="true" id="b99263ab-4a5f-43a9-9375-bc608fabb1a9" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -31,12 +33,13 @@
     &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
     &quot;git-widget-placeholder&quot;: &quot;main&quot;,
     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/zakar/Downloads/axelor-LVME&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/zakar/Downloads/SPRINGBOOT/sae-2026-sae_td2_d&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;com.anthropic.code.plugin.settings&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
@@ -74,7 +77,21 @@
       <workItem from="1772462589972" duration="3191000" />
       <workItem from="1772928101880" duration="42684000" />
       <workItem from="1773243860206" duration="9047000" />
-      <workItem from="1773669157188" duration="13280000" />
+      <workItem from="1773669157188" duration="61334000" />
+      <workItem from="1774449755356" duration="7432000" />
+      <workItem from="1774787707600" duration="247000" />
+      <workItem from="1774877947732" duration="15070000" />
+      <workItem from="1775045971323" duration="3086000" />
+      <workItem from="1775567318081" duration="3761000" />
+      <workItem from="1775598900176" duration="6213000" />
+      <workItem from="1776150643312" duration="8503000" />
+      <workItem from="1776431184693" duration="3453000" />
+      <workItem from="1776638793789" duration="29808000" />
+      <workItem from="1776858993110" duration="10330000" />
+      <workItem from="1776883922395" duration="5335000" />
+      <workItem from="1777020632743" duration="186000" />
+      <workItem from="1777129023303" duration="1168000" />
+      <workItem from="1777142689624" duration="9807000" />
     </task>
     <servers />
   </component>

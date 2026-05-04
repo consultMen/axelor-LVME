@@ -84,6 +84,16 @@
     <!-- M2 - Frais Congélation recopiés depuis le produit -->
     <decimal name="fraisCongelation" title="Frais Congélation" precision="20" scale="10"
       min="0"/>
+    <!-- M2 - Taux recopi\u00e9s depuis le SaleOrder pour calcul PR Net -->
+    <decimal name="tauxRFA" title="% RFA" precision="20" scale="2"
+      help="Recopi\u00e9 du devis - utilis\u00e9 pour calcul PR Net"/>
+
+    <decimal name="tauxCommission" title="% Commission" precision="20" scale="2"
+      help="Recopi\u00e9 du devis - utilis\u00e9 pour calcul PR Net"/>
+
+    <!-- M2 - Prix de Revient Net (formule N7 spec) -->
+    <decimal name="prixRevientNet" title="P.R. Net (\u20ac/kg)" precision="20" scale="4"
+      readonly="true" help="(PR + Frais Cong\u00e9lation) \u00d7 (1 + (RFA + Commission) / 100)"/>
 
     <!-- Margins -->
     <decimal name="subTotalCostPrice" title="SubTotal cost price" precision="20" scale="3"/>
