@@ -159,4 +159,153 @@ public class StockMoveController {
       TraceBackService.trace(response, e);
     }
   }
+
+  // ==================================================================
+  // M2 LVME - Restaurer les calculs PR/Marge apr\u00e8s r\u00e9alisation BL
+  // R\u00e9sout : Axelor \u00e9crase PR/Marge apr\u00e8s realize stock move
+  // ==================================================================
+
+  @com.google.inject.persist.Transactional(rollbackOn = {Exception.class})
+  public void restoreCalculsAfterRealize(ActionRequest request, ActionResponse response) {
+    try {
+      StockMove stockMove = request.getContext().asType(StockMove.class);
+
+      if (stockMove.getId() == null) return;
+
+      StockMove smDb =
+          Beans.get(com.axelor.apps.stock.db.repo.StockMoveRepository.class)
+              .find(stockMove.getId());
+
+      if (smDb == null || smDb.getSaleOrderSet() == null) return;
+
+      int totalUpdated = 0;
+      for (com.axelor.apps.sale.db.SaleOrder saleOrder : smDb.getSaleOrderSet()) {
+        if (saleOrder.getSaleOrderLineList() == null) continue;
+
+        for (com.axelor.apps.sale.db.SaleOrderLine line : saleOrder.getSaleOrderLineList()) {
+          // R\u00e9cup\u00e9rer le lot via JPQL
+          java.util.List<com.axelor.apps.supplychain.db.SaleOrderLineLot> lots =
+              com.axelor
+                  .db
+                  .JPA
+                  .em()
+                  .createQuery(
+                      "SELECT lot FROM SaleOrderLineLot lot "
+                          + "WHERE lot.saleOrderLine.id = :solId "
+                          + "AND lot.trackingNumber IS NOT NULL "
+                          + "ORDER BY lot.id DESC",
+                      com.axelor.apps.supplychain.db.SaleOrderLineLot.class)
+                  .setParameter("solId", line.getId())
+                  .getResultList();
+
+          if (lots.isEmpty()) continue;
+
+          com.axelor.apps.stock.db.TrackingNumber tn = lots.get(0).getTrackingNumber();
+          if (tn == null) continue;
+
+          // R\u00e9cup\u00e9rer le PR depuis StockMoveLine
+          java.math.BigDecimal pr = java.math.BigDecimal.ZERO;
+          java.util.List<com.axelor.apps.stock.db.StockMoveLine> smls =
+              Beans.get(com.axelor.apps.stock.db.repo.StockMoveLineRepository.class)
+                  .all()
+                  .filter(
+                      "self.trackingNumber.id = ?1 AND self.prKg IS NOT NULL AND self.prKg > 0",
+                      tn.getId())
+                  .order("-id")
+                  .fetch();
+
+          if (!smls.isEmpty()) {
+            pr = smls.get(0).getPrKg().setScale(3, java.math.RoundingMode.HALF_UP);
+          }
+
+          if (pr.signum() == 0) continue;
+
+          // R\u00e9cup\u00e9rer les autres valeurs
+          java.math.BigDecimal fraisCong =
+              line.getFraisCongelation() != null
+                  ? line.getFraisCongelation()
+                  : java.math.BigDecimal.ZERO;
+          java.math.BigDecimal tauxRFA =
+              line.getTauxRFA() != null ? line.getTauxRFA() : java.math.BigDecimal.ZERO;
+          java.math.BigDecimal tauxComm =
+              line.getTauxCommission() != null
+                  ? line.getTauxCommission()
+                  : java.math.BigDecimal.ZERO;
+          java.math.BigDecimal qty =
+              line.getQty() != null ? line.getQty() : java.math.BigDecimal.ZERO;
+          java.math.BigDecimal exTaxTotal =
+              line.getExTaxTotal() != null ? line.getExTaxTotal() : java.math.BigDecimal.ZERO;
+
+          // Recalculer PR Net + Marge
+          java.math.BigDecimal coefficient =
+              java.math.BigDecimal.ONE.add(
+                  tauxRFA
+                      .add(tauxComm)
+                      .divide(new java.math.BigDecimal("100"), 6, java.math.RoundingMode.HALF_UP));
+
+          java.math.BigDecimal prixRevientNet =
+              pr.add(fraisCong).multiply(coefficient).setScale(4, java.math.RoundingMode.HALF_UP);
+
+          java.math.BigDecimal coutTotal =
+              prixRevientNet.multiply(qty).setScale(2, java.math.RoundingMode.HALF_UP);
+          java.math.BigDecimal margeBrute =
+              exTaxTotal.subtract(coutTotal).setScale(2, java.math.RoundingMode.HALF_UP);
+
+          java.math.BigDecimal tauxMarge = java.math.BigDecimal.ZERO;
+          if (exTaxTotal.signum() != 0) {
+            tauxMarge =
+                margeBrute
+                    .multiply(new java.math.BigDecimal("100"))
+                    .divide(exTaxTotal, 2, java.math.RoundingMode.HALF_UP);
+          }
+
+          java.math.BigDecimal tauxMarkup = java.math.BigDecimal.ZERO;
+          if (coutTotal.signum() != 0) {
+            tauxMarkup =
+                margeBrute
+                    .multiply(new java.math.BigDecimal("100"))
+                    .divide(coutTotal, 2, java.math.RoundingMode.HALF_UP);
+          }
+
+          // UPDATE SQL direct
+          com.axelor
+              .db
+              .JPA
+              .em()
+              .createNativeQuery(
+                  "UPDATE sale_sale_order_line SET "
+                      + "sub_total_cost_price = :pr, "
+                      + "prix_revient_net = :prNet, "
+                      + "sub_total_gross_margin = :marge, "
+                      + "sub_margin_rate = :tauxMarge, "
+                      + "sub_total_markup = :markup "
+                      + "WHERE id = :id")
+              .setParameter("pr", pr)
+              .setParameter("prNet", prixRevientNet)
+              .setParameter("marge", margeBrute)
+              .setParameter("tauxMarge", tauxMarge)
+              .setParameter("markup", tauxMarkup)
+              .setParameter("id", line.getId())
+              .executeUpdate();
+
+          totalUpdated++;
+          System.out.println(
+              "=== RESTORE AFTER REALIZE === \u2705 Ligne "
+                  + line.getId()
+                  + " : PR="
+                  + pr
+                  + " | Marge="
+                  + margeBrute);
+        }
+      }
+
+      System.out.println(
+          "=== RESTORE AFTER REALIZE === \u2705 Termin\u00e9 ("
+              + totalUpdated
+              + " ligne(s) restaur\u00e9es)");
+
+    } catch (Exception e) {
+      TraceBackService.trace(response, e);
+    }
+  }
 }

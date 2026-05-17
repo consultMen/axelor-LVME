@@ -22,7 +22,9 @@
       massUpdate="true"/>
     <decimal name="customerPaymentDelay" title="Customers payment delay (Average in days)"/>
     <decimal name="supplierPaymentDelay" title="Suppliers payment delay (Average in days)"/>
-
+    <decimal name="fraisCongelation" title="Frais Cong\u00e9lation (\u20ac/kg/mois)"
+      precision="20" scale="4" default="0"
+      help="Taux unitaire de frais de congelation par mois apres les 3 premiers mois. Formule sur ligne de vente : (mois - 3)fraisCongelation"/>
     <!-- Onglet Bank Details -->
     <many-to-one name="defaultBankDetails" ref="com.axelor.apps.base.db.BankDetails"
       title="Default Bank Account"/>

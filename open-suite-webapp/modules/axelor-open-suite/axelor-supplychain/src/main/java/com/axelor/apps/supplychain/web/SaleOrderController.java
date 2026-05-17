@@ -879,4 +879,238 @@ public class SaleOrderController {
       TraceBackService.trace(response, e);
     }
   }
+
+  // ==================================================================
+  // M2 LVME - Copier les lots de la commande vers le BL
+  // R\u00e9sout : tracking_number=NULL dans StockMoveLine apr\u00e8s confirmation
+  // ==================================================================
+
+  @com.google.inject.persist.Transactional(rollbackOn = {Exception.class})
+  public void copyLotsToStockMove(ActionRequest request, ActionResponse response) {
+    try {
+      SaleOrder saleOrder = request.getContext().asType(SaleOrder.class);
+
+      if (saleOrder.getId() == null) {
+        System.out.println("=== COPY LOTS BL === Commande pas sauv\u00e9e, skip");
+        return;
+      }
+
+      SaleOrder saleOrderDb = Beans.get(SaleOrderRepository.class).find(saleOrder.getId());
+
+      if (saleOrderDb == null) return;
+
+      // Trouver les StockMove (BL) li\u00e9s \u00e0 cette commande
+      List<StockMove> stockMoves =
+          Beans.get(StockMoveRepository.class)
+              .all()
+              .filter(":saleOrderId MEMBER OF self.saleOrderSet")
+              .bind("saleOrderId", saleOrderDb.getId())
+              .fetch();
+
+      System.out.println(
+          "=== COPY LOTS BL === "
+              + stockMoves.size()
+              + " BL trouv\u00e9(s) pour commande "
+              + saleOrderDb.getId());
+
+      int totalCopies = 0;
+      for (StockMove sm : stockMoves) {
+        if (sm.getStockMoveLineList() == null) continue;
+
+        for (com.axelor.apps.stock.db.StockMoveLine sml : sm.getStockMoveLineList()) {
+          // Si d\u00e9j\u00e0 un trackingNumber, on skip
+          if (sml.getTrackingNumber() != null) {
+            continue;
+          }
+
+          if (sml.getSaleOrderLine() != null) {
+            SaleOrderLine sol = sml.getSaleOrderLine();
+
+            // R\u00e9cup\u00e9rer le 1er lot de cette SaleOrderLine via JPQL
+            List<com.axelor.apps.supplychain.db.SaleOrderLineLot> lots =
+                JPA.em()
+                    .createQuery(
+                        "SELECT lot FROM SaleOrderLineLot lot "
+                            + "WHERE lot.saleOrderLine.id = :solId "
+                            + "AND lot.trackingNumber IS NOT NULL "
+                            + "ORDER BY lot.id DESC",
+                        com.axelor.apps.supplychain.db.SaleOrderLineLot.class)
+                    .setParameter("solId", sol.getId())
+                    .getResultList();
+
+            if (!lots.isEmpty()) {
+              com.axelor.apps.stock.db.TrackingNumber tn = lots.get(0).getTrackingNumber();
+              sml.setTrackingNumber(tn);
+              totalCopies++;
+
+              // \u2b50 Copier aussi le LotFournisseur s'il existe
+              if (tn.getLotFournisseur() != null) {
+                sml.setLotFournisseur(tn.getLotFournisseur());
+                System.out.println(
+                    "=== COPY LOTS BL === \u2705 Lot copi\u00e9 : "
+                        + tn.getTrackingNumberSeq()
+                        + " + LotFournisseur : "
+                        + tn.getLotFournisseur().getSupplierLotNumber()
+                        + " sur SML "
+                        + sml.getId());
+              } else {
+                System.out.println(
+                    "=== COPY LOTS BL === \u2705 Lot copi\u00e9 : "
+                        + tn.getTrackingNumberSeq()
+                        + " (pas de LotFournisseur)"
+                        + " sur SML "
+                        + sml.getId());
+              }
+            }
+          }
+        }
+
+        Beans.get(StockMoveRepository.class).save(sm);
+      }
+
+      System.out.println(
+          "=== COPY LOTS BL === \u2705 Termin\u00e9 (" + totalCopies + " lot(s) copi\u00e9s)");
+
+    } catch (Exception e) {
+      TraceBackService.trace(response, e);
+    }
+  }
+
+  // ==================================================================
+  // M2 LVME - Persister les calculs PR/Marge de TOUTES les lignes
+  // R\u00e9sout : Axelor \u00e9crase PR/Marge \u00e0 la confirmation
+  // ==================================================================
+
+  @com.google.inject.persist.Transactional(rollbackOn = {Exception.class})
+  public void persistCalculsAllLines(ActionRequest request, ActionResponse response) {
+    try {
+      SaleOrder saleOrder = request.getContext().asType(SaleOrder.class);
+
+      if (saleOrder.getId() == null) {
+        System.out.println("=== PERSIST ALL LINES === Commande pas sauv\u00e9e, skip");
+        return;
+      }
+
+      SaleOrder saleOrderDb = Beans.get(SaleOrderRepository.class).find(saleOrder.getId());
+      if (saleOrderDb == null) return;
+
+      if (saleOrderDb.getSaleOrderLineList() == null) return;
+
+      int totalUpdated = 0;
+      for (SaleOrderLine line : saleOrderDb.getSaleOrderLineList()) {
+        // Pour chaque ligne, recalculer PR + Marge depuis le lot
+        java.util.List<com.axelor.apps.supplychain.db.SaleOrderLineLot> lots =
+            JPA.em()
+                .createQuery(
+                    "SELECT lot FROM SaleOrderLineLot lot "
+                        + "WHERE lot.saleOrderLine.id = :solId "
+                        + "AND lot.trackingNumber IS NOT NULL "
+                        + "ORDER BY lot.id DESC",
+                    com.axelor.apps.supplychain.db.SaleOrderLineLot.class)
+                .setParameter("solId", line.getId())
+                .getResultList();
+
+        if (lots.isEmpty()) continue;
+
+        com.axelor.apps.stock.db.TrackingNumber tn = lots.get(0).getTrackingNumber();
+        if (tn == null) continue;
+
+        // R\u00e9cup\u00e9rer le PR depuis StockMoveLine
+        java.math.BigDecimal pr = java.math.BigDecimal.ZERO;
+        java.util.List<com.axelor.apps.stock.db.StockMoveLine> smls =
+            Beans.get(com.axelor.apps.stock.db.repo.StockMoveLineRepository.class)
+                .all()
+                .filter(
+                    "self.trackingNumber.id = ?1 AND self.prKg IS NOT NULL AND self.prKg > 0",
+                    tn.getId())
+                .order("-id")
+                .fetch();
+
+        if (!smls.isEmpty()) {
+          pr = smls.get(0).getPrKg().setScale(3, java.math.RoundingMode.HALF_UP);
+        }
+
+        if (pr.signum() == 0) continue;
+
+        // Recalculer PR Net + Marge
+        java.math.BigDecimal fraisCong =
+            line.getFraisCongelation() != null
+                ? line.getFraisCongelation()
+                : java.math.BigDecimal.ZERO;
+        java.math.BigDecimal tauxRFA =
+            line.getTauxRFA() != null ? line.getTauxRFA() : java.math.BigDecimal.ZERO;
+        java.math.BigDecimal tauxComm =
+            line.getTauxCommission() != null ? line.getTauxCommission() : java.math.BigDecimal.ZERO;
+        java.math.BigDecimal qty =
+            line.getQty() != null ? line.getQty() : java.math.BigDecimal.ZERO;
+        java.math.BigDecimal exTaxTotal =
+            line.getExTaxTotal() != null ? line.getExTaxTotal() : java.math.BigDecimal.ZERO;
+
+        java.math.BigDecimal coefficient =
+            java.math.BigDecimal.ONE.add(
+                tauxRFA
+                    .add(tauxComm)
+                    .divide(new java.math.BigDecimal("100"), 6, java.math.RoundingMode.HALF_UP));
+
+        java.math.BigDecimal prixRevientNet =
+            pr.add(fraisCong).multiply(coefficient).setScale(4, java.math.RoundingMode.HALF_UP);
+
+        java.math.BigDecimal coutTotal =
+            prixRevientNet.multiply(qty).setScale(2, java.math.RoundingMode.HALF_UP);
+        java.math.BigDecimal margeBrute =
+            exTaxTotal.subtract(coutTotal).setScale(2, java.math.RoundingMode.HALF_UP);
+
+        java.math.BigDecimal tauxMarge = java.math.BigDecimal.ZERO;
+        if (exTaxTotal.signum() != 0) {
+          tauxMarge =
+              margeBrute
+                  .multiply(new java.math.BigDecimal("100"))
+                  .divide(exTaxTotal, 2, java.math.RoundingMode.HALF_UP);
+        }
+
+        java.math.BigDecimal tauxMarkup = java.math.BigDecimal.ZERO;
+        if (coutTotal.signum() != 0) {
+          tauxMarkup =
+              margeBrute
+                  .multiply(new java.math.BigDecimal("100"))
+                  .divide(coutTotal, 2, java.math.RoundingMode.HALF_UP);
+        }
+
+        // UPDATE SQL direct (sans toucher \u00e0 la version)
+        JPA.em()
+            .createNativeQuery(
+                "UPDATE sale_sale_order_line SET "
+                    + "sub_total_cost_price = :pr, "
+                    + "prix_revient_net = :prNet, "
+                    + "sub_total_gross_margin = :marge, "
+                    + "sub_margin_rate = :tauxMarge, "
+                    + "sub_total_markup = :markup "
+                    + "WHERE id = :id")
+            .setParameter("pr", pr)
+            .setParameter("prNet", prixRevientNet)
+            .setParameter("marge", margeBrute)
+            .setParameter("tauxMarge", tauxMarge)
+            .setParameter("markup", tauxMarkup)
+            .setParameter("id", line.getId())
+            .executeUpdate();
+
+        totalUpdated++;
+        System.out.println(
+            "=== PERSIST ALL LINES === \u2705 Ligne "
+                + line.getId()
+                + " : PR="
+                + pr
+                + " | Marge="
+                + margeBrute);
+      }
+
+      System.out.println(
+          "=== PERSIST ALL LINES === \u2705 Termin\u00e9 ("
+              + totalUpdated
+              + " ligne(s) mises \u00e0 jour)");
+
+    } catch (Exception e) {
+      TraceBackService.trace(response, e);
+    }
+  }
 }
