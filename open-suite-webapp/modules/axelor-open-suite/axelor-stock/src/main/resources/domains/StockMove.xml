@@ -125,7 +125,12 @@
       ref="com.axelor.apps.stock.db.StockCorrection" copy="false"/>
     <many-to-one name="massStockMove" title="Mass move"
       ref="com.axelor.apps.stock.db.MassStockMove"/>
+    <!-- ===== LVME - Cession de Stock ===== -->
+    <boolean name="isCession" title="Est une cession" default="false"
+      help="Marque ce mouvement comme une cession de stock interne LVME"/>
 
+    <string name="libelleMouvement" title="Libellé Mouvement"
+      help="Libellé visible du mouvement (ex: CESSION)"/>
     <unique-constraint columns="stockMoveSeq,company"/>
 
     <extra-code><![CDATA[
