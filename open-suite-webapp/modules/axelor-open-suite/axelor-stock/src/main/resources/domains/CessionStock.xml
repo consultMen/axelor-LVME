@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<domain-models xmlns="http://axelor.com/xml/ns/domain-models"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://axelor.com/xml/ns/domain-models http://axelor.com/xml/ns/domain-models/domain-models_7.4.xsd">
+
+  <module name="stock" package="com.axelor.apps.stock.db"/>
+
+  <entity name="CessionStock" lang="java">
+    <string name="cessionSeq" namecolumn="true" title="N° Cession" readonly="true"/>
+    <date name="cessionDate" title="Date" required="true"/>
+    <many-to-one name="company" ref="com.axelor.apps.base.db.Company" title="Société"/>
+    <many-to-one name="product" ref="com.axelor.apps.base.db.Product" title="Produit"
+      required="true"/>
+    <many-to-one name="lotSource" ref="com.axelor.apps.stock.db.TrackingNumber"
+      title="N° Lot" required="true"/>
+    <string name="libelleMvts" title="Libellé Mvts" default="CESSION" readonly="true"/>
+    <string name="entreeSortie" title="Entrée/Sortie" default="Sortie" readonly="true"/>
+    <many-to-one name="uniteVente" ref="com.axelor.apps.base.db.Unit" title="Unité"/>
+    <decimal name="prixRevient" title="Prix Revient" precision="20" scale="4"/>
+    <decimal name="poidsKg" title="Poids (Kg)" precision="20" scale="3" required="true"/>
+
+    <!-- ========== BLOC ARTICLE (auto-rempli) ========== -->
+    <string name="articleCode" title="Article"/>
+    <string name="designation" title="Désignation"/>
+    <string name="nomScientifique" title="Nom Scientifique"/>
+    <many-to-one name="nouveauLot" ref="com.axelor.apps.stock.db.TrackingNumber"
+      title="Lot destination"/>
+    <date name="dateCongelation" title="Date Congélation"/>
+    <string name="origine" title="Origine"/>
+    <date name="dluo" title="D.L.C. / D.L.U.O"/>
+    <string name="conditionnement" title="Conditionnement"/>
+    <string name="marque" title="Marque"/>
+    <many-to-one name="frigo" ref="com.axelor.apps.stock.db.StockLocation" title="Frigo"/>
+    <decimal name="tauxTVA" title="Taux TVA" precision="5" scale="2" default="0.00"/>
+    <string name="emplacement" title="Emplacement"/>
+    <string name="zonePeche" title="Zone Pêche"/>
+    <string name="gencode" title="Gencode"/>
+    <string name="refFourn" title="RéfFourn"/>
+    <integer name="nbColisParCouche" title="Nb Colis / Couche"/>
+    <integer name="nbColisParPalette" title="Nb Colis / Palette"/>
+
+    <!-- ========== BLOC CALCULS========== -->
+    <decimal name="nbColis" title="Nb Colis" precision="20" scale="3"/>
+    <decimal name="pdsColis" title="Pds Colis" precision="20" scale="3"/>
+    <decimal name="pdsTotal" title="Pds Total" precision="20" scale="3"/>
+    <decimal name="paKg" title="PA/Kg" precision="20" scale="4"/>
+    <decimal name="prDevise" title="PR devise" precision="20" scale="4"/>
+    <decimal name="prKg" title="PR/Kg" precision="20" scale="4"/>
+    <decimal name="montantHT" title="Montant HT" precision="20" scale="2"/>
+
+    <!-- ========== Lot créé après validation (caché) ========== -->
+
+    <boolean name="cessionRealisee" title="Cession réalisée" default="false" readonly="true"/>
+    <date name="dateRealisation" title="Date réalisation" readonly="true"/>
+
+  </entity>
+
+</domain-models>
