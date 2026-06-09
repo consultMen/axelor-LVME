@@ -202,6 +202,36 @@ public class CessionStockController {
     }
   }
 
+  /**
+   * Calculs automatiques quand l'user modifie nbColis ou pdsColis. - pdsTotal = nbColis × pdsColis
+   * - montantHT = pdsTotal × prKg Note : poidsKg et prDevise restent libres pour l'user.
+   */
+  public void computeCalculs(ActionRequest request, ActionResponse response) {
+    try {
+      CessionStock cession = request.getContext().asType(CessionStock.class);
+
+      BigDecimal nbColis = cession.getNbColis();
+      BigDecimal pdsColis = cession.getPdsColis();
+      BigDecimal prKg = cession.getPrKg();
+
+      // 1. POIDS TOTAL = nbColis × pdsColis
+      BigDecimal pdsTotal = BigDecimal.ZERO;
+      if (nbColis != null && pdsColis != null) {
+        pdsTotal = nbColis.multiply(pdsColis).setScale(3, java.math.RoundingMode.HALF_UP);
+      }
+      response.setValue("pdsTotal", pdsTotal);
+
+      // 2. MONTANT HT = pdsTotal × prKg
+      if (prKg != null) {
+        BigDecimal montantHT = pdsTotal.multiply(prKg).setScale(2, java.math.RoundingMode.HALF_UP);
+        response.setValue("montantHT", montantHT);
+      }
+
+    } catch (Exception e) {
+      response.setException(e);
+    }
+  }
+
   private String getConditionnementViaReflection(StockMoveLine line) {
     try {
       Method getPurchaseOrderLine = line.getClass().getMethod("getPurchaseOrderLine");
