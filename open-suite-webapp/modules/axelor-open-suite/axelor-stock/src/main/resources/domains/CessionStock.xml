@@ -17,7 +17,8 @@
     <string name="entreeSortie" title="Entrée/Sortie" default="Sortie" readonly="true"/>
     <many-to-one name="uniteVente" ref="com.axelor.apps.base.db.Unit" title="Unité"/>
     <decimal name="prixRevient" title="Prix Revient" precision="20" scale="4"/>
-    <decimal name="poidsKg" title="Poids (Kg)" precision="20" scale="3" required="true"/>
+    <decimal name="poidsKg" title="Poids à envoyer (Kg)" precision="20" scale="3"
+      required="true"/>
 
     <!-- ========== BLOC ARTICLE (auto-rempli) ========== -->
     <string name="articleCode" title="Article"/>
@@ -39,7 +40,17 @@
     <integer name="nbColisParCouche" title="Nb Colis / Couche"/>
     <integer name="nbColisParPalette" title="Nb Colis / Palette"/>
 
-    <!-- ========== BLOC CALCULS========== -->
+    <!-- ========== DESTINATION (Produit B) — Saisie manuelle ========== -->
+    <many-to-one name="productDest" ref="com.axelor.apps.base.db.Product"
+      title="Produit destination"/>
+    <many-to-one name="conditionnementDest"
+      ref="com.axelor.apps.purchase.db.Conditionnement" title="Conditionnement dest"/>
+    <decimal name="nbColisDest" title="Nb colis reçus" precision="20" scale="3"/>
+    <decimal name="pdsColisDest" title="Pds/colis dest" precision="20" scale="3"/>
+    <decimal name="pdsTotalDest" title="Pds total dest" precision="20" scale="3"/>
+    <decimal name="poidsKgDest" title="Poids à recevoir (Kg)" precision="20" scale="3"/>
+
+    <!-- ========== BLOC CALCULS ========== -->
     <decimal name="nbColis" title="Nb Colis" precision="20" scale="3"/>
     <decimal name="pdsColis" title="Pds Colis" precision="20" scale="3"/>
     <decimal name="pdsTotal" title="Pds Total" precision="20" scale="3"/>
@@ -48,8 +59,7 @@
     <decimal name="prKg" title="PR/Kg" precision="20" scale="4"/>
     <decimal name="montantHT" title="Montant HT" precision="20" scale="2"/>
 
-    <!-- ========== Lot créé après validation (caché) ========== -->
-
+    <!-- ========== Statut cession ========== -->
     <boolean name="cessionRealisee" title="Cession réalisée" default="false" readonly="true"/>
     <date name="dateRealisation" title="Date réalisation" readonly="true"/>
 

@@ -275,4 +275,37 @@ public class CessionStockController {
       return null;
     }
   }
+
+  public void computeDest(ActionRequest request, ActionResponse response) {
+    try {
+      CessionStock cession = request.getContext().asType(CessionStock.class);
+
+      BigDecimal nbColisDest = cession.getNbColisDest();
+      BigDecimal pdsColisDest = cession.getPdsColisDest();
+
+      BigDecimal pdsTotalDest = BigDecimal.ZERO;
+      if (nbColisDest != null && pdsColisDest != null) {
+        pdsTotalDest =
+            nbColisDest.multiply(pdsColisDest).setScale(3, java.math.RoundingMode.HALF_UP);
+      }
+      response.setValue("pdsTotalDest", pdsTotalDest);
+
+    } catch (Exception e) {
+      response.setException(e);
+    }
+  }
+
+  public void copyPoidsToDest(ActionRequest request, ActionResponse response) {
+    try {
+      CessionStock cession = request.getContext().asType(CessionStock.class);
+      BigDecimal poidsKg = cession.getPoidsKg();
+
+      if (poidsKg != null) {
+        response.setValue("poidsKgDest", poidsKg);
+      }
+
+    } catch (Exception e) {
+      response.setException(e);
+    }
+  }
 }
