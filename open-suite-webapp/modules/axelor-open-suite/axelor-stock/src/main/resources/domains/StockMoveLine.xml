@@ -70,7 +70,10 @@
       default="0"/>
     <decimal name="prKg" title="PR/Kg" precision="20" scale="10" default="0"/>
     <decimal name="paDevise" title="PA devise" precision="20" scale="10" default="0"/>
-
+    <decimal name="prixRevientReel" title="PR réel (€/kg)" precision="20" scale="10"
+      default="0" help="PR + frais congélation appliqués"/>
+    <decimal name="montantReel" title="Montant réel (€)" precision="20" scale="4"
+      default="0" help="Montant HT avec frais congélation = qty × prixRevientReel"/>
     <integer name="conformitySelect" title="Conformity"
       selection="stock.move.line.conformity.select"/>
 

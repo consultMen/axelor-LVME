@@ -38,6 +38,7 @@
     <string name="pricingScaleLogs" title="Price calculation details" large="true"
       readonly="true"/>
 
+
     <many-to-many name="taxLineSet" ref="com.axelor.apps.account.db.TaxLine"
       title="Taxes"/>
     <many-to-one name="taxEquiv" ref="com.axelor.apps.account.db.TaxEquiv"

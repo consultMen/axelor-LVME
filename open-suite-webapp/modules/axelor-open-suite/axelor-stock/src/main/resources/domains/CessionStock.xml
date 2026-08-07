@@ -8,17 +8,17 @@
   <entity name="CessionStock" lang="java">
     <string name="cessionSeq" namecolumn="true" title="N° Cession" readonly="true"/>
     <date name="cessionDate" title="Date" required="true"/>
+    <string name="typeCession" title="Type de cession" selection="cession.stock.type.select"
+      default="RECONDITIONNEMENT" required="true"/>
     <many-to-one name="company" ref="com.axelor.apps.base.db.Company" title="Société"/>
-    <many-to-one name="product" ref="com.axelor.apps.base.db.Product" title="Produit"
-      required="true"/>
+    <many-to-one name="product" ref="com.axelor.apps.base.db.Product" title="Produit"/>
     <many-to-one name="lotSource" ref="com.axelor.apps.stock.db.TrackingNumber"
-      title="N° Lot" required="true"/>
+      title="N° Lot"/>
     <string name="libelleMvts" title="Libellé Mvts" default="CESSION" readonly="true"/>
     <string name="entreeSortie" title="Entrée/Sortie" default="Sortie" readonly="true"/>
     <many-to-one name="uniteVente" ref="com.axelor.apps.base.db.Unit" title="Unité"/>
     <decimal name="prixRevient" title="Prix Revient" precision="20" scale="4"/>
-    <decimal name="poidsKg" title="Poids à envoyer (Kg)" precision="20" scale="3"
-      required="true"/>
+    <decimal name="poidsKg" title="Poids à envoyer (Kg)" precision="20" scale="3"/>
 
     <!-- ========== BLOC ARTICLE (auto-rempli) ========== -->
     <string name="articleCode" title="Article"/>
@@ -56,12 +56,16 @@
     <decimal name="pdsTotal" title="Pds Total" precision="20" scale="3"/>
     <decimal name="paKg" title="PA/Kg" precision="20" scale="4"/>
     <decimal name="prDevise" title="PR devise" precision="20" scale="4"/>
-    <decimal name="prKg" title="PR/Kg" precision="20" scale="4"/>
+    <decimal name="prKg" title="PR/Kg" precision="20" scale="10"/>
     <decimal name="montantHT" title="Montant HT" precision="20" scale="2"/>
 
     <!-- ========== Statut cession ========== -->
     <boolean name="cessionRealisee" title="Cession réalisée" default="false" readonly="true"/>
     <date name="dateRealisation" title="Date réalisation" readonly="true"/>
+
+    <!-- ========== CHAMPS SPÉCIFIQUES TYPE FRAIS_STOCKAGE ========== -->
+    <decimal name="ancienPR" title="Ancien PR (€/kg)" precision="20" scale="10"/>
+    <string name="motif" title="Motif" large="true"/>
 
   </entity>
 

@@ -26,6 +26,8 @@
     <many-to-one name="lotFournisseur" ref="com.axelor.apps.stock.db.LotFournisseur"
       title="Lot Fournisseur"/>
     <date name="dateArrivage" title="Date d'arrivage"/>
+    <decimal name="prixRevientReel" title="Prix de revient réel (€/kg)" precision="20"
+      scale="10" default="0" help="Prix de revient calculé = PR d'achat + frais de stockage cumulés"/>
 
     <integer name="originMoveTypeSelect" title="Move origin type"
       selection="stock.tracking.number.origin.move.type.select" default="0"
