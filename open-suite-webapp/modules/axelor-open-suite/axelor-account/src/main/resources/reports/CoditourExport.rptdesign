@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.23" id="1">
+    <property name="createdBy">Claude</property>
+    <list-property name="propertyBindings">
+        <structure>
+            <property name="name">odaURL</property>
+            <property name="id">209</property>
+            <expression name="value" type="javascript">params["DBName"].value</expression>
+        </structure>
+        <structure>
+            <property name="name">odaUser</property>
+            <property name="id">209</property>
+            <expression name="value" type="javascript">params["UserName"].value</expression>
+        </structure>
+        <structure>
+            <property name="name">odaPassword</property>
+            <property name="id">209</property>
+            <expression name="value" type="javascript">params["Password"].value</expression>
+        </structure>
+        <structure>
+            <property name="name">odaDriverClass</property>
+            <property name="id">209</property>
+            <expression name="value" type="javascript">params["DefaultDriver"].value</expression>
+        </structure>
+    </list-property>
+    <property name="units">cm</property>
+    <property name="layoutPreference">auto layout</property>
+    <property name="bidiLayoutOrientation">ltr</property>
+    <property name="imageDPI">96</property>
+    <parameters>
+        <scalar-parameter name="Mois" id="2001">
+            <property name="valueType">static</property>
+            <property name="isRequired">true</property>
+            <property name="dataType">integer</property>
+            <property name="distinct">true</property>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="Annee" id="2002">
+            <property name="valueType">static</property>
+            <property name="isRequired">true</property>
+            <property name="dataType">integer</property>
+            <property name="distinct">true</property>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="DBName" id="3828">
+            <property name="hidden">true</property>
+            <property name="valueType">static</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant">jdbc:postgresql://localhost:5432/</value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="UserName" id="3829">
+            <property name="hidden">true</property>
+            <property name="valueType">static</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="Password" id="3675">
+            <property name="hidden">true</property>
+            <property name="valueType">static</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="AttachmentPath" id="3838">
+            <property name="hidden">true</property>
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant"></value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="DefaultDriver" id="3819">
+            <property name="hidden">true</property>
+            <property name="valueType">static</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant">org.postgresql.Driver</value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+    </parameters>
+    <data-sources>
+        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="Data Source" id="209">
+            <property name="odaDriverClass">org.postgresql.Driver</property>
+            <property name="odaURL">jdbc:postgresql://localhost:5432/</property>
+        </oda-data-source>
+    </data-sources>
+    <data-sets>
+        <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="CoditourDS" id="3000">
+            <property name="nullsOrdering">nulls lowest</property>
+            <list-property name="parameters">
+                <structure>
+                    <property name="name">param_mois</property>
+                    <property name="paramName">Mois</property>
+                    <property name="nativeName"></property>
+                    <property name="dataType">integer</property>
+                    <property name="position">1</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">param_annee</property>
+                    <property name="paramName">Annee</property>
+                    <property name="nativeName"></property>
+                    <property name="dataType">integer</property>
+                    <property name="position">2</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+            </list-property>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure><property name="position">1</property><property name="name">code_coditour</property><property name="dataType">string</property></structure>
+                    <structure><property name="position">2</property><property name="name">invoice_date</property><property name="dataType">date</property></structure>
+                    <structure><property name="position">3</property><property name="name">numero_facture</property><property name="dataType">string</property></structure>
+                    <structure><property name="position">4</property><property name="name">devise</property><property name="dataType">string</property></structure>
+                    <structure><property name="position">5</property><property name="name">type_f_a</property><property name="dataType">string</property></structure>
+                    <structure><property name="position">6</property><property name="name">montant_ht</property><property name="dataType">decimal</property></structure>
+                    <structure><property name="position">7</property><property name="name">montant_ttc</property><property name="dataType">decimal</property></structure>
+                    <structure><property name="position">8</property><property name="name">code_fixe</property><property name="dataType">string</property></structure>
+                    <structure><property name="position">9</property><property name="name">montant_ristourne</property><property name="dataType">decimal</property></structure>
+                    <structure><property name="position">10</property><property name="name">periode</property><property name="dataType">string</property></structure>
+                </list-property>
+            </structure>
+            <property name="dataSource">Data Source</property>
+            <list-property name="resultSet">
+                <structure><property name="position">1</property><property name="name">code_coditour</property><property name="nativeName">code_coditour</property><property name="dataType">string</property></structure>
+                <structure><property name="position">2</property><property name="name">invoice_date</property><property name="nativeName">invoice_date</property><property name="dataType">date</property></structure>
+                <structure><property name="position">3</property><property name="name">numero_facture</property><property name="nativeName">numero_facture</property><property name="dataType">string</property></structure>
+                <structure><property name="position">4</property><property name="name">devise</property><property name="nativeName">devise</property><property name="dataType">string</property></structure>
+                <structure><property name="position">5</property><property name="name">type_f_a</property><property name="nativeName">type_f_a</property><property name="dataType">string</property></structure>
+                <structure><property name="position">6</property><property name="name">montant_ht</property><property name="nativeName">montant_ht</property><property name="dataType">decimal</property></structure>
+                <structure><property name="position">7</property><property name="name">montant_ttc</property><property name="nativeName">montant_ttc</property><property name="dataType">decimal</property></structure>
+                <structure><property name="position">8</property><property name="name">code_fixe</property><property name="nativeName">code_fixe</property><property name="dataType">string</property></structure>
+                <structure><property name="position">9</property><property name="name">montant_ristourne</property><property name="nativeName">montant_ristourne</property><property name="dataType">decimal</property></structure>
+                <structure><property name="position">10</property><property name="name">periode</property><property name="nativeName">periode</property><property name="dataType">string</property></structure>
+            </list-property>
+            <xml-property name="queryText"><![CDATA[SELECT 
+    p.code_coditour,
+    inv.invoice_date,
+    inv.invoice_id AS numero_facture,
+    'EUR' AS devise,
+    CASE WHEN inv.operation_type_select = 3 THEN 'F' ELSE 'A' END AS type_f_a,
+    inv.ex_tax_total AS montant_ht,
+    inv.in_tax_total AS montant_ttc,
+    '70533' AS code_fixe,
+    ROUND(inv.ex_tax_total * COALESCE(so.tauxrfa, 0) / 100, 2) AS montant_ristourne,
+    TO_CHAR(inv.invoice_date, 'MM/YY') AS periode
+FROM account_invoice inv
+JOIN base_partner p ON p.id = inv.partner
+LEFT JOIN sale_sale_order so ON so.id = inv.sale_order
+WHERE p.code_coditour IS NOT NULL
+  AND inv.status_select = 3
+  AND EXTRACT(MONTH FROM inv.invoice_date) = ?
+  AND EXTRACT(YEAR FROM inv.invoice_date) = ?
+ORDER BY inv.invoice_date]]></xml-property>
+        </oda-data-set>
+    </data-sets>
+    <page-setup>
+        <simple-master-page name="Simple MasterPage" id="2">
+            <property name="type">a4</property>
+            <property name="orientation">landscape</property>
+        </simple-master-page>
+    </page-setup>
+    <body>
+        <table id="4000">
+            <property name="dataSet">CoditourDS</property>
+            <property name="width">100%</property>
+            <list-property name="boundDataColumns">
+                <structure><property name="name">code_coditour</property><expression name="expression" type="javascript">dataSetRow["code_coditour"]</expression><property name="dataType">string</property></structure>
+                <structure><property name="name">invoice_date</property><expression name="expression" type="javascript">dataSetRow["invoice_date"]</expression><property name="dataType">date</property></structure>
+                <structure><property name="name">numero_facture</property><expression name="expression" type="javascript">dataSetRow["numero_facture"]</expression><property name="dataType">string</property></structure>
+                <structure><property name="name">devise</property><expression name="expression" type="javascript">dataSetRow["devise"]</expression><property name="dataType">string</property></structure>
+                <structure><property name="name">type_f_a</property><expression name="expression" type="javascript">dataSetRow["type_f_a"]</expression><property name="dataType">string</property></structure>
+                <structure><property name="name">montant_ht</property><expression name="expression" type="javascript">dataSetRow["montant_ht"]</expression><property name="dataType">decimal</property></structure>
+                <structure><property name="name">montant_ttc</property><expression name="expression" type="javascript">dataSetRow["montant_ttc"]</expression><property name="dataType">decimal</property></structure>
+                <structure><property name="name">code_fixe</property><expression name="expression" type="javascript">dataSetRow["code_fixe"]</expression><property name="dataType">string</property></structure>
+                <structure><property name="name">montant_ristourne</property><expression name="expression" type="javascript">dataSetRow["montant_ristourne"]</expression><property name="dataType">decimal</property></structure>
+                <structure><property name="name">periode</property><expression name="expression" type="javascript">dataSetRow["periode"]</expression><property name="dataType">string</property></structure>
+            </list-property>
+            <column id="4001"/>
+            <column id="4002"/>
+            <column id="4003"/>
+            <column id="4004"/>
+            <column id="4005"/>
+            <column id="4006"/>
+            <column id="4007"/>
+            <column id="4008"/>
+            <column id="4009"/>
+            <column id="4010"/>
+            <header>
+                <row id="4020">
+                    <cell id="4021"><label id="4031"><text-property name="text">Code Coditour</text-property></label></cell>
+                    <cell id="4022"><label id="4032"><text-property name="text">Date</text-property></label></cell>
+                    <cell id="4023"><label id="4033"><text-property name="text">N° Facture</text-property></label></cell>
+                    <cell id="4024"><label id="4034"><text-property name="text">Devise</text-property></label></cell>
+                    <cell id="4025"><label id="4035"><text-property name="text">Type F/A</text-property></label></cell>
+                    <cell id="4026"><label id="4036"><text-property name="text">Montant HT</text-property></label></cell>
+                    <cell id="4027"><label id="4037"><text-property name="text">Montant TTC</text-property></label></cell>
+                    <cell id="4028"><label id="4038"><text-property name="text">Code</text-property></label></cell>
+                    <cell id="4029"><label id="4039"><text-property name="text">Montant Ristourne</text-property></label></cell>
+                    <cell id="4030"><label id="4040"><text-property name="text">Période</text-property></label></cell>
+                </row>
+            </header>
+            <detail>
+                <row id="4050">
+                    <cell id="4051"><data id="4061"><property name="resultSetColumn">code_coditour</property></data></cell>
+                    <cell id="4052"><data id="4062"><property name="resultSetColumn">invoice_date</property><structure name="dateTimeFormat"><property name="category">Custom</property><property name="pattern">dd/MM/yyyy</property></structure></data></cell>
+                    <cell id="4053"><data id="4063"><property name="resultSetColumn">numero_facture</property></data></cell>
+                    <cell id="4054"><data id="4064"><property name="resultSetColumn">devise</property></data></cell>
+                    <cell id="4055"><data id="4065"><property name="resultSetColumn">type_f_a</property></data></cell>
+                    <cell id="4056"><data id="4066"><property name="resultSetColumn">montant_ht</property></data></cell>
+                    <cell id="4057"><data id="4067"><property name="resultSetColumn">montant_ttc</property></data></cell>
+                    <cell id="4058"><data id="4068"><property name="resultSetColumn">code_fixe</property></data></cell>
+                    <cell id="4059"><data id="4069"><property name="resultSetColumn">montant_ristourne</property></data></cell>
+                    <cell id="4060"><data id="4070"><property name="resultSetColumn">periode</property></data></cell>
+                </row>
+            </detail>
+        </table>
+    </body>
+</report>

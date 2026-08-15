@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<domain-models xmlns="http://axelor.com/xml/ns/domain-models"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://axelor.com/xml/ns/domain-models
+                      http://axelor.com/xml/ns/domain-models/domain-models_7.4.xsd">
+
+  <module name="sale" package="com.axelor.apps.sale.db"/>
+
+  <entity name="Groupement" lang="java">
+
+    <!-- Identification -->
+    <string name="name" namecolumn="true" title="Nom" required="true"/>
+    <string name="code" title="Code" unique="true"/>
+
+    <!-- Conditions commerciales -->
+    <decimal name="pourcRfa" title="RFA globale (%)" precision="5" scale="2" default="0"/>
+
+    <!-- Contact principal (Partner natif) -->
+    <many-to-one name="contactPartner" ref="com.axelor.apps.base.db.Partner"
+      title="Contact principal"/>
+
+    <!-- Adresse (Address native Axelor) -->
+    <many-to-one name="address" ref="com.axelor.apps.base.db.Address" title="Adresse"/>
+
+    <!-- Coordonnées -->
+    <string name="fixedPhone" title="Téléphone fixe"/>
+    <string name="mobilePhone" title="Portable"/>
+    <string name="fax" title="Fax"/>
+    <string name="emailAddress" title="Email"/>
+
+    <!-- Divers -->
+    <string name="obs" title="Observations" large="true"/>
+    <boolean name="actif" title="Actif" default="true"/>
+
+  </entity>
+
+</domain-models>

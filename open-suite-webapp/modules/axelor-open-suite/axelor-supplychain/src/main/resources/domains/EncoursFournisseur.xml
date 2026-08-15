@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<domain-models xmlns="http://axelor.com/xml/ns/domain-models"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://axelor.com/xml/ns/domain-models
+  https://axelor.com/xml/ns/domain-models/domain-models_7.0.xsd">
+
+  <module name="supplychain" package="com.axelor.apps.supplychain.db"/>
+
+  <entity name="EncoursFournisseur" table="lvme_encours_fournisseur" cacheable="false">
+    <many-to-one name="fournisseur" ref="com.axelor.apps.base.db.Partner"
+      column="fournisseur_id" title="Fournisseur"/>
+    <string name="numeroArrivage" column="numero_arrivage" title="N° Arrivage"/>
+    <date name="dateArrivage" column="date_arrivage" title="Date d'arrivage"/>
+    <decimal name="montantHtArrivage" column="montant_ht_arrivage"
+      title="Montant HT Arrivage" precision="20" scale="2"/>
+    <decimal name="montantHtComptabilise" column="montant_ht_comptabilise"
+      title="Montant HT Comptabilisé" precision="20" scale="2"/>
+    <decimal name="ecart" column="ecart" title="Écart" precision="20" scale="2"/>
+    <date name="dateComptabilisation" column="date_comptabilisation"
+      title="Date comptabilisation"/>
+  </entity>
+
+</domain-models>

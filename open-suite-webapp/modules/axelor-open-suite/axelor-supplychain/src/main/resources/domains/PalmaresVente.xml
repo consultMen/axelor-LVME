@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<domain-models xmlns="http://axelor.com/xml/ns/domain-models"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://axelor.com/xml/ns/domain-models
+                      http://axelor.com/xml/ns/domain-models/domain-models_7.4.xsd">
+
+  <module name="supplychain" package="com.axelor.apps.supplychain.db"/>
+
+  <!-- LVME - Palmarès des ventes (VEN-090 / VEN-091) Entité en LECTURE SEULE mappée sur la vue SQL "lvme_palmares_ventes".
+    cacheable="false" + readonly : Axelor ne gère pas le cycle de vie (pas d'insert/update/delete), il lit
+    juste la vue. -->
+  <entity name="PalmaresVente" table="lvme_palmares_ventes" cacheable="false">
+
+    <many-to-one name="client" ref="com.axelor.apps.base.db.Partner" column="client_id"
+      title="Client"/>
+    <many-to-one name="product" ref="com.axelor.apps.base.db.Product"
+      column="product_id" title="Produit"/>
+    <many-to-one name="commercial" ref="com.axelor.auth.db.User" column="commercial_id"
+      title="Commercial"/>
+
+    <date name="invoiceDate" column="invoice_date" title="Date facture"/>
+
+    <decimal name="nbColis" column="nb_colis" title="Nb colis" precision="20" scale="3"/>
+    <decimal name="qteUv" column="qte_uv" title="Qté UV" precision="20" scale="3"/>
+    <decimal name="poidsTotal" column="poids_total" title="Poids total (kg)" precision="20"
+      scale="3"/>
+    <decimal name="caHt" column="ca_ht" title="CA HT (€)" precision="20" scale="2"/>
+    <decimal name="marge" column="marge" title="Marge (€)" precision="20" scale="2"/>
+
+  </entity>
+
+</domain-models>

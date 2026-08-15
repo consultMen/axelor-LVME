@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<domain-models xmlns="http://axelor.com/xml/ns/domain-models"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://axelor.com/xml/ns/domain-models
+  https://axelor.com/xml/ns/domain-models/domain-models_7.0.xsd">
+
+  <module name="supplychain" package="com.axelor.apps.supplychain.db"/>
+
+  <entity name="SyntheseRisqueClient" table="lvme_synthese_risques_clients" cacheable="false">
+    <many-to-one name="client" ref="com.axelor.apps.base.db.Partner" column="client_id"
+      title="Client"/>
+    <string name="pays" column="pays" title="Pays"/>
+    <decimal name="encours" column="encours" title="Encours" precision="20" scale="2"/>
+    <decimal name="creditAutorise" column="credit_autorise" title="Crédit autorisé"
+      precision="20" scale="2"/>
+    <decimal name="montantRisque" column="montant_risque" title="Montant risque"
+      precision="20" scale="2"/>
+  </entity>
+
+</domain-models>

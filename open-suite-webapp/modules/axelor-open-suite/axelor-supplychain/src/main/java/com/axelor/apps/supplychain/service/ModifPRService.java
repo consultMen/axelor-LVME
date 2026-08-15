@@ -1,6 +1,5 @@
 package com.axelor.apps.supplychain.service;
 
-import com.axelor.apps.sale.db.repo.SaleOrderLineRepository;
 import com.axelor.apps.stock.db.CessionStock;
 import com.axelor.apps.stock.db.StockMoveLine;
 import com.axelor.apps.stock.db.TrackingNumber;
@@ -14,25 +13,23 @@ import java.time.LocalDate;
 import java.util.List;
 
 /**
- * Service LVME - UC-16 Type 2 MODIF_PR Modification du prix de revient d'un lot spécifique. Spec :
- * STK-040 - "La modification de prix d'achat est tracée comme un type de mouvement de cession de
- * stock dédié."
+ * Service LVME - UC-16 Type 2 MODIF_PR Spec STK-040 : modification de prix d'achat tracée comme
+ * cession dédiée.
  */
 public class ModifPRService {
 
   @Inject protected TrackingNumberRepository trackingRepo;
   @Inject protected StockMoveLineRepository stockMoveLineRepo;
-  @Inject protected SaleOrderLineRepository saleOrderLineRepo;
   @Inject protected CessionStockRepository cessionRepo;
 
-  /** Applique la modification de PR sur le lot sélectionné. */
+  /** Applique la modification de prKg pour le lot sélectionné. */
   @Transactional
   public String appliquerModifPR(CessionStock cession) {
     if (cession == null || cession.getId() == null) {
       return "Cession introuvable.";
     }
 
-    // Recharger la cession depuis la BD (évite les proxies ByteBuddy)
+    // Recharger la cession depuis la BD (évite proxy ByteBuddy)
     cession = cessionRepo.find(cession.getId());
     if (cession == null) {
       return "Cession introuvable en base.";
@@ -53,21 +50,14 @@ public class ModifPRService {
       return "Le motif de la modification est obligatoire.";
     }
 
-    // Récupérer l'ancien PR pour trace
-    BigDecimal ancienPR =
-        lot.getPrixRevientReel() != null ? lot.getPrixRevientReel() : BigDecimal.ZERO;
-
-    // 1. Modifier le lot (TrackingNumber)
-    lot.setPrixRevientReel(nouveauPR);
-    trackingRepo.save(lot);
-
-    // 2. Modifier la StockMoveLine d'origine (prKg + prixRevientReel)
-    if (lot.getOriginStockMoveLine() != null) {
-      lot.getOriginStockMoveLine().setPrKg(nouveauPR);
-      lot.getOriginStockMoveLine().setPrixRevientReel(nouveauPR);
+    // Recharger le lot depuis la BD
+    lot = trackingRepo.find(lot.getId());
+    BigDecimal ancienPR = BigDecimal.ZERO;
+    if (lot.getOriginStockMoveLine() != null && lot.getOriginStockMoveLine().getPrKg() != null) {
+      ancienPR = lot.getOriginStockMoveLine().getPrKg();
     }
 
-    // 3. Modifier toutes les StockMoveLines liées à ce lot
+    // 1. Modifier toutes les StockMoveLines liées à ce lot
     List<StockMoveLine> smls =
         stockMoveLineRepo.all().filter("self.trackingNumber = ?", lot).fetch();
     for (StockMoveLine sml : smls) {
@@ -76,26 +66,28 @@ public class ModifPRService {
       stockMoveLineRepo.save(sml);
     }
 
-    // 4. Marquer la cession réalisée + trace
-    cession.setAncienPR(ancienPR);
+    // 2. Modifier le lot (TrackingNumber.prixRevientReel)
+    lot.setPrixRevientReel(nouveauPR);
+    trackingRepo.save(lot);
+
+    // 3. Marquer la cession réalisée + trace
+    cession.setAncienPR(ancienPR.setScale(4, java.math.RoundingMode.HALF_UP));
     cession.setCessionRealisee(true);
     cession.setDateRealisation(LocalDate.now());
-
     cessionRepo.save(cession);
 
-    return "Modification PR appliquée : "
+    return "Modification PR appliquée : lot "
         + lot.getTrackingNumberSeq()
-        + " - Ancien PR = "
+        + " (ancien PR : "
         + ancienPR
-        + " → Nouveau PR = "
+        + " → nouveau PR : "
         + nouveauPR
-        + " €/kg"
-        + " ("
+        + " €/kg, "
         + smls.size()
-        + " ligne(s) d'arrivage mise(s) à jour)";
+        + " ligne(s) mise(s) à jour)";
   }
 
-  /** Charge le PR actuel du lot dans le champ ancienPR (auto-remplissage). */
+  /** Charge l'ancien PR depuis le lot (pour auto-remplissage). */
   public BigDecimal getAncienPRFromLot(TrackingNumber lot) {
     if (lot == null || lot.getId() == null) {
       return BigDecimal.ZERO;
@@ -104,6 +96,11 @@ public class ModifPRService {
     if (lotDB == null) {
       return BigDecimal.ZERO;
     }
-    return lotDB.getPrixRevientReel() != null ? lotDB.getPrixRevientReel() : BigDecimal.ZERO;
+    // On prend le prKg de la StockMoveLine d'origine
+    if (lotDB.getOriginStockMoveLine() != null
+        && lotDB.getOriginStockMoveLine().getPrKg() != null) {
+      return lotDB.getOriginStockMoveLine().getPrKg();
+    }
+    return BigDecimal.ZERO;
   }
 }

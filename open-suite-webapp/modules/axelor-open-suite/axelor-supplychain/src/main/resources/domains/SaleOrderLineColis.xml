@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<domain-models xmlns="http://axelor.com/xml/ns/domain-models"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://axelor.com/xml/ns/domain-models http://axelor.com/xml/ns/domain-models/domain-models_7.4.xsd">
+  <module name="supplychain" package="com.axelor.apps.sale.db"/>
+  <entity name="SaleOrderLine">
+    <many-to-one name="conditionnement"
+      ref="com.axelor.apps.purchase.db.Conditionnement" title="Conditionnement"/>
+    <decimal name="nbColis" title="Nb colis" precision="20" scale="3" default="0"/>
+    <decimal name="poidsParColis" title="Poids/colis (Kg)" precision="20" scale="3"
+      default="0"/>
+    <decimal name="coefPoidsNet" title="Coefficient poids net" precision="10" scale="4"
+      default="1"/>
+    <decimal name="poidsParColisNet" title="Poids/colis-NET (Kg)" precision="20" scale="3"/>
+    <decimal name="poidsTotalNet" title="Poids total net (Kg)" precision="20" scale="3"/>
+    <decimal name="nbUnitesParColis" title="Nb unités/colis" precision="20" scale="3"
+      default="0"/>
+    <decimal name="qtySachetPreleve" title="Qté sachet prélevé (Kg)" precision="20"
+      scale="3" default="0"/>
+  </entity>
+</domain-models>

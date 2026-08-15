@@ -25,6 +25,12 @@
     <many-to-one name="commercial" ref="com.axelor.auth.db.User" title="Commercial"/>
     <boolean name="portPaye" title="Port Payé"/>
 
+    <!-- UC-01 - Rattachement groupement (spec VEN-020, VEN-021) -->
+    <many-to-one name="groupement" ref="com.axelor.apps.sale.db.Groupement"
+      title="Groupement" help="Groupement du client (Coditour, Relais d'Or, Système U...)"/>
+    <string name="codeCoditour" title="Code Coditour"
+      help="Identifiant du client chez Coditour (pour déclaration mensuelle de ristournes)"/>
+
   </entity>
 
 </domain-models>
