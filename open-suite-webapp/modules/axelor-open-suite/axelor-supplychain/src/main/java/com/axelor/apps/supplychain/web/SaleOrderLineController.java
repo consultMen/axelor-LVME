@@ -1,21 +1,3 @@
-/*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
 package com.axelor.apps.supplychain.web;
 
 import com.axelor.apps.account.service.analytic.AnalyticGroupService;
@@ -78,13 +60,6 @@ public class SaleOrderLineController {
     }
   }
 
-  /**
-   * Called from sale order line request quantity wizard view. Call {@link
-   * ReservedQtyService#updateReservedQty(SaleOrderLine, BigDecimal)}.
-   *
-   * @param request
-   * @param response
-   */
   public void changeReservedQty(ActionRequest request, ActionResponse response) {
     SaleOrderLine saleOrderLine = request.getContext().asType(SaleOrderLine.class);
     BigDecimal newReservedQty = saleOrderLine.getReservedQty();
@@ -113,13 +88,6 @@ public class SaleOrderLineController {
     }
   }
 
-  /**
-   * Called from sale order line form view, on request qty click. Call {@link
-   * ReservedQtyService#requestQty(SaleOrderLine)}
-   *
-   * @param request
-   * @param response
-   */
   public void requestQty(ActionRequest request, ActionResponse response) {
     try {
       SaleOrderLine saleOrderLine = request.getContext().asType(SaleOrderLine.class);
@@ -137,13 +105,6 @@ public class SaleOrderLineController {
     }
   }
 
-  /**
-   * Called from sale order line form view, on request qty click. Call {@link
-   * ReservedQtyService#cancelReservation(SaleOrderLine)}
-   *
-   * @param request
-   * @param response
-   */
   public void cancelReservation(ActionRequest request, ActionResponse response) {
     try {
       SaleOrderLine saleOrderLine = request.getContext().asType(SaleOrderLine.class);
@@ -161,12 +122,6 @@ public class SaleOrderLineController {
     }
   }
 
-  /**
-   * Called from sale order line form. Set domain for supplier partner.
-   *
-   * @param request
-   * @param response
-   */
   public void supplierPartnerDomain(ActionRequest request, ActionResponse response) {
     SaleOrderLine saleOrderLine = request.getContext().asType(SaleOrderLine.class);
     String domain = "self.isContact = false AND self.isSupplier = true";
@@ -214,12 +169,6 @@ public class SaleOrderLineController {
     response.setAttr("supplierPartner", "domain", domain);
   }
 
-  /**
-   * Called from sale order line form, on product change and on sale supply select change
-   *
-   * @param request
-   * @param response
-   */
   public void supplierPartnerDefault(ActionRequest request, ActionResponse response) {
     SaleOrderLine saleOrderLine = request.getContext().asType(SaleOrderLine.class);
     if (saleOrderLine.getSaleSupplySelect() != SaleOrderLineRepository.SALE_SUPPLY_PURCHASE) {
@@ -256,13 +205,6 @@ public class SaleOrderLineController {
     response.setValue("supplierPartner", supplierPartner);
   }
 
-  /**
-   * Called from sale order form view, on clicking allocateAll button on one sale order line. Call
-   * {@link ReservedQtyService#allocateAll(SaleOrderLine)}.
-   *
-   * @param request
-   * @param response
-   */
   public void allocateAll(ActionRequest request, ActionResponse response) {
     try {
       SaleOrderLine saleOrderLine = request.getContext().asType(SaleOrderLine.class);
@@ -280,13 +222,6 @@ public class SaleOrderLineController {
     }
   }
 
-  /**
-   * Called from sale order form view, on clicking deallocate button on one sale order line. Call
-   * {@link ReservedQtyService#updateReservedQty(SaleOrderLine, BigDecimal.ZERO)}.
-   *
-   * @param request
-   * @param response
-   */
   public void deallocateAll(ActionRequest request, ActionResponse response) {
     try {
       SaleOrderLine saleOrderLine = request.getContext().asType(SaleOrderLine.class);
@@ -298,13 +233,6 @@ public class SaleOrderLineController {
     }
   }
 
-  /**
-   * Called from sale order line, on desired delivery date change. Call {@link
-   * SaleOrderLineServiceSupplyChain#updateStockMoveReservationDateTime(SaleOrderLine)}.
-   *
-   * @param request
-   * @param response
-   */
   public void updateReservationDate(ActionRequest request, ActionResponse response) {
     try {
       SaleOrderLine saleOrderLine = request.getContext().asType(SaleOrderLine.class);
@@ -416,7 +344,6 @@ public class SaleOrderLineController {
     response.setValues(
         saleOrderLineOnSaleSupplyChangeService.onSaleSupplyChangeValues(saleOrderLine, saleOrder));
 
-    // Check
     Beans.get(SaleOrderLineCheckSupplychainService.class)
         .saleSupplySelectOnChangeCheck(saleOrderLine, saleOrder);
   }
@@ -443,32 +370,26 @@ public class SaleOrderLineController {
   }
 
   // ==================================================================
-  // M2 - Calcul frais cong\u00e9lation (V3 - LVME)
-  // R\u00e8gles :
-  // - Sans lot s\u00e9lectionn\u00e9 \u2192 affiche le taux soci\u00e9t\u00e9
-  // brut
-  // - Avec lot et \u00e2ge >= 3 mois \u2192 (mois - 3) \u00d7 taux
-  // soci\u00e9t\u00e9
-  // - Avec lot et \u00e2ge < 3 mois \u2192 taux soci\u00e9t\u00e9 brut (pas
-  // encore p\u00e9nalisation)
+  // M2 - Calcul frais congélation (V3 - LVME)
+  // Règles :
+  // - Sans lot sélectionné -> affiche le taux société brut
+  // - Avec lot et âge >= 3 mois -> (mois - 3) x taux société
+  // - Avec lot et âge < 3 mois -> taux société brut (pas encore pénalisation)
   // ==================================================================
 
   public void setFraisCongelationFromLot(ActionRequest request, ActionResponse response) {
     try {
       SaleOrderLine line = request.getContext().asType(SaleOrderLine.class);
 
-      // 1. R\u00e9cup\u00e9rer la SaleOrder pour avoir la Company
       com.axelor.apps.sale.db.SaleOrder saleOrder =
           com.axelor.apps.sale.service.saleorderline.SaleOrderLineContextHelper.getSaleOrder(
               request.getContext(), line);
 
       if (saleOrder == null || saleOrder.getCompany() == null) {
-        System.out.println("=== FRAIS LVME === Pas de soci\u00e9t\u00e9, frais = 0");
         response.setValue("fraisCongelation", java.math.BigDecimal.ZERO);
         return;
       }
 
-      // 2. R\u00e9cup\u00e9rer le taux fraisCongelation depuis la Company
       com.axelor.apps.base.db.Company company =
           Beans.get(com.axelor.apps.base.db.repo.CompanyRepository.class)
               .find(saleOrder.getCompany().getId());
@@ -477,74 +398,34 @@ public class SaleOrderLineController {
       if (tauxFraisCong == null) {
         tauxFraisCong = java.math.BigDecimal.ZERO;
       }
-      // Arrondi pour respecter scale=4
       tauxFraisCong = tauxFraisCong.setScale(4, java.math.RoundingMode.HALF_UP);
 
-      // 3. V\u00e9rifier s'il y a un lot s\u00e9lectionn\u00e9
       java.util.List<com.axelor.apps.supplychain.db.SaleOrderLineLot> lotList =
           line.getSaleOrderLineLotList();
 
       if (lotList == null || lotList.isEmpty()) {
-        // \u2b50 SANS LOT : afficher le taux soci\u00e9t\u00e9 brut
-        System.out.println(
-            "=== FRAIS LVME === Sans lot : taux soci\u00e9t\u00e9 brut = "
-                + tauxFraisCong
-                + " \u20ac/kg");
         response.setValue("fraisCongelation", tauxFraisCong);
         return;
       }
 
       com.axelor.apps.stock.db.TrackingNumber tn = lotList.get(0).getTrackingNumber();
       if (tn == null || tn.getDateArrivage() == null) {
-        // \u2b50 LOT SANS DATE : afficher le taux soci\u00e9t\u00e9 brut
-        System.out.println(
-            "=== FRAIS LVME === Lot sans dateArrivage : taux soci\u00e9t\u00e9 brut = "
-                + tauxFraisCong
-                + " \u20ac/kg");
         response.setValue("fraisCongelation", tauxFraisCong);
         return;
       }
 
-      // 4. Calculer l'\u00e2ge en mois
       java.time.LocalDate dateArrivage = tn.getDateArrivage();
       java.time.LocalDate today = java.time.LocalDate.now();
       long moisAge = java.time.temporal.ChronoUnit.MONTHS.between(dateArrivage, today);
 
-      // 5. Appliquer la formule LVME
       java.math.BigDecimal frais;
       if (moisAge < 3) {
-        // \u2b50 LOT JEUNE (< 3 mois) : afficher le taux soci\u00e9t\u00e9 brut
         frais = tauxFraisCong;
-        System.out.println(
-            "=== FRAIS LVME === Lot "
-                + tn.getTrackingNumberSeq()
-                + " : \u00e2ge="
-                + moisAge
-                + " mois (< 3) \u2192 taux soci\u00e9t\u00e9 brut = "
-                + frais
-                + " \u20ac/kg");
       } else {
-        // \u2b50 LOT ANCIEN (>= 3 mois) : appliquer la p\u00e9nalisation
         frais =
             new java.math.BigDecimal(moisAge - 3)
                 .multiply(tauxFraisCong)
                 .setScale(4, java.math.RoundingMode.HALF_UP);
-        System.out.println(
-            "=== FRAIS LVME === Lot "
-                + tn.getTrackingNumberSeq()
-                + " : dateArrivage="
-                + dateArrivage
-                + " | \u00e2ge="
-                + moisAge
-                + " mois"
-                + " | taux soci\u00e9t\u00e9="
-                + tauxFraisCong
-                + " \u20ac/kg"
-                + " | (mois-3)\u00d7"
-                + tauxFraisCong
-                + " = "
-                + frais
-                + " \u20ac/kg");
       }
 
       response.setValue("fraisCongelation", frais);
@@ -554,7 +435,6 @@ public class SaleOrderLineController {
     }
   }
 
-  /** Recopie tauxRFA + tauxCommission depuis le SaleOrder parent vers la ligne. */
   public void copyTauxFromSaleOrder(ActionRequest request, ActionResponse response) {
     try {
       SaleOrderLine line = request.getContext().asType(SaleOrderLine.class);
@@ -568,13 +448,8 @@ public class SaleOrderLineController {
                 ? saleOrder.getTauxCommission()
                 : java.math.BigDecimal.ZERO;
 
-        System.out.println(
-            "=== TAUX LVME === Recopie : RFA=" + tauxRFA + "% Commission=" + tauxComm + "%");
-
         response.setValue("tauxRFA", tauxRFA);
         response.setValue("tauxCommission", tauxComm);
-      } else {
-        System.out.println("=== TAUX LVME === SaleOrder null, aucune recopie possible");
       }
     } catch (Exception e) {
       TraceBackService.trace(response, e);
@@ -582,20 +457,7 @@ public class SaleOrderLineController {
   }
 
   // ==================================================================
-  // M2 - R\u00e9cup\u00e9rer le PR du lot s\u00e9lectionn\u00e9 (depuis l'achat
-  // d'origine)
-  // ==================================================================
-
-  /**
-   * R\u00e9cup\u00e8re le PR du lot s\u00e9lectionn\u00e9 et le met dans subTotalCostPrice.
-   *
-   * <p>Logique : 1. Prendre le 1er lot s\u00e9lectionn\u00e9 (convention LVME : 1 lot/ligne) 2. Le
-   * TrackingNumber a un lien vers son PurchaseOrderLine d'origine 3. Lire le prKg du
-   * PurchaseOrderLine 4. Le mettre dans subTotalCostPrice
-   */
-  // ==================================================================
-  // M2 - R\u00e9cup\u00e9rer le PR du lot s\u00e9lectionn\u00e9 (3
-  // strat\u00e9gies en cascade)
+  // M2 - Récupérer le PR du lot sélectionné (3 stratégies en cascade)
   // ==================================================================
 
   public void setPrFromLot(ActionRequest request, ActionResponse response) {
@@ -606,14 +468,12 @@ public class SaleOrderLineController {
           line.getSaleOrderLineLotList();
 
       if (lotList == null || lotList.isEmpty()) {
-        System.out.println("=== PR LVME === Aucun lot s\u00e9lectionn\u00e9");
         return;
       }
 
       com.axelor.apps.stock.db.TrackingNumber tn = lotList.get(0).getTrackingNumber();
       if (tn == null) return;
 
-      // STRAT\u00c9GIE 1 : StockMoveLine d'entr\u00e9e
       java.util.List<com.axelor.apps.stock.db.StockMoveLine> stockMoveLines =
           Beans.get(com.axelor.apps.stock.db.repo.StockMoveLineRepository.class)
               .all()
@@ -626,21 +486,11 @@ public class SaleOrderLineController {
 
       if (!stockMoveLines.isEmpty()) {
         java.math.BigDecimal prKg =
-            stockMoveLines
-                .get(0)
-                .getPrKg()
-                .setScale(3, java.math.RoundingMode.HALF_UP); // \u2b50 ARRONDI
-        System.out.println(
-            "=== PR LVME === Lot "
-                + tn.getTrackingNumberSeq()
-                + " : PR="
-                + prKg
-                + " \u20ac/kg (StockMoveLine entr\u00e9e)");
+            stockMoveLines.get(0).getPrKg().setScale(3, java.math.RoundingMode.HALF_UP);
         response.setValue("subTotalCostPrice", prKg);
         return;
       }
 
-      // STRAT\u00c9GIE 2 : Fallback SML
       stockMoveLines =
           Beans.get(com.axelor.apps.stock.db.repo.StockMoveLineRepository.class)
               .all()
@@ -652,40 +502,22 @@ public class SaleOrderLineController {
 
       if (!stockMoveLines.isEmpty()) {
         java.math.BigDecimal prKg =
-            stockMoveLines
-                .get(0)
-                .getPrKg()
-                .setScale(3, java.math.RoundingMode.HALF_UP); // \u2b50 ARRONDI
-        System.out.println(
-            "=== PR LVME === Lot "
-                + tn.getTrackingNumberSeq()
-                + " : PR="
-                + prKg
-                + " \u20ac/kg (fallback SML)");
+            stockMoveLines.get(0).getPrKg().setScale(3, java.math.RoundingMode.HALF_UP);
         response.setValue("subTotalCostPrice", prKg);
         return;
       }
 
-      // STRAT\u00c9GIE 3 : Fallback Product
       com.axelor.apps.base.db.Product product = line.getProduct();
       if (product != null && product.getId() != null) {
         product =
             Beans.get(com.axelor.apps.base.db.repo.ProductRepository.class).find(product.getId());
         java.math.BigDecimal pp = product.getPurchasePrice();
         if (pp != null && pp.signum() > 0) {
-          pp = pp.setScale(3, java.math.RoundingMode.HALF_UP); // \u2b50 ARRONDI
-          System.out.println(
-              "=== PR LVME === Lot "
-                  + tn.getTrackingNumberSeq()
-                  + " : PR="
-                  + pp
-                  + " \u20ac/kg (fallback Product)");
+          pp = pp.setScale(3, java.math.RoundingMode.HALF_UP);
           response.setValue("subTotalCostPrice", pp);
           return;
         }
       }
-
-      System.out.println("=== PR LVME === Aucun PR trouv\u00e9");
 
     } catch (Exception e) {
       TraceBackService.trace(response, e);
@@ -694,32 +526,28 @@ public class SaleOrderLineController {
 
   // ==================================================================
   // M2 - Calcul du Prix de Revient Net (formule N7 spec)
-  // PR Net = (PR + FraisCong) \u00d7 (1 + (RFA + Commission) / 100)
+  // PR Net = (PR + FraisCong) x (1 + (RFA + Commission) / 100)
   // ==================================================================
 
   public void computePrixRevientNet(ActionRequest request, ActionResponse response) {
     try {
       SaleOrderLine line = request.getContext().asType(SaleOrderLine.class);
 
-      // 1. R\u00e9cup\u00e9rer le PR (subTotalCostPrice)
       java.math.BigDecimal pr =
           line.getSubTotalCostPrice() != null
               ? line.getSubTotalCostPrice()
               : java.math.BigDecimal.ZERO;
 
-      // 2. R\u00e9cup\u00e9rer le frais de cong\u00e9lation
       java.math.BigDecimal fraisCong =
           line.getFraisCongelation() != null
               ? line.getFraisCongelation()
               : java.math.BigDecimal.ZERO;
 
-      // 3. R\u00e9cup\u00e9rer RFA et Commission
       java.math.BigDecimal tauxRFA =
           line.getTauxRFA() != null ? line.getTauxRFA() : java.math.BigDecimal.ZERO;
       java.math.BigDecimal tauxComm =
           line.getTauxCommission() != null ? line.getTauxCommission() : java.math.BigDecimal.ZERO;
 
-      // 4. Calcul : PR Net = (PR + FraisCong) \u00d7 (1 + (RFA + Comm) / 100)
       java.math.BigDecimal coefficient =
           java.math.BigDecimal.ONE.add(
               tauxRFA
@@ -728,19 +556,6 @@ public class SaleOrderLineController {
 
       java.math.BigDecimal prixRevientNet =
           pr.add(fraisCong).multiply(coefficient).setScale(4, java.math.RoundingMode.HALF_UP);
-
-      System.out.println(
-          "=== PR NET LVME === PR="
-              + pr
-              + " + FraisCong="
-              + fraisCong
-              + " | RFA="
-              + tauxRFA
-              + "% Comm="
-              + tauxComm
-              + "%"
-              + " \u2192 PR Net="
-              + prixRevientNet);
 
       response.setValue("prixRevientNet", prixRevientNet);
 
@@ -784,28 +599,12 @@ public class SaleOrderLineController {
                 .divide(coutTotal, 2, java.math.RoundingMode.HALF_UP);
       }
 
-      System.out.println(
-          "=== MARGE LVME === HT="
-              + exTaxTotal
-              + " - Co\u00fbt(PR Net \u00d7 Qty)="
-              + coutTotal
-              + " \u2192 Marge="
-              + margeBrute
-              + " \u20ac ("
-              + tauxMarge
-              + "%)");
-
       response.setValue("subTotalGrossMargin", margeBrute);
       response.setValue("subMarginRate", tauxMarge);
       response.setValue("subTotalMarkup", tauxMarkup);
 
-      // \u2b50 PR\u00c9SERVER LA LISTE DES LOTS pour qu'elle ne soit pas perdue
       if (line.getSaleOrderLineLotList() != null) {
         response.setValue("saleOrderLineLotList", line.getSaleOrderLineLotList());
-        System.out.println(
-            "=== MARGE LVME === Liste lots pr\u00e9serv\u00e9e ("
-                + line.getSaleOrderLineLotList().size()
-                + " lot(s))");
       }
 
     } catch (Exception e) {
@@ -815,8 +614,6 @@ public class SaleOrderLineController {
 
   // ==================================================================
   // M2 - Rechargement HYBRIDE des valeurs LVME au onLoad
-  // V2 : Lit la BD ET recalcule la marge dynamiquement
-  // R\u00e9sout : valeurs natives \u00e0 0 apr\u00e8s confirmation de commande
   // ==================================================================
 
   public void reloadLineFromDb(ActionRequest request, ActionResponse response) {
@@ -825,13 +622,11 @@ public class SaleOrderLineController {
 
       if (line.getId() == null) return;
 
-      // 1. Recharger la ligne depuis la base
       SaleOrderLine lineDb =
           Beans.get(com.axelor.apps.sale.db.repo.SaleOrderLineRepository.class).find(line.getId());
 
       if (lineDb == null) return;
 
-      // 2. R\u00e9cup\u00e9rer les valeurs LVME persist\u00e9es
       java.math.BigDecimal prixRevientNet =
           lineDb.getPrixRevientNet() != null
               ? lineDb.getPrixRevientNet()
@@ -851,16 +646,13 @@ public class SaleOrderLineController {
       java.math.BigDecimal qty =
           lineDb.getQty() != null ? lineDb.getQty() : java.math.BigDecimal.ZERO;
 
-      // 3. Afficher les champs LVME
       response.setValue("fraisCongelation", fraisCong);
       response.setValue("tauxRFA", tauxRFA);
       response.setValue("tauxCommission", tauxComm);
       response.setValue("prixRevientNet", prixRevientNet);
 
-      // 4. Recalculer le PR depuis le lot (si lot pr\u00e9sent)
       java.math.BigDecimal pr = java.math.BigDecimal.ZERO;
 
-      // \u2b50 REQU\u00caTE JPQL DIRECTE pour \u00e9viter les soucis de lazy loading
       java.util.List<com.axelor.apps.supplychain.db.SaleOrderLineLot> lotList =
           com.axelor
               .db
@@ -872,17 +664,9 @@ public class SaleOrderLineController {
               .setParameter("solId", lineDb.getId())
               .getResultList();
 
-      System.out.println(
-          "=== RELOAD LVME === Lots en BD pour ligne "
-              + lineDb.getId()
-              + " : "
-              + (lotList != null ? lotList.size() : 0)
-              + " lot(s)");
-
       if (lotList != null && !lotList.isEmpty()) {
         com.axelor.apps.stock.db.TrackingNumber tn = lotList.get(0).getTrackingNumber();
         if (tn != null) {
-          // Strat\u00e9gie 1 : StockMoveLine d'entr\u00e9e
           java.util.List<com.axelor.apps.stock.db.StockMoveLine> sml =
               Beans.get(com.axelor.apps.stock.db.repo.StockMoveLineRepository.class)
                   .all()
@@ -896,7 +680,6 @@ public class SaleOrderLineController {
           if (!sml.isEmpty()) {
             pr = sml.get(0).getPrKg().setScale(3, java.math.RoundingMode.HALF_UP);
           } else {
-            // Strat\u00e9gie 2 : Fallback sans typeSelect
             sml =
                 Beans.get(com.axelor.apps.stock.db.repo.StockMoveLineRepository.class)
                     .all()
@@ -913,12 +696,8 @@ public class SaleOrderLineController {
         }
       }
 
-      // Afficher le PR recalcul\u00e9
       response.setValue("subTotalCostPrice", pr);
 
-      // \u2b50 4-bis : RECALCULER prixRevientNet \u00e0 partir du PR
-      // r\u00e9cup\u00e9r\u00e9 du lot
-      // (au lieu de lire la BD qui a une valeur fausse)
       java.math.BigDecimal coefficient =
           java.math.BigDecimal.ONE.add(
               tauxRFA
@@ -930,9 +709,6 @@ public class SaleOrderLineController {
 
       response.setValue("prixRevientNet", prixRevientNet);
 
-      System.out.println("=== RELOAD LVME === PR Net recalcul\u00e9 : " + prixRevientNet);
-
-      // 5. Recalculer la marge avec le PR Net + qty + exTaxTotal
       java.math.BigDecimal coutTotal =
           prixRevientNet.multiply(qty).setScale(2, java.math.RoundingMode.HALF_UP);
       java.math.BigDecimal margeBrute =
@@ -958,33 +734,13 @@ public class SaleOrderLineController {
       response.setValue("subMarginRate", tauxMarge);
       response.setValue("subTotalMarkup", tauxMarkup);
 
-      System.out.println(
-          "=== RELOAD LVME === Ligne "
-              + lineDb.getId()
-              + " | PR="
-              + pr
-              + " | Frais="
-              + fraisCong
-              + " | PR Net="
-              + prixRevientNet
-              + " | HT="
-              + exTaxTotal
-              + " | Co\u00fbt="
-              + coutTotal
-              + " | Marge="
-              + margeBrute
-              + " ("
-              + tauxMarge
-              + "%)");
-
     } catch (Exception e) {
       TraceBackService.trace(response, e);
     }
   }
 
   // ==================================================================
-  // M2 - Persistance explicite du lot s\u00e9lectionn\u00e9
-  // R\u00e9sout : le lot disparait apr\u00e8s on-line-change natif Axelor
+  // M2 - Persistance explicite du lot sélectionné
   // ==================================================================
 
   @com.google.inject.persist.Transactional(rollbackOn = {Exception.class})
@@ -993,14 +749,12 @@ public class SaleOrderLineController {
       SaleOrderLine line = request.getContext().asType(SaleOrderLine.class);
 
       if (line.getId() == null) {
-        System.out.println("=== PERSIST LOT === Ligne pas encore sauv\u00e9e, skip");
         return;
       }
 
       java.util.List<com.axelor.apps.supplychain.db.SaleOrderLineLot> lotListUI =
           line.getSaleOrderLineLotList();
 
-      // R\u00e9cup\u00e9rer les IDs des trackingNumbers dans l'UI
       java.util.Set<Long> uiTnIds = new java.util.HashSet<>();
       if (lotListUI != null) {
         for (com.axelor.apps.supplychain.db.SaleOrderLineLot lot : lotListUI) {
@@ -1010,14 +764,11 @@ public class SaleOrderLineController {
         }
       }
 
-      System.out.println("=== PERSIST LOT === " + uiTnIds.size() + " lot(s) dans UI : " + uiTnIds);
-
       SaleOrderLine lineDb =
           Beans.get(com.axelor.apps.sale.db.repo.SaleOrderLineRepository.class).find(line.getId());
 
       if (lineDb == null) return;
 
-      // R\u00e9cup\u00e9rer les lots actuellement en BD
       java.util.List<com.axelor.apps.supplychain.db.SaleOrderLineLot> lotListDb =
           com.axelor
               .db
@@ -1029,21 +780,10 @@ public class SaleOrderLineController {
               .setParameter("solId", lineDb.getId())
               .getResultList();
 
-      System.out.println("=== PERSIST LOT === " + lotListDb.size() + " lot(s) en BD");
-
-      // \u2b50 1. SUPPRIMER les lots BD qui ne sont plus dans l'UI
       for (com.axelor.apps.supplychain.db.SaleOrderLineLot lotDb : lotListDb) {
         Long dbTnId = lotDb.getTrackingNumber() != null ? lotDb.getTrackingNumber().getId() : null;
 
         if (dbTnId == null || !uiTnIds.contains(dbTnId)) {
-          // Ce lot BD n'est plus dans l'UI \u2192 le supprimer
-          System.out.println(
-              "=== PERSIST LOT === \ud83d\uddd1\ufe0f Suppression lot BD : id="
-                  + lotDb.getId()
-                  + " (tn="
-                  + dbTnId
-                  + ")");
-
           com.axelor
               .db
               .JPA
@@ -1054,7 +794,6 @@ public class SaleOrderLineController {
         }
       }
 
-      // \u2b50 2. AJOUTER les lots UI qui ne sont pas en BD
       for (Long uiTnId : uiTnIds) {
         boolean dejaPresent = false;
         for (com.axelor.apps.supplychain.db.SaleOrderLineLot lotDb : lotListDb) {
@@ -1066,7 +805,6 @@ public class SaleOrderLineController {
         }
 
         if (dejaPresent) {
-          System.out.println("=== PERSIST LOT === Lot d\u00e9j\u00e0 pr\u00e9sent : tn=" + uiTnId);
           continue;
         }
 
@@ -1080,14 +818,10 @@ public class SaleOrderLineController {
           newLot.setSaleOrderLine(lineDb);
 
           lineDb.addSaleOrderLineLotListItem(newLot);
-
-          System.out.println(
-              "=== PERSIST LOT === \u2705 Lot ajout\u00e9 : " + tn.getTrackingNumberSeq());
         }
       }
 
       Beans.get(com.axelor.apps.sale.db.repo.SaleOrderLineRepository.class).save(lineDb);
-      System.out.println("=== PERSIST LOT === \u2705 Synchronisation termin\u00e9e");
 
     } catch (Exception e) {
       TraceBackService.trace(response, e);
@@ -1095,9 +829,8 @@ public class SaleOrderLineController {
   }
 
   // ==================================================================
-  // M2 LVME - Persistance forc\u00e9e des calculs en BD
-  // R\u00e9sout : Axelor natif \u00e9crase PR/Marge avec 0 au save
-  // \u2192 Compta + stats fausses
+  // M2 LVME - Persistance forcée des calculs en BD
+  // + Recalcul du total de marge au niveau de la commande (FIX AJOUTÉ)
   // ==================================================================
 
   @com.google.inject.persist.Transactional(rollbackOn = {Exception.class})
@@ -1106,11 +839,9 @@ public class SaleOrderLineController {
       SaleOrderLine line = request.getContext().asType(SaleOrderLine.class);
 
       if (line.getId() == null) {
-        System.out.println("=== PERSIST CALCULS === Ligne pas encore sauv\u00e9e, skip");
         return;
       }
 
-      // R\u00e9cup\u00e9rer les valeurs calcul\u00e9es du contexte UI
       java.math.BigDecimal pr =
           line.getSubTotalCostPrice() != null
               ? line.getSubTotalCostPrice()
@@ -1130,7 +861,7 @@ public class SaleOrderLineController {
       java.math.BigDecimal tauxMarkup =
           line.getSubTotalMarkup() != null ? line.getSubTotalMarkup() : java.math.BigDecimal.ZERO;
 
-      // \u2b50 UPDATE SQL DIRECT (sans toucher \u00e0 la version Hibernate)
+      // UPDATE SQL DIRECT de la ligne (sans toucher à la version Hibernate)
       int updated =
           com.axelor
               .db
@@ -1154,15 +885,46 @@ public class SaleOrderLineController {
               .setParameter("id", line.getId())
               .executeUpdate();
 
+      // FIX MARGE COMMERCIALE : recalcul du total de la commande
+      // (somme de toutes les lignes) -> car le service natif Axelor
+      // se déclenche avant notre calcul custom, avec une valeur encore à 0.
+      Long saleOrderId = line.getSaleOrder() != null ? line.getSaleOrder().getId() : null;
+      if (saleOrderId == null) {
+        Object result =
+            com.axelor
+                .db
+                .JPA
+                .em()
+                .createNativeQuery("SELECT sale_order FROM sale_sale_order_line WHERE id = :id")
+                .setParameter("id", line.getId())
+                .getSingleResult();
+        saleOrderId = result != null ? ((Number) result).longValue() : null;
+      }
+
+      if (saleOrderId != null) {
+        com.axelor
+            .db
+            .JPA
+            .em()
+            .createNativeQuery(
+                "UPDATE sale_sale_order SET total_gross_margin = "
+                    + "(SELECT COALESCE(SUM(sub_total_gross_margin), 0) FROM sale_sale_order_line WHERE sale_order = :orderId) "
+                    + "WHERE id = :orderId")
+            .setParameter("orderId", saleOrderId)
+            .executeUpdate();
+      }
+
       System.out.println(
-          "=== PERSIST CALCULS === \u2705 SQL direct : "
+          "=== PERSIST CALCULS === Ligne mise à jour ("
               + updated
-              + " ligne(s) mise(s) \u00e0 jour pour ligne "
+              + ") pour ligne "
               + line.getId()
               + " | PR="
               + pr
               + " | Marge="
-              + margeBrute);
+              + margeBrute
+              + " | Commande total marge recalculé="
+              + saleOrderId);
 
     } catch (Exception e) {
       TraceBackService.trace(response, e);

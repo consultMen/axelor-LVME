@@ -20,10 +20,6 @@ import java.time.LocalDate;
 @Singleton
 public class CessionStockController {
 
-  /**
-   * AUTO-FILL : Au choix d'un produit, on remplit auto les champs métier depuis la dernière
-   * réception fournisseur réalisée.
-   */
   public void loadFromProduct(ActionRequest request, ActionResponse response) {
     try {
       CessionStock cession = request.getContext().asType(CessionStock.class);
@@ -83,10 +79,6 @@ public class CessionStockController {
     }
   }
 
-  /**
-   * SPLIT : Transfère une quantité d'un lot source vers un lot destination EXISTANT, dans le même
-   * emplacement.
-   */
   @Transactional
   public void executeSplit(ActionRequest request, ActionResponse response) {
     try {
@@ -96,7 +88,6 @@ public class CessionStockController {
 
       cession = cessionRepo.find(cession.getId());
 
-      // ===== 1. VALIDATIONS =====
       if (Boolean.TRUE.equals(cession.getCessionRealisee())) {
         response.setError("Cette cession a déjà été réalisée.");
         return;
@@ -125,7 +116,6 @@ public class CessionStockController {
       TrackingNumber lotSource = cession.getLotSource();
       TrackingNumber lotDestination = cession.getNouveauLot();
 
-      // ===== 2. Vérifier la qty dispo sur le lot source =====
       StockLocationLine sourceLine =
           sllRepo
               .all()
@@ -154,11 +144,9 @@ public class CessionStockController {
         return;
       }
 
-      // ===== 3. Décrémenter le lot source =====
       sourceLine.setCurrentQty(qtyDispo.subtract(cession.getPoidsKg()));
       sllRepo.save(sourceLine);
 
-      // ===== 4. Trouver ou créer la ligne de stock pour le lot destination =====
       StockLocationLine destLine =
           sllRepo
               .all()
@@ -168,12 +156,10 @@ public class CessionStockController {
               .fetchOne();
 
       if (destLine != null) {
-        // Cumuler avec l'existant
         BigDecimal qtyActuelle =
             destLine.getCurrentQty() != null ? destLine.getCurrentQty() : BigDecimal.ZERO;
         destLine.setCurrentQty(qtyActuelle.add(cession.getPoidsKg()));
       } else {
-        // Créer une nouvelle ligne
         destLine = new StockLocationLine();
         destLine.setProduct(cession.getProduct());
         destLine.setTrackingNumber(lotDestination);
@@ -182,12 +168,10 @@ public class CessionStockController {
       }
       sllRepo.save(destLine);
 
-      // ===== 5. Marquer cession comme réalisée =====
       cession.setCessionRealisee(true);
       cession.setDateRealisation(LocalDate.now());
       cessionRepo.save(cession);
 
-      // ===== 6. Confirmation =====
       response.setReload(true);
       response.setNotify(
           "Cession réalisée : "
@@ -202,10 +186,6 @@ public class CessionStockController {
     }
   }
 
-  /**
-   * Calculs automatiques quand l'user modifie nbColis ou pdsColis. - pdsTotal = nbColis × pdsColis
-   * - montantHT = pdsTotal × prKg Note : poidsKg et prDevise restent libres pour l'user.
-   */
   public void computeCalculs(ActionRequest request, ActionResponse response) {
     try {
       CessionStock cession = request.getContext().asType(CessionStock.class);
@@ -214,14 +194,12 @@ public class CessionStockController {
       BigDecimal pdsColis = cession.getPdsColis();
       BigDecimal prKg = cession.getPrKg();
 
-      // 1. POIDS TOTAL = nbColis × pdsColis
       BigDecimal pdsTotal = BigDecimal.ZERO;
       if (nbColis != null && pdsColis != null) {
         pdsTotal = nbColis.multiply(pdsColis).setScale(3, java.math.RoundingMode.HALF_UP);
       }
       response.setValue("pdsTotal", pdsTotal);
 
-      // 2. MONTANT HT = pdsTotal × prKg
       if (prKg != null) {
         BigDecimal montantHT = pdsTotal.multiply(prKg).setScale(2, java.math.RoundingMode.HALF_UP);
         response.setValue("montantHT", montantHT);
@@ -304,6 +282,20 @@ public class CessionStockController {
         response.setValue("poidsKgDest", poidsKg);
       }
 
+    } catch (Exception e) {
+      response.setException(e);
+    }
+  }
+
+  public void syncFraisCongelation(ActionRequest request, ActionResponse response) {
+    try {
+      CessionStock cession = request.getContext().asType(CessionStock.class);
+      if ("FRAIS_STOCKAGE".equals(cession.getTypeCession()) && cession.getCompany() != null) {
+        com.axelor.apps.base.db.Company company =
+            Beans.get(com.axelor.apps.base.db.repo.CompanyRepository.class)
+                .find(cession.getCompany().getId());
+        response.setValue("prKg", company.getFraisCongelation());
+      }
     } catch (Exception e) {
       response.setException(e);
     }
