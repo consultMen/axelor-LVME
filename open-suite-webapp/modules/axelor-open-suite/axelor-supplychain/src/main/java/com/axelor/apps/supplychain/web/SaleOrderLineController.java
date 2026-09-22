@@ -457,7 +457,9 @@ public class SaleOrderLineController {
   }
 
   // ==================================================================
-  // M2 - Récupérer le PR du lot sélectionné (3 stratégies en cascade)
+  // M9 - Récupérer le PR du lot sélectionné (3 stratégies en cascade)
+  // Écrit dans prixRevient (champ LVME dédié, €/kg unitaire)
+  // et non dans subTotalCostPrice qui appartient à Axelor.
   // ==================================================================
 
   public void setPrFromLot(ActionRequest request, ActionResponse response) {
@@ -487,7 +489,7 @@ public class SaleOrderLineController {
       if (!stockMoveLines.isEmpty()) {
         java.math.BigDecimal prKg =
             stockMoveLines.get(0).getPrKg().setScale(3, java.math.RoundingMode.HALF_UP);
-        response.setValue("subTotalCostPrice", prKg);
+        response.setValue("prixRevient", prKg);
         return;
       }
 
@@ -503,7 +505,7 @@ public class SaleOrderLineController {
       if (!stockMoveLines.isEmpty()) {
         java.math.BigDecimal prKg =
             stockMoveLines.get(0).getPrKg().setScale(3, java.math.RoundingMode.HALF_UP);
-        response.setValue("subTotalCostPrice", prKg);
+        response.setValue("prixRevient", prKg);
         return;
       }
 
@@ -514,7 +516,7 @@ public class SaleOrderLineController {
         java.math.BigDecimal pp = product.getPurchasePrice();
         if (pp != null && pp.signum() > 0) {
           pp = pp.setScale(3, java.math.RoundingMode.HALF_UP);
-          response.setValue("subTotalCostPrice", pp);
+          response.setValue("prixRevient", pp);
           return;
         }
       }
@@ -534,9 +536,7 @@ public class SaleOrderLineController {
       SaleOrderLine line = request.getContext().asType(SaleOrderLine.class);
 
       java.math.BigDecimal pr =
-          line.getSubTotalCostPrice() != null
-              ? line.getSubTotalCostPrice()
-              : java.math.BigDecimal.ZERO;
+          line.getPrixRevient() != null ? line.getPrixRevient() : java.math.BigDecimal.ZERO;
 
       java.math.BigDecimal fraisCong =
           line.getFraisCongelation() != null
@@ -696,7 +696,7 @@ public class SaleOrderLineController {
         }
       }
 
-      response.setValue("subTotalCostPrice", pr);
+      response.setValue("prixRevient", pr);
 
       java.math.BigDecimal coefficient =
           java.math.BigDecimal.ONE.add(
@@ -843,9 +843,7 @@ public class SaleOrderLineController {
       }
 
       java.math.BigDecimal pr =
-          line.getSubTotalCostPrice() != null
-              ? line.getSubTotalCostPrice()
-              : java.math.BigDecimal.ZERO;
+          line.getPrixRevient() != null ? line.getPrixRevient() : java.math.BigDecimal.ZERO;
       java.math.BigDecimal prixRevientNet =
           line.getPrixRevientNet() != null ? line.getPrixRevientNet() : java.math.BigDecimal.ZERO;
       java.math.BigDecimal fraisCong =
@@ -869,7 +867,7 @@ public class SaleOrderLineController {
               .em()
               .createNativeQuery(
                   "UPDATE sale_sale_order_line SET "
-                      + "sub_total_cost_price = :pr, "
+                      + "prix_revient = :pr, "
                       + "prix_revient_net = :prNet, "
                       + "frais_congelation = :frais, "
                       + "sub_total_gross_margin = :marge, "
@@ -913,18 +911,6 @@ public class SaleOrderLineController {
             .setParameter("orderId", saleOrderId)
             .executeUpdate();
       }
-
-      System.out.println(
-          "=== PERSIST CALCULS === Ligne mise à jour ("
-              + updated
-              + ") pour ligne "
-              + line.getId()
-              + " | PR="
-              + pr
-              + " | Marge="
-              + margeBrute
-              + " | Commande total marge recalculé="
-              + saleOrderId);
 
     } catch (Exception e) {
       TraceBackService.trace(response, e);

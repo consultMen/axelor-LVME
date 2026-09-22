@@ -85,24 +85,58 @@
         </panel>
       </insert>
     </extend>
-    <!-- insérTION dans informationsPanel -->
+
+    <!-- INSERTION dans informationsPanel -->
     <extend target="//panel[@name='informationsPanel']">
       <insert position="inside">
+
         <panel name="stockPhysiquePanel" title="Stock Physique Disponible" colSpan="12"
           showIf="product != null">
           <field name="availableStatus" widget="badge" colSpan="3" readonly="true"/>
-          <field name="qtyFromStock" colSpan="6"
-            onChange="action-sale-order-line-on-qty-from-stock-change"/>
           <panel-dashlet name="stockLocationDashlet" colSpan="12" height="200"
             action="action-view-stock-location-line-for-product" canSearch="true"/>
         </panel>
-        <panel name="arrivagesPanel" title="Arrivages (Commandes Achat)" colSpan="12"
+
+        <!-- ===================== LOTS DISPONIBLES (Phase 2) ===================== -->
+        <panel name="lotsAvailablePanel" title="Lots disponibles pour ce produit (FEFO)"
+          colSpan="12" showIf="product != null">
+          <panel-dashlet name="lotsAvailableDashlet" colSpan="12" height="200"
+            action="action-view-tracking-numbers-available-for-product" canSearch="true"/>
+        </panel>
+
+        <!-- ===================== LOTS SÉLECTIONNÉS (Phase 2) ===================== -->
+        <panel name="lotSelectionPanel" title="Lots sélectionnés" colSpan="12"
           showIf="product != null">
+          <panel-related name="saleOrderLineLotListPanel" field="saleOrderLineLotList"
+            grid-view="sale-order-line-lot-grid" form-view="sale-order-line-lot-form"
+            colSpan="12" canNew="true" canEdit="true" canRemove="true"
+            onChange="action-method-sale-order-line-persist-lot-selection,action-method-sale-order-line-set-frais-congelation-from-lot,action-method-sale-order-line-set-pr-from-lot,action-method-sale-order-line-compute-pr-net,action-method-sale-order-line-recompute-marge-with-pr-net,action-method-sale-order-line-persist-calculs-lvme"/>
+        </panel>
+
+        <panel name="arrivagesPanel" title="Arrivages (Commandes Achat)" colSpan="12"
+          showIf="product != null ">
           <field name="qtyFromArrivage" readonly="true" colSpan="5"/>
+          <button name="addArrivageBtn" title="Ajouter un arrivage"
+            onClick="action-view-sale-order-line-add-arrivage" colSpan="2"/>
           <panel-related name="saleOrderLineArrivageListPanel"
             field="saleOrderLineArrivageList" grid-view="sale-order-line-arrivage-grid"
-            form-view="sale-order-line-add-arrivage-wizard" colSpan="12" canNew="true"
+            form-view="sale-order-line-arrivage-form" colSpan="12" canNew="false"
             canRemove="true" onChange="action-sale-order-line-arrivage-recompute"/>
+        </panel>
+
+        <panel name="stockLocationLinesPanel" title="Réservations Stocks" colSpan="12"
+          showIf="product != null">
+          <field name="qtyFromStock" title="Qté depuis stock" readonly="true" colSpan="4"
+            onChange="action-sale-order-line-on-qty-from-stock-change"/>
+          <spacer colSpan="2"/>
+          <button name="addStockLocationBtn" title="Sélectionner emplacement"
+            onClick="action-view-sale-order-line-add-stock-location" colSpan="4"/>
+          <panel-related name="saleOrderLineStockLocationListPanel"
+            field="saleOrderLineStockLocationList"
+            grid-view="sale-order-line-stock-location-grid" colSpan="12" canNew="false"
+            canRemove="true" onChange="action-sale-order-line-stock-location-recompute"/>
+          <panel-dashlet name="stockLocationLineDashlet" colSpan="12" height="200"
+            action="action-sale-order-line-stock-location-lines" canSearch="true"/>
         </panel>
 
       </insert>
@@ -446,3 +480,4 @@
 
 
 </object-views>
+

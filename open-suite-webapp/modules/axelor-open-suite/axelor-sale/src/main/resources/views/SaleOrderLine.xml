@@ -205,8 +205,11 @@
   </form>
 
   <form name="sale-order-line-form" title="SO line"
-    model="com.axelor.apps.sale.db.SaleOrderLine" onLoad="action-sale-order-line-method-onload"
-    onNew="action-sale-order-line-method-onnew" width="large">
+    model="com.axelor.apps.sale.db.SaleOrderLine"
+    onLoad="action-method-sale-order-line-reload-from-db,action-sale-order-line-method-onload"
+    onNew="action-sale-order-line-method-onnew"
+    onSave="action-method-sale-order-line-set-pr-from-lot,action-method-sale-order-line-compute-pr-net,action-method-sale-order-line-recompute-marge-with-pr-net"
+    width="large">
     <panel name="productPanel" showIf="typeSelect > 0">
       <field name="productName" colSpan="9" title="Title"/>
       <field name="typeSelect" requiredIf="typeSelect != 0" colSpan="3"
@@ -304,7 +307,7 @@
             onSelect="action-sale-order-line-method-domain-product" form-view="product-form"
             grid-view="product-grid" if="!__config__.app.isApp('supplychain')"/>
           <field name="product" canEdit="false" x-image-field="picture"
-            onChange="action-sale-order-line-method-get-product-information"
+            onChange="action-sale-order-line-method-get-product-information,action-method-sale-order-line-copy-taux-from-sale-order,action-method-sale-order-line-set-frais-congelation-from-lot,action-method-sale-order-line-compute-pr-net"
             onSelect="action-sale-order-line-method-domain-product" form-view="product-form"
             grid-view="stock-move-line-product-grid" if="__config__.app.isApp('supplychain')"/>
           <field name="enableFreezeFields" colSpan="2"/>
@@ -313,9 +316,33 @@
           <field name="productName" colSpan="12"/>
           <field name="oldQty"/>
         </panel>
+
+        <!-- ===================== TAUX LVME ===================== -->
+        <field name="fraisCongelation" title="Frais Congélation (€/kg)" readonly="true"
+          colSpan="3" widget="Decimal" x-scale="4" hideIf="product == null"/>
+        <field name="tauxRFA" title="% RFA" readonly="true" colSpan="3" widget="Decimal"
+          x-scale="2" hideIf="product == null"/>
+        <field name="tauxCommission" title="% Commission" readonly="true" colSpan="3"
+          widget="Decimal" x-scale="2" hideIf="product == null"/>
+
+        <!-- ===================== CONDITIONNEMENT / COLIS ===================== -->
+        <panel name="colisPanel" title="Conditionnement / Colis" colSpan="12"
+          showIf="product != null">
+          <field name="conditionnement" colSpan="6" canNew="true"
+            form-view="conditionnement-form" grid-view="conditionnement-grid"/>
+          <field name="nbColis" colSpan="3"/>
+          <field name="nbUnitesParColis" colSpan="3"/>
+          <field name="poidsParColis" colSpan="3"/>
+          <field name="coefPoidsNet" colSpan="3"/>
+          <field name="poidsParColisNet" colSpan="3"/>
+          <field name="poidsTotalNet" colSpan="3"/>
+          <field name="qtySachetPreleve" colSpan="3"
+            help="Quantité prélevée hors colis entiers (rupture d'UV inférieure au colis)"/>
+        </panel>
+
         <panel name="productDetailPanel" colSpan="12">
           <field name="qty" colSpan="3"
-            onChange="action-group-sale-saleorderline-qty-onchange"
+            onChange="action-group-sale-saleorderline-qty-onchange,action-method-sale-order-line-compute-pr-net,action-method-sale-order-line-recompute-marge-with-pr-net"
             readonlyIf="$availabiltyRequest || ($isReadOnly !== false &amp;&amp; !$get('saleOrder.orderBeingEdited'))"
             validIf="$qtyValid != false"/>
           <field name="orderedQty" colSpan="3" x-scale="$nbDecimalDigitForQty"
@@ -326,7 +353,20 @@
             canEdit="false" form-view="unit-form" grid-view="unit-grid"/>
           <field name="price" colSpan="3"
             readonlyIf="$isReadOnly !== false || deliveryState == 3 || $nonNegotiable || ((subSaleOrderLineList.length &gt; 0 || saleOrderLineDetailsList.length &gt; 0) &amp;&amp; $computeWithSOL)"
-            onChange="action-sale-order-line-method-onchange-price" hidden="true"/>
+            onChange="action-sale-order-line-method-onchange-price,action-method-sale-order-line-recompute-marge-with-pr-net"
+            hidden="true"/>
+
+          <!-- ===================== PRIX DE REVIENT / MARGE LVME ===================== -->
+          <field name="subTotalCostPrice" title="Prix de Revient" readonly="true" colSpan="3"
+            widget="Decimal" x-scale="4" hideIf="product == null"
+            onChange="action-method-sale-order-line-compute-pr-net"/>
+          <field name="prixRevientNet" title="P.R. Net" readonly="true" colSpan="3"
+            widget="Decimal" x-scale="4" hideIf="product == null"/>
+          <field name="subTotalGrossMargin" title="Marge HT (€)" readonly="true" colSpan="3"
+            widget="Decimal" x-scale="2" hideIf="product == null"/>
+          <field name="subMarginRate" title="% Marge" readonly="true" colSpan="3"
+            widget="Decimal" x-scale="2" hideIf="product == null"/>
+
           <field name="inTaxPrice" colSpan="3"
             readonlyIf="$isReadOnly !== false || deliveryState == 3"
             onChange="action-sale-order-line-method-onchange-intaxprice" hidden="true"/>
@@ -439,19 +479,6 @@
         </panel>
         <field name="$isReadOnly" hidden="true"/>
         <field name="product.productTypeSelect" hidden="true"/>
-      </panel>
-      <panel name="marginPanel" title="Margin" readonlyIf="$isReadOnly !== false">
-        <field name="subTotalCostPrice"
-          onChange="action-sale-order-line-method-compute-subMargin"
-          x-scale="$companyCurrency.numberOfDecimals"
-          readonlyIf="subSaleOrderLineList.length &gt; 0 &amp;&amp; $computeWithSOL"/>
-        <field name="subTotalGrossMargin" readonly="true"
-          x-scale="$companyCurrency.numberOfDecimals"/>
-        <field name="subMarginRate" readonly="true"/>
-        <field name="subTotalMarkup" readonly="true"/>
-        <field name="$companyCurrency" readonly="true" title="Currency" type="many-to-one"
-          target="com.axelor.apps.base.db.Currency"/>
-        <field name="$companyCurrency.numberOfDecimals" hidden="true"/>
       </panel>
       <panel name="deliveryPanel" title="Delivery">
         <field name="deliveryAddress" canNew="true"

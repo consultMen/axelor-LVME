@@ -91,7 +91,9 @@
 
     <decimal name="tauxCommission" title="% Commission" precision="20" scale="2"
       help="Recopi\u00e9 du devis - utilis\u00e9 pour calcul PR Net"/>
-
+    <!-- M9 - Prix de Revient unitaire issu du lot sélectionné -->
+    <decimal name="prixRevient" title="Prix de Revient (€/kg)" precision="20" scale="4"
+      readonly="true" help="Prix de revient unitaire du lot, issu de la réception fournisseur"/>
     <!-- M2 - Prix de Revient Net (formule N7 spec) -->
     <decimal name="prixRevientNet" title="P.R. Net (\u20ac/kg)" precision="20" scale="4"
       readonly="true" help="(PR + Frais Cong\u00e9lation) \u00d7 (1 + (RFA + Commission) / 100)"/>
