@@ -108,8 +108,8 @@
         <panel name="lotSelectionPanel" title="Lots sélectionnés" colSpan="12"
           showIf="product != null">
           <panel-related name="saleOrderLineLotListPanel" field="saleOrderLineLotList"
-            grid-view="sale-order-line-lot-grid" form-view="sale-order-line-lot-form"
-            colSpan="12" canNew="true" canEdit="true" canRemove="true"
+            grid-view="sale-order-line-lot-grid" form-view="sale-order-line-lot-form" colSpan="12"
+            canNew="true" canEdit="true" canRemove="true"
             onChange="action-method-sale-order-line-persist-lot-selection,action-method-sale-order-line-set-frais-congelation-from-lot,action-method-sale-order-line-set-pr-from-lot,action-method-sale-order-line-compute-pr-net,action-method-sale-order-line-recompute-marge-with-pr-net,action-method-sale-order-line-persist-calculs-lvme"/>
         </panel>
 
@@ -120,8 +120,8 @@
             onClick="action-view-sale-order-line-add-arrivage" colSpan="2"/>
           <panel-related name="saleOrderLineArrivageListPanel"
             field="saleOrderLineArrivageList" grid-view="sale-order-line-arrivage-grid"
-            form-view="sale-order-line-arrivage-form" colSpan="12" canNew="false"
-            canRemove="true" onChange="action-sale-order-line-arrivage-recompute"/>
+            form-view="sale-order-line-arrivage-form" colSpan="12" canNew="false" canRemove="true"
+            onChange="action-sale-order-line-arrivage-recompute"/>
         </panel>
 
         <panel name="stockLocationLinesPanel" title="Réservations Stocks" colSpan="12"
@@ -132,9 +132,9 @@
           <button name="addStockLocationBtn" title="Sélectionner emplacement"
             onClick="action-view-sale-order-line-add-stock-location" colSpan="4"/>
           <panel-related name="saleOrderLineStockLocationListPanel"
-            field="saleOrderLineStockLocationList"
-            grid-view="sale-order-line-stock-location-grid" colSpan="12" canNew="false"
-            canRemove="true" onChange="action-sale-order-line-stock-location-recompute"/>
+            field="saleOrderLineStockLocationList" grid-view="sale-order-line-stock-location-grid"
+            colSpan="12" canNew="false" canRemove="true"
+            onChange="action-sale-order-line-stock-location-recompute"/>
           <panel-dashlet name="stockLocationLineDashlet" colSpan="12" height="200"
             action="action-sale-order-line-stock-location-lines" canSearch="true"/>
         </panel>

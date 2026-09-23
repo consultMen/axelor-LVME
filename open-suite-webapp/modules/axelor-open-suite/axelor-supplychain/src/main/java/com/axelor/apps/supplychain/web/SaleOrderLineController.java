@@ -10,6 +10,7 @@ import com.axelor.apps.base.db.repo.BlockingRepository;
 import com.axelor.apps.base.db.repo.TraceBackRepository;
 import com.axelor.apps.base.service.BlockingService;
 import com.axelor.apps.base.service.exception.TraceBackService;
+import com.axelor.apps.purchase.db.Conditionnement;
 import com.axelor.apps.sale.db.SaleOrder;
 import com.axelor.apps.sale.db.SaleOrderLine;
 import com.axelor.apps.sale.db.repo.SaleOrderLineRepository;
@@ -34,6 +35,7 @@ import com.axelor.utils.helpers.ContextHelper;
 import com.google.common.base.Strings;
 import com.google.inject.Singleton;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -915,5 +917,43 @@ public class SaleOrderLineController {
     } catch (Exception e) {
       TraceBackService.trace(response, e);
     }
+  }
+
+  public void computePackaging(ActionRequest request, ActionResponse response) {
+
+    SaleOrderLine line = request.getContext().asType(SaleOrderLine.class);
+    Conditionnement c = line.getConditionnement();
+
+    BigDecimal nbColis = line.getNbColis() == null ? BigDecimal.ZERO : line.getNbColis();
+    BigDecimal sachet =
+        line.getQtySachetPreleve() == null ? BigDecimal.ZERO : line.getQtySachetPreleve();
+
+    if (c == null) {
+      response.setValue("poidsParColis", BigDecimal.ZERO);
+      response.setValue("poidsParColisNet", BigDecimal.ZERO);
+      response.setValue("nbUnitesParColis", BigDecimal.ZERO);
+      response.setValue("coefPoidsNet", BigDecimal.ONE);
+      response.setValue("poidsTotalNet", BigDecimal.ZERO);
+      response.setValue("qty", sachet);
+      return;
+    }
+
+    BigDecimal poidsParColis =
+        c.getPoidsParColis() == null ? BigDecimal.ZERO : c.getPoidsParColis();
+    BigDecimal nbUnitesParColis =
+        c.getUnitesParColis() == null ? BigDecimal.ZERO : c.getUnitesParColis();
+    BigDecimal coefPoidsNet = c.getCoefPoidsNet() == null ? BigDecimal.ONE : c.getCoefPoidsNet();
+
+    BigDecimal poidsParColisNet =
+        poidsParColis.multiply(coefPoidsNet).setScale(3, RoundingMode.HALF_UP);
+    BigDecimal poidsTotalNet = nbColis.multiply(poidsParColisNet).setScale(3, RoundingMode.HALF_UP);
+    BigDecimal qty = nbColis.multiply(poidsParColis).add(sachet).setScale(2, RoundingMode.HALF_UP);
+
+    response.setValue("poidsParColis", poidsParColis);
+    response.setValue("nbUnitesParColis", nbUnitesParColis);
+    response.setValue("coefPoidsNet", coefPoidsNet);
+    response.setValue("poidsParColisNet", poidsParColisNet);
+    response.setValue("poidsTotalNet", poidsTotalNet);
+    response.setValue("qty", qty);
   }
 }
