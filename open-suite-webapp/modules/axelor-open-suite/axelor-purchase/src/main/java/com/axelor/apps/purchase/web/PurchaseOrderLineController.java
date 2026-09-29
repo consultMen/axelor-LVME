@@ -513,7 +513,9 @@ public class PurchaseOrderLineController {
       Beans.get(PurchaseOrderLineDuplicateService.class)
           .duplicateLine(
               Beans.get(PurchaseOrderLineRepository.class).find(purchaseOrderLine.getId()));
-      response.setReload(true);
+      // LVME : recharge complète de l'onglet (le rechargement partiel depuis la ligne laissait
+      // fournisseur / société / devise vides à l'écran, puis l'enregistrement échouait)
+      response.setSignal("refresh-tab", true);
     } catch (Exception e) {
       TraceBackService.trace(response, e);
     }
