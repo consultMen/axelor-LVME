@@ -53,6 +53,7 @@ import com.axelor.apps.sale.db.repo.CartLineManagementRepository;
 import com.axelor.apps.sale.db.repo.SaleOrderLineSaleRepository;
 import com.axelor.apps.sale.db.repo.SaleOrderManagementRepository;
 import com.axelor.apps.sale.service.AdvancePaymentServiceImpl;
+import com.axelor.apps.sale.service.MarginComputeServiceImpl;
 import com.axelor.apps.sale.service.PartnerSaleServiceImpl;
 import com.axelor.apps.sale.service.PricingGroupSaleServiceImpl;
 import com.axelor.apps.sale.service.batch.SaleBatchService;
@@ -280,6 +281,7 @@ import com.axelor.apps.supplychain.service.saleorder.SaleOrderIntercoService;
 import com.axelor.apps.supplychain.service.saleorder.SaleOrderIntercoServiceImpl;
 import com.axelor.apps.supplychain.service.saleorder.SaleOrderInvoiceService;
 import com.axelor.apps.supplychain.service.saleorder.SaleOrderInvoiceServiceImpl;
+import com.axelor.apps.supplychain.service.saleorder.MarginComputeServiceLVMEImpl;
 import com.axelor.apps.supplychain.service.saleorder.SaleOrderMarginServiceLVMEImpl;
 import com.axelor.apps.supplychain.service.saleorder.SaleOrderPurchaseService;
 import com.axelor.apps.supplychain.service.saleorder.SaleOrderPurchaseServiceImpl;
@@ -319,6 +321,8 @@ import com.axelor.apps.supplychain.service.saleorderline.SaleOrderLineCreateSupp
 import com.axelor.apps.supplychain.service.saleorderline.SaleOrderLineDomainSupplychainService;
 import com.axelor.apps.supplychain.service.saleorderline.SaleOrderLineDomainSupplychainServiceImpl;
 import com.axelor.apps.supplychain.service.saleorderline.SaleOrderLineDummySupplychainServiceImpl;
+import com.axelor.apps.supplychain.service.saleorderline.SaleOrderLineDuplicateLvmeService;
+import com.axelor.apps.supplychain.service.saleorderline.SaleOrderLineDuplicateLvmeServiceImpl;
 import com.axelor.apps.supplychain.service.saleorderline.SaleOrderLineInitValueSupplychainServiceImpl;
 import com.axelor.apps.supplychain.service.saleorderline.SaleOrderLineOnChangeSupplychainServiceImpl;
 import com.axelor.apps.supplychain.service.saleorderline.SaleOrderLineProductSupplychainService;
@@ -546,10 +550,12 @@ public class SupplychainModule extends AxelorModule {
         .to(SaleOrderBlockingSupplychainServiceImpl.class);
     bind(MrpLineSaleOrderService.class).to(MrpLineSaleOrderServiceImpl.class);
     bind(SaleOrderLineStockLocationService.class).to(SaleOrderLineStockLocationServiceImpl.class);
+    bind(SaleOrderLineDuplicateLvmeService.class).to(SaleOrderLineDuplicateLvmeServiceImpl.class);
 
     bind(AnalyticMoveLineParentServiceImpl.class)
         .to(AnalyticMoveLineParentSupplychainServiceImpl.class);
     bind(SaleOrderLineArrivageService.class).to(SaleOrderLineArrivageServiceImpl.class);
     bind(SaleOrderMarginServiceImpl.class).to(SaleOrderMarginServiceLVMEImpl.class);
+    bind(MarginComputeServiceImpl.class).to(MarginComputeServiceLVMEImpl.class);
   }
 }

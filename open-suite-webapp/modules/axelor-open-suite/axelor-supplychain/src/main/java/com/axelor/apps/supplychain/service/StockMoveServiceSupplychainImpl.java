@@ -171,6 +171,19 @@ public class StockMoveServiceSupplychainImpl extends StockMoveServiceImpl
 
     LOG.debug("Stock move realization: {} ", stockMove.getStockMoveSeq());
     String newStockSeq = super.realizeStockMove(stockMove, check);
+
+    // LVME : livraison partielle, colis et marge de la ligne livrée au prorata de la qté réelle
+    if (stockMove.getTypeSelect() == StockMoveRepository.TYPE_OUTGOING
+        && stockMove.getStockMoveLineList() != null) {
+      for (StockMoveLine sml : stockMove.getStockMoveLineList()) {
+        if (sml.getSaleOrderLine() != null
+            && sml.getRealQty() != null
+            && sml.getQty() != null
+            && sml.getRealQty().compareTo(sml.getQty()) != 0) {
+          prorateLvmeFields(sml, sml, sml.getRealQty());
+        }
+      }
+    }
     AppSupplychain appSupplychain = appSupplyChainService.getAppSupplychain();
 
     Set<SaleOrder> saleOrderSet = stockMove.getSaleOrderSet();
@@ -495,10 +508,47 @@ public class StockMoveServiceSupplychainImpl extends StockMoveServiceImpl
    * @return the generated stock move line
    * @throws AxelorException
    */
+  /**
+   * LVME : recalcule colis, poids net total, unités et marge de {@code target} pour la quantité
+   * {@code newQty}, à partir des valeurs de {@code source} établies pour {@code source.qty}.
+   */
+  protected void prorateLvmeFields(StockMoveLine target, StockMoveLine source, BigDecimal newQty) {
+    BigDecimal baseQty = source.getQty();
+    if (baseQty == null || baseQty.signum() == 0 || newQty == null) {
+      return;
+    }
+    BigDecimal ratio = newQty.divide(baseQty, 6, java.math.RoundingMode.HALF_UP);
+
+    BigDecimal nbColis =
+        (source.getNbColis() != null ? source.getNbColis() : BigDecimal.ZERO)
+            .multiply(ratio)
+            .setScale(3, java.math.RoundingMode.HALF_UP);
+    BigDecimal poidsParColisNet =
+        source.getPoidsParColisNet() != null ? source.getPoidsParColisNet() : BigDecimal.ZERO;
+    BigDecimal nbUnitesParColis =
+        source.getNbUnitesParColis() != null ? source.getNbUnitesParColis() : BigDecimal.ZERO;
+    BigDecimal margeHt =
+        (source.getMargeHt() != null ? source.getMargeHt() : BigDecimal.ZERO)
+            .multiply(ratio)
+            .setScale(3, java.math.RoundingMode.HALF_UP);
+
+    target.setNbColis(nbColis);
+    target.setPoidsTotalNet(
+        nbColis.multiply(poidsParColisNet).setScale(3, java.math.RoundingMode.HALF_UP));
+    target.setUnitesTot(
+        nbColis.multiply(nbUnitesParColis).setScale(3, java.math.RoundingMode.HALF_UP));
+    target.setMargeHt(margeHt);
+  }
+
   @Override
   protected StockMoveLine copySplittedStockMoveLine(StockMoveLine stockMoveLine)
       throws AxelorException {
     StockMoveLine newStockMoveLine = super.copySplittedStockMoveLine(stockMoveLine);
+
+    // LVME : colis et marge du reliquat au prorata de la quantité restante
+    if (stockMoveLine.getSaleOrderLine() != null) {
+      prorateLvmeFields(newStockMoveLine, stockMoveLine, newStockMoveLine.getQty());
+    }
 
     if (appSupplyChainService.isApp("supplychain")
         && appSupplyChainService.getAppSupplychain().getManageStockReservation()) {

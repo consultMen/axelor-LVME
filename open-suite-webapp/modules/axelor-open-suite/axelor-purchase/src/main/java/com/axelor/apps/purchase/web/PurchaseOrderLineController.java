@@ -35,6 +35,8 @@ import com.axelor.apps.purchase.db.Conditionnement;
 import com.axelor.apps.purchase.db.PurchaseOrder;
 import com.axelor.apps.purchase.db.PurchaseOrderLine;
 import com.axelor.apps.purchase.db.SupplierCatalog;
+import com.axelor.apps.purchase.db.repo.PurchaseOrderLineRepository;
+import com.axelor.apps.purchase.service.PurchaseOrderLineDuplicateService;
 import com.axelor.apps.purchase.service.PurchaseOrderLineService;
 import com.axelor.apps.purchase.service.PurchaseOrderLineWarningService;
 import com.axelor.apps.purchase.service.SupplierCatalogService;
@@ -500,5 +502,20 @@ public class PurchaseOrderLineController {
         "hidden",
         !Beans.get(PurchaseOrderLineWarningService.class)
             .checkSupplierCatalogUnit(purchaseOrderLine, purchaseOrder));
+  }
+
+  public void duplicateLine(ActionRequest request, ActionResponse response) {
+    try {
+      PurchaseOrderLine purchaseOrderLine = request.getContext().asType(PurchaseOrderLine.class);
+      if (purchaseOrderLine.getId() == null) {
+        return;
+      }
+      Beans.get(PurchaseOrderLineDuplicateService.class)
+          .duplicateLine(
+              Beans.get(PurchaseOrderLineRepository.class).find(purchaseOrderLine.getId()));
+      response.setReload(true);
+    } catch (Exception e) {
+      TraceBackService.trace(response, e);
+    }
   }
 }

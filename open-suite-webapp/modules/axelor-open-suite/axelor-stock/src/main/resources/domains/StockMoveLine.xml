@@ -74,6 +74,9 @@
       default="0" help="PR + frais congélation appliqués"/>
     <decimal name="montantReel" title="Montant réel (€)" precision="20" scale="4"
       default="0" help="Montant HT avec frais congélation = qty × prixRevientReel"/>
+    <!-- LVME : marge reprise de la ligne de commande client (proratisée à la qté livrée) -->
+    <decimal name="margeHt" title="Marge HT (€)" precision="20" scale="3" default="0"/>
+    <decimal name="tauxMarge" title="% Marge" precision="20" scale="2" default="0"/>
     <integer name="conformitySelect" title="Conformity"
       selection="stock.move.line.conformity.select"/>
 

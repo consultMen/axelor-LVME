@@ -46,6 +46,8 @@ import com.axelor.apps.stock.service.PartnerStockSettingsService;
 import com.axelor.apps.stock.service.StockMoveLineService;
 import com.axelor.apps.stock.service.StockMoveService;
 import com.axelor.apps.stock.service.config.StockConfigService;
+import com.axelor.apps.stock.db.TrackingNumber;
+import com.axelor.apps.supplychain.db.SaleOrderLineLot;
 import com.axelor.apps.supplychain.db.SupplyChainConfig;
 import com.axelor.apps.supplychain.db.repo.SupplyChainConfigRepository;
 import com.axelor.apps.supplychain.exception.SupplychainExceptionMessage;
@@ -54,6 +56,7 @@ import com.axelor.apps.supplychain.service.app.AppSupplychainService;
 import com.axelor.apps.supplychain.service.config.SupplyChainConfigService;
 import com.axelor.apps.supplychain.service.saleorderline.SaleOrderLineBlockingSupplychainService;
 import com.axelor.apps.supplychain.service.saleorderline.SaleOrderLineServiceSupplyChain;
+import com.axelor.db.JPA;
 import com.axelor.i18n.I18n;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
@@ -477,6 +480,8 @@ public class SaleOrderStockServiceImpl implements SaleOrderStockService {
       throws AxelorException {
 
     if (this.isStockMoveProduct(saleOrderLine)) {
+      // LVME UC-05 : quantité dans l'unité de la commande, avant conversion (prorata du colisage)
+      BigDecimal qtyInSaleOrderUnit = qty;
 
       Unit unit = saleOrderLine.getProduct().getUnit();
       BigDecimal priceDiscounted = saleOrderLine.getPriceDiscounted();
@@ -546,6 +551,12 @@ public class SaleOrderStockServiceImpl implements SaleOrderStockService {
               fromStockLocation,
               toStockLocation);
 
+      // LVME UC-05 : report du colisage de la commande sur la ligne de BL
+      if (stockMoveLine != null) {
+        copyPackagingFromSaleOrderLine(saleOrderLine, stockMoveLine, qtyInSaleOrderUnit);
+        copyLotAndCostFromSaleOrderLine(saleOrderLine, stockMoveLine, qtyInSaleOrderUnit);
+      }
+
       if (saleOrderLine.getDeliveryState() == 0) {
         saleOrderLine.setDeliveryState(SaleOrderLineRepository.DELIVERY_STATE_NOT_DELIVERED);
       }
@@ -553,6 +564,116 @@ public class SaleOrderStockServiceImpl implements SaleOrderStockService {
       return stockMoveLine;
     }
     return null;
+  }
+
+  /**
+   * LVME UC-05 : recopie le colisage de la ligne de commande vers la ligne de BL. En livraison
+   * partielle, le nombre de colis et les totaux sont proratisés selon la quantité livrée.
+   */
+  protected void copyPackagingFromSaleOrderLine(
+      SaleOrderLine sol, StockMoveLine sml, BigDecimal qtyInSaleOrderUnit) {
+
+    BigDecimal nbColis = sol.getNbColis();
+    if (nbColis == null || nbColis.signum() == 0) {
+      return; // pas de colisage saisi : on laisse les valeurs par défaut
+    }
+
+    BigDecimal ratio = BigDecimal.ONE;
+    if (sol.getQty() != null
+        && sol.getQty().signum() != 0
+        && qtyInSaleOrderUnit.compareTo(sol.getQty()) != 0) {
+      ratio = qtyInSaleOrderUnit.divide(sol.getQty(), 6, RoundingMode.HALF_UP);
+    }
+
+    BigDecimal nbColisBl = nbColis.multiply(ratio).setScale(3, RoundingMode.HALF_UP);
+    BigDecimal nbUnitesParColis = zeroIfNull(sol.getNbUnitesParColis());
+    BigDecimal poidsParColisNet = zeroIfNull(sol.getPoidsParColisNet());
+
+    sml.setNbColis(nbColisBl);
+    sml.setNbUnitesParColis(nbUnitesParColis);
+    sml.setPoidsParColis(zeroIfNull(sol.getPoidsParColis()));
+    sml.setCoefPoidsNet(sol.getCoefPoidsNet() != null ? sol.getCoefPoidsNet() : BigDecimal.ONE);
+    sml.setPoidsParColisNet(poidsParColisNet);
+    sml.setPoidsTotalNet(nbColisBl.multiply(poidsParColisNet).setScale(3, RoundingMode.HALF_UP));
+    sml.setUnitesTot(nbColisBl.multiply(nbUnitesParColis).setScale(3, RoundingMode.HALF_UP));
+  }
+
+  /**
+   * LVME : recopie sur la ligne de BL le lot choisi sur la ligne de commande, la traçabilité de sa
+   * réception (DLUO, origine, pêche...), les prix de revient et la marge de la ligne de commande.
+   */
+  protected void copyLotAndCostFromSaleOrderLine(
+      SaleOrderLine sol, StockMoveLine sml, BigDecimal qtyInSaleOrderUnit) {
+
+    // Prix de revient et marge : ceux de la ligne de commande
+    sml.setPrKg(zeroIfNull(sol.getPrixRevient()));
+    sml.setPrixRevientReel(zeroIfNull(sol.getPrixRevientNet()));
+
+    BigDecimal ratio = BigDecimal.ONE;
+    if (sol.getQty() != null
+        && sol.getQty().signum() != 0
+        && qtyInSaleOrderUnit.compareTo(sol.getQty()) != 0) {
+      ratio = qtyInSaleOrderUnit.divide(sol.getQty(), 6, RoundingMode.HALF_UP);
+    }
+    sml.setMargeHt(
+        zeroIfNull(sol.getSubTotalGrossMargin()).multiply(ratio).setScale(3, RoundingMode.HALF_UP));
+    sml.setTauxMarge(zeroIfNull(sol.getSubMarginRate()));
+
+    // Lot choisi sur la ligne de commande
+    if (sol.getId() == null) {
+      return;
+    }
+    SaleOrderLineLot solLot =
+        JPA.all(SaleOrderLineLot.class)
+            .filter("self.saleOrderLine.id = :solId AND self.trackingNumber IS NOT NULL")
+            .bind("solId", sol.getId())
+            .order("-id")
+            .fetchOne();
+    if (solLot == null) {
+      return;
+    }
+
+    TrackingNumber trackingNumber = solLot.getTrackingNumber();
+    sml.setTrackingNumber(trackingNumber);
+    sml.setLotFournisseur(
+        solLot.getLotFournisseur() != null
+            ? solLot.getLotFournisseur()
+            : trackingNumber.getLotFournisseur());
+
+    // Traçabilité : ligne de réception fournisseur du lot
+    StockMoveLine receptionLine =
+        JPA.all(StockMoveLine.class)
+            .filter(
+                "self.trackingNumber.id = :tnId AND self.stockMove.typeSelect = :incoming"
+                    + " AND self.stockMove.statusSelect IN (:planned, :realized)")
+            .bind("tnId", trackingNumber.getId())
+            .bind("incoming", StockMoveRepository.TYPE_INCOMING)
+            .bind("planned", StockMoveRepository.STATUS_PLANNED)
+            .bind("realized", StockMoveRepository.STATUS_REALIZED)
+            .order("-id")
+            .fetchOne();
+    if (receptionLine == null) {
+      return;
+    }
+    if (sml.getLotFournisseur() == null) {
+      sml.setLotFournisseur(receptionLine.getLotFournisseur());
+    }
+    sml.setModePeche(receptionLine.getModePeche());
+    sml.setOrigine(receptionLine.getOrigine());
+    sml.setZonePeche(receptionLine.getZonePeche());
+    sml.setMarque(receptionLine.getMarque());
+    sml.setDateCongelation(receptionLine.getDateCongelation());
+    sml.setDluo(
+        solLot.getPerishableExpirationDate() != null
+            ? solLot.getPerishableExpirationDate()
+            : receptionLine.getDluo());
+    sml.setDurabilite(receptionLine.getDurabilite());
+    sml.setPaDevise(zeroIfNull(receptionLine.getPaDevise()));
+    sml.setFraisApprocheKg(zeroIfNull(receptionLine.getFraisApprocheKg()));
+  }
+
+  private static BigDecimal zeroIfNull(BigDecimal value) {
+    return value == null ? BigDecimal.ZERO : value;
   }
 
   @Override
