@@ -1,0 +1,3 @@
+<action-method name="action-lvme-sale-order-line-method-duplicate">
+  <call class="com.axelor.apps.supplychain.web.SaleOrderLineDuplicateLvmeController" method="duplicateLine"/>
+</action-method>

@@ -1,0 +1,10 @@
+<action-attrs name="action-stock-move-attrs-typeselect-change">
+  <attribute if="typeSelect == 1" name="title" expr="eval: com.axelor.i18n.I18n.get('Internal move information')" for="stockMoveInformationPanel"/>
+  <attribute if="typeSelect == 2" name="title" expr="eval: com.axelor.i18n.I18n.get('Outgoing move information')" for="stockMoveInformationPanel"/>
+  <attribute if="typeSelect == 3" name="title" expr="eval: com.axelor.i18n.I18n.get('Incoming move information')" for="stockMoveInformationPanel"/>
+  <attribute if="typeSelect == 1" name="title" expr="eval: com.axelor.i18n.I18n.get('Internal move lines')" for="stockMoveLineList"/>
+  <attribute if="typeSelect == 2" name="title" expr="eval: com.axelor.i18n.I18n.get('Outgoing move lines')" for="stockMoveLineList"/>
+  <attribute if="typeSelect == 3" name="title" expr="eval: com.axelor.i18n.I18n.get('Incoming move lines')" for="stockMoveLineList"/>
+<attribute name="required" expr="eval: false" for="fromAddress"/>
+</action-attrs>
+

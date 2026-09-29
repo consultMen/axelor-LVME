@@ -1,0 +1,222 @@
+<!--
+  REC-003 — Rotation des stocks (4 KPI) — éléments à créer / remplacer dans l'ADMINISTRATION Axelor
+  ============================================================================
+  Rappel Axelor 7.4 : dans les expressions eval:, les champs de filtre s'écrivent SANS « $ »
+  (articleDu), dans les vues AVEC « $ » ($articleDu).
+
+  Prérequis : 1) SQL lvme_rotation_stock.sql (v3) exécuté  2) REC-003_selections.sql exécuté
+              3) Axelor redémarré (nouvelles colonnes du modèle RotationStock)
+
+  Ordre : Actions R1 à R5  →  Vues : REMPLACER R6 (grille) et R7 (fiche), CRÉER R8 (écran)
+          →  Action R9  →  Menu « Rotation des stocks » : changer son action (voir R10)
+-->
+
+
+<!-- ======================= R1 : tableau des produits (sur le même écran) ======================= -->
+<action-view name="action-lvme-rotation-stock-dashlet" title="Rotation des stocks"
+  model="com.axelor.apps.supplychain.db.RotationStock">
+  <view type="grid" name="lvme-rotation-stock-grid"/>
+  <view type="form" name="lvme-rotation-stock-form"/>
+  <domain>(:_artDu = '' OR self.productCode &gt;= :_artDu) AND (:_artAu = '' OR self.productCode &lt;= :_artAu)
+    AND (:_famille = 0 OR self.productCategory.id = :_famille)
+    AND (:_statut = '' OR self.statut = :_statut)
+    AND (:_couvMax = 0 OR (self.daysOfStock IS NOT NULL AND self.daysOfStock &lt; :_couvMax))
+    AND (:_ageMin = 0 OR (self.avgAgeDays IS NOT NULL AND self.avgAgeDays &gt; :_ageMin))
+    AND (:_dormant = false OR self.isDormant = true)</domain>
+  <context name="_artDu" expr="eval: articleDu?.id ? (__repo__(Product).find(articleDu.id as Long)?.code ?: '') : ''"/>
+  <context name="_artAu" expr="eval: articleAu?.id ? (__repo__(Product).find(articleAu.id as Long)?.code ?: '') : (articleDu?.id ? (__repo__(Product).find(articleDu.id as Long)?.code ?: '') : '')"/>
+  <context name="_famille" expr="eval: (famille?.id ?: 0) as Long"/>
+  <context name="_statut" expr="eval: statutRotation ? statutRotation.toString() : ''"/>
+  <context name="_couvMax" expr="eval: (couvertureMax ?: 0) as Integer"/>
+  <context name="_ageMin" expr="eval: (ageMin ?: 0) as Integer"/>
+  <context name="_dormant" expr="eval: dormantsSeulement ? true : false"/>
+</action-view>
+
+
+<!-- ======================= R2 : bouton « Lancer la recherche » ======================= -->
+<action-attrs name="action-lvme-rotation-stock-refresh">
+  <attribute name="refresh" for="rotationDashlet" expr="eval: true"/>
+</action-attrs>
+
+
+<!-- ======================= R3 : calcul des 4 KPI (tuiles) ======================= -->
+<action-attrs name="action-lvme-rotation-stock-kpi">
+  <!-- KPI 1 : couverture moyenne (jours), pondérée par la valeur du stock -->
+  <attribute name="value" for="$kpiCouverture"
+    expr="eval: def l = __repo__(RotationStock).all().filter('self.daysOfStock IS NOT NULL').fetch(); def v = (l.collect{ it.stockValue ?: 0 }.sum() ?: 0) as BigDecimal; v &gt; 0 ? ((l.collect{ (it.daysOfStock ?: 0) * (it.stockValue ?: 0) }.sum() / v) as BigDecimal).setScale(0, java.math.RoundingMode.HALF_UP).toString() + ' j' : 'n.d.'"/>
+  <attribute name="value" for="$kpiACommander"
+    expr="eval: __repo__(RotationStock).all().filter('self.statut = ?1', 'A commander').count() + ' produit(s) à commander (moins de 60 j)'"/>
+  <!-- KPI 2 : taux de rotation (fois / an), pondéré par la valeur -->
+  <attribute name="value" for="$kpiRotation"
+    expr="eval: def l = __repo__(RotationStock).all().fetch(); def v = (l.collect{ it.stockValue ?: 0 }.sum() ?: 0) as BigDecimal; v &gt; 0 ? ((l.collect{ (it.rotationRate ?: 0) * (it.stockValue ?: 0) }.sum() / v) as BigDecimal).setScale(2, java.math.RoundingMode.HALF_UP).toString() + ' fois / an' : 'n.d.'"/>
+  <!-- KPI 3 : âge moyen du stock (jours), pondéré par la valeur -->
+  <attribute name="value" for="$kpiAge"
+    expr="eval: def l = __repo__(RotationStock).all().filter('self.avgAgeDays IS NOT NULL').fetch(); def v = (l.collect{ it.stockValue ?: 0 }.sum() ?: 0) as BigDecimal; v &gt; 0 ? ((l.collect{ (it.avgAgeDays ?: 0) * (it.stockValue ?: 0) }.sum() / v) as BigDecimal).setScale(0, java.math.RoundingMode.HALF_UP).toString() + ' j' : 'n.d.'"/>
+  <attribute name="value" for="$kpiLotsAnciens"
+    expr="eval: __repo__(RotationStock).all().filter('self.oldestLotAge &gt; 180').count() + ' produit(s) avec un lot de plus de 180 j'"/>
+  <!-- KPI 4 : stock dormant (valeur, nombre, % du stock) -->
+  <attribute name="value" for="$kpiDormant"
+    expr="eval: String.format(java.util.Locale.FRANCE, '%,.0f €', ((__repo__(RotationStock).all().fetch().collect{ it.dormantValue ?: 0 }.sum() ?: 0) as BigDecimal))"/>
+  <attribute name="value" for="$kpiDormantDetail"
+    expr="eval: def l = __repo__(RotationStock).all().fetch(); def t = (l.collect{ it.stockValue ?: 0 }.sum() ?: 0) as BigDecimal; def d = (l.collect{ it.dormantValue ?: 0 }.sum() ?: 0) as BigDecimal; l.count{ it.isDormant } + ' produit(s) sans vente depuis 90 j' + (t &gt; 0 ? ' (' + (d * 100 / t).setScale(0, java.math.RoundingMode.HALF_UP) + ' % du stock)' : '')"/>
+  <!-- Bandeau : stock total -->
+  <attribute name="value" for="$kpiStockTotal"
+    expr="eval: def l = __repo__(RotationStock).all().fetch(); 'Stock total : ' + String.format(java.util.Locale.FRANCE, '%,.0f €', ((l.collect{ it.stockValue ?: 0 }.sum() ?: 0) as BigDecimal)) + ' — ' + l.size() + ' produit(s) en stock — calculé le ' + __date__.format(java.time.format.DateTimeFormatter.ofPattern('dd/MM/yyyy'))"/>
+</action-attrs>
+
+
+<!-- ======================= R4 : ouverture de l'écran (KPI) ======================= -->
+<action-group name="action-lvme-rotation-stock-group-onnew">
+  <action name="action-lvme-rotation-stock-kpi"/>
+</action-group>
+
+
+<!-- ======================= R5 : bouton « Recalculer les KPI » ======================= -->
+<action-group name="action-lvme-rotation-stock-group-recalcul">
+  <action name="action-lvme-rotation-stock-kpi"/>
+  <action name="action-lvme-rotation-stock-refresh"/>
+</action-group>
+
+
+<!-- ======================= R6 : GRILLE (REMPLACER lvme-rotation-stock-grid) — Liste, Modèle : com.axelor.apps.supplychain.db.RotationStock ======================= -->
+<grid name="lvme-rotation-stock-grid" title="Rotation des stocks"
+  model="com.axelor.apps.supplychain.db.RotationStock" orderBy="productCode"
+  canNew="false" canEdit="false" canDelete="false">
+  <hilite color="danger" strong="true" if="statut == 'A commander'"/>
+  <hilite color="warning" if="statut == 'Dormant' || statut == 'Lot ancien'"/>
+  <field name="productCode" width="110"/>
+  <field name="productName"/>
+  <field name="productCategory" width="110"/>
+  <field name="stockQty" aggregate="sum" width="90"/>
+  <field name="stockValue" aggregate="sum" width="100"/>
+  <field name="sales90d" width="85"/>
+  <field name="avgDailySales" width="85"/>
+  <field name="daysOfStock" title="Couverture (j)" width="90">
+    <hilite background="danger" strong="true" if="statut == 'A commander'"/>
+  </field>
+  <field name="sales365d" width="90"/>
+  <field name="rotationRate" width="85"/>
+  <field name="avgAgeDays" width="85"/>
+  <field name="oldestLotAge" width="85"/>
+  <field name="lastSaleDate" width="95"/>
+  <field name="daysSinceLastSale" width="85"/>
+  <field name="dormantValue" aggregate="sum" width="100"/>
+  <field name="statut" width="110"/>
+</grid>
+
+
+<!-- ======================= R7 : FICHE (REMPLACER lvme-rotation-stock-form) — Formulaire, Modèle : com.axelor.apps.supplychain.db.RotationStock ======================= -->
+<form name="lvme-rotation-stock-form" title="Rotation des stocks"
+  model="com.axelor.apps.supplychain.db.RotationStock" canNew="false" canEdit="false" canDelete="false" canSave="false">
+  <panel name="mainPanel" title="Produit" readonly="true">
+    <field name="product"/>
+    <field name="productCategory"/>
+    <field name="statut"/>
+    <field name="isDormant"/>
+  </panel>
+  <panel name="kpiPanel" title="Indicateurs" readonly="true" itemSpan="3">
+    <field name="daysOfStock" title="Couverture (j)"/>
+    <field name="rotationRate"/>
+    <field name="avgAgeDays"/>
+    <field name="dormantValue"/>
+  </panel>
+  <panel name="detailPanel" title="Détail" readonly="true" itemSpan="3">
+    <field name="stockQty"/>
+    <field name="stockValue"/>
+    <field name="sales90d"/>
+    <field name="avgDailySales"/>
+    <field name="sales365d"/>
+    <field name="lastSaleDate"/>
+    <field name="daysSinceLastSale"/>
+    <field name="oldestLotDate"/>
+    <field name="oldestLotAge"/>
+  </panel>
+</form>
+
+
+<!-- ======================= R8 : ÉCRAN KPI + FILTRES + TABLEAU (CRÉER) — Formulaire, Modèle : com.axelor.utils.db.Wizard ======================= -->
+<form name="lvme-rotation-stock-dashboard-form" title="Rotation des stocks"
+  model="com.axelor.utils.db.Wizard" width="large" canNew="false" canSave="false" canCopy="false" canDelete="false"
+  onNew="action-lvme-rotation-stock-group-onnew">
+
+  <!-- Les 4 KPI -->
+  <panel name="kpiPanel" showTitle="false" colSpan="12">
+    <field name="$kpiStockTotal" type="string" hidden="true"/>
+    <field name="$kpiCouverture" type="string" hidden="true"/>
+    <field name="$kpiACommander" type="string" hidden="true"/>
+    <field name="$kpiRotation" type="string" hidden="true"/>
+    <field name="$kpiAge" type="string" hidden="true"/>
+    <field name="$kpiLotsAnciens" type="string" hidden="true"/>
+    <field name="$kpiDormant" type="string" hidden="true"/>
+    <field name="$kpiDormantDetail" type="string" hidden="true"/>
+    <field name="$kpiTuiles" showTitle="false" readonly="true" colSpan="12" type="string">
+      <viewer depends="$kpiStockTotal,$kpiCouverture,$kpiACommander,$kpiRotation,$kpiAge,$kpiLotsAnciens,$kpiDormant,$kpiDormantDetail"><![CDATA[
+        <>
+          <Box mb={2} style={{ color: '#555' }}>{$kpiStockTotal}</Box>
+          <Box d="grid" style={{ gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
+            <Box style={{ border: '1px solid #dc3545', borderLeft: '6px solid #dc3545', borderRadius: 8, padding: 12 }}>
+              <Box style={{ fontSize: 13, color: '#666' }}>1. Couverture moyenne</Box>
+              <Box style={{ fontSize: 26, fontWeight: 'bold' }}>{$kpiCouverture}</Box>
+              <Box style={{ fontSize: 12, color: '#dc3545' }}>{$kpiACommander}</Box>
+            </Box>
+            <Box style={{ border: '1px solid #0d6efd', borderLeft: '6px solid #0d6efd', borderRadius: 8, padding: 12 }}>
+              <Box style={{ fontSize: 13, color: '#666' }}>2. Taux de rotation</Box>
+              <Box style={{ fontSize: 26, fontWeight: 'bold' }}>{$kpiRotation}</Box>
+              <Box style={{ fontSize: 12, color: '#666' }}>Ventes 12 mois / stock actuel</Box>
+            </Box>
+            <Box style={{ border: '1px solid #fd7e14', borderLeft: '6px solid #fd7e14', borderRadius: 8, padding: 12 }}>
+              <Box style={{ fontSize: 13, color: '#666' }}>3. Âge moyen du stock</Box>
+              <Box style={{ fontSize: 26, fontWeight: 'bold' }}>{$kpiAge}</Box>
+              <Box style={{ fontSize: 12, color: '#fd7e14' }}>{$kpiLotsAnciens}</Box>
+            </Box>
+            <Box style={{ border: '1px solid #6c757d', borderLeft: '6px solid #6c757d', borderRadius: 8, padding: 12 }}>
+              <Box style={{ fontSize: 13, color: '#666' }}>4. Stock dormant</Box>
+              <Box style={{ fontSize: 26, fontWeight: 'bold' }}>{$kpiDormant}</Box>
+              <Box style={{ fontSize: 12, color: '#666' }}>{$kpiDormantDetail}</Box>
+            </Box>
+          </Box>
+        </>
+      ]]></viewer>
+    </field>
+  </panel>
+
+  <!-- Filtres -->
+  <panel name="filtresPanel" showTitle="false" colSpan="12">
+    <panel name="filtreArticlePanel" colSpan="4" itemSpan="12">
+      <field name="$articleDu" title="Article du" type="many-to-one" target="com.axelor.apps.base.db.Product" canNew="false" canEdit="false" canView="false"/>
+      <field name="$articleAu" title="au" type="many-to-one" target="com.axelor.apps.base.db.Product" canNew="false" canEdit="false" canView="false"/>
+    </panel>
+    <panel name="filtreFamillePanel" colSpan="4" itemSpan="12">
+      <field name="$famille" title="Fam. article" type="many-to-one" target="com.axelor.apps.base.db.ProductCategory" canNew="false" canEdit="false" canView="false"/>
+      <field name="$statutRotation" title="Statut" type="string" selection="lvme.rotation.statut.select"/>
+    </panel>
+    <panel name="filtreSeuilPanel" colSpan="2" itemSpan="12">
+      <field name="$couvertureMax" title="Couverture inférieure à (j)" type="integer"/>
+      <field name="$ageMin" title="Âge moyen supérieur à (j)" type="integer"/>
+    </panel>
+    <panel name="filtreActionPanel" colSpan="2" itemSpan="12">
+      <field name="$dormantsSeulement" title="Seulement les dormants" type="boolean"/>
+      <button name="lancerRechercheBtn" title="Lancer la recherche" icon="search" css="btn-primary" onClick="action-lvme-rotation-stock-refresh"/>
+      <button name="recalculBtn" title="Recalculer les KPI" icon="arrow-repeat" onClick="action-lvme-rotation-stock-group-recalcul"/>
+    </panel>
+  </panel>
+
+  <!-- Tableau par produit -->
+  <panel-dashlet name="rotationDashlet" title="Rotation par produit" colSpan="12" height="550"
+    action="action-lvme-rotation-stock-dashlet"/>
+</form>
+
+
+<!-- ======================= R9 : ouverture de l'écran (CRÉER) ======================= -->
+<action-view name="action-lvme-rotation-stock-open" title="Rotation des stocks"
+  model="com.axelor.utils.db.Wizard">
+  <view type="form" name="lvme-rotation-stock-dashboard-form"/>
+  <view-param name="show-toolbar" value="false"/>
+  <view-param name="forceEdit" value="true"/>
+</action-view>
+
+
+<!-- ======================= R10 : MENU (MODIFIER l'existant) =======================
+  Administration > Menus > ouvrir « lvme-menu-rotation-stock » (Rotation des stocks)
+  Action : remplacer par  action-lvme-rotation-stock-open   → Enregistrer
+-->

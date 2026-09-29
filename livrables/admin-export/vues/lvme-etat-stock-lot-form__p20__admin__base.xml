@@ -1,0 +1,32 @@
+<form name="lvme-etat-stock-lot-form" title="Lot en stock"
+  model="com.axelor.apps.supplychain.db.EtatStockLot" canNew="false" canEdit="false" canDelete="false" canSave="false">
+  <panel name="lotPanel" title="Lot" readonly="true">
+    <field name="product"/>
+    <field name="productCategory"/>
+    <field name="trackingNumber"/>
+    <field name="arrivalNumber"/>
+    <field name="supplier"/>
+    <field name="stockLocation"/>
+    <field name="natureLabel"/>
+    <field name="origine" selection="lvme.origine.select"/>
+    <field name="conditionnement"/>
+    <field name="unit"/>
+    <field name="entryDate"/>
+    <field name="arrivalDate"/>
+    <field name="dluo"/>
+    <field name="prixRevient"/>
+  </panel>
+  <panel name="qtyPanel" title="Quantités" readonly="true" itemSpan="3">
+    <field name="qtyPerColis"/>
+    <field name="nbColisIn"/>
+    <field name="nbColisOut"/>
+    <field name="nbColisCdes"/>
+    <field name="nbColisStock"/>
+    <field name="entreeQty"/>
+    <field name="sortieQty"/>
+    <field name="cdesQty"/>
+    <field name="stockQty"/>
+    <field name="dispoQty"/>
+    <field name="stockValue"/>
+  </panel>
+</form>

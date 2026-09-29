@@ -1,0 +1,5 @@
+<action-view name="action-encours-fournisseur-all" title="État en-cours fournisseur"
+      model="com.axelor.apps.supplychain.db.EncoursFournisseur">
+  <view type="grid" name="encours-fournisseur-grid"/>
+  <view type="form" name="encours-fournisseur-form"/>
+</action-view>

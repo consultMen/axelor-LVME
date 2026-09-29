@@ -1,0 +1,13 @@
+<form name="encours-fournisseur-form" title="État en-cours fournisseur"
+      model="com.axelor.apps.supplychain.db.EncoursFournisseur"
+      canNew="false" canEdit="false" canDelete="false">
+  <panel title="Détail">
+    <field name="fournisseur" readonly="true"/>
+    <field name="numeroArrivage" readonly="true"/>
+    <field name="dateArrivage" readonly="true"/>
+    <field name="montantHtArrivage" readonly="true"/>
+    <field name="montantHtComptabilise" readonly="true"/>
+    <field name="ecart" readonly="true"/>
+    <field name="dateComptabilisation" readonly="true"/>
+  </panel>
+</form>

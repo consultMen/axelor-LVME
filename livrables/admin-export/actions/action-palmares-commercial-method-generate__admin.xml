@@ -1,0 +1,3 @@
+<action-method name="action-palmares-commercial-method-generate">
+  <call class="com.axelor.apps.supplychain.web.PalmaresCommercialController" method="generate"/>
+</action-method>

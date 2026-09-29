@@ -1,0 +1,16 @@
+<action-view name="action-stock-location-line-view-by-product-lot" 
+             model="com.axelor.apps.stock.db.StockLocationLine" 
+             title="Détail par lots">
+  <view name="stock-location-line-details-grid" type="grid"/>
+  <view name="stock-location-line-details-form" type="form"/>
+  <domain>
+    self.product.id = :productId
+    AND self.detailsStockLocation IS NOT NULL
+    AND self.detailsStockLocation.isNotInCalculStock != true
+    AND self.detailsStockLocation.typeSelect != :typeVirtual
+    AND (:companyId IS NULL OR self.detailsStockLocation.company.id = :companyId)
+  </domain>
+  <context name="productId" expr="eval: product?.id"/>
+  <context name="companyId" expr="eval: company?.id"/>
+  <context name="typeVirtual" expr="eval: __repo__(StockLocation).TYPE_VIRTUAL"/>
+</action-view>

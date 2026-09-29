@@ -1,0 +1,31 @@
+<grid name="purchase-order-line-purchase-order-grid" title="PO lines" model="com.axelor.apps.purchase.db.PurchaseOrderLine">
+  <hilite color="default" strong="true" if="isTitleLine == true"/>
+  <hilite color="danger" if="receiptState == 1"/>
+  <hilite color="warning" if="receiptState == 2"/>
+  <hilite color="success" if="receiptState == 3"/>
+  <field name="$hasWarning" hidden="true"/>
+  <button name="errorIconButton" showIf="$hasWarning" onClick="refresh" readonlyIf="true" icon="fa-exclamation-triangle"/>
+  <field name="sequence" if="__config__.app.getApp('purchase')?.isDisplayPurchaseOrderLineNumber" width="51"/>
+  <button name="addToCartBtn" title="Add to cart" onClick="action-purchase-order-line-method-add-to-cart" icon="cart-plus-fill" if="__config__.app.getApp('sale')?.getIsCartManagementEnabled()" readonlyIf="!product || isTitleLine"/>
+  <field name="product" hidden="true"/>
+  <field name="receiptState" hidden="true" if="__config__.app.isApp('supplychain')"/>
+  <field name="productName"/>
+  <field name="productCode"/>
+  <field name="purchaseOrder.currency" hidden="true"/>
+  <field name="purchaseOrder.currency.numberOfDecimals" hidden="true"/>
+  <field name="qty" aggregate="sum" x-scale="$nbDecimalDigitForQty"/>
+  <field name="unit" form-view="unit-form" grid-view="unit-grid"/>
+  <field name="conditionnement"/>
+  <field name="priceDiscounted" title="Unit price W.T." x-scale="$nbDecimalDigitForUnitPrice"/>
+  <field name="exTaxTotal" aggregate="sum" x-scale="purchaseOrder.currency.numberOfDecimals"/>
+  <field name="inTaxTotal" aggregate="sum" x-scale="purchaseOrder.currency.numberOfDecimals"/>
+  <field name="budgetStr" if="__config__.app.getApp('budget') &amp;&amp; __config__.app.getApp('budget').getManageMultiBudget()"/>
+  <field name="budget" if="__config__.app.getApp('budget') &amp;&amp; !__config__.app.getApp('budget').getManageMultiBudget()"/>
+  <field name="isTitleLine" hidden="true"/>
+  <field name="desiredReceiptDate"/>
+  <field name="estimatedReceiptDate"/>
+  <field name="$nbDecimalDigitForUnitPrice" hidden="true"/>
+  <field name="$nbDecimalDigitForQty" hidden="true"/>
+  <field name="purchaseOrder.statusSelect" hidden="true"/>
+  <button name="lvmeDuplicateLineBtn" title="Dupliquer la ligne" icon="fa-copy" readonlyIf="id == null || $get('purchaseOrder.statusSelect') &gt; 2" onClick="save,action-lvme-purchase-order-line-method-duplicate"/>
+</grid>

@@ -1,0 +1,3 @@
+<action-method name="action-coditour-wizard-method-print">
+  <call class="com.axelor.apps.account.web.CoditourWizardController" method="print"/>
+</action-method>

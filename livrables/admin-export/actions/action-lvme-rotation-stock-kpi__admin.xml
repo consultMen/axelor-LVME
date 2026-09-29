@@ -1,0 +1,23 @@
+<action-attrs name="action-lvme-rotation-stock-kpi">
+  <!-- KPI 1 : couverture moyenne (jours), pondérée par la valeur du stock -->
+  <attribute name="value" for="$kpiCouverture"
+    expr="eval: def l = __repo__(RotationStock).all().filter('self.daysOfStock IS NOT NULL').fetch(); def v = (l.collect{ it.stockValue ?: 0 }.sum() ?: 0) as BigDecimal; v &gt; 0 ? ((l.collect{ (it.daysOfStock ?: 0) * (it.stockValue ?: 0) }.sum() / v) as BigDecimal).setScale(0, java.math.RoundingMode.HALF_UP).toString() + ' j' : 'n.d.'"/>
+  <attribute name="value" for="$kpiACommander"
+    expr="eval: __repo__(RotationStock).all().filter('self.statut = ?1', 'A commander').count() + ' produit(s) à commander (moins de 60 j)'"/>
+  <!-- KPI 2 : taux de rotation (fois / an), pondéré par la valeur -->
+  <attribute name="value" for="$kpiRotation"
+    expr="eval: def l = __repo__(RotationStock).all().fetch(); def v = (l.collect{ it.stockValue ?: 0 }.sum() ?: 0) as BigDecimal; v &gt; 0 ? ((l.collect{ (it.rotationRate ?: 0) * (it.stockValue ?: 0) }.sum() / v) as BigDecimal).setScale(2, java.math.RoundingMode.HALF_UP).toString() + ' fois / an' : 'n.d.'"/>
+  <!-- KPI 3 : âge moyen du stock (jours), pondéré par la valeur -->
+  <attribute name="value" for="$kpiAge"
+    expr="eval: def l = __repo__(RotationStock).all().filter('self.avgAgeDays IS NOT NULL').fetch(); def v = (l.collect{ it.stockValue ?: 0 }.sum() ?: 0) as BigDecimal; v &gt; 0 ? ((l.collect{ (it.avgAgeDays ?: 0) * (it.stockValue ?: 0) }.sum() / v) as BigDecimal).setScale(0, java.math.RoundingMode.HALF_UP).toString() + ' j' : 'n.d.'"/>
+  <attribute name="value" for="$kpiLotsAnciens"
+    expr="eval: __repo__(RotationStock).all().filter('self.oldestLotAge &gt; 180').count() + ' produit(s) avec un lot de plus de 180 j'"/>
+  <!-- KPI 4 : stock dormant (valeur, nombre, % du stock) -->
+  <attribute name="value" for="$kpiDormant"
+    expr="eval: String.format(java.util.Locale.FRANCE, '%,.0f €', ((__repo__(RotationStock).all().fetch().collect{ it.dormantValue ?: 0 }.sum() ?: 0) as BigDecimal))"/>
+  <attribute name="value" for="$kpiDormantDetail"
+    expr="eval: def l = __repo__(RotationStock).all().fetch(); def t = (l.collect{ it.stockValue ?: 0 }.sum() ?: 0) as BigDecimal; def d = (l.collect{ it.dormantValue ?: 0 }.sum() ?: 0) as BigDecimal; l.count{ it.isDormant } + ' produit(s) sans vente depuis 90 j' + (t &gt; 0 ? ' (' + (d * 100 / t).setScale(0, java.math.RoundingMode.HALF_UP) + ' % du stock)' : '')"/>
+  <!-- Bandeau : stock total -->
+  <attribute name="value" for="$kpiStockTotal"
+    expr="eval: def l = __repo__(RotationStock).all().fetch(); 'Stock total : ' + String.format(java.util.Locale.FRANCE, '%,.0f €', ((l.collect{ it.stockValue ?: 0 }.sum() ?: 0) as BigDecimal)) + ' — ' + l.size() + ' produit(s) en stock — calculé le ' + __date__.format(java.time.format.DateTimeFormatter.ofPattern('dd/MM/yyyy'))"/>
+</action-attrs>

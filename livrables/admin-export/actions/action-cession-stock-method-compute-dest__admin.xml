@@ -1,0 +1,4 @@
+<action-method name="action-cession-stock-method-compute-dest">
+  <call class="com.axelor.apps.stock.web.CessionStockController"
+        method="computeDest"/>
+</action-method>

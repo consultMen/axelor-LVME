@@ -1,0 +1,10 @@
+<form name="coditour-wizard-form" title="Export Coditour"
+      model="com.axelor.apps.account.db.CoditourWizard"
+      onNew="action-coditour-wizard-record-default">
+  <panel title="Sélection période">
+    <field name="mois" selection="lvme.coditour.month.select"/>
+    <field name="annee"/>
+    <button name="btnGenerate" title="Générer" colSpan="6" onClick="action-coditour-wizard-method-print"/>
+    <button name="btnClose" title="Fermer" colSpan="6" onClick="close"/>
+  </panel>
+</form>

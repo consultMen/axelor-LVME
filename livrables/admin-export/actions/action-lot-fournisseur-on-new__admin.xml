@@ -1,0 +1,5 @@
+<action-record name="action-lot-fournisseur-on-new" 
+               model="com.axelor.apps.stock.db.LotFournisseur">
+  <field name="product" expr="eval: _parent?.product" if="_parent?.product != null"/>
+  <field name="supplier" expr="eval: _parent?.supplier" if="_parent?.supplier != null"/>
+</action-record>

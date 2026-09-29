@@ -1,0 +1,27 @@
+<grid id="my-stock-move-line-grid-ext"
+      name="stock-move-line-grid"
+      title="Stock move lines (ext)"
+      model="com.axelor.apps.stock.db.StockMoveLine"
+      extension="true">
+
+  <extend target="//field[@name='trackingNumber']">
+    <insert position="after">
+      <field name="lotFournisseur" 
+             title="Lot Fournisseur"
+             width="150px"
+             form-view="lot-fournisseur-form"
+             grid-view="lot-fournisseur-grid"/>
+      <field name="lotFournisseur.dateProduction" 
+             title="Date de production" 
+             width="130px"/>
+      <field name="trackingNumber.dateArrivage" 
+             title="Date d'arrivage" 
+             width="130px"/>
+      <field name="marque" readonly="true"/>
+      <field name="modePeche" readonly="true"/>
+      <field name="origine" readonly="true"/>
+      <field name="zonePeche" readonly="true"/>
+    </insert>
+  </extend>
+  
+</grid>

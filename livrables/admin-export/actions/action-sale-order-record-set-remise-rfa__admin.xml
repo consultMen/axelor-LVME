@@ -1,0 +1,8 @@
+<action-record name="action-sale-order-record-set-remise-rfa"
+  model="com.axelor.apps.sale.db.SaleOrder">
+  <field name="remiseFacture" expr="eval: clientPartner != null ? clientPartner.remiseFacture : null"/>
+  <field name="tauxRFA" expr="eval: clientPartner != null ? clientPartner.tauxRFA : null"/>
+  <field name="tauxCommission" expr="eval: clientPartner != null ? clientPartner.tauxCommission : null"/>
+  <field name="commercial" expr="eval: clientPartner != null ? clientPartner.commercial : null"/>
+  <field name="portPaye" expr="eval: clientPartner != null ? clientPartner.portPaye : false"/>
+</action-record>

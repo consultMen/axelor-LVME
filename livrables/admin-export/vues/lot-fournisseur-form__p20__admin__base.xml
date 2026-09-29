@@ -1,0 +1,19 @@
+<form name="lot-fournisseur-form" 
+      title="Lot Fournisseur" 
+      model="com.axelor.apps.stock.db.LotFournisseur"
+      onNew="action-lot-fournisseur-on-new">
+  <panel name="mainPanel" title="Informations Lot Fournisseur">
+    <field name="supplierLotNumber" title="N° Lot Fournisseur" colSpan="6"/>
+    <field name="dateProduction" title="Date de production" colSpan="6"/>
+   <field name="product" 
+       title="Produit"
+       colSpan="12"
+       required="true"
+       form-view="product-form"
+       grid-view="product-grid"/>
+    <field name="supplier" title="Fournisseur" colSpan="12"
+           domain="self.isSupplier IS TRUE"
+           form-view="partner-supplier-form"
+           grid-view="partner-supplier-grid"/>
+  </panel>
+</form>

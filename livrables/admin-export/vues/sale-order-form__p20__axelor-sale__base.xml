@@ -1,0 +1,373 @@
+<form id="sale-order-form" name="sale-order-form" title="Sale order" model="com.axelor.apps.sale.db.SaleOrder" onLoad="action-group-sale-saleorder-onload" onNew="action-sale-order-method-onnew">
+  <toolbar>
+    <button name="printBtn" title="Reports" hideIf="clientPartner == null" readonlyIf="!id" icon="fa-print" onClick="save,action-sale-order-view-reports-wizard"/>
+    <button name="sendByEmailBtn" title="Send email" hidden="true" showIf="id" icon="fa-envelope" onClick="action-send-by-email-with-template"/>
+    <button if="__config__.app.getApp('sale')?.getIsEnableCalculationEntireQuotation()" name="recomputePricesBtn" title="Recompute prices" showIf="statusSelect == 1" icon="fa-calculator" onClick="action-sale-order-group-recompute-prices-btn"/>
+  </toolbar>
+  <menubar>
+    <menu name="saleOrderToolsMenu" title="Tools">
+      <item name="defineAsTemplateItem" title="Define as template" hideIf="clientPartner == null" action="save,action-sale-order-method-generate-template"/>
+      <item if="__config__.app.getApp('supplychain')?.manageStockReservation" name="allocateAllItem" title="Allocate all" showIf="statusSelect == 3 &amp;&amp; !orderBeingEdited" action="save,action-sale-order-method-allocate-all"/>
+      <item if="__config__.app.getApp('supplychain')?.manageStockReservation" name="deallocateAllItem" title="Deallocate all" showIf="statusSelect == 3 &amp;&amp; !orderBeingEdited" action="save,action-sale-order-method-deallocate-all"/>
+      <item if="__config__.app.getApp('supplychain')?.manageStockReservation" name="reserveAllItem" title="Reserve all" showIf="statusSelect == 3 &amp;&amp; !orderBeingEdited" action="save,action-sale-order-method-reserve-all"/>
+      <item if="__config__.app.getApp('supplychain')?.manageStockReservation" name="cancelReservationItem" title="Cancel reservation" showIf="statusSelect == 3 &amp;&amp; !orderBeingEdited" action="save,action-sale-order-method-cancel-reservation"/>
+      <item if="__config__.app.getApp('sale')?.getEnableConfigurator()" name="duplicateWithConfiguratorBtn" title="Duplicate with configurator" action="action-sale-order-group-on-duplicate-with-configurator"/>
+    </menu>
+  </menubar>
+  <panel name="mainPanel">
+    <panel name="blockedCustCreditExceedPanel" colSpan="12">
+      <field name="blockedOnCustCreditExceed" showTitle="false" readonly="true" showIf="blockedOnCustCreditExceed &amp;&amp; !manualUnblock" colSpan="4">
+        <viewer depends="blockedOnCustCreditExceed"><![CDATA[
+          <>{blockedOnCustCreditExceed && <Badge style={{ backgroundColor: "#B6473F" }}>{_t('Blocked')}</Badge>}</>
+        ]]></viewer>
+      </field>
+      <button name="manualUnblockBtn" title="Manual Unblock" showIf="blockedOnCustCreditExceed == true &amp;&amp; manualUnblock == false" colSpan="4" css="btn-custom" onClick="action-sale-order-manual-unblock"/>
+      <field name="manualUnblock" hidden="true"/>
+      <field name="orderBeingEdited" hidden="true"/>
+      <field name="$viewerOrderBeingEdited" showTitle="false" readonly="true" showIf="orderBeingEdited" colSpan="9">
+        <viewer depends="orderBeingEdited"><![CDATA[
+          <>{orderBeingEdited && <Badge bg="danger">{_t('Order being edited')}</Badge>}</>
+        ]]></viewer>
+      </field>
+      <field name="$viewerOrderRequiresAdvancePayment" showTitle="false" readonly="true" showIf="(statusSelect == 2 &amp;&amp; advancePaymentNeeded) &amp;&amp; $number(advanceTotal) &lt; $number(advancePaymentAmountNeeded)" colSpan="6">
+        <viewer><![CDATA[
+          <><Badge bg="danger">{_t('Advance payment needed')}</Badge></>
+        ]]></viewer>
+      </field>
+    </panel>
+    <field if="!__config__.app.getApp('sale')?.isQuotationAndOrderSplitEnabled" name="statusSelect" showTitle="false" colSpan="12" widget="NavSelect"/>
+    <field if="__config__.app.getApp('sale')?.isQuotationAndOrderSplitEnabled" name="statusSelect" showTitle="false" showIf="statusSelect &lt;= 2 || statusSelect == 5" colSpan="12" widget="NavSelect" selection-in="[1,2,5]"/>
+    <field if="__config__.app.getApp('sale')?.isQuotationAndOrderSplitEnabled" name="statusSelect" showTitle="false" showIf="statusSelect > 2 &amp;&amp; statusSelect != 5" colSpan="12" widget="NavSelect" selection-in="[3,4]"/>
+    <field name="saleOrderSeq" showTitle="false">
+      <viewer depends="statusSelect,saleOrderSeq"><![CDATA[
+         <>
+            <h3>
+            	{[1,2,5].includes(statusSelect) && saleOrderSeq && <span>{_t('Quotation')} </span>}
+            	{[3,4].includes(statusSelect) && <span>{_t('Sale order')} </span>}
+            	{saleOrderSeq}
+            </h3>
+         </>
+    ]]></viewer>
+    </field>
+    <panel name="detailsPanel" colSpan="10">
+      <field if="__config__.app.isApp('supplychain') &amp;&amp; __config__.app.getApp('supplychain')?.getAllowSusbcriptionSaleOrder()" if-module="axelor-supplychain" name="saleOrderTypeSelect" showTitle="false" readonlyIf="statusSelect >= 2" colSpan="3" css="label-bold bold">
+        <viewer><![CDATA[
+         <>
+            {saleOrderTypeSelect == 1 && <Badge bg="info">{_t('Standard')}</Badge>}
+            {saleOrderTypeSelect == 2 && <Badge bg="info">{_t('Subscription')}</Badge>}
+         </>
+       ]]></viewer>
+      </field>
+      <field if="__config__.app.isApp('supplychain')" if-module="axelor-supplychain" name="invoicingState" showTitle="false" readonly="true" showIf="statusSelect >= 3" colSpan="3" css="label-bold bold">
+        <viewer depends="invoicingState"><![CDATA[
+         <>
+            {invoicingState == 1 && <Badge bg="danger">{_t('Not invoiced')}</Badge>}
+            {invoicingState == 2 && <Badge bg="warning">{_t('Partially invoiced')}</Badge>}
+            {invoicingState == 3 && <Badge bg="success">{_t('Invoiced')}</Badge>}
+         </>
+     ]]></viewer>
+      </field>
+      <field if="__config__.app.isApp('supplychain')" if-module="axelor-supplychain" name="deliveryState" showTitle="false" showIf="statusSelect >= 3" colSpan="3" css="label-bold bold">
+        <viewer><![CDATA[
+         <>
+            {deliveryState == 1 && <Badge bg="danger">{_t('Not delivered')}</Badge>}
+            {deliveryState == 2 && <Badge bg="warning">{_t('Partially delivered')}</Badge>}
+            {deliveryState == 3 && <Badge bg="success">{_t('Delivered')}</Badge>}
+         </>
+     ]]></viewer>
+      </field>
+      <field if="__config__.app.getApp('sale')?.isQuotationAndOrderSplitEnabled" name="orderingStatus" showTitle="false" showIf="statusSelect &lt;= 2">
+        <viewer><![CDATA[
+         <>
+               {orderingStatus == 1 && <Badge bg="warning">{_t('Partially ordered')}</Badge>}
+            {orderingStatus == 2 && <Badge bg="success">{_t('orderingStatus.closed')}</Badge>}
+         </>
+     ]]></viewer>
+      </field>
+      <field name="availabilityRequestLabel" showTitle="false" hidden="true" readonly="true" colSpan="3" css="label-bold bold">
+        <viewer><![CDATA[
+          <><Badge bg="danger">{_t('Availability Request')}</Badge></>
+        ]]></viewer>
+      </field>
+      <field name="$discountsNeedReview" showTitle="false" readonly="true" showIf="$discountsNeedReview">
+        <viewer><![CDATA[
+          <><Badge bg="danger">{_t('Discounts need review')}</Badge></>
+        ]]></viewer>
+      </field>
+    </panel>
+    <field name="oneoffSale" colSpan="2"/>
+    <field name="company.tradingNameList" hidden="true"/>
+    <panel name="generalInfoPanel" colSpan="12">
+      <field name="company" readonlyIf="statusSelect == 3 || clientPartner != null" colSpan="3" widget="SuggestBox" canEdit="false" onChange="action-sale-order-method-company-onchange" form-view="company-form" grid-view="company-grid"/>
+      <field if="__config__.app.getApp('base')?.enableTradingNamesManagement" name="tradingName" hidden="true" hideIf="company.tradingNameList == null || company.tradingNameList.length == 0" readonlyIf="!createdByInterco &amp;&amp; ((saleOrderLineList &amp;&amp; saleOrderLineList.length > 0) || statusSelect >= 2)" colSpan="3" canEdit="false" onChange="action-sale-method-printing-settings-default-values,action-sale-order-record-set-stock-location" domain="self.company = :company" requiredIf="company.tradingNameList != null &amp;&amp; company.tradingNameList.length != 0" form-view="trading-name-form" grid-view="trading-name-grid"/>
+      <label if="!(__config__.app.getApp('base')?.enableTradingNamesManagement)" name="tradingNameLabel" colSpan="3"/>
+      <field name="currency" readonlyIf="(saleOrderLineList &amp;&amp; saleOrderLineList.length > 0) || statusSelect >= 2" colSpan="3" canEdit="false" required="true" form-view="currency-form" grid-view="currency-grid"/>
+      <field name="priceList" hideIf="company == null" readonlyIf="(saleOrderLineList &amp;&amp; saleOrderLineList.length > 0) || statusSelect >= 2" colSpan="3" canEdit="false" onChange="action-sale-order-record-hide-discount" onSelect="action-sale-order-method-price-list-domain" form-view="price-list-form" grid-view="price-list-grid"/>
+      <field name="clientPartner" hideIf="company == null" readonlyIf="statusSelect > 1" colSpan="3" onChange="action-sale-order-method-client-partner-onchange,action-sale-order-record-set-remise-rfa" onSelect="action-sale-order-method-set-client-partner-domain" required="true" form-view="partner-form" grid-view="partner-grid" x-image-field="picture"/>
+      <field name="contactPartner" colSpan="3" canEdit="false" onChange="action-record-so-contact-partner-change" onSelect="action-sale-order-domain-on-contact-partner" domain="self.isContact = true" form-view="partner-contact-form" grid-view="partner-contact-grid" x-image-field="picture"/>
+      <field name="remiseFacture" hideIf="clientPartner == null" readonlyIf="statusSelect > 1" colSpan="2"/>
+      <field name="tauxRFA" hideIf="clientPartner == null" readonlyIf="statusSelect > 1" colSpan="2"/>
+      <field if="__config__.app.getApp('base')?.activatePartnerRelations" name="invoicedPartner" hideIf="company == null || clientPartner == null" readonlyIf="statusSelect > 1" colSpan="3" onChange="action-group-sale-order-supplychain-set-main-invoicing-address" onSelect="action-sale-order-supplychain-method-set-invoiced-partner-domain" required="true" form-view="partner-form" grid-view="partner-grid" x-image-field="picture"/>
+      <field if="__config__.app.getApp('base')?.activatePartnerRelations" name="deliveredPartner" hideIf="company == null || clientPartner == null" readonlyIf="statusSelect > 1" colSpan="3" onChange="action-group-sale-order-supplychain-set-delivery-address" onSelect="action-sale-order-supplychain-method-set-delivered-partner-domain" requiredIf="true" form-view="partner-form" grid-view="partner-grid" x-image-field="picture"/>
+      <field if="__config__.app.getApp('sale')?.getManageSaleOrderVersion()" name="versionNumber" colSpan="3"/>
+      <field if="__config__.app.getApp('base')?.getEnableTaxNumbers()" name="taxNumber" readonlyIf="statusSelect > 1 &amp;&amp; !orderBeingEdited" colSpan="3" canNew="false" canEdit="false" onChange="action-sale-order-method-empty-fiscal-position-if-not-compatible,action-sale-order-method-fiscal-position-on-change,action-sale-order-method-on-line-change" onSelect="action-sale-order-attrs-compute-tax-number-domain"/>
+      <field name="fiscalPosition" readonlyIf="statusSelect > 1 &amp;&amp; !orderBeingEdited" colSpan="3" canNew="false" canEdit="false" onChange="action-sale-order-method-fiscal-position-on-change,action-sale-order-method-on-line-change" onSelect="action-sale-order-supplychain-attrs-fiscal-position-domain"/>
+      <panel name="otherInfoPanel" colSpan="3">
+        <field name="inAti" hidden="true" readonlyIf="(saleOrderLineList &amp;&amp; saleOrderLineList.length > 0) || statusSelect >= 2" widget="boolean-switch" onChange="action-sale-order-attrs-in-ati"/>
+        <field if="__config__.app.isApp('supplychain')" if-module="axelor-supplychain" name="interco" hidden="true" colSpan="6" widget="boolean-switch"/>
+        <field if="__config__.app.isApp('supplychain')" if-module="axelor-supplychain" name="createdByInterco" readonly="true" showIf="createdByInterco" colSpan="6"/>
+        <field name="currency.numberOfDecimals" hidden="true"/>
+      </panel>
+    </panel>
+    <panel name="addressPanel" hideIf="company == null" colSpan="12">
+      <panel name="mainInvoicingAddressPanel" stacked="true">
+        <field name="mainInvoicingAddress" hideIf="$readonly() || (statusSelect > 1 &amp;&amp; !orderBeingEdited)" canNew="true" canEdit="false" onChange="action-sale-order-method-address-str" onSelect="action-sale-order-attrs-domain-main-invoicing-address" form-view="address-form" grid-view="address-grid"/>
+        <field name="mainInvoicingAddressStr" readonlyIf="statusSelect > 1 &amp;&amp; !orderBeingEdited" height="5">
+          <viewer><![CDATA[<>{mainInvoicingAddressStr}</>]]></viewer>
+        </field>
+      </panel>
+      <panel name="deliveryAddressPanel" stacked="true">
+        <field name="deliveryAddress" hideIf="$readonly() || (statusSelect > 1 &amp;&amp; !orderBeingEdited)" canNew="true" canEdit="false" onChange="action-sale-order-group-delivery-address-change" onSelect="action-sale-order-attrs-domain-delivery-address" form-view="address-form" grid-view="address-grid"/>
+        <field name="deliveryAddressStr" readonlyIf="statusSelect > 1 &amp;&amp; !orderBeingEdited" height="5">
+          <viewer><![CDATA[<>{deliveryAddressStr}</>]]></viewer>
+        </field>
+      </panel>
+    </panel>
+    <field name="clientPartner.saleOrderInformation" showTitle="false" hideIf="clientPartner == null || clientPartner.saleOrderInformation == null" colSpan="12" css="bold red"/>
+  </panel>
+  <panel-tabs name="mainPanelTab" hideIf="clientPartner == null || ($enableTradingNamesManagement &amp;&amp; company.tradingNameList != null &amp;&amp; company.tradingNameList.length != 0 &amp;&amp; tradingName == null)">
+    <panel name="contentPanel" title="Content">
+      <panel if="__config__.app.getApp('sale')?.getListDisplayTypeSelect() == __repo__(AppSale).APP_SALE_LINE_DISPLAY_TYPE_MULTI" name="displayMultiLinesButtonPanel" colSpan="12">
+        <spacer colSpan="8"/>
+        <button name="displayLinesBtn" title="Display lines" readonlyIf="id == null" colSpan="4" onClick="action-sale-order-view-display-multi-lines"/>
+      </panel>
+      <panel-related if="__config__.app.getApp('sale')?.getListDisplayTypeSelect() == __repo__(AppSale).APP_SALE_LINE_DISPLAY_TYPE_CLASSIC" name="detailLinesPanel" title="Details Lines" readonlyIf="clientPartner == null" colSpan="12" height="30" field="saleOrderLineList" form-view="sale-order-line-form" grid-view="sale-order-line-grid" orderBy="sequence" onChange="action-sale-order-method-on-line-change" canNew="!(clientPartner == null || statusSelect == 2 || (statusSelect == 3 &amp;&amp; !orderBeingEdited) || statusSelect == 4)" canRemove="!(clientPartner == null || statusSelect == 2 || (statusSelect == 3 &amp;&amp; !orderBeingEdited) || statusSelect == 4)" canMove="true"/>
+      <panel-related if="__config__.app.getApp('sale')?.getListDisplayTypeSelect() == __repo__(AppSale).APP_SALE_LINE_DISPLAY_TYPE_MULTI" name="saleOrderLineEditableTreePanel" title="Details Lines" readonlyIf="clientPartner == null || statusSelect == 2 || (statusSelect == 3 &amp;&amp; !orderBeingEdited) || statusSelect == 4" colSpan="12" field="saleOrderLineList" form-view="sale-order-line-form" grid-view="sale-order-line-editable-grid" editable="true" orderBy="sequence" onNew="action-sale-order-line-method-onnew-editable" onChange="action-sale-order-method-on-line-change" canNew="!(clientPartner == null || statusSelect == 2 || (statusSelect == 3 &amp;&amp; !orderBeingEdited) || statusSelect == 4)" canRemove="!(clientPartner == null || statusSelect == 2 || (statusSelect == 3 &amp;&amp; !orderBeingEdited) || statusSelect == 4)" canMove="true" widget="tree-grid" x-tree-field-title="Add a new sale order line" x-tree-field="subSaleOrderLineList"/>
+      <panel-related if="__config__.app.getApp('sale')?.getListDisplayTypeSelect() == __repo__(AppSale).APP_SALE_LINE_DISPLAY_TYPE_EDITABLE" name="editableDetailLinesPanel" title="Details Lines" readonlyIf="clientPartner == null || statusSelect == 2 || (statusSelect == 3 &amp;&amp; !orderBeingEdited) || statusSelect == 4" colSpan="12" height="30" field="saleOrderLineList" form-view="sale-order-line-form" grid-view="sale-order-line-editable-grid" orderBy="sequence" onNew="action-sale-order-line-method-onnew-editable" onChange="action-sale-order-method-on-line-change" canNew="!(clientPartner == null || statusSelect == 2 || (statusSelect == 3 &amp;&amp; !orderBeingEdited) || statusSelect == 4)" canRemove="!(clientPartner == null || statusSelect == 2 || (statusSelect == 3 &amp;&amp; !orderBeingEdited) || statusSelect == 4)" canMove="true"/>
+      <panel name="descriptionPanel" title="Comment to display" colSpan="12">
+        <field name="description" showTitle="false" colSpan="12" widget="Html" x-lite="true"/>
+      </panel>
+      <panel if="__config__.app.getApp('sale')?.getListDisplayTypeSelect() == __repo__(AppSale).APP_SALE_LINE_DISPLAY_TYPE_MULTI" name="subLinePanel" colSpan="12">
+        <field name="isDisplaySubLinesOnReport" widget="boolean-switch"/>
+      </panel>
+    </panel>
+    <panel name="taxPanel" title="Tax" readonlyIf="statusSelect != 1">
+      <panel-related name="saleOrderLineTaxListPanel" colSpan="12" field="saleOrderLineTaxList" form-view="sale-order-line-tax-form" grid-view="sale-order-line-tax-grid" onChange="action-sale-order-method-compute" canNew="false" canRemove="false"/>
+    </panel>
+    <panel if="__config__.app.isApp('supplychain')" if-module="axelor-supplychain" name="deliveryInformationPanel" title="Delivery" colSpan="12">
+      <field name="specificPackage" colSpan="12"/>
+      <field name="stockLocation" canEdit="false" onSelect="action-sale-order-attrs-set-stock-location-domain" form-view="stock-location-form" grid-view="stock-location-grid"/>
+      <field name="toStockLocation" canEdit="false" domain="self.company = :company and self.typeSelect != 1 and self.usableOnSaleOrder = true" form-view="stock-location-form" grid-view="stock-location-grid"/>
+      <field name="estimatedShippingDate" onChange="action-sale-order-group-on-estimated-shipping-date-change"/>
+      <field name="estimatedDeliveryDate" onChange="action-sale-order-group-on-estimated-delivery-date-change"/>
+      <field name="deliveryCondition" colSpan="12"/>
+      <field name="shipmentMode" canEdit="false" form-view="shipment-mode-form" grid-view="shipment-mode-grid"/>
+      <field name="freightCarrierMode" canEdit="false" onChange="action-sale-order-record-freight-carrier" domain="self.shipmentMode = :shipmentMode" form-view="freight-carrier-mode-form" grid-view="freight-carrier-mode-grid"/>
+      <field name="carrierPartner" canEdit="false" domain="self.isCarrier = TRUE AND (self.companySet IS EMPTY OR :company MEMBER OF self.companySet)" form-view="partner-form" grid-view="partner-grid" x-image-field="picture"/>
+      <field name="forwarderPartner" canEdit="false" domain="self.isContact = FALSE AND (self.isCarrier = TRUE OR self.isSupplier = TRUE) AND :company MEMBER OF self.companySet" form-view="partner-form" grid-view="partner-grid" x-image-field="picture"/>
+      <field if="__config__.app.getApp('stock')?.isIncotermEnabled" name="incoterm" canEdit="false" form-view="incoterm-form" grid-view="incoterm-grid"/>
+      <field name="isNeedingConformityCertificate" colSpan="3"/>
+      <field name="isIspmRequired" readonly="true" colSpan="3"/>
+      <button name="customerDeliveriesDetailsBtn" title="Customer deliveries details" showIf="statusSelect >= 3" colSpan="6" onClick="action-view-show-stock-move-line"/>
+      <panel-dashlet name="customerDeliveriesPanel" title="Customer deliveries" showIf="statusSelect >= 3" colSpan="12" action="action-sale-order-view-stock-moves"/>
+      <panel name="deliveryCommentsPanel" title="Comment to display on delivery" colSpan="12">
+        <field name="deliveryComments" showTitle="false" colSpan="12" widget="html"/>
+      </panel>
+      <panel name="pickingOrderCommentsPanel" title="Comment to display on picking order" colSpan="12">
+        <field name="pickingOrderComments" showTitle="false" colSpan="12" widget="html"/>
+      </panel>
+    </panel>
+    <panel name="invoicingPanel" title="Invoicing">
+      <panel-dashlet if="__config__.app.isApp('supplychain')" if-module="axelor-supplychain" name="saleOrderInvoicePanel" title="Invoicing" showIf="statusSelect >= 3" colSpan="12" action="action-view-show-invoices-from-sale-order"/>
+      <panel name="invoiceCommentsPanel" title="Comment to display on invoice" colSpan="12">
+        <field name="invoiceComments" showTitle="false" colSpan="12" widget="html"/>
+      </panel>
+      <panel name="descriptionToDisplayOnProformaPanel" title="Comment to display on proforma" colSpan="12">
+        <field name="proformaComments" showTitle="false" colSpan="12" widget="html"/>
+      </panel>
+    </panel>
+    <panel if="__config__.app.isApp('production')" if-module="axelor-production" name="productionPanel" title="Production" colSpan="12">
+      <panel name="productionNotePanel" title="Production note" colSpan="12">
+        <field name="productionNote" showTitle="false" colSpan="12" widget="Html"/>
+      </panel>
+      <panel-dashlet name="manufOrdersPanel" showIf="statusSelect == 3 || statusSelect == 4" colSpan="12" action="action-sale-order-view-manuf-orders"/>
+    </panel>
+    <panel if="__config__.app.isApp('supplychain') &amp;&amp; __config__.app.getApp('supplychain')?.getAllowTimetableInvoicing()" if-module="axelor-supplychain" name="timetablePanel" title="Timetable" onTabSelect="action-sale-order-attrs-readonly-timetable">
+      <field name="expectedRealisationDate" colSpan="12" width="50%"/>
+      <label name="orLabel" title="OR" colSpan="12"/>
+      <field name="timetableTemplate" onChange="action-sale-order-method-apply-timetable-template,action-sale-order-method-update-amount-to-be-spread-over-the-timetable"/>
+      <field name="computationDate" onChange="action-sale-order-method-apply-timetable-template,action-sale-order-method-update-amount-to-be-spread-over-the-timetable"/>
+      <field name="amountToBeSpreadOverTheTimetable" colSpan="12" x-scale="currency.numberOfDecimals"/>
+      <panel-related if-module="axelor-supplychain" name="timetableListPanel" colSpan="12" field="timetableList" form-view="timetable-form" grid-view="timetable-grid" onChange="action-sale-order-method-update-amount-to-be-spread-over-the-timetable,action-supplychain-sale-order-validate-check-amount-timetable"/>
+    </panel>
+    <panel if="__config__.app.isApp('supplychain') &amp;&amp; (__config__.app.getApp('supplychain')?.manageAdvancePaymentsFromPaymentConditions ||  !__config__.app.getApp('account')?.getManageAdvancePaymentInvoice())" name="advancePaymentPanel" title="Advance payments">
+      <panel if="__config__.app.getApp('supplychain')?.manageAdvancePaymentsFromPaymentConditions" name="advancePaymentNeededPanel">
+        <field name="advancePaymentNeeded" readonlyIf="statusSelect > 1"/>
+        <field name="advancePaymentAmountNeeded" showIf="advancePaymentNeeded" readonlyIf="statusSelect > 1" x-scale="currency.numberOfDecimals"/>
+      </panel>
+      <field if="!__config__.app.getApp('account')?.getManageAdvancePaymentInvoice()" if-module="axelor-supplychain" name="advancePaymentList" readonly="true" colSpan="12" form-view="advance-payment-form" grid-view="advance-payment-grid"/>
+    </panel>
+    <panel if="__config__.app.getApp('sale')?.getPrintingConfigPerSaleOrder()" name="printingPanel" title="Printing">
+      <field name="printingSettings" canEdit="false"/>
+      <field if="__config__.app.getApp('base')?.getIsRegroupProductsOnPrintings()" name="groupProductsOnPrintings" colSpan="6"/>
+      <field name="hideDiscount"/>
+      <field name="specificNotes" readonly="true" showIf="specificNotes" colSpan="12"/>
+    </panel>
+    <panel-include if="__config__.app.isApp('supplychain') &amp;&amp; __config__.app.getApp('supplychain')?.getAllowSusbcriptionSaleOrder()" if-module="axelor-supplychain" view="incl-sale-order-subscrption-form"/>
+    <panel-dashlet if="__config__.app.isApp('supplychain')" name="generatedPurchaseOrderPanel" title="Generated purchase orders" hideIf="statusSelect &lt;= 2" action="action-sale-order-view-show-generated-po"/>
+    <panel if="__config__.app.getApp('sale')?.manageSaleOrderVersion" name="pastVersionRecoveryPanel" title="Past versions" showIf="versionNumber > 1">
+      <field name="$previousVersionNumber" title="Version number" colSpan="2" type="integer" onChange="action-sale-order-method-get-previous-version-number-on-change"/>
+      <field name="$versionDateTime" title="Version date" readonly="true" colSpan="6" type="datetime"/>
+      <field if="__config__.app.getApp('sale')?.isPastVersionRecovery" name="$saveActualVersion" title="Save actual version" colSpan="4" type="boolean" widget="boolean-switch"/>
+      <spacer if="!__config__.app.getApp('sale')?.isPastVersionRecovery" colSpan="4"/>
+      <button name="lastVersionBtn" title="Go to last version" showIf="(statusSelect == 1 || statusSelect == 2) &amp;&amp; $previousVersionNumber != versionNumber - 1" colSpan="4" css="btn-custom text-left" icon="fa-arrow-right" onClick="action-sale-order-method-get-last-version"/>
+      <spacer colSpan="4"/>
+      <button if="__config__.app.getApp('sale')?.isPastVersionRecovery" name="versionRecoveryBtn" title="Recover from this version" showIf="(statusSelect == 1 || statusSelect == 2) " colSpan="4" css="btn-custom text-left" icon="fa-upload" onClick="action-sale-order-group-version-recovery-btn"/>
+      <spacer if="!__config__.app.getApp('sale')?.isPastVersionRecovery" colSpan="6"/>
+      <panel-dashlet name="pastVersionsPanel" readonly="true" colSpan="12" action="action-sale-order-view-previous-versions"/>
+    </panel>
+    <panel-dashlet if="__config__.app.getApp('sale')?.isQuotationAndOrderSplitEnabled" name="childrenOrdersPanel" title="Children sale orders" readonly="true" showIf="statusSelect &lt;= 2" colSpan="12" action="action-sale-order-view-children-order"/>
+  </panel-tabs>
+  <panel name="attrsPanel">
+    <field name="attrs" colSpan="12"/>
+  </panel>
+  <panel name="actionsPanel" hideIf="clientPartner == null" sidebar="true" stacked="true">
+    <button name="finalizeBtn" title="Finalize" showIf="statusSelect == 1" readonlyIf="!saleOrderLineList || saleOrderLineList.length == 0" colSpan="12" css="btn-success" icon="check" onClick="action-group-sale-order-finalize-quotation"/>
+    <button if="!__config__.app.getApp('sale')?.isQuotationAndOrderSplitEnabled" name="confirmOrderBtn" title="Confirm order" showIf="statusSelect == 2" readonlyIf="(advancePaymentNeeded &amp;&amp; $number(advanceTotal) &lt; $number(advancePaymentAmountNeeded)) || !saleOrderLineList || saleOrderLineList.length == 0" colSpan="12" css="btn-success" icon="check-all" onClick="action-sale-group-confirmed"/>
+    <button if="__config__.app.getApp('sale')?.isQuotationAndOrderSplitEnabled" name="confirmOrderBtn" title="Confirm order" showIf="statusSelect == 2" readonlyIf="(advancePaymentNeeded &amp;&amp; $number(advanceTotal) &lt; $number(advancePaymentAmountNeeded)) || !saleOrderLineList || saleOrderLineList.length == 0" colSpan="12" css="btn-success" icon="check-all" onClick="action-sale-order-group-split-confirm"/>
+    <button if="(__config__.app.isApp('supplychain') &amp;&amp; __config__.app.getApp('supplychain')?.allowCompleteManuallySaleOrder) || (!__config__.app.isApp('supplychain'))" name="completeManuallySaleOrderBtn" title="Complete manually sale order" showIf="statusSelect == 3" readonlyIf="!saleOrderLineList || saleOrderLineList.length == 0" colSpan="12" css="btn-warning" icon="person-check-fill" prompt="Warning, a completed order can't be changed anymore, do you want to continue?" onClick="save,action-sale-order-method-complete-sale-order"/>
+    <button name="cancelBtn" title="Cancel" showIf="id &amp;&amp; (statusSelect == 1 || statusSelect == 2)" readonlyIf="!saleOrderLineList || saleOrderLineList.length == 0" colSpan="12" css="btn-danger" icon="x" onClick="save,action-sale-order-view-cancel"/>
+    <button if="__config__.app.isApp('supplychain') &amp;&amp; __config__.app.getApp('supplychain')?.allowCompleteManuallySaleOrder" if-module="axelor-supplychain" name="backToOrderConfirmBtn" title="Back to confirmed order" showIf="statusSelect == 4" readonlyIf="!saleOrderLineList || saleOrderLineList.length == 0" icon="reply-fill" onClick="save,action-sale-order-method-set-status-to-confirmed"/>
+    <button if="__config__.app.getApp('sale')?.getManageSaleOrderVersion()" name="newVersionBtn" title="New version" showIf="(statusSelect == 1 || statusSelect == 2) &amp;&amp; id" readonlyIf="!saleOrderLineList || saleOrderLineList.length == 0" colSpan="12" icon="tag-fill" onClick="action-sale-order-group-new-version-btn"/>
+    <button name="separateInNewQuotationBtn" title="Separate in a new quotation" showIf="statusSelect == 1" readonlyIf="!saleOrderLineList || saleOrderLineList.length == 0" icon="diagram-2-fill" onClick="save,action-sale-order-method-separate-in-new-quotation"/>
+    <button if="__config__.app.getApp('sale')?.allowPendingOrderModification" name="editOrderBtn" title="Edit order" showIf="statusSelect == 3 &amp;&amp; !orderBeingEdited" readonlyIf="!saleOrderLineList || saleOrderLineList.length == 0" colSpan="12" icon="pencil-square" onClick="action-sale-order-method-edit-order"/>
+    <button name="validateChangesBtn" title="Validate changes" showIf="statusSelect == 3 &amp;&amp; orderBeingEdited" readonlyIf="!saleOrderLineList || saleOrderLineList.length == 0" colSpan="12" icon="bookmark-check" onClick="action-group-sale-order-validate-changes"/>
+    <button if="__config__.app.isApp('supplychain') &amp;&amp; __config__.app.getApp('supplychain')?.getGenerateInvoiceFromSaleOrder()" if-module="axelor-supplychain" name="generateInvoiceBtn" title="Generate invoice" showIf="statusSelect == 3 &amp;&amp; !orderBeingEdited" readonlyIf="!saleOrderLineList || saleOrderLineList.length == 0" colSpan="12" icon="file-earmark" onClick="action-supplychain-sale-order-group-generate-invoice"/>
+    <button if="__config__.app.isApp('supplychain') &amp;&amp; __config__.app.getApp('supplychain')?.getGenerateInvoiceFromSaleOrder()" if-module="axelor-supplychain" name="invoiceAdvancePaymentBtn" title="Invoice an advance payment" showIf="statusSelect == 2 &amp;&amp; inTaxTotal != 0 &amp;&amp; advancePaymentAmountNeeded > 0  &amp;&amp; advancePaymentNeeded" readonlyIf="!saleOrderLineList || saleOrderLineList.length == 0" colSpan="12" icon="receipt-cutoff" onClick="save,action-sale-order-view-invoicing-advance-payment-wizard"/>
+    <button if="__config__.app.isApp('supplychain') &amp;&amp; !__config__.app.getApp('account')?.getManageAdvancePaymentInvoice()" if-module="axelor-supplychain" name="addAdvancePaymentBtn" title="Register a deposit" showIf="statusSelect == 3 &amp;&amp; amountInvoiced == 0" readonlyIf="!saleOrderLineList || saleOrderLineList.length == 0" colSpan="12" icon="cash-coin" onClick="save,action-sale-order-view-register-advance-payment"/>
+    <button if="__config__.app.getApp('sale')?.enablePackManagement" name="addPackBtn" title="Add a pack" hideIf="clientPartner == null || [2,4,5].indexOf(statusSelect) != -1 || (statusSelect == 3 &amp;&amp; !orderBeingEdited)" readonlyIf="!saleOrderLineList || saleOrderLineList.length == 0" icon="box-seam-fill" onClick="save,action-sale-order-view-add-pack"/>
+    <button if="__config__.app.getApp('sale')?.getEnableConfigurator()" name="addLineFromConfiguratorBtn" title="Add Line from Configurator" showIf="statusSelect == 1" readonlyIf="!saleOrderLineList || saleOrderLineList.length == 0" icon="ui-checks" onClick="save,action-sale-order-view-generate-line"/>
+    <button if="__config__.app.getApp('supplychain')?.custStockMoveMgtOnSO &amp;&amp; !__config__.app.getApp('supplychain')?.customerStockMoveGenerationAuto" name="generateCustomerStockMoveBtn" title="Generate customer deliveries" showIf="statusSelect == 3 &amp;&amp; !orderBeingEdited" readonlyIf="!saleOrderLineList || saleOrderLineList.length == 0" colSpan="12" icon="truck" onClick="save,action-supplychain-group-sale-order-create-stock-move"/>
+    <button if="__config__.app.isApp('production') &amp;&amp; __config__.app.getApp('production')?.prodOrderMgtOnSO &amp;&amp;         !__config__.app.getApp('production')?.productionOrderGenerationAuto" if-module="axelor-production" name="generateProductionOrderBtn" title="Generate production order" showIf="statusSelect == 3 &amp;&amp; !orderBeingEdited" readonlyIf="!saleOrderLineList || saleOrderLineList.length == 0" colSpan="12" icon="house-gear-fill" onClick="save,action-sale-order-method-create-production-order"/>
+    <button if="__config__.app.isApp('supplychain') &amp;&amp; !__config__.app.getApp('supplychain')?.getPurchaseOrderGenerationAuto()" name="generatePOBtn" title="Generate purchase order" showIf="(statusSelect == 2 || statusSelect == 3) &amp;&amp; !orderBeingEdited" readonlyIf="!saleOrderLineList || saleOrderLineList.length == 0" colSpan="12" icon="cart-check-fill" onClick="save,action-supplychain-sale-order-generate-purchase-orders-from-selected-SOLines"/>
+    <field name="message" hidden="true" type="string"/>
+    <field name="amountInvoiced" hidden="true" x-scale="currency.numberOfDecimals"/>
+  </panel>
+  <panel name="inTaxTotalPanel" readonly="true" hideIf="clientPartner == null" colSpan="4" sidebar="true">
+    <field name="currency.symbol" hidden="true"/>
+    <field name="currency.numberOfDecimals" hidden="true"/>
+    <field name="exTaxTotal" hidden="true" x-currency="currency.symbol" x-scale="currency.numberOfDecimals"/>
+    <field name="taxTotal" hidden="true" x-currency="currency.symbol" x-scale="currency.numberOfDecimals"/>
+    <field name="amountInvoiced" hidden="true" x-currency="currency.symbol" x-scale="currency.numberOfDecimals"/>
+    <field name="advanceTotal" hidden="true" x-currency="currency.symbol" x-scale="currency.numberOfDecimals"/>
+    <field name="exTaxTotalOrdered" hidden="true" x-currency="currency.symbol" x-scale="currency.numberOfDecimals"/>
+    <field name="inTaxTotalOrdered" hidden="true" x-currency="currency.symbol" x-scale="currency.numberOfDecimals"/>
+    <field name="inTaxTotal" showTitle="false" colSpan="12" x-currency="currency.symbol" x-scale="currency.numberOfDecimals">
+      <viewer depends="exTaxTotal,taxTotal,statusSelect,amountInvoiced,advanceTotal,discountTypeSelect,discountAmount,priceBeforeGlobalDiscount,discountCurrency,discountScale,exTaxTotalOrdered,inTaxTotalOrdered"><![CDATA[
+
+                 <>
+                    <Box as="dl" d="grid" gridTemplateColumns="1fr 1fr" textAlign="end">
+                           {discountTypeSelect != 0 && <Box as="dt" m={0} px={3} py={1} fontWeight="normal">{_t('Total W.T. before discount')}</Box>}
+                    	 {discountTypeSelect != 0 && <Box as="dd" m={0} px={3} py={1}>{$fmt('priceBeforeGlobalDiscount')}</Box>}
+                           {discountTypeSelect != 0 && <Box as="dt" m={0} px={3} py={1} fontWeight="normal">{_t('Discount')}</Box>}
+                    	 {discountTypeSelect != 0 && <Box as="dd" m={0} px={3} py={1}>{'-' + $fmt('discountAmount')}</Box>}
+                        <Box as="dt" m={0} px={3} py={1} fontWeight="normal">{_t('Total W.T.')}</Box>
+                    	 <Box as="dd" m={0} px={3} py={1}>{$fmt('exTaxTotal')}</Box>
+                    	 <Box as="dt" m={0} px={3} py={1} fontWeight="normal">{_t('Total tax')}</Box>
+                    	 <Box as="dd" m={0} px={3} py={1}>{$fmt('taxTotal')}</Box>
+                    	 <Box as="dt" m={0} px={3} py={1} borderTop fontWeight="normal" fontSize={5}>{_t('Total A.T.I.')}</Box>
+                    	 <Box as="dd" m={0} px={3} py={1} borderTop fontWeight="bold" fontSize={5}>{$fmt('inTaxTotal')}</Box>
+                    	 {statusSelect >= 3 && <Box as="dt" m={0} px={3} py={1} fontWeight="normal">{_t('Amount invoiced W.T.')}</Box>}
+                    	 {statusSelect >= 3 && <Box as="dd" m={0} px={3} py={1}>{$fmt('amountInvoiced')}</Box>}
+                    	 {(statusSelect >= 2 && inAti && inTaxTotalOrdered != 0) && <Box as="dt" m={0} px={3} py={1} fontWeight="normal">{_t('Total ordered A.T.I.')}</Box>}
+                    	 {(statusSelect >= 2 && inAti && inTaxTotalOrdered != 0) && <Box as="dd" m={0} px={3} py={1}>{$fmt('inTaxTotalOrdered')}</Box>}
+                    	 {(statusSelect >= 2 && !inAti && exTaxTotalOrdered != 0) && <Box as="dt" m={0} px={3} py={1} fontWeight="normal">{_t('Total ordered W.T.')}</Box>}
+                    	 {(statusSelect >= 2 && !inAti && exTaxTotalOrdered != 0) && <Box as="dd" m={0} px={3} py={1}>{$fmt('exTaxTotalOrdered')}</Box>}
+                    	 {statusSelect >= 2 && <Box as="dt" m={0} px={3} py={1} fontWeight="normal">{_t('Advance payment A.T.I. total')}</Box>}
+                    	 {statusSelect >= 2 && <Box as="dd" m={0} px={3} py={1}>{$fmt('advanceTotal')}</Box>}
+                    </Box>
+                 </>
+
+      ]]></viewer>
+    </field>
+  </panel>
+  <panel if="__config__.app.getApp('base')?.getIsGlobalDiscountEnabled()" name="globalDiscountPanel" title="Global discount" showIf="clientPartner &amp;&amp; saleOrderLineList &amp;&amp; saleOrderLineList.length != 0" readonlyIf="statusSelect > 1 &amp;&amp; !orderBeingEdited" sidebar="true">
+    <field name="discountTypeSelect" onChange="action-sale-order-method-on-line-change"/>
+    <field name="discountAmount" showIf="discountTypeSelect != 0" colSpan="6" onChange="action-sale-order-method-on-line-change" x-currency="discountCurrency" x-scale="discountScale"/>
+    <button name="$swapDiscountTypeBtn" title="Swap discount type" showIf="discountTypeSelect != 0" colSpan="6" icon="arrow-left-right" onClick="action-sale-order-attrs-swap-discount-type, action-sale-order-method-on-line-change" widget="info-button"/>
+    <field name="priceBeforeGlobalDiscount" hidden="true" type="decimal" x-currency="currency.symbol" x-scale="currency.numberOfDecimals"/>
+    <field name="discountCurrency" hidden="true" x-dirty="false"/>
+    <field name="discountScale" hidden="true" x-dirty="false"/>
+  </panel>
+  <panel name="salesFollowUpPanel" title="Sales follow-up" hideIf="clientPartner == null" itemSpan="6" sidebar="true" canCollapse="true" collapseIf="true">
+    <field name="salespersonUser" canNew="false" canView="false" canEdit="false" form-view="user-form" grid-view="user-grid"/>
+    <field if="__config__.app.getApp('base')?.getTeamManagement()" name="team" canEdit="false" onSelect="action-sale-order-domain-on-team" form-view="team-form" grid-view="team-grid"/>
+  </panel>
+  <panel name="characteristicsPanel" title="Characteristics" hideIf="clientPartner == null" itemSpan="6" sidebar="true" canCollapse="true" collapseIf="true">
+    <panel if="__config__.app.isApp('supplychain')" if-module="axelor-supplychain" name="paymentDetailsPanel" colSpan="12">
+      <field name="paymentMode" readonlyIf="statusSelect > 2" canEdit="false" onChange="action-sale-order-method-fill-company-bank-details" domain="self.inOutSelect = 1" form-view="payment-mode-form" grid-view="payment-mode-grid"/>
+      <field name="paymentCondition" readonlyIf="statusSelect > 2" canEdit="false" onChange="action-sale-order-method-set-advance-payment" onSelect="action-sale-order-attrs-payment-condition-set-domain" form-view="payment-condition-form" grid-view="payment-condition-grid"/>
+    </panel>
+    <field name="companyBankDetails" hidden="true" widget="SuggestBox" canEdit="false" onSelect="com.axelor.apps.base.web.CompanyBankDetailsController:fillCompanyBankDetailsDomain" form-view="bank-details-form" grid-view="bank-details-grid"/>
+  </panel>
+  <panel name="referencePanel" title="References" hideIf="clientPartner == null" itemSpan="6" sidebar="true" canCollapse="true" collapseIf="true">
+    <field name="externalReference" hideIf="company == null" onChange="action-sale-sale-order-attrs-external-reference"/>
+    <field name="$duplicateExternalReference" showTitle="false" hidden="true" readonly="true" colSpan="12">
+      <viewer><![CDATA[
+        <><Badge bg="warning">{_t('Watch out, a sale order was already created with this external reference.')}</Badge></>
+      ]]></viewer>
+    </field>
+    <field name="opportunity" readonlyIf="statusSelect >= 2" canEdit="false" form-view="opportunity-form" grid-view="opportunity-grid"/>
+    <field name="duplicateReferenceLabel" showTitle="false" hidden="true" readonly="true">
+      <viewer><![CDATA[
+        <><Badge bg="warning">{_t('Reference already existing')}</Badge></>
+      ]]></viewer>
+    </field>
+    <field name="originSaleQuotation" showIf="originSaleQuotation" colSpan="12"/>
+  </panel>
+  <panel name="marginPanel" title="Margin" readonly="true" hideIf="clientPartner == null" itemSpan="6" sidebar="true" canCollapse="true" collapseIf="true">
+    <field name="accountedRevenue" x-scale="company.currency.numberOfDecimals">
+      <hilite color="warning" if="accountedRevenue &lt; companyExTaxTotal"/>
+    </field>
+    <field name="totalCostPrice" x-scale="company.currency.numberOfDecimals"/>
+    <field name="totalGrossMargin" x-scale="company.currency.numberOfDecimals">
+      <hilite color="danger" if="totalGrossMargin &lt; 0"/>
+    </field>
+    <field name="marginRate">
+      <hilite color="danger" if="marginRate &lt; 0"/>
+    </field>
+    <field name="markup">
+      <hilite color="danger" if="markup &lt; 0"/>
+    </field>
+    <field name="company.currency" title="Company currency" readonly="true"/>
+    <field name="company.currency.numberOfDecimals" hidden="true"/>
+  </panel>
+  <panel name="datesPanel" title="Dates" hideIf="clientPartner == null" sidebar="true" canCollapse="true" collapseIf="true">
+    <field name="creationDate" readonlyIf="statusSelect != 1" colSpan="6" onChange="action-sale-order-record-compute-end-of-validity-date"/>
+    <field name="confirmedByUser" readonly="true" showIf="statusSelect == 3 || statusSelect == 4" colSpan="6" canNew="false" canView="false" canEdit="false" form-view="user-form" grid-view="user-grid"/>
+    <field name="confirmationDateTime" readonly="true" showIf="statusSelect == 3 || statusSelect == 4" colSpan="6"/>
+    <field name="orderDate" showIf="statusSelect == 3 || statusSelect == 4" colSpan="6"/>
+    <field name="orderNumber" showIf="statusSelect == 3 || statusSelect == 4" colSpan="6"/>
+    <field if="__config__.app.isApp('supplychain')" if-module="axelor-supplychain" name="shipmentDate" showIf="statusSelect == 3 || statusSelect == 4" colSpan="6"/>
+    <field name="duration" readonlyIf="statusSelect >= 2" colSpan="6" widget="SuggestBox" canNew="true" canEdit="false" onChange="action-sale-order-record-compute-end-of-validity-date" domain="self.applicationTypeSelect = 1"/>
+    <field name="endOfValidityDate" readonly="true" colSpan="6">
+      <hilite color="danger" if="$moment().diff(endOfValidityDate, 'days') > 0 &amp;&amp; statusSelect != 3"/>
+    </field>
+    <field name="lastReminderDate" colSpan="6"/>
+    <field name="lastReminderComments"/>
+    <field if="__config__.app.isApp('supplychain') &amp;&amp; !__config__.app.getApp('supplychain')?.getAllowTimetableInvoicing()" name="expectedRealisationDate" colSpan="6"/>
+    <field name="cancelReason" hidden="true"/>
+    <field name="cancelReasonStr" title="Cancel Reason" hidden="true" readonly="true" showIf="cancelReason != null &amp;&amp; cancelReasonStr != null" colSpan="12" css="red">
+      <viewer><![CDATA[<>{cancelReasonStr}</>]]></viewer>
+    </field>
+    <field if="__config__.app.isApp('supplychain')" if-module="axelor-supplychain" name="standardDelay" hidden="true" readonly="true" showIf="standardDelay > 0"/>
+  </panel>
+  <panel name="internalNotePanel" title="Internal Note" colSpan="12" sidebar="true">
+    <field name="internalNote" showTitle="false" colSpan="12" widget="Html" x-lite="true"/>
+  </panel>
+  <panel-mail name="mailPanel">
+    <mail-messages limit="4"/>
+    <mail-followers/>
+  </panel-mail>
+</form>
+

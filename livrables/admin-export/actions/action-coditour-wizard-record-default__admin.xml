@@ -1,0 +1,5 @@
+<action-record name="action-coditour-wizard-record-default"
+                model="com.axelor.apps.account.db.CoditourWizard">
+  <field name="mois" expr="eval: __date__.getMonthValue()"/>
+  <field name="annee" expr="eval: __date__.getYear()"/>
+</action-record>

@@ -1,0 +1,64 @@
+<grid name="stock-move-line-grid" title="Stock move lines" model="com.axelor.apps.stock.db.StockMoveLine" editable="true" edit-icon="true">
+  <hilite color="default" strong="true" if="lineTypeSelect != 0"/>
+  <field name="lineTypeSelect" hidden="true"/>
+  <field name="fromStockLocation" onChange="action-stock-move-line-group-stock-location-onchange" onSelect="action-stock-move-line-method-compute-from-stock-location-domain"/>
+  <field name="toStockLocation" onChange="action-stock-move-line-group-stock-location-onchange" onSelect="action-stock-move-line-method-compute-to-stock-location-domain"/>
+  <button if="__config__.app.getApp('sale')?.getIsCartManagementEnabled()" name="addToCartBtn" title="Add to cart" icon="cart-plus-fill" onClick="action-stock-move-line-method-add-to-cart"/>
+  <field name="product" readonlyIf="lineTypeSelect == 1 || (($get('stockMove.statusSelect') == 2 &amp;&amp; $get('stockMove.pickingIsEdited')) || $get('stockMove.statusSelect') == 3) || (fromStockLocation == null &amp;&amp; stockMove.typeSelect == 3) || (toStockLocation == null &amp;&amp; stockMove.typeSelect == 2)" width="250px" canEdit="false" onChange="action-group-stock-stockmoveline-product-onchange" onSelect="action-stock-move-line-method-product-domain" form-view="product-form" grid-view="stock-move-line-product-grid" x-image-field="picture"/>
+  <field name="stockMove.typeSelect" hidden="true"/>
+  <field if="__config__.app.getApp('base')?.getManageProductVariants()" name="productModel" readonlyIf="lineTypeSelect == 1 || product" domain="self.isModel = true " form-view="product-form" grid-view="product-grid" x-image-field="picture"/>
+  <field name="productName" readonlyIf="($get('stockMove.statusSelect') == 2 &amp;&amp; $get('stockMove.pickingIsEdited')) || $get('stockMove.statusSelect') == 3" width="200px" required="true"/>
+  <field name="qty" readonlyIf="$get('stockMove.statusSelect') > 1 || lineTypeSelect == 1" width="100px" onChange="action-stock-move-line-group-qty-onchange" aggregate="sum" x-scale="$nbDecimalDigitForQty"/>
+  <field name="realQty" readonlyIf="($get('stockMove.statusSelect') == 2 &amp;&amp; $get('stockMove.pickingIsEdited')) || $get('stockMove.statusSelect') == 3 || lineTypeSelect == 1" width="100px" onChange="action-stock-move-line-group-real-qty-onchange, action-stock-move-line-attrs-set-real-qty-modified-by-user-true" aggregate="sum" x-scale="$nbDecimalDigitForQty"/>
+  <field if="__config__.app.getApp('supplychain')?.getManageStockReservation()" if-module="axelor-supplychain" name="requestedReservedQty" readonly="true" aggregate="sum" x-scale="$nbDecimalDigitForQty"/>
+  <field if="__config__.app.getApp('supplychain')?.getManageStockReservation()" if-module="axelor-supplychain" name="reservedQty" readonly="true" aggregate="sum" x-scale="$nbDecimalDigitForQty"/>
+  <button if="__config__.app.getApp('supplychain')?.manageStockReservation" name="allocateAll" title="Allocate" hidden="true" readonlyIf="$get('stockMove.statusSelect') != 2 || $number(reservedQty) == $number(qty) || $get('product.productTypeSelect') == 'service'" icon="fa-plus-square" onClick="save,action-supplychain-stock-move-line-allocate-all"/>
+  <button if="__config__.app.getApp('supplychain')?.manageStockReservation" name="deallocate" title="Deallocate" hidden="true" readonlyIf="$get('stockMove.statusSelect') != 2 || $number(reservedQty) == 0" icon="fa-minus-square" onClick="save,action-supplychain-stock-move-line-deallocate-all"/>
+  <field name="qtyInvoiced" readonly="true" x-scale="$nbDecimalDigitForQty"/>
+  <field name="unitPriceUntaxed" readonlyIf="lineTypeSelect == 1 || $get('stockMove.pickingIsEdited') || saleOrderLine || purchaseOrderLine" width="120px" onChange="action-stock-move-line-record-price-onchange" x-scale="$nbDecimalDigitForUnitPrice"/>
+  <field name="unitPriceTaxed" hidden="true" x-scale="$nbDecimalDigitForUnitPrice"/>
+  <field name="companyUnitPriceUntaxed" hidden="true"/>
+  <field name="unit" readonlyIf="lineTypeSelect == 1 || (($get('stockMove.statusSelect') == 2 &amp;&amp; $get('stockMove.pickingIsEdited')) || $get('stockMove.statusSelect') == 3)" width="70px" form-view="unit-form" grid-view="unit-grid"/>
+  <field name="wapPrice" hidden="true" x-scale="$nbDecimalDigitForUnitPrice"/>
+  <field name="trackingNumber" readonlyIf="lineTypeSelect == 1 || $get('stockMove.statusSelect') > 2" canNew="($get('stockMove.typeSelect') == 3 &amp;&amp; $get('$trackingNumberConfiguration.isPurchaseTrackingManaged')) || ($get('stockMove.typeSelect') == 1 &amp;&amp; !$get('$trackingNumberConfiguration.isPurchaseTrackingManaged') &amp;&amp; $get('$trackingNumberConfiguration.isProductionTrackingManaged')) || ($get('stockMove.typeSelect') == 2 &amp;&amp; !$get('$trackingNumberConfiguration.isPurchaseTrackingManaged') &amp;&amp; !$get('$trackingNumberConfiguration.isProductionTrackingManaged') &amp;&amp; $get('$trackingNumberConfiguration.isSaleTrackingManaged'))" onSelect="action-stock-move-line-attrs-tracking-number-domain" form-view="tracking-number-stock-move-line-form" grid-view="tracking-number-grid"/>
+  <field name="lotFournisseur" title="Lot Fournisseur" width="150px" onChange="action-stock-move-line-record-lot-fournisseur-onchange" onSelect="action-stock-move-line-attrs-lot-fournisseur-domain" form-view="lot-fournisseur-form" grid-view="lot-fournisseur-grid"/>
+  <field name="stockMove.partner" hidden="true"/>
+  <field name="lotFournisseur.dateProduction" title="Date de production" width="130px"/>
+  <field name="trackingNumber.dateArrivage" title="Date d'arrivage" width="130px"/>
+  <field name="$trackingNumberConfiguration.isPurchaseTrackingManaged" hidden="true"/>
+  <field name="$trackingNumberConfiguration.isProductionTrackingManaged" hidden="true"/>
+  <field name="$trackingNumberConfiguration.isSaleTrackingManaged" hidden="true"/>
+  <field name="marque" readonly="true" width="120px"/>
+  <field name="modePeche" readonly="true" width="120px"/>
+  <field name="origine" readonly="true" width="120px"/>
+  <field name="zonePeche" readonly="true" width="120px"/>
+  <field name="nbColis" readonly="true" width="90px" x-scale="3"/>
+  <field name="poidsParColis" readonly="true" width="120px" x-scale="3"/>
+  <field name="poidsParColisNet" title="Poids/Colis-NET(Kg)" readonly="true" colSpan="3"/>
+  <field name="nbUnitesParColis" readonly="true" width="130px" x-scale="3"/>
+  <field name="unitesTot" readonly="true" width="110px" x-scale="3"/>
+  <field name="fraisApprocheKg" readonly="true" width="130px" x-scale="$nbDecimalDigitForUnitPrice"/>
+  <field name="prKg" readonly="true" width="90px" x-scale="$nbDecimalDigitForUnitPrice"/>
+  <field name="paDevise" readonly="true" width="110px" x-scale="$nbDecimalDigitForUnitPrice"/>
+  <field name="stockMove.typeSelect" hidden="true"/>
+  <field name="conformitySelect" readonlyIf="lineTypeSelect == 1"/>
+  <field name="availableStatus" readonly="true" width="150">
+    <hilite color="success" strong="true" if="availableStatusSelect == 1"/>
+    <hilite color="info" strong="true" if="availableStatusSelect == 2"/>
+    <hilite color="danger" strong="true" if="availableStatusSelect == 3"/>
+    <hilite color="warning" strong="true" if="availableStatusSelect == 4"/>
+  </field>
+  <field name="stockMove" hidden="true" width="120"/>
+  <field name="stockMove.pickingIsEdited" hidden="true"/>
+  <field name="stockMove.statusSelect" hidden="true"/>
+  <field name="product.productTypeSelect" hidden="true"/>
+  <field if="__config__.app.isApp('supplychain')" if-module="axelor-supplychain" name="saleOrderLine" hidden="true"/>
+  <field if="__config__.app.isApp('supplychain')" if-module="axelor-supplychain" name="purchaseOrderLine" hidden="true"/>
+  <button name="trackNumberWizardBtn" title="Split by tracking numbers" readonlyIf="lineTypeSelect == 1 || $get('stockMove.statusSelect') > 2 || (!$get('$trackingNumberConfiguration.isPurchaseTrackingManaged') &amp;&amp; !$get('$trackingNumberConfiguration.isProductionTrackingManaged') &amp;&amp; !$get('$trackingNumberConfiguration.isSaleTrackingManaged')) || !($get('$trackingNumberConfiguration.isSaleTrackingManaged') &amp;&amp; !$get('$trackingNumberConfiguration.hasSaleAutoSelectTrackingNbr') &amp;&amp; $get('stockMove.typeSelect') == 2)" icon="fa-barcode" onClick="save,action-stock-move-line-method-open-wizard"/>
+  <button name="splitMoveLineIntoFulfilledMoveAndAnUnfulfilledOneButton" title="Split into fulfilled line and unfulfilled one" help="Split into fulfilled line and unfulfilled one" hideIf=" $get('stockMove.typeSelect') == 1 || $get('stockMove.statusSelect') > 2 " icon="fa-clone" onClick="save,action-stock-move-line-method-split-into-fulfilled-line-and-unfulfilled-one"/>
+  <field name="isRealQtyModifiedByUser" hidden="true"/>
+  <field name="$trackingNumberConfiguration.hasSaleAutoSelectTrackingNbr" hidden="true"/>
+  <field name="$nbDecimalDigitForQty" hidden="true"/>
+  <field name="$nbDecimalDigitForUnitPrice" hidden="true"/>
+</grid>
+

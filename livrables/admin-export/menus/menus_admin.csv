@@ -1,0 +1,540 @@
+name;title;parent;action;order_seq;module
+account-analytic-grouping;Analytic Groupings;account-conf-analytic;account.analytic.grouping;900;axelor-account
+account-analytic-grouping-value;Analytic Regrouping Values;account-conf-analytic;account.conf.analytic.grouping.values;1200;axelor-account
+account-analytic-move-line-search;Analytic review;account-conf-analytic;account.analytic.move.line.search;1100;axelor-account
+account-analytic-rules;Analytic Rules;account-conf-analytic;account.conf.analytic.rules;1000;axelor-account
+account-analytic-structure;Analytic Structure;account-conf-analytic;account.conf.analytic.axis.tree;100;axelor-account
+account-bank-statement-query;Bank statement queries;account-conf-bank-accounting-reconciliation;account.bank.statement.query;200;axelor-bank-payment
+account-bank-statement-rule;Bank statement rules;account-conf-bank-accounting-reconciliation;account.bank.statement.rule;100;axelor-bank-payment
+account-conf;Configuration;account-root;;1300;axelor-account
+account-conf-analytic;Analytic;account-conf;;200;axelor-account
+account-conf-analytic-account;Analytic accounts;account-conf-analytic;account.conf.analytic.account;400;axelor-account
+account-conf-analytic-accounting-plan;Chart of Analytic Accounts;account-conf-analytic;account.conf.analytic.accounting.plan;500;axelor-account
+account-conf-analytic-axis;analyticAxis.plurial;account-conf-analytic;account.conf.analytic.axis;600;axelor-account
+account-conf-analytic-distribution-template;Analytic Distribution Template;account-conf-analytic;account.conf.analytic.distribution.template;800;axelor-account
+account-conf-analytic-journal;Analytic journals;account-conf-analytic;account.conf.analytic.journal;200;axelor-account
+account-conf-analytic-journal-type;Analytic journals types;account-conf-analytic;account.conf.analytic.journal.type;300;axelor-account
+account-conf-analytic-move-line;Analytic Move Lines;account-conf-analytic;account.conf.analytic.move.line;700;axelor-account
+account-conf-bank-accounting-reconciliation;Bank Statement / Reconciliations;account-conf;;800;axelor-bank-payment
+account-conf-bank-order;Bank orders;account-conf;;600;axelor-bank-payment
+account-conf-bank-order-bank-order-economic-reason;Bank Orders economic reasons;account-conf-bank-order;account.conf.bank.order.bank.order.economic.reason;200;axelor-bank-payment
+account-conf-bank-order-bank-order-file-format;Bank order file formats;account-conf-bank-order;account.conf.bank.order.bank.order.file.format;100;axelor-bank-payment
+account-conf-ebics-bank-statement-file-format;Bank statements file formats;account-conf-bank-statement;account.conf.ebics.bank.statement.file.format;500;axelor-bank-payment
+account-conf-financial;Financial;account-conf;;100;axelor-account
+account-conf-financial-account;Financial Accounts;account-conf-financial;account.conf.financial.account;600;axelor-account
+account-conf-financial-account-management;Financial Accounts Management;account-conf-financial;account.conf.financial.account.management;800;axelor-account
+account-conf-financial-account-type;Account types;account-conf-financial;account.conf.financial.account.type;900;axelor-account
+account-conf-financial-accounting-plan;Chart of Accounts;account-conf-financial;account.conf.financial.accounting.plan;700;axelor-account
+account-conf-financial-financial-discount;Financial Discounts;account-conf-financial;financial.discount;1300;axelor-account
+account-conf-financial-journal;Journals;account-conf-financial;account.conf.financial.journal;400;axelor-account
+account-conf-financial-journal-type;Journal types;account-conf-financial;account.conf.financial.journal.type;500;axelor-account
+account-conf-financial-period;Periods;account-conf-financial;account.conf.financial.period;300;axelor-account
+account-conf-financial-service-types;Service types;account-conf-financial;account.conf.financial.service.types;1100;axelor-account
+account-conf-financial-tax;Taxes;account-conf-financial;account.conf.financial.tax;1000;axelor-account
+account-conf-financial-tax-number;Tax numbers;account-conf-financial;account.conf.financial.tax.number;1200;axelor-account
+account-conf-financial-year;Fiscal years;account-conf-financial;account.conf.financial.year;200;axelor-account
+account-conf-fiscal-position;Fiscal positions;account-conf-financial;account.conf.fiscal.position;100;axelor-account
+account-conf-import-fec-type;Import FEC Type;account-conf-reporting;account.conf.import.fec.type;100;axelor-account
+account-conf-payment;Payment;account-conf;;300;axelor-account
+account-conf-payment-payment-condition;Payment conditions;account-conf-payment;account.conf.payment.payment.condition;200;axelor-account
+account-conf-payment-payment-mode;Payment modes;account-conf-payment;account.conf.payment.payment.mode;100;axelor-account
+account-conf-reporting;Exports/Imports;account-conf;;900;axelor-account
+account-conf-reporting-interbank-code;Interbank codes;account-conf-reporting;account.conf.reporting.interbank.code;200;axelor-account
+account-interbank-code-line;Interbank code/Payment mode;account-conf-bank-accounting-reconciliation;account.account.management.interbank.code.payment.mode;300;axelor-bank-payment
+account-root;Accounting;;;-900;axelor-account
+account-root-accounting;Accounting Exports/Reports;account-root;;700;axelor-account
+account-root-accounting-accounting-exports;Accounting exports;account-root-accounting;account.root.accounting.accounting.exports;300;axelor-account
+account-root-accounting-accounting-reports;Accounting reports;account-root-accounting;account.root.accounting.accounting.reports;200;axelor-account
+account-root-accounting-conf-accounting-config-templates;Accounting configurations templates;account-conf-reporting;account.conf.reporting.accounting.config.templates;500;axelor-account
+account-root-accounting-conf-report-types-export;Export types;account-conf-reporting;account.conf.reporting.accounting.report.types.export;400;axelor-account
+account-root-accounting-conf-report-types-report;Report types;account-conf-reporting;account.conf.reporting.accounting.report.types.report;300;axelor-account
+account-root-accounting-reimbursement;Reimbursements;account-root-accounting;account.root.accounting.reimbursement;100;axelor-account
+account-root-asset-management;Fixed assets;account-root;;1100;axelor-account
+account-root-asset-management-asset-disposal-reasons;Asset disposal reasons;account-root-asset-management-conf;account.root.asset.management.asset-disposal-reasons;300;axelor-account
+account-root-asset-management-conf;Configurations;account-root-asset-management;;200;axelor-account
+account-root-asset-management-conf-asset-categories;Fixed asset categories;account-root-asset-management-conf;accont.root.asset.management.conf.asset.categories;100;axelor-account
+account-root-asset-management-conf-asset-type;Fixed asset types;account-root-asset-management-conf;accont.root.asset.management.conf.asset.types;200;axelor-account
+account-root-asset-management-fixed-assets;Fixed assets;account-root-asset-management;account.root.asset.management.fixed.assets;100;axelor-account
+account-root-bank-order-bank-to-bank-transfer;Bank to Bank Transfers;account-root-bank-orders;;400;axelor-bank-payment
+account-root-bank-order-credit-transfer;Credit Transfers;account-root-bank-orders;;300;axelor-bank-payment
+account-root-bank-order-direct-debit;Direct Debits;account-root-bank-orders;;100;axelor-bank-payment
+account-root-bank-order-international-bank-to-bank-transfer;International Bank to Bank Transfers;account-root-bank-order-bank-to-bank-transfer;account.bank.order.international.bank.to.bank.transfer;200;axelor-bank-payment
+account-root-bank-order-international-credit-transfer;International Credit Transfers;account-root-bank-order-credit-transfer;account.bank.order.international.credit.transfer;200;axelor-bank-payment
+account-root-bank-order-international-direct-debit;International Direct Debits;account-root-bank-order-direct-debit;account.bank.order.international.direct.debit;200;axelor-bank-payment
+account-root-bank-order-lcr;LCR;account-root-bank-orders;;200;axelor-bank-payment
+account-root-bank-order-lcr-bank-orders;LCR bank orders;account-root-bank-order-lcr;account.bank.payment.bank.order.lcr;100;axelor-bank-payment
+account-root-bank-order-send-a-bank-order;Send a Bank Order;account-root-bank-orders;account.send.bank.order;500;axelor-bank-payment
+account-root-bank-order-sepa-bank-to-bank-transfer;National Bank to Bank Transfers;account-root-bank-order-bank-to-bank-transfer;account.bank.order.sepa.bank.to.bank.transfer;100;axelor-bank-payment
+account-root-bank-order-sepa-direct-debit;SEPA Direct Debits;account-root-bank-order-direct-debit;account.bank.order.sepa.direct.debit;100;axelor-bank-payment
+account-root-bank-orders;Bank Orders;account-root;;900;axelor-bank-payment
+account-root-bank-reconciliation;Bank Reconciliations;account-root;;1000;axelor-bank-payment
+account-root-bank-reconciliation-bank-reconciliation;Bank Reconciliations;account-root-bank-reconciliation;account.bank.reconciliation;100;axelor-bank-payment
+account-root-bank-reconciliation-bank-reconciliation-line;Bank Reconciliation Lines;account-root-bank-reconciliation;account.bank.reconciliation.line;200;axelor-bank-payment
+account-root-bank-statement;Bank Statements;account-root;;600;axelor-bank-payment
+account-root-bank-statement-bank-statement;Bank Statements;account-root-bank-statement;account.bank.statement;100;axelor-bank-payment
+account-root-debt-recovery;Debt recovery;account-root;;500;axelor-account
+account-root-move;Moves;account-root;;100;axelor-account
+account-root-move-mass-entry-move;Mass entry;account-root-move;account.root.move.mass.entry.move;0;axelor-account
+account-root-move-move;Moves;account-root-move;account.root.move.move;100;axelor-account
+account-root-move-move-line;Move lines;account-root-move;account.root.move.move.line;300;axelor-account
+account-root-payment-schedule;Payment Schedule;invoice-root;;800;axelor-account
+account-root-payment-schedule-payment-schedule;Payment Schedules;account-root-payment-schedule;account.root.payment.schedule.payment.schedule;100;axelor-account
+account-root-payment-schedule-payment-schedule-line;Payment schedule lines:all;account-root-payment-schedule;account.root.payment.schedule.payment.schedule.line;200;axelor-account
+account-root-payment-schedule-payment-schedule-line-reject;Payment schedule line rejection;account-root-payment-schedule;account.root.payment.schedule.payment.schedule.line.reject;300;axelor-bank-payment
+account-root-payments;Payments;account-root;;300;axelor-account
+account-root-payments-cheque-deposit-slip-all;Deposit slips;account-root-payments;account.root.payments.cheque.deposit.slip.all;400;axelor-account
+account-root-payments-payment-voucher;Payments assistant;account-root-payments;account.root.payments.payment.voucher;200;axelor-account
+account-root-payments-suppl-invoices-to-pay;Suppl. Invoices to pay;account-root-payments;account.root.payments.suppl.invoices.to.pay;300;axelor-account
+account-root-periodic-processing;Periodical processing;account-root;;400;axelor-account
+account-root-periodic-processing-annual-move-consistency-control;Moves consistency control;account-root-periodic-processing-annual-processing;account.root.periodic.processing.annual.processing.move.consistency.control;200;axelor-account
+account-root-periodic-processing-annual-processing;Annual processing;account-root-periodic-processing;;8;axelor-account
+account-root-periodic-processing-annual-processing-year-closure;Year closure;account-root-periodic-processing-annual-processing;account.root.periodic.processing.annual.processing.year.closure;100;axelor-account
+account-root-periodic-processing-cheque-reject;Rejects of cheques;account-root-periodic-processing;account.root.periodic.processing.cheque.reject;7;axelor-account
+account-root-periodic-processing-overpayment-clearances;Overpayments clearances;account-root-periodic-processing;account.root.periodic.processing.overpayment.clearances;5;axelor-account
+account-root-periodic-processing-reconcile;Reconcilations;account-root-periodic-processing;account.root.periodic.processing.reconcile;200;axelor-account
+account-root-periodic-processing-reconcile-group;Reconcile Groups;account-root-periodic-processing;account.root.periodic.processing.reconcile.group;300;axelor-account
+account-root-periodic-processing-reconcile-group-proposal;Reconcile Group proposals;account-root-periodic-processing;account.root.periodic.processing.reconcile.group.proposal;4;axelor-account
+account-root-periodic-processing-reconcile-manager;Reconcile managers;account-root-periodic-processing;account.root.periodic.processing.reconcile.manager;100;axelor-account
+account-root-periodic-processing-shift-irrecoverable;Shift to irrecoverable;account-root-periodic-processing;account.root.periodic.processing.shift.irrecoverable;6;axelor-account
+account-root-pfp;PFP;account-root;;200;axelor-account
+account-root-pfp-awaiting-pfp;awaitingPfpMenuTitle;account-root-pfp;account.root.pfp.awaiting.pfp;200;axelor-account
+account-root-pfp-my-awaiting-pfp;My awaiting PFP;account-root-pfp;account.root.my.awaiting.pfp;100;axelor-account
+account-root-report;Reportings;account-root;;1200;axelor-account
+account.bank.order.sepa.credit.transfert;SEPA Credit Transfers;account-root-bank-order-credit-transfer;account.bank.order.sepa.credit.transfer;100;axelor-bank-payment
+admin-root-batch-accounting;Accounting batches;admin-root-batch;admin.root.batch.accounting;500;axelor-account
+admin-root-batch-business-project;Business project batches;admin-root-batch;admin.root.batch.business.project;1300;axelor-business-project
+admin-root-batch-contract;Contract batches;admin-root-batch;admin.root.batch.contract;1200;axelor-contract
+admin-root-batch-crm;CRM batches;admin-root-batch;admin.root.batch.crm;800;axelor-crm
+admin-root-batch-hr;HR batches;admin-root-batch;admin.root.batch.hr;700;axelor-human-resource
+admin-root-batch-production;Production batches;admin-root-batch;admin.root.batch.production;1400;axelor-production
+admin-root-batch-sale;Sale batches;admin-root-batch;admin.root.batch.sale;900;axelor-sale
+admin-root-batch-stock;Stock batches;admin-root-batch;admin.root.batch.stock;1000;axelor-stock
+admin-root-batch-supplychain;Supplychain batches;admin-root-batch;admin.root.batch.supplychain;1100;axelor-supplychain
+all-employment-contract;Employment Contracts;hr-root-emp-mgt;employment.contracts.all;200;axelor-human-resource
+all-expense;Expenses;my-hr-root;expense.all;310;axelor-human-resource
+all-extra-hours;All extra hours;my-hr-root;extra.hours.all;550;axelor-human-resource
+all-leave-request;Leave Requests;my-hr-root;leave.all;250;axelor-human-resource
+all-lunch-voucher-mgt;Lunch Voucher Management;hr-root-emp-mgt;lunch.voucher.mgt.all;400;axelor-human-resource
+all-my-timesheet;Timesheets;my-hr-root;action.timesheet.view.my.timesheet;410;axelor-human-resource
+all-payroll-preparation;Payroll Preparations;hr-root-emp-mgt;payroll.preparation.all;300;axelor-human-resource
+all-timesheet;All timesheets;timesheet-root;action.timesheet.method.all.timesheet;100;axelor-human-resource
+app-bi-root;BI;;;-115;axelor-bi
+app-bi-root-library;Library;app-bi-root;app.bi.root.library;56;axelor-bi
+app-bi-root-studio;Studio;app-bi-root;app.bi.root.studio;55;axelor-bi
+appraisal-all-appraisals;Appraisals;appraisal-root;appraisal.all.appraisals;100;axelor-talent
+appraisal-config;Configuration;appraisal-root;;200;axelor-talent
+appraisal-config-appraisal-type;Appraisal types;appraisal-config;appraisal.config.appraisal.type;200;axelor-talent
+appraisal-root;Appraisals;hr-root;;400;axelor-talent
+appraisal-template-appraisals;Appraisal templates;appraisal-config;appraisal.template.appraisals;100;axelor-talent
+bank-payment-bank-details;Bank details tree;account-root-bank-statement;bank.payment.bank.detail.tree;200;axelor-bank-payment
+budget-root-budget-management;Budget management;;;-850;axelor-budget
+budget-root-budget-management-budgets;Budgets;budget-root-budget-management;;10;axelor-budget
+budget-root-budget-management-budgets-investment;Investment budgets;budget-root-budget-management-budgets;budget.root.budget.management.budgets.investment;30;axelor-budget
+budget-root-budget-management-budgets-purchase;Purchase budgets;budget-root-budget-management-budgets;budget.root.budget.management.budgets.purchase;20;axelor-budget
+budget-root-budget-management-budgets-purchase-and-investment;Purchase and investment budgets;budget-root-budget-management-budgets;budget.root.budget.management.budgets.purchase.and.investment;40;axelor-budget
+budget-root-budget-management-budgets-sale;Sale budgets;budget-root-budget-management-budgets;budget.root.budget.management.budgets.sale;10;axelor-budget
+budget-root-budget-management-templates;Templates;budget-root-budget-management;;25;axelor-budget
+budget-root-budget-management-templates-import;Import budgets and budget templates;budget-root-budget-management;budget.root.management.templates.import;23;axelor-budget
+business-project-all;Business projects;menu-business-project-root;business.project.all;200;axelor-business-project
+business-project-folder;Project Folders;project-configurations;business.project.folder;1200;axelor-business-project
+business-project-root-invoicing-project;Invoicing project;menu-business-project-root;business.project.root.invoicing.project;400;axelor-business-project
+campaign-all;Campaigns;marketing-root;campaign.all;200;axelor-marketing
+Conditionnement;Conditionnement;sc-root-purchase;conditionnement-action;0;admin
+conf-expense-type;Expense Type;expense-root-conf;conf.expense.type;100;axelor-human-resource
+contract-template-all;Contract templates;contracts-root-conf-all;contract.templates.all;200;axelor-contract
+contracts-root;Contracts;;;-1500;axelor-contract
+contracts-root-conf-all;Configuration;contracts-root;;500;axelor-contract
+contracts-root-conf-terminated;Terminated contracts;contracts-root-conf-all;contracts.root.conf.terminated;100;axelor-contract
+contracts-root-customer-all;Customer contracts;contracts-root;contracts.root.customer.all;100;axelor-contract
+contracts-root-supplier-all;Supplier contracts;contracts-root;contracts.root.supplier.all;200;axelor-contract
+crm-conf;Configuration;crm-root;;1200;axelor-crm
+crm-conf-catalog-type;Catalogs type;crm-conf;crm.conf.catalog.type;500;axelor-crm
+crm-conf-category;Event Categories;crm-conf;crm.conf.event.category;200;axelor-crm
+crm-conf-contact-function;Contact function;crm-conf;crm.conf.contact.function;400;axelor-crm
+crm-conf-industry-sector;Industry;crm-conf;crm.conf.industry.sector;600;axelor-crm
+crm-conf-lead-source;Leads Source;crm-conf;crm.conf.lead.source;100;axelor-crm
+crm-conf-lost-reason;Lost reasons;crm-conf;crm.conf.lost.reason;300;axelor-crm
+crm-conf-partner-roles;Roles;crm-conf;crm.conf.partner.roles;700;axelor-crm
+crm-root;CRM;;;-2100;axelor-crm
+crm-root-catalog;Catalogs;crm-root;crm.root.catalogs;500;axelor-crm
+crm-root-contacts;Contacts;crm-root-customer-follow-up;crm.root.contacts;200;axelor-crm
+crm-root-customers;Customers;crm-root-customer-follow-up;crm.root.customers;100;axelor-crm
+crm-root-event;Events;crm-root;;600;axelor-crm
+crm-root-lead;Leads;crm-root;;100;axelor-crm
+crm-root-meeting-my-calendar;My CRM events;menu-calendar;crm.root.meeting.my.calendar;200;axelor-crm
+crm-root-opportunity;Opportunities;crm-root;;300;axelor-crm
+crm-root-report;Reportings;crm-root;;1100;axelor-crm
+debt-recovery-root-conf;Configuration;account-root-debt-recovery;;400;axelor-account
+debt-recovery-root-conf-debt-recovery-method;Debt recovery methods;debt-recovery-root-conf;debt.recovery.root.conf.debt.recovery.method;100;axelor-account
+debt-recovery-root-conf-factor;Factor;debt-recovery-root-conf;debt.recovery.root.conf.factor;200;axelor-account
+debt-recovery-root-conf-payment-delay-reason;Payment delay reasons;debt-recovery-root-conf;debt.recovery.root.conf.payment.delay.reason;300;axelor-account
+debt-recovery-root-debt-recovery;Debt recovery;account-root-debt-recovery;debt.recovery.root.debt.recovery;100;axelor-account
+debt-recovery-root-factoring;Factoring;account-root-debt-recovery;;300;axelor-account
+debt-recovery-root-history;Debt recovery history;account-root-debt-recovery;debt.recovery.root.history;200;axelor-account
+debt-recovery-root-notifications;Notifications;debt-recovery-root-factoring;debt.recovery.root.notifications;200;axelor-account
+debt-recovery-root-subrogation-releases;Subrogation releases;debt-recovery-root-factoring;debt.recovery.root.subrogation.releases;100;axelor-account
+duration-all;Durations;contracts-root-conf-all;duration.all;300;axelor-contract
+edit-expense;Complete my expense;my-hr-root;edit.expense;300;axelor-human-resource
+edit-extra-hours;Extra hours request;my-hr-root;edit.extra.hours;500;axelor-human-resource
+edit-leave-request;Complete my leave request;my-hr-root;edit.leave.request;200;axelor-human-resource
+edit-timesheet;Complete my timesheet;my-hr-root;edit.timesheet;400;axelor-human-resource
+employee-all;List of employees;hr-root-emp-mgt;employee.all;100;axelor-human-resource
+employment-contract-template-all;Employment Contract Templates;hr-root-emp-mgt-conf;employment.contract.templat.all;300;axelor-human-resource
+end-of-contract-reason-all;End of contract reasons;hr-root-emp-mgt-conf;end.of.contract.reason.all;200;axelor-human-resource
+event-planning-all;Public holidays planning;plannings-all;hr.public.holiday.planning.all;100;axelor-human-resource
+expense-root;Expenses;hr-root;;600;axelor-human-resource
+expense-root-conf;Configuration;expense-root;;500;axelor-human-resource
+extra-hours-root;Extra hours;hr-root;;800;axelor-human-resource
+extra-hours-type;Extra hours type;extra-hours-root;extra.hours.type;500;axelor-human-resource
+fec-import;FEC import;account-conf;fec.import;500;axelor-account
+fleet-conf;Configuration;fleet-root;;800;axelor-fleet
+fleet-conf-recurring-cost;Recurring Costs;fleet-conf;fleet.conf.recurring.cost;100;axelor-fleet
+fleet-conf-vehicle-make;Vehicle brands;fleet-conf;fleet.conf.vehicle.makes;200;axelor-fleet
+fleet-conf-vehicle-odometer;Vehicle odometer;fleet-conf;fleet.conf.vehicle.odometer;300;axelor-fleet
+fleet-conf-vehicle-repair-cause;Cause of repair;fleet-conf;fleet.conf.vehicle.repair.cause;600;axelor-fleet
+fleet-conf-vehicle-service-type;Vehicle service type;fleet-conf;fleet.conf.vehicle.service.type;400;axelor-fleet
+fleet-conf-vehicle-tag;Vehicle tags;fleet-conf;fleet.conf.vehicle.tag;500;axelor-fleet
+fleet-root;Fleet;;;-400;axelor-fleet
+fleet-root-vehicle;Vehicle;fleet-root;fleet.root.vehicle;100;axelor-fleet
+fleet-root-vehicle-contract;Vehicle contracts;fleet-root;fleet.root.vehicle.contract;400;axelor-fleet
+fleet-root-vehicle-cost;Vehicle cost;fleet-root;fleet.root.vehicle.cost;700;axelor-fleet
+fleet-root-vehicle-fuel-log;Vehicle fuel log;fleet-root;fleet.root.vehicle.fuel.log;500;axelor-fleet
+fleet-root-vehicle-models;Vehicle models;fleet-root;fleet.root.vehicle.models;200;axelor-fleet
+fleet-root-vehicle-rent;Vehicle rent;fleet-root;fleet.root.vehicle.rent;300;axelor-fleet
+fleet-root-vehicle-service-log;Vehicle service log;fleet-root;fleet.root.vehicle.service.log;600;axelor-fleet
+forecast-conf;Configuration;forecast-root;;400;axelor-cash-management
+forecast-conf-forecast-generator;Forecast Assistants;forecast-conf;forecast.conf.forecast.generator;200;axelor-cash-management
+forecast-conf-forecast-recap-line-type;Forecast Recap line Types;forecast-conf;forecast.conf.forecast.recap.line.type;100;axelor-cash-management
+forecast-config-manual-forecast;Manual forecasts;forecast-conf;forecast-config-manual-forecast;300;axelor-cash-management
+forecast-root;Cash management;;;-800;axelor-cash-management
+forecast-root-forecast-recap;Forecast Recaps;forecast-root;forecast.root.forecast.recap;200;axelor-cash-management
+forecast-root-forecast-report;Forecast Reports;forecast-root;forecast.root.forecast.report;300;axelor-cash-management
+helpdesk-config;Configuration;helpdesk-root;;800;axelor-helpdesk
+helpdesk-late-ticket;Late tickets;helpdesk-root;helpdesk.late.ticket;500;axelor-helpdesk
+helpdesk-my-team-ticket-all;My team tickets;helpdesk-root;helpdesk.my.team.ticket.all;300;axelor-helpdesk
+helpdesk-my-ticket-all;My tickets;helpdesk-root;helpdesk.my.ticket.all;200;axelor-helpdesk
+helpdesk-not-assigned-ticket;Not assigned tickets;helpdesk-root;helpdesk.not.assigned.ticket;400;axelor-helpdesk
+helpdesk-report-sla;SLA;helpdesk-reporting;helpdesk.report.sla;200;axelor-helpdesk
+helpdesk-report-ticket;Tickets;helpdesk-reporting;helpdesk.report.ticket;100;axelor-helpdesk
+helpdesk-reporting;Reportings;helpdesk-root;;700;axelor-helpdesk
+helpdesk-root;Helpdesk;;;-300;axelor-helpdesk
+helpdesk-sla-policies-all;SLA policies;helpdesk-config;helpdesk.sla.policies.all;100;axelor-helpdesk
+helpdesk-ticket-all;All tickets;helpdesk-root;helpdesk.ticket.all;600;axelor-helpdesk
+helpdesk-ticket-current;Current tickets;helpdesk-root;helpdesk.ticket.current;100;axelor-helpdesk
+helpdesk-ticket-types-all;Ticket types;helpdesk-config;helpdesk-ticket-types-all;200;axelor-helpdesk
+historic-expense;Historic team Expenses;expense-root;expense.historic;400;axelor-human-resource
+historic-extra-hours;Historic extra hours;extra-hours-root;extra.hours.historic;400;axelor-human-resource
+historic-leave-request;Historic team leave requests;leave-request-root;leave.historic;400;axelor-human-resource
+hr-conf-fiscal-period;Fiscal periods;hr-root-emp-mgt-conf;hr.conf.fiscal.period;800;axelor-human-resource
+hr-conf-payroll-period;Payroll periods;hr-root-emp-mgt-conf;hr.conf.payroll.period;700;axelor-human-resource
+hr-conf-payroll-year;Payroll years;hr-root-emp-mgt-conf;hr.conf.payroll.year;600;axelor-human-resource
+hr-conf-product-activity;Product Activities;hr-root-emp-mgt-conf;conf.product.activity;100;axelor-human-resource
+hr-employee-bonus-mgt;Employee bonus mgt;hr-root-emp-mgt;employee.bonus.mgt.all;500;axelor-human-resource
+hr-employee-bonus-type;Employee bonus type;hr-root-emp-mgt-conf;employee.bonus.type.all;400;axelor-human-resource
+hr-employee-dpae;DPAEs;hr-root-emp-mgt;employee.dpae.all;600;axelor-human-resource
+hr-employment-amendment-type;Amendment type;hr-root-configuration-employment-contract-amendment;employment.amendment.type.all;200;axelor-human-resource
+hr-employment-contract-type;Employment contract type;hr-root-emp-mgt-conf;employment.contract.type.all;500;axelor-human-resource
+hr-report-root;Reportings;hr-root;;900;axelor-human-resource
+hr-root;HR;;;-1600;axelor-human-resource
+hr-root-configuration-collective-agreement;Collective agreement;hr-root-configuration-employments;hr.root.configuration.collective.agreement;100;axelor-human-resource
+hr-root-configuration-contract-type;Contract types;hr-root-configuration-employment-contract-amendment;hr.root.configuration.contract.type;100;axelor-human-resource
+hr-root-configuration-employment-contract-amendment;Employment contracts/Contract amendments;hr-root-emp-mgt-conf;;1200;axelor-human-resource
+hr-root-configuration-employments;Employments;hr-root-emp-mgt-conf;;1100;axelor-human-resource
+hr-root-configuration-employments-all;Employments;hr-root-configuration-employments;hr.root.configuration.employments;500;axelor-human-resource
+hr-root-configuration-health-mutual;Health mutual;hr-root-emp-mgt-conf;;1300;axelor-human-resource
+hr-root-configuration-health-mutual-rejection-reason;Health mutual rejection reasons;hr-root-configuration-health-mutual;hr.root.configuration.health.mutual.rejection.reason;100;axelor-human-resource
+hr-root-configuration-pay-grid;Pay Grid;hr-root-configuration-employments;hr.root.configuration.pay.grid;400;axelor-human-resource
+hr-root-configuration-qualification;Qualification;hr-root-configuration-employments;hr.root.configuration.qualification;200;axelor-human-resource
+hr-root-configuration-qualification-level;Qualification Level;hr-root-configuration-employments;hr.root.configuration.qualification.level;300;axelor-human-resource
+hr-root-configuration-smic-value;SmicValue.menu;hr-root-configuration-employments;hr.root.configuration.smic.value;600;axelor-human-resource
+hr-root-emp-mgt;Employees Management;hr-root;;100;axelor-human-resource
+hr-root-emp-mgt-conf;Configuration;hr-root-emp-mgt;;700;axelor-human-resource
+hr-root-emp-mgt-conf-file-type;File types;hr-root-emp-mgt-conf;hr.root.emp.mgt.conf.file.type;1000;axelor-human-resource
+hr-root-emp-mgt-probation-period;Probation periods;hr-root-configuration-employment-contract-amendment;hr.root.emp.mgt.probation.period;300;axelor-human-resource
+invoice-conf;Configuration;invoice-root;;1100;axelor-account
+invoice-conf-pfp-partial-reason;PFP Partial Reasons;invoice-conf;invoice.conf.pfp.partial.reason;200;axelor-account
+invoice-conf-refusalreason;Reason of refusal;invoice-conf;invoice.conf.refusalreason;100;axelor-account
+invoice-root;Invoicing;;;-1000;axelor-account
+invoice-root-cust-credit-note;Cust. Credit notes;invoice-root;invoice.root.custrefunds;200;axelor-account
+invoice-root-custinvoices;Cust. Invoices;invoice-root;invoice.root.custinvoices;100;axelor-account
+invoice-root-invoice-terms;Terms list;invoice-root;invoice.root.invoice.terms;700;axelor-account
+invoice-root-my-awaiting-pfp;My awaiting PFP;invoice-root;invoice.root.my.awaiting.pfp;400;axelor-account
+invoice-root-pfp;PFP;invoice-root;;500;axelor-account
+invoice-root-pfp-awaiting-pfp;awaitingPfpMenuTitle;invoice-root-pfp;invoice.root.pfp.awaiting.pfp;200;axelor-account
+invoice-root-pfp-my-awaiting-pfp;My awaiting PFP;invoice-root-pfp;invoice.root.my.awaiting.pfp;100;axelor-account
+invoice-root-purchase-sup-credit-note;Suppl. Credit notes;invoice-root;invoice.root.purchase.sup.credit.note;600;axelor-account
+invoice-root-purchase-supinvoices;Suppl. Invoices;invoice-root;invoice.root.purchase.supinvoices;300;axelor-account
+invoice-root-report;Reportings;invoice-root;;1000;axelor-account
+invoice-root-subscription-invoice;Subscription invoices to validate;invoice-root;invoice.root.subscription.invoice;900;axelor-supplychain
+kilometric-allow-param-all;Kilometric Allowance Params;expense-root-conf;kilometric.allow.param.all;200;axelor-human-resource
+leave-line-all-employee;Leave accounts;leave-request-conf;action.leave.line.view.conf;200;axelor-human-resource
+leave-reason-all;Leave reason;leave-request-conf;leave.reason.all;100;axelor-human-resource
+leave-request-conf;Configuration;leave-request-root;;700;axelor-human-resource
+leave-request-root;Leave Requests;hr-root;;500;axelor-human-resource
+leave-request-root-leave-calendar;Leaves calendar;leave-request-root;action.leave.request.method.leave.calendar;500;axelor-human-resource
+library-dashboard-root;BI;library-root;library.dashboard.root;10;axelor-bi-library
+library-root;Library;;;-110;axelor-base-library
+library-root-versions;Versions;library-root-configuration;library.root.versions;100;axelor-base-library
+lvme-menu-age-lot;Âge des lots;stock-root;lvme-action-age-lot;0;admin
+lvme-menu-cession-stock;Cessions de Stock;stock-root;action-cession-stock-show;0;admin
+lvme-menu-coditour-export;Export Coditour;account-conf;action-coditour-wizard-open;0;admin
+lvme-menu-encours-fournisseur;État en-cours fournisseur;sc-root-purchase-conf;action-encours-fournisseur-all;0;admin
+lvme-menu-etat-stock-lot;État des stocks par lots;stock-root;action-lvme-etat-stock-lot-open;50;admin
+lvme-menu-palmares-commercial;Palmarès par commercial;sc-root-sale-conf;action-palmares-commercial-wizard-open;0;admin
+lvme-menu-palmares-vente;Palmarès des ventes;sc-root-sale-conf;action-palmares-vente-all;0;admin
+lvme-menu-rotation-stock;Rotation des stocks;stock-root;action-lvme-rotation-stock-open;0;admin
+lvme-menu-synthese-risque-client;Synthèse risques clients;account-conf;action-synthese-risque-client-all;0;admin
+manufacturing-conf;Configuration;manufacturing-root;;1700;axelor-production
+manufacturing-conf-cancelreason;Cancel Reasons;manufacturing-conf;manufacturing.conf.cancelreason;900;axelor-production
+manufacturing-conf-configurators;Configurators;manufacturing-conf;;700;axelor-production
+manufacturing-conf-configurators-bom;Configurator BOM;manufacturing-conf-configurators;manufacturing.conf.configurator.bom;300;axelor-production
+manufacturing-conf-configurators-bom-components;Configurator BOM components;manufacturing-conf-configurators;manufacturing.conf.configurator.bom.components;400;axelor-production
+manufacturing-conf-configurators-configurators;Configurators;manufacturing-conf-configurators;manufacturing.conf.configurator.configurators;200;axelor-production
+manufacturing-conf-configurators-creator;Configurator creators;manufacturing-conf-configurators;manufacturing.conf.configurator.creator;100;axelor-production
+manufacturing-conf-configurators-prod-process-line;Configurator Phase;manufacturing-conf-configurators;manufacturing.conf.configurator.prod.process.line;600;axelor-production
+manufacturing-conf-configurators-prod-product;Configurator prod product;manufacturing-conf-configurators;manufacturing.conf.configurator.prod.product;700;axelor-production
+manufacturing-conf-configurators-prodprocess;Configurator production process;manufacturing-conf-configurators;manufacturing.conf.configurator.prod.process;500;axelor-production
+manufacturing-conf-cost-sheet-group;Cost sheet groups;manufacturing-conf;manufacturing.conf.cost.sheet.group;500;axelor-production
+manufacturing-conf-machine;Machines;manufacturing-conf;manufacturing.conf.machine;200;axelor-production
+manufacturing-conf-machine-planning;Machine Planning;manufacturing-conf;manufacturing.conf.machine.planning;1000;axelor-production
+manufacturing-conf-machine-tool;Tool;manufacturing-conf;manufacturing.conf.machine.tool;300;axelor-production
+manufacturing-conf-machine-type;Machine Types;manufacturing-conf;manufacturing.conf.machine.type;400;axelor-production
+manufacturing-conf-manuf-order;Permanent manufacturing orders;manufacturing-conf;manufacturing.conf.manuf.order;600;axelor-production
+manufacturing-conf-mps-weekly-schedule;MPS Weekly schedules;manufacturing-conf;manufacturing.conf.mps.weekly.schedule;1200;axelor-production
+manufacturing-conf-product-approvals;Product approvals;manufacturing-conf;manufacturing.conf.product.approvals;800;axelor-production
+manufacturing-conf-work-center;Work centers;manufacturing-conf;manufacturing.conf.work.center;100;axelor-production
+manufacturing-conf-work-center-groups;Work center groups;manufacturing-conf;manufacturing.conf.work.center.group;1300;axelor-production
+manufacturing-conf-workshop;Workshop;manufacturing-conf;manufacturing.conf.workshop;1100;axelor-production
+manufacturing-mps;S&OP/MPS;manufacturing-root;;1200;axelor-production
+manufacturing-mps-conf;Configuration;manufacturing-mps;;400;axelor-production
+manufacturing-mps-conf-manufacturing-periods;Manufacturing periods;manufacturing-mps-conf;manufacturing.mps.conf.manufacturing-periods;200;axelor-production
+manufacturing-mps-conf-mrp-line-type;Move types;manufacturing-mps-conf;manufacturing.mps.conf.mrp.line.type;100;axelor-production
+manufacturing-mps-forecast;Forecasts;manufacturing-mps;manufacturing.mps.forecast;300;axelor-production
+manufacturing-mps-master-production-scheduling;MPS;manufacturing-mps;manufacturing.mps.master.production.scheduling;200;axelor-production
+manufacturing-mps-sop;S&OP;manufacturing-mps;manufacturing.mps.sop;100;axelor-production
+manufacturing-root;Manufacturing;;;-600;axelor-production
+manufacturing-root-bill-of-material-root;Bills of materials;manufacturing-root;;300;axelor-production
+manufacturing-root-cost-calculations;Cost calculations;manufacturing-root;manufacturing.root.cost.calculations;1400;axelor-production
+manufacturing-root-general-bill-of-material;General BoM;manufacturing-root-bill-of-material-root;manufacturing.root.general.bill.of.material;100;axelor-production
+manufacturing-root-manuf-order;Manufacturing orders;manufacturing-root;manufacturing.root.manuf.order;500;axelor-production
+manufacturing-root-mps-charge;MPS Charge;manufacturing-root;manufacturing.root.mps.charge;1300;axelor-production
+manufacturing-root-operation-order;Manufacturing operations;manufacturing-root;manufacturing.root.operation.order;600;axelor-production
+manufacturing-root-operation-order-planned-calendar;Planned operations;manufacturing-root-calendars;manufacturing.root.operation.order.planned.calendar;100;axelor-production
+manufacturing-root-operation-order-real-calendar;Real operations;manufacturing-root-calendars;manufacturing.root.operation.order.real.calendar;300;axelor-production
+manufacturing-root-outsourcing;Outsourcing;manufacturing-root;;900;axelor-production
+manufacturing-root-outsourcing-subcontractors;Subcontractors;manufacturing-root-outsourcing;manufacturing.root.subcontractors;100;axelor-production
+manufacturing-root-outsourcing-subcontractors-arrivals;Subcontractors arrivals;manufacturing-root-outsourcing;manufacturing.root.subcontractors.arrivals;300;axelor-production
+manufacturing-root-outsourcing-subcontractors-deliveries;Subcontractors deliveries;manufacturing-root-outsourcing;manufacturing.root.subcontractors.deliveries;200;axelor-production
+manufacturing-root-personalized-bill-of-material;Personalized BoM;manufacturing-root-bill-of-material-root;manufacturing.root.personalized.bill.of.material;200;axelor-production
+manufacturing-root-prod-process;Production processes;manufacturing-root;;200;axelor-production
+manufacturing-root-production-order;Productions orders;manufacturing-root;manufacturing.root.production.order;400;axelor-production
+manufacturing-root-products;Products;manufacturing-root;manufacturing.root.products;100;axelor-production
+manufacturing-root-raw-material-requirement;Raw material requirement;manufacturing-root;manufacturing.root.raw.material.requirement;1100;axelor-production
+manufacturing-root-report;Reportings;manufacturing-root;;1500;axelor-production
+marketing-conf;Configuration;marketing-root;;300;axelor-marketing
+marketing-conf-campaign-type;Campaign types;marketing-conf;marketing.conf.campaign.type;100;axelor-marketing
+marketing-conf-template;Template;marketing-conf;marketing.conf.template;200;axelor-marketing
+marketing-root;Marketing;;;-2000;axelor-marketing
+menu-account-invoice-advanced;Advanced;invoice-root-report;;300;axelor-account
+menu-account-purchase-invoice-advanced;Purchases Invoiced;menu-account-invoice-advanced;account.purchase.invoice.advanced.view;200;axelor-account
+menu-account-purchase-invoice-dashboard-1;Purchase Invoices;invoice-root-report;account.purchase.invoice.dashboard.2.view;200;axelor-account
+menu-account-sale-invoice-advanced;Turnover;menu-account-invoice-advanced;account.sale.invoice.advanced.view;100;axelor-account
+menu-account-sale-invoice-dashboard-1;Sale Invoices;invoice-root-report;account.sale.invoice.dashboard.1.view;100;axelor-account
+menu-accounting-dashboard-1;Accounting;account-root-report;accounting.dashboard.view;100;axelor-account
+menu-accounting-dashboard-2;Accounting with invoice terms;account-root-report;accounting.dashboard.invoice.terms.view;200;axelor-account
+menu-bi-all;Dashboards;app-bi-root;action.bi.dashboard.all;54;axelor-bi
+menu-bi-root-all-snapshots;Snapshots;app-bi-root;action.bi.snapshot.all;55;axelor-bi
+menu-calls-dashboard;Calls;crm-root-report;;100;axelor-crm
+menu-calls-dashboard-1;Calls monitoring;menu-calls-dashboard;crm.calls.dashboard.view;100;axelor-crm
+menu-cash-management-dashboard-1;Cash Management Dashboard;forecast-root;cash.management.dashboard.1.view;100;axelor-cash-management
+menu-dashboards-customers;Customers / prospects;sc-root-sale-report;sale.customer.list.dashboard.view;400;axelor-sale
+menu-event-dashboard;Event;crm-root-report;;400;axelor-crm
+menu-event-dashboard-manager;Manager;menu-event-dashboard;crm.event.dashboard.manager.view;200;axelor-crm
+menu-event-dashboard-one;Event monitoring;menu-event-dashboard;crm.event.dashboard.one.view;100;axelor-crm
+menu-event-dashboard-salesman;Salesman;menu-event-dashboard;crm.event.dashboard.salesman.view;300;axelor-crm
+menu-hr-manager-dashboard;Human Resources Manager;hr-report-root;hr.manager.dashboard.view;100;axelor-human-resource
+menu-hr-user-dashboard;Human Resources Employee;hr-report-root;hr.user.dashboard.view;200;axelor-human-resource
+menu-lead-dashboard;Lead;crm-root-report;;300;axelor-crm
+menu-lead-dashboard-manager;Manager;menu-lead-dashboard;crm.lead.dashboard.manager.view;200;axelor-crm
+menu-lead-dashboard-one;Leads monitoring;menu-lead-dashboard;crm.lead.dashboard.one.view;100;axelor-crm
+menu-lead-dashboard-salesman;Salesman;menu-lead-dashboard;crm.lead.dashboard.salesman.view;300;axelor-crm
+menu-manufacturing-dashboard-1;Manufacturing;manufacturing-root-report;manufacturing.dashboard.view;100;axelor-production
+menu-manufacturing-user-dashboard;User;manufacturing-root-report;manufacturing.user.dashboard.view;200;axelor-production
+menu-my-project-root;My project;;;-1400;axelor-project
+menu-opportunities-dashboard;Opportunities;crm-root-report;;200;axelor-crm
+menu-opportunities-dashboard-1;Tb Opportunities 1;menu-opportunities-dashboard;crm.opportunities.dashboard.1.view;100;axelor-crm
+menu-opportunities-dashboard-2;Tb Opportunities 2;menu-opportunities-dashboard;crm.opportunities.dashboard.2.view;400;axelor-crm
+menu-opportunities-dashboard-manager;Manager;menu-opportunities-dashboard;crm.opportunities.manager.view;200;axelor-crm
+menu-opportunities-dashboard-salesman;Salesman;menu-opportunities-dashboard;crm.opportunities.salesman.view;300;axelor-crm
+menu-products-dashboard-1;Products;referential-report;supplychain.products.dashboard.1;200;axelor-supplychain
+menu-project-root;Project management;;;-1400;axelor-project
+menu-purchase-dashboard-1;Purchase Buyer;sc-root-purchase-report;purchase.dashboard.1;100;axelor-purchase
+menu-purchase-dashboard-2;Purchase Manager;sc-root-purchase-report;purchase.dashboard.2;200;axelor-purchase
+menu-quality-root;Quality;;;-1700;axelor-quality
+menu-sale-dashboard-2;Turnover Study;sc-root-sale-report;sale.dashboard.2;300;axelor-sale
+menu-sale-manager-dashboard-sample;Sales Manager;sc-root-sale-report;sale.manager.dashboard.view.sample;200;axelor-sale
+menu-saleman-dashboard-sample;Salesperson;sc-root-sale-report;saleman.dashboard.view.sample;100;axelor-sale
+menu-stock-dashboard-1;General;stock-root-report;stock.dashboard.one.view;100;axelor-stock
+menu-stock-dashboard-2;Deliveries;stock-root-report;stock.dashboard.two.view;200;axelor-stock
+move-template;Move Templates;move-template-root;move.template;100;axelor-account
+move-template-root;Move Templates;account-conf;;400;axelor-account
+move-template-type;Move Template Types;move-template-root;move.template.type;200;axelor-account
+move-template-wizard;Move From Template;account-root-move;move.template.wizard;400;axelor-account
+plannings-all;Plannings;hr-root-emp-mgt-conf;;900;axelor-human-resource
+project-activity;Project Activities;menu-my-project-root;project.activity;400;axelor-project
+project-all;Projects;menu-project-project-root;project.all;100;axelor-project
+project-announcement;Announcement;menu-my-project-root;project.announcement;600;axelor-business-support
+project-configurations;Configuration;menu-project-root;;1200;axelor-project
+project-configurations-project-status;Project status;project-configurations;project.configurations.project.status;400;axelor-project
+project-configurations-task-status;Task status;project-configurations;project.configurations.task.status;500;axelor-project
+project-open-tasks;Tasks;menu-my-project-root;all.open.project.tasks;300;axelor-project
+project-project-template;Project templates;project-template;project.project.template;200;axelor-project
+project-reporting;Reportings;menu-project-root;;800;axelor-project
+project-reporting-my-projects;My projects;project-reporting;project.my.projects;100;axelor-project
+project-reporting-planned-charge;Planned charge;project-reporting;project.planned.charge;200;axelor-project
+project-resource;Project.Resource;project-configurations;project.resource;800;axelor-project
+project-resource-booking;Resource bookings;menu-project-root;project.resource.booking;600;axelor-project
+project-resource-type;Resource types;project-configurations;project.resource.types;700;axelor-project
+project-spent-time;Spent time;menu-my-project-root;project.spent.time;500;axelor-human-resource
+project-tags;Tags;project-configurations;project.tags;900;axelor-project
+project-task-all;Project tasks;menu-project-project-root;project.task.all;300;axelor-project
+project-task-category;Category;project-configurations;project.task.category;100;axelor-project
+project-task-customer;Tickets;menu-project-root;;300;axelor-business-support
+project-task-project-priority;Project Priority;project-configurations;team.task.project.priority;600;axelor-project
+project-task-template;Task templates;project-template;project.task.template;100;axelor-project
+project-template;Templates;menu-project-root;;500;axelor-project
+project-topic;Topics;project-configurations;project.topic;300;axelor-project
+project-versions;Project.versions;project-configurations;action.project.version.view.all.versions;1100;axelor-project
+project-wiki;Wiki;menu-my-project-root;all.wiki;700;axelor-project
+project-wiki-folder;Wiki folder;project-configurations;project.wiki.folder;1000;axelor-project
+purchase-maps-partner-suppliers;Suppliers;purchase-report-maps;action-purchase-method-show-suppliers-on-map-page;100;axelor-purchase
+purchase-report-maps;Maps;sc-root-purchase-report;;300;axelor-purchase
+purchase-root-abc-analysis;ABC analysis;sc-root-purchase;purchase.root.abc.analysis;900;axelor-purchase
+purchase-root-purchase-orders-without-stock.move;Purchase order without stock move;sc-root-purchase;purchase.root.purchase.orders.without.stock.move;700;axelor-supplychain
+quality-alert-calendar;Alert calendar;quality-calendar;quality.alert.calendar;100;axelor-quality
+quality-alerts;Quality alerts;menu-quality-root;quality.alerts;200;axelor-quality
+quality-calendar;Calendar;menu-quality-root;;300;axelor-quality
+quality-configurations;Configuration;menu-quality-root;;600;axelor-quality
+quality-control-calendar;Quality control calendar;quality-calendar;quality.control.calendar;200;axelor-quality
+quality-control-point-type;Control point type;quality-configurations;quality.control.point.type;400;axelor-quality
+quality-control-points;Control points;quality-controls-root;quality.controls.points;300;axelor-quality
+quality-controls;Quality controls;quality-controls-root;quality.controls;200;axelor-quality
+quality-controls-root;Quality controls;menu-quality-root;;100;axelor-quality
+quality-processes;Quality processes;quality-controls-root;quality.processes;100;axelor-quality
+quality-reportings;Reportings;menu-quality-root;;500;axelor-quality
+quality-reportings-dashboard;Quality Dashboard;quality-reportings;quality.dashboard.view;100;axelor-quality
+quality-root-causes;Root causes;quality-configurations;quality.root.causes;200;axelor-quality
+quality-tags;Tags;quality-configurations;quality.tags;300;axelor-quality
+quality-teams;Quality teams;quality-configurations;quality.teams;100;axelor-quality
+recruitment-config;Configuration;recruitment-root;;300;axelor-talent
+recruitment-config-education-level;Level of education;recruitment-config;recruitment.config.education.level;100;axelor-talent
+recruitment-config-hiring-stage;Hiring Stage;recruitment-config;recruitment.config.hiringStage;200;axelor-talent
+recruitment-config-skill;Skills;recruitment-config;recruitment.config.skill;400;axelor-talent
+recruitment-config-source;Source;recruitment-config;recruitment.config.source;300;axelor-talent
+recruitment-job-application-all;Applications;recruitment-root;recruitment.job.application.all;200;axelor-talent
+recruitment-job-position-open;Job positions;recruitment-root;recruitment.job.position.open;100;axelor-talent
+recruitment-root;Recruitment;hr-root;;200;axelor-talent
+referential-conf-das2-activity;DAS2 activities;referential-conf;account.referential.conf.das2.activity;300;axelor-account
+sale-conf-cancelreason;Cancel Reasons;sc-root-sale-conf;sale.conf.cancelreason;200;axelor-sale
+sale-conf-configurators;Configurators;sc-root-sale-conf;;900;axelor-sale
+sale-conf-configurators-configurators;Configurators;sale-conf-configurators;sale.conf.configurator.configurators;200;axelor-sale
+sale-conf-configurators-creator;Configurator creators;sale-conf-configurators;sale.conf.configurator.creator;100;axelor-sale
+sale-conf-duration;Durations;sc-root-sale-conf;sale.conf.duration;300;axelor-sale
+sale-conf-shipping-costs;Shipping costs;sc-root-sale-conf;sale.conf.shipping.costs;400;axelor-sale
+sale-configuration-timetable-template;Timetable templates;sc-root-sale-conf;sale.conf.timetable.template;100;axelor-supplychain
+sale-maps-partner-customers;Customers;sc-root-sale-maps;action-show-customers-on-map-page;100;axelor-sale
+sale-maps-partner-prospects;Prospects;sc-root-sale-maps;action-show-prospects-on-map-page;200;axelor-sale
+sale-menu-clients-coditour;Clients Coditour;sc-root-sale-conf;sale.partner.coditour;0;axelor-sale
+sale-menu-comptes-reservation;Comptes de réservation;sc-root-sale-conf;sale.stock-location.reservation;0;admin
+sale-menu-groupements;Groupements;sc-root-sale-conf;sale.groupement.all;100;axelor-sale
+sale-root-sale-orders-without-stock-move;Sale order without stock move;sc-root-sale;sale.root.sale.orders.without.stock.move;700;axelor-supplychain
+sale.conf.tax;Taxes;sc-root-sale-conf;sale.conf.financial.tax;800;axelor-sale
+sc-crm-root-sale-quotations;Sale quotations;crm-root-customer-follow-up;sc.root.sale.quotations;300;axelor-sale
+sc-root-abc-analysis;ABC analysis;sc-root-sale;sale.root.abc.analysis;1000;axelor-sale
+sc-root-purchase;Purchases;;;-1800;axelor-purchase
+sc-root-purchase-conf;Configuration;sc-root-purchase;;1400;axelor-purchase
+sc-root-purchase-conf-partner-price-list;Supplier partner price lists;sc-root-purchase-conf;sc.root.purchase.conf.partner.price.list;100;axelor-purchase
+sc-root-purchase-conf-price-list;Price lists;sc-root-purchase-conf;sc.root.purchase.conf.price.list;200;axelor-purchase
+sc-root-purchase-contacts;Contacts;sc-root-purchase;sc.root.purchase.contacts;200;axelor-purchase
+sc-root-purchase-historical;Historical;sc-root-purchase;purchase.historical.orders;1100;axelor-purchase
+sc-root-purchase-order-supplier-lines-requests;Supplier consultations;sc-root-purchase;sc.root.purchase.orders.supplier.lines.requests;1200;axelor-supplier-management
+sc-root-purchase-orders;Purchase orders;sc-root-purchase;sc.root.purchase.orders;600;axelor-purchase
+sc-root-purchase-products;Products & services;sc-root-purchase;sc.root.purchase.products;300;axelor-purchase
+sc-root-purchase-quotations;Purchase quotations;sc-root-purchase;sc.root.purchase.quotations;500;axelor-purchase
+sc-root-purchase-report;Reportings;sc-root-purchase;;1300;axelor-purchase
+sc-root-purchase-request;Internal purchase requests;sc-root-purchase;sc.root.purchase.request.all;400;axelor-purchase
+sc-root-purchase-suppliers;Suppliers;sc-root-purchase;sc.root.purchase.suppliers;100;axelor-purchase
+sc-root-sale;Sales;;;-1900;axelor-sale
+sc-root-sale-conf;Configuration;sc-root-sale;;1400;axelor-sale
+sc-root-sale-conf-partner-price-list;Customer partner price lists;sc-root-sale-conf;sc.root.sale.conf.partner.price.list;500;axelor-sale
+sc-root-sale-conf-price-list;Price lists;sc-root-sale-conf;sc.root.sale.conf.price.list;600;axelor-sale
+sc-root-sale-conf-pricing-rule;Pricing rules;sc-root-sale-conf;sc.root.sale.conf.pricing.rule;1000;axelor-sale
+sc-root-sale-contacts;Contacts;sc-root-sale;sc.root.sale.contacts;200;axelor-sale
+sc-root-sale-customers;Customers;sc-root-sale;sc.root.sale.customers;100;axelor-sale
+sc-root-sale-historical;Historical;sc-root-sale;sc.hist.sale.orders;1100;axelor-sale
+sc-root-sale-maps;Maps;sc-root-sale-report;;500;axelor-sale
+sc-root-sale-orders;Sale orders;sc-root-sale;sc.root.sale.orders;600;axelor-sale
+sc-root-sale-pack;Pack;sc-root-sale;sc.root.sale.pack;300;axelor-sale
+sc-root-sale-pricing;Pricing;sc-root-sale;sc.root.sale.pricing;1200;axelor-sale
+sc-root-sale-products;Products & services;sc-root-sale;sc.root.sale.products;400;axelor-sale
+sc-root-sale-quotations;Sale quotations;sc-root-sale;sc.root.sale.quotations;500;axelor-sale
+sc-root-sale-report;Reportings;sc-root-sale;;1300;axelor-sale
+sc-root-sale-templates;Quotations template;sc-root-sale-conf;sc.root.sale.templates;700;axelor-sale
+stock-config-lot-fournisseur;Lots Fournisseur;stock-root-conf;action-lot-fournisseur-view-all;15;admin
+stock-mrp;MRP;stock-root;;1000;axelor-supplychain
+stock-mrp-calculation;MRP;stock-mrp;stock.mrp.calculation;100;axelor-supplychain
+stock-mrp-configuration;Configuration;stock-mrp;;300;axelor-supplychain
+stock-mrp-configuration-mrp-line-type;MRP move types;stock-mrp-configuration;stock.mrp.configuration.mrp.line.type;100;axelor-supplychain
+stock-mrp-forecast;Forecasts;stock-mrp;stock.mrp.forecast;200;axelor-supplychain
+stock-multi-purchase-invoicing;Mass Suppl. Stock Move Invoicing;sc-root-purchase;stock.root.multi.purchase.invoicing;800;axelor-supplychain
+stock-multi-sale-invoicing;Mass Cust. Stock Move Invoicing;sc-root-sale;stock.root.multi.sale.invoicing;800;axelor-supplychain
+stock-root;Stock management;;;-700;axelor-stock
+stock-root-abc-analysis;ABC analysis;stock-root-conf;stock.root.abc.analysis;1200;axelor-stock
+stock-root-all-line;Stock move lines;stock-root-conf;stock.root.all.line;1100;axelor-stock
+stock-root-availabilityreq;Availability requests;sc-root-sale;stock.root.availabilityreq;900;axelor-supplychain
+stock-root-conf;Configuration;stock-root;;1200;axelor-stock
+stock-root-conf-cancel-reason;Cancel reason;stock-root-conf;action.stock.view.cancel.reason;900;axelor-stock
+stock-root-conf-customs-code-nomenclature;Customs code nomenclature:all;stock-root-conf;stock.root.conf.customs.code.nomenclature;800;axelor-stock
+stock-root-conf-freight-carrier;Freight Carrier;stock-root-conf;stock.root.conf.freight.carrier;400;axelor-stock
+stock-root-conf-freight-carrier-mode;Freight carrier modes;stock-root-conf;stock.root.conf.freight.carrier.mode;500;axelor-stock
+stock-root-conf-invoice-blocking-reason;Invoice blocking reason;stock-root-conf;action.stock.view.invoice.blocking.reason;1100;axelor-supplychain
+stock-root-conf-shipment-mode;Shipment Mode;stock-root-conf;stock.root.conf.shipment.mode;600;axelor-stock
+stock-root-conf-stock-correction-reason;Stock Correction Reason;stock-root-conf;stock.root.conf.stock.correction.reason;1000;axelor-stock
+stock-root-conf-stock-rules;Stock rules;stock-root-conf;stock.root.conf.stock.rules;200;axelor-stock
+stock-root-conf-stock-tracking-numbers;Tracking Numbers;stock-root-conf;stock.root.conf.stock.tracking.numbers;300;axelor-stock
+stock-root-conf-tracking-number-config;Tracking number configuration;stock-root-conf;stock.root.conf.tracking.number.config;700;axelor-stock
+stock-root-custdeliveries;Customer deliveries;stock-root-deliveries;stock.root.custdeliveries;100;axelor-stock
+stock-root-custdeliveries-invoicing-block;Invoicing blocked customer deliveries;stock-root-deliveries;stock.root.custdeliveries.invoicing.block;400;axelor-supplychain
+stock-root-custreturns;Customer returns;stock-root-deliveries;stock.root.custreturns;200;axelor-stock
+stock-root-custshipprep;Cust. Shipment to prepare;stock-root-deliveries;stock.root.custshipprep;500;axelor-stock
+stock-root-incoterm;Incoterms;stock-root-conf;stock.root.incoterm;100;axelor-stock
+stock-root-internal;Internal Stock Moves;stock-root;stock.root.internal;300;axelor-stock
+stock-root-inventories;Inventories;stock-root;stock.root.inventories.draft;800;axelor-stock
+stock-root-logistical-forms;Logistical forms;stock-root-deliveries;stock.root.logistical.forms;300;axelor-stock
+stock-root-products;Products.items;stock-root;stock.root.products;400;axelor-stock
+stock-root-report;Reportings;stock-root;;1100;axelor-stock
+stock-root-search;Tracking Number Search;stock-root;stock.root.search;600;axelor-stock
+stock-root-stock-correction;Stock Corrections;stock-root;stock.root.stock.correction;700;axelor-stock
+stock-root-stock-details-by-product;Stock details by product;stock-root;stock.root.stock.details.by.product;500;axelor-supplychain
+stock-root-stock-location;Stock Locations;stock-root;stock.root.stock.location;900;axelor-stock
+stock-root-suparrivals;Supplier arrivals;stock-root-arrivals;stock.root.suparrivals;100;axelor-stock
+stock-root-supreturns;Supplier returns;stock-root-arrivals;stock.root.supreturns;200;axelor-stock
+supplychain-declarations-of-exchanges;Declarations of exchanges;account-root-periodic-processing;supplychain.declarations.of.exchanges;800;axelor-supplychain
+targets-all;Targets;marketing-root;targets.all;100;axelor-marketing
+time-sheet-reminder;Timesheet reminder;timesheet-root;action.timesheet.view.timesheet.reminder;600;axelor-human-resource
+time-sheet-report;Timesheet report;timesheet-root;action.timesheet.view.timesheet.report;500;axelor-human-resource
+time-sheet-timer;Start&Stop Timer;my-hr-root;time.sheet.timer;450;axelor-human-resource
+timesheet-root;Timesheets;hr-root;;700;axelor-human-resource
+training-category-all;Categories;training-conf;training.category.all;100;axelor-talent
+training-conf;Configuration;training-root;;300;axelor-talent
+training-dashboard;Training dashboard;training-root;training.dashboard;200;axelor-talent
+training-register-all;All trainings;training-root;training.register.all;100;axelor-talent
+training-root;Training;hr-root;;300;axelor-talent
+training-session-all;Training sessions;training-conf;training.session.all;300;axelor-talent
+training-training-all;Trainings;training-conf;training.training.all;200;axelor-talent
+validate-expense;Expenses to Validate;expense-root;expense.validate;100;axelor-human-resource
+validate-extra-hours;Extra hours to validate;extra-hours-root;extra.hours.validate;300;axelor-human-resource
+validate-leave-request;Leave Requests to Validate;leave-request-root;leave.validate;300;axelor-human-resource
+validate-timesheet;Timesheets to Validate;timesheet-root;timesheet.validate;200;axelor-human-resource
+ventilate-expense;Expenses to Ventilate;expense-root;expense.ventilate;200;axelor-human-resource
+weekly-planning-all;Weekly planning;plannings-all;hr.weekly.planning.all;200;axelor-human-resource

@@ -1,0 +1,16 @@
+<action-view name="action-view-tracking-numbers-available-for-product" 
+             title="Lots disponibles pour ce produit"
+             model="com.axelor.apps.stock.db.TrackingNumber">
+  <view type="grid" name="tracking-number-fefo-grid"/>
+  <view type="form" name="tracking-number-form"/>
+  <domain>
+    self.product.id = :productId 
+    AND self.id IN (
+      SELECT sll.trackingNumber.id 
+      FROM StockLocationLine sll 
+      WHERE sll.currentQty > 0 
+      AND sll.trackingNumber IS NOT NULL
+    )
+  </domain>
+  <context name="productId" expr="eval: product?.id"/>
+</action-view>

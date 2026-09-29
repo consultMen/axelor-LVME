@@ -1,0 +1,8 @@
+<action-view name="action-stock-move-cession-show"
+  title="Cessions de Stock"
+  model="com.axelor.apps.stock.db.StockMove">
+  <view type="grid" name="stock-move-cession-grid"/>
+  <view type="form" name="stock-move-cession-form"/>
+  <domain>self.isCession = true</domain>
+  <context name="_isCession" expr="eval: true"/>
+</action-view>

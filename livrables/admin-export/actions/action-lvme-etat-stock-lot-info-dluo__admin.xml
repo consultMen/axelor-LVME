@@ -1,0 +1,4 @@
+<action-validate name="action-lvme-etat-stock-lot-info-dluo">
+  <info message="Attention : des lots en stock ont une DLUO dépassée (lignes rouges) ou dans moins de 30 jours (lignes orange)."
+    if="eval: __repo__(EtatStockLot).all().filter('self.stockQty &gt; 0 AND self.dluo &lt;= ?1', __date__.plusDays(30)).count() &gt; 0"/>
+</action-validate>

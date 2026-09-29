@@ -1,0 +1,7 @@
+<action-view name="action-coditour-wizard-open" title="Export Coditour"
+      model="com.axelor.apps.account.db.CoditourWizard">
+  <view type="form" name="coditour-wizard-form"/>
+  <view-param name="popup" value="true"/>
+  <view-param name="show-toolbar" value="false"/>
+  <view-param name="popup-save" value="false"/>
+</action-view>

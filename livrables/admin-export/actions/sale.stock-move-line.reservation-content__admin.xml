@@ -1,0 +1,11 @@
+<action-view name="sale.stock-move-line.reservation-content" 
+    title="Contenu de la réservation"
+    model="com.axelor.apps.stock.db.StockMoveLine">
+  <view type="grid" name="stock-move-line-grid"/>
+  <view type="form" name="stock-move-line-form"/>
+  <domain>
+    self.stockMove.toStockLocation.id = :id
+    AND self.stockMove.statusSelect = 3
+  </domain>
+  <context name="id" expr="eval:id"/>
+</action-view>

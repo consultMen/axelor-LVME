@@ -1,0 +1,42 @@
+<grid name="sale-order-line-grid" title="SO lines" model="com.axelor.apps.sale.db.SaleOrderLine" orderBy="sequence" edit-icon="true">
+  <hilite color="default" strong="true" if="typeSelect != 0"/>
+  <hilite color="danger" if="deliveryState == 1"/>
+  <hilite color="warning" if="deliveryState == 2"/>
+  <hilite color="success" if="deliveryState == 3"/>
+  <field name="$hasWarning" hidden="true"/>
+  <button name="errorIconButton" showIf="$hasWarning" readonlyIf="true" icon="fa-exclamation-triangle" onClick="refresh"/>
+  <field if="__config__.app.getApp('sale')?.isDisplaySaleOrderLineNumber" name="sequence" width="51"/>
+  <button if="__config__.app.getApp('sale')?.getIsCartManagementEnabled()" name="addToCartBtn" title="Add to cart" readonlyIf="!product || typeSelect != 0" icon="cart-plus-fill" onClick="action-sale-order-line-method-add-to-cart"/>
+  <field name="product" hidden="true"/>
+  <field name="typeSelect" hidden="true"/>
+  <field if="__config__.app.isApp('supplychain')" name="deliveryState" hidden="true"/>
+  <field name="product.code" width="120"/>
+  <field name="productName"/>
+  <field name="$currencyNumberOfDecimals" hidden="true"/>
+  <field name="qty" aggregate="sum" x-scale="$nbDecimalDigitForQty"/>
+  <field if="__config__.app.getApp('sale')?.isQuotationAndOrderSplitEnabled" name="orderedQty" readonly="true" aggregate="sum" x-scale="$nbDecimalDigitForQty"/>
+  <field if="__config__.app.getApp('supplychain')?.manageStockReservation" name="reservedQty" aggregate="sum" x-scale="2"/>
+  <button if="__config__.app.getApp('supplychain')?.manageStockReservation" name="allocateAll" title="Allocate" readonlyIf="$get('saleOrder.statusSelect') != 3 || $get('saleOrder.orderBeingEdited') || $number(reservedQty) == $number(qty) || deliveryState == 3 || $get('product.productTypeSelect') == 'service'" icon="fa-plus-square" onClick="save,action-supplychain-sale-order-line-allocate-all"/>
+  <button if="__config__.app.getApp('supplychain')?.manageStockReservation" name="deallocate" title="Deallocate" readonlyIf="$get('saleOrder.statusSelect') != 3 || $get('saleOrder.orderBeingEdited') || $number(reservedQty) == 0 || deliveryState == 3" icon="fa-minus-square" onClick="save,action-supplychain-sale-order-line-deallocate-all"/>
+  <field name="unit" form-view="unit-form" grid-view="unit-grid"/>
+  <field name="priceDiscounted" title="Unit price W.T." x-scale="$nbDecimalDigitForUnitPrice"/>
+  <field name="exTaxTotal" aggregate="sum" x-scale="$currencyNumberOfDecimals"/>
+  <field name="inTaxTotal" aggregate="sum" x-scale="$currencyNumberOfDecimals"/>
+  <field name="estimatedShippingDate"/>
+  <field name="estimatedDeliveryDate"/>
+  <field if="__config__.app.isApp('supplychain')" name="availableStatus">
+    <hilite color="success" strong="true" if="availableStatusSelect == 1"/>
+    <hilite color="danger" strong="true" if="availableStatusSelect == 2"/>
+  </field>
+  <button if="__config__.app.getApp('sale')?.getEnableConfigurator()" name="configuratorEditBtn" readonlyIf="configurator == null" icon="pencil-square" onClick="action-sale-order-line-group-on-configurator-edit"/>
+  <button if="__config__.app.getApp('sale')?.getEnableLineDuplication()" name="configuratorDuplicateBtn" readonlyIf="saleOrder.id == null" icon="fa-copy" onClick="action-sale-order-line-group-on-configurator-duplicate"/>
+  <field name="saleOrder.statusSelect" hidden="true"/>
+  <field name="saleOrder.orderBeingEdited" hidden="true"/>
+  <field name="product.productTypeSelect" hidden="true"/>
+  <field name="$nbDecimalDigitForUnitPrice" hidden="true"/>
+  <field name="$nbDecimalDigitForQty" hidden="true"/>
+  <field name="configurator" hidden="true"/>
+  <field name="saleOrder" hidden="true"/>
+  <field name="saleOrder.id" hidden="true"/>
+</grid>
+

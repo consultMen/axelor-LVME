@@ -1,0 +1,4 @@
+<action-method name="action-frais-stockage-method-recalculer">
+  <call class="com.axelor.apps.supplychain.web.FraisStockageController"
+        method="recalculerGlobal"/>
+</action-method>

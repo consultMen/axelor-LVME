@@ -1,0 +1,5 @@
+<action-view name="action-palmares-vente-all" title="Palmarès des ventes"
+      model="com.axelor.apps.supplychain.db.PalmaresVente">
+  <view type="grid" name="palmares-vente-grid"/>
+  <view type="form" name="palmares-vente-form"/>
+</action-view>

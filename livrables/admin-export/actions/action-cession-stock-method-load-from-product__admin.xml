@@ -1,0 +1,4 @@
+<action-method name="action-cession-stock-method-load-from-product">
+  <call class="com.axelor.apps.stock.web.CessionStockController"
+        method="loadFromProduct"/>
+</action-method>

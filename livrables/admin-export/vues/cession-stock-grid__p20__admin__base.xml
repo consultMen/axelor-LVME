@@ -1,0 +1,11 @@
+<grid name="cession-stock-grid" title="Cessions de Stock"
+  model="com.axelor.apps.stock.db.CessionStock">
+  <field name="cessionSeq"/>
+  <field name="cessionDate"/>
+  <field name="product"/>
+  <field name="lotSource"/>
+  <field name="poidsKg"/>
+  <field name="nouveauLotName"/>
+  <field name="cessionRealisee" widget="boolean-switch"/>
+  <field name="dateRealisation"/>
+</grid>

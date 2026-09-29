@@ -1,0 +1,5 @@
+<action-record name="action-stock-move-line-record-lot-fournisseur-onchange" 
+               model="com.axelor.apps.stock.db.StockMoveLine">
+  <field name="lotFournisseur.dateProduction" 
+         expr="eval: lotFournisseur?.dateProduction"/>
+</action-record>

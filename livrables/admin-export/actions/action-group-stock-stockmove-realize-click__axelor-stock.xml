@@ -1,0 +1,9 @@
+<action-group name="action-group-stock-stockmove-realize-click">
+  <action name="save"/>
+  <action name="action-stock-move-check-stock-move-line-real-qty"/>
+  <action if="typeSelect == __repo__(StockMove).TYPE_INCOMING &amp;&amp; !isReversion" name="action-stock-move-validate-shipment-informations"/>
+  <action name="action-stock-move-method-check-wap"/>
+  <action if="isValidWAP" name="action-stock-move-group-realize"/>
+  <action name="save"/>
+  <action name="action-method-stock-move-restore-calculs-after-realize"/>
+</action-group>

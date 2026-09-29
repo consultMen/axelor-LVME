@@ -1,0 +1,26 @@
+<grid name="purchase-order-line-purchase-order-grid" title="PO lines" model="com.axelor.apps.purchase.db.PurchaseOrderLine" edit-icon="true">
+  <hilite color="default" strong="true" if="isTitleLine == true"/>
+  <hilite color="danger" if="receiptState == 1"/>
+  <hilite color="warning" if="receiptState == 2"/>
+  <hilite color="success" if="receiptState == 3"/>
+  <field name="$hasWarning" hidden="true"/>
+  <button name="errorIconButton" showIf="$hasWarning" readonlyIf="true" icon="fa-exclamation-triangle" onClick="refresh"/>
+  <field if="__config__.app.getApp('purchase')?.isDisplayPurchaseOrderLineNumber" name="sequence" width="51"/>
+  <field if="__config__.app.isApp('supplychain')" name="receiptState" hidden="true"/>
+  <field name="productName"/>
+  <field name="productCode"/>
+  <field name="purchaseOrder.currency" hidden="true"/>
+  <field name="purchaseOrder.currency.numberOfDecimals" hidden="true"/>
+  <field name="qty" aggregate="sum" x-scale="$nbDecimalDigitForQty"/>
+  <field name="unit" form-view="unit-form" grid-view="unit-grid"/>
+  <field name="conditionnement"/>
+  <field name="priceDiscounted" title="Unit price W.T." x-scale="$nbDecimalDigitForUnitPrice"/>
+  <field name="exTaxTotal" aggregate="sum" x-scale="purchaseOrder.currency.numberOfDecimals"/>
+  <field name="inTaxTotal" aggregate="sum" x-scale="purchaseOrder.currency.numberOfDecimals"/>
+  <field name="isTitleLine" hidden="true"/>
+  <field name="desiredReceiptDate"/>
+  <field name="estimatedReceiptDate"/>
+  <field name="$nbDecimalDigitForUnitPrice" hidden="true"/>
+  <field name="$nbDecimalDigitForQty" hidden="true"/>
+</grid>
+

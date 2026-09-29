@@ -1,0 +1,3 @@
+<action-method name="action-lvme-purchase-order-line-method-duplicate">
+  <call class="com.axelor.apps.purchase.web.PurchaseOrderLineController" method="duplicateLine"/>
+</action-method>

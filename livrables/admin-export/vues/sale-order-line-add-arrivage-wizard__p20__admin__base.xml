@@ -1,0 +1,24 @@
+<form name="sale-order-line-add-arrivage-wizard" 
+  title="Ajouter un arrivage"
+  model="com.axelor.apps.supplychain.db.SaleOrderLineArrivage">
+  <panel name="mainPanel">
+    <field name="$stockMoveLine"
+      type="many-to-one"
+      target="com.axelor.apps.stock.db.StockMoveLine"
+      domain="self.stockMove.typeSelect = 3 
+              AND self.product.id = :_productId"
+      title="Ligne BR (arrivage)"
+      grid-view="stock-move-line-grid"
+      form-view="stock-move-line-form"
+      colSpan="12"
+      canNew="false"
+      canEdit="false"/>
+    <field name="qtyAllocated" min="0" 
+      title="Qté à allouer"
+      colSpan="6"/>
+    <field name="saleOrderLine" hidden="true"/>
+    <button name="validateBtn" title="Valider"
+      onClick="action-sale-order-line-arrivage-add,close"
+      colSpan="6"/>
+  </panel>
+</form>

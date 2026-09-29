@@ -1,0 +1,157 @@
+<form name="cession-stock-form" title="Cession de Stock"
+  model="com.axelor.apps.stock.db.CessionStock"
+  onNew="action-cession-stock-record-default-values,action-cession-stock-method-sync-frais-congelation">
+
+  <!-- ===== HEADER ===== -->
+  <panel name="entetePanel" title="Cession de Stock" colSpan="12">
+    <field name="cessionSeq" readonly="true" colSpan="3"/>
+    <field name="cessionDate" colSpan="3"/>
+    <field name="company" colSpan="3"/>
+    <field name="typeCession" colSpan="3" required="true"
+       onChange="action-cession-stock-method-sync-frais-congelation"/>
+    <field name="libelleMvts" readonly="true" colSpan="3"/>
+  </panel>
+
+  <!-- ===== SOURCE + DESTINATION (Type 1 RECONDITIONNEMENT) ===== -->
+  <panel name="sourceEtDestinationPanel" colSpan="12"
+       showIf="typeCession == 'RECONDITIONNEMENT'">
+    
+    <panel name="produitAPanel" title="Source — Produit A" colSpan="6">
+      <field name="product" colSpan="12" required="true"
+        onChange="action-cession-stock-method-load-from-product"
+        domain="self.dtype = 'Product' AND self.isModel = false"
+        form-view="product-form"
+        grid-view="product-grid"/>
+      <field name="lotSource" colSpan="12"
+        requiredIf="typeCession == 'RECONDITIONNEMENT'"
+        domain="self.product = :product"
+        form-view="tracking-number-form"
+        grid-view="tracking-number-grid"/>
+      <field name="conditionnement" readonly="true" colSpan="12"/>
+      <field name="nbColis" colSpan="6"
+        onChange="action-cession-stock-method-compute-calculs"/>
+      <field name="pdsColis" colSpan="6"
+        onChange="action-cession-stock-method-compute-calculs"/>
+      <field name="pdsTotal" readonly="true" colSpan="12"/>
+      <field name="poidsKg" colSpan="12" required="true"
+        onChange="action-cession-stock-method-copy-poids-to-dest"/>
+    </panel>
+
+    <panel name="produitBPanel" title="Destination — Produit B" colSpan="6">
+      <field name="productDest" colSpan="12" required="true"
+        domain="self.dtype = 'Product' AND self.isModel = false"
+        form-view="product-form"
+        grid-view="product-grid"/>
+      <field name="nouveauLot" colSpan="12" required="true"
+        form-view="tracking-number-form"
+        grid-view="tracking-number-grid"
+        canNew="false"/>
+      <field name="conditionnementDest" colSpan="12"/>
+      <field name="nbColisDest" colSpan="6"
+        onChange="action-cession-stock-method-compute-dest"/>
+      <field name="pdsColisDest" colSpan="6"
+        onChange="action-cession-stock-method-compute-dest"/>
+      <field name="pdsTotalDest" readonly="true" colSpan="12"/>
+      <field name="poidsKgDest" readonly="true" colSpan="12"/>
+    </panel>
+
+  </panel>
+
+  <!-- ===== PANEL MODIF_PR (Type 2) ===== -->
+  <panel name="modifPrPanel" title="Modification du prix de revient" colSpan="12"
+         showIf="typeCession == 'MODIF_PR'">
+    <field name="lotSource" colSpan="12"
+       requiredIf="typeCession == 'MODIF_PR'"
+       onChange="action-cession-stock-record-load-ancien-pr"
+       form-view="tracking-number-form"
+       grid-view="tracking-number-grid"
+       help="Sélectionner le lot dont on modifie le PR"/>
+    
+    <field name="ancienPR" colSpan="6" 
+       title="Ancien PR (€/kg)"
+       readonly="true"
+       help="PR actuel du lot (auto-rempli à la sélection)"/>
+    
+    <field name="prKg" colSpan="6" 
+       title="Nouveau PR (€/kg)"
+       requiredIf="typeCession == 'MODIF_PR'"
+       readonlyIf="cessionRealisee"
+       help="Nouveau prix de revient à appliquer"/>
+    
+    <field name="motif" colSpan="12" 
+       requiredIf="typeCession == 'MODIF_PR'"
+       help="Raison de la modification (ex : rabais rétroactif, correction)"/>
+  </panel>
+
+  <!-- ===== PANEL FRAIS_STOCKAGE (Type 3) ===== -->
+  <panel name="fraisStockagePanel" title="Frais de stockage" colSpan="12"
+         showIf="typeCession == 'FRAIS_STOCKAGE'">
+    <field name="motif" colSpan="12" required="true"
+           help="Raison du recalcul (ex: mise à jour taux mensuel)"/>
+    
+    <field name="prKg" 
+       title="Taux appliqué (€/kg)" 
+       readonly="true"/>
+  </panel>
+
+  <!-- ===== BLOC ARTICLE ===== -->
+  <panel name="articlePanel" title="Article" colSpan="12"
+         showIf="typeCession == 'RECONDITIONNEMENT'">
+    <field name="articleCode" readonly="true" colSpan="3"/>
+    <field name="designation" readonly="true" colSpan="9"/>
+    <field name="nomScientifique" readonly="true" colSpan="12"/>
+
+    <field name="dateCongelation" readonly="true" colSpan="3"/>
+    <field name="origine" readonly="true" colSpan="3"/>
+    <field name="dluo" readonly="true" colSpan="3"/>
+    <field name="marque" readonly="true" colSpan="3"/>
+
+    <field name="frigo" readonly="true" colSpan="3"/>
+    <field name="tauxTVA" readonly="true" colSpan="3"/>
+    <field name="emplacement" readonly="true" colSpan="3"/>
+    <field name="zonePeche" readonly="true" colSpan="3"/>
+
+    <field name="gencode" readonly="true" colSpan="3"/>
+    <field name="refFourn" readonly="true" colSpan="3"/>
+    <field name="nbColisParCouche" colSpan="3"/>
+    <field name="nbColisParPalette" colSpan="3"/>
+
+    <field name="entreeSortie" readonly="true" colSpan="3"/>
+    <field name="uniteVente" colSpan="3"/>
+    <field name="prixRevient" readonly="true" colSpan="3"/>
+  </panel>
+
+  <!-- ===== BLOC CALCULS ===== -->
+  <panel name="calculsPanel" title="Calculs" colSpan="12"
+         showIf="typeCession == 'RECONDITIONNEMENT'">
+    <field name="paKg" colSpan="3"/>
+    <field name="prDevise" colSpan="3"/>
+    <field name="prKg" colSpan="3"/>
+    <field name="montantHT" readonly="true" colSpan="3"/>
+  </panel>
+
+  <!-- ===== ÉTAT ===== -->
+  <panel name="etatPanel" title="État" colSpan="12">
+    <field name="cessionRealisee" readonly="true" widget="boolean-switch" colSpan="3"/>
+    <field name="dateRealisation" readonly="true" colSpan="3"/>
+  </panel>
+
+  <!-- ===== BOUTONS ===== -->
+  <panel name="actionsPanel" colSpan="12">
+    <button name="btnValiderCession"
+      title="✓ Valider la cession"
+      onClick="save,action-cession-stock-method-execute-split"
+      showIf="!cessionRealisee &amp;&amp; typeCession == 'RECONDITIONNEMENT'"/>
+    
+    <button name="btnAppliquerModifPR"
+      title="✏️ Appliquer la modification"
+      onClick="save,action-modif-pr-method-appliquer"
+      showIf="!cessionRealisee &amp;&amp; typeCession == 'MODIF_PR'"/>
+    
+    <button name="btnAppliquerFraisStockage"
+      title="🔄 Appliquer le recalcul"
+      onClick="save,action-frais-stockage-method-appliquer"
+      showIf="!cessionRealisee &amp;&amp; typeCession == 'FRAIS_STOCKAGE'"/>
+  </panel>
+
+</form>

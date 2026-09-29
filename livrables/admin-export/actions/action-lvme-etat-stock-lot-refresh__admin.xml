@@ -1,0 +1,4 @@
+<action-attrs name="action-lvme-etat-stock-lot-refresh">
+  <attribute name="refresh" for="lotsDashlet" expr="eval: true"/>
+</action-attrs>
+

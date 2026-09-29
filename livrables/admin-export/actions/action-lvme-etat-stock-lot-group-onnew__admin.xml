@@ -1,0 +1,5 @@
+<action-group name="action-lvme-etat-stock-lot-group-onnew">
+  <action name="action-lvme-etat-stock-lot-defaults"/>
+  <action name="action-lvme-etat-stock-lot-alertes-dluo"/>
+  <action name="action-lvme-etat-stock-lot-info-dluo"/>
+</action-group>

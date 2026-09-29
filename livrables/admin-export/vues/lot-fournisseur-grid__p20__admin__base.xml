@@ -1,0 +1,9 @@
+<grid name="lot-fournisseur-grid" 
+      title="Lots Fournisseur" 
+      model="com.axelor.apps.stock.db.LotFournisseur"
+      orderBy="supplierLotNumber">
+  <field name="supplierLotNumber" title="N° Lot Fournisseur" width="200"/>
+  <field name="dateProduction" title="Date de production" width="150"/>
+  <field name="product" title="Produit" width="200"/>
+  <field name="supplier" title="Fournisseur" width="200"/>
+</grid>

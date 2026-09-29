@@ -1,0 +1,10 @@
+<action-record name="action-cession-stock-record-default-values" 
+  model="com.axelor.apps.stock.db.CessionStock">
+  <field name="libelleMvts" expr="'CESSION'"/>
+  <field name="entreeSortie" expr="'Sortie'"/>
+  <field name="cessionRealisee" expr="false"/>
+  <field name="cessionDate" expr="eval: __date__"/>
+  <field name="company" expr="eval: __user__.activeCompany"/>
+  <field name="cessionSeq" 
+    expr="call: com.axelor.apps.base.service.administration.SequenceService:getSequenceNumber('cessionStock', __user__.activeCompany, com.axelor.apps.stock.db.CessionStock.class, 'cessionSeq')"/>
+</action-record>

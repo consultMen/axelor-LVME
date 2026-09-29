@@ -1,0 +1,11 @@
+<grid name="purchase-order-line-purchase-order-grid" id="lvme-purchase-order-line-grid-duplicate"
+  title="PO lines" model="com.axelor.apps.purchase.db.PurchaseOrderLine" extension="true">
+  <extend target="/">
+    <insert position="inside">
+      <field name="purchaseOrder.statusSelect" hidden="true"/>
+      <button name="lvmeDuplicateLineBtn" title="Dupliquer la ligne" icon="fa-copy"
+        readonlyIf="id == null || $get('purchaseOrder.statusSelect') &gt; 2"
+        onClick="save,action-lvme-purchase-order-line-method-duplicate"/>
+    </insert>
+  </extend>
+</grid>

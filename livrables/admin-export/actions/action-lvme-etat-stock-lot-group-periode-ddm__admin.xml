@@ -1,0 +1,4 @@
+<action-group name="action-lvme-etat-stock-lot-group-periode-ddm">
+  <action name="action-lvme-etat-stock-lot-periode-ddm"/>
+  <action name="action-lvme-etat-stock-lot-refresh"/>
+</action-group>

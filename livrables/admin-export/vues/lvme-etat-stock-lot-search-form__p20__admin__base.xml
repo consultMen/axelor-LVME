@@ -1,0 +1,53 @@
+<form name="lvme-etat-stock-lot-search-form" title="État des stocks par lots"
+  model="com.axelor.utils.db.Wizard" width="large" canNew="false" canSave="false" canCopy="false" canDelete="false"
+  onNew="action-lvme-etat-stock-lot-group-onnew">
+  <!-- LVME : bandeau d'alerte DLUO -->
+  <panel name="alertesDluoPanel" showTitle="false" colSpan="12">
+    <field name="$nbDluoDepassee" type="integer" hidden="true"/>
+    <field name="$nbDluoProche" type="integer" hidden="true"/>
+    <field name="$alerteDluo" showTitle="false" readonly="true" colSpan="12" type="string">
+      <viewer depends="$nbDluoDepassee,$nbDluoProche"><![CDATA[
+        <>
+          {$nbDluoDepassee > 0 && <Badge bg="danger">{$nbDluoDepassee} lot(s) en stock avec DLUO dépassée (lignes rouges)</Badge>}
+          {' '}
+          {$nbDluoProche > 0 && <Badge bg="warning">{$nbDluoProche} lot(s) avec DLUO dans moins de 30 jours (lignes orange)</Badge>}
+          {!($nbDluoDepassee > 0) && !($nbDluoProche > 0) && <Badge bg="success">Aucun lot en stock avec DLUO dépassée ou proche</Badge>}
+        </>
+      ]]></viewer>
+    </field>
+  </panel>
+  <panel name="filtresPanel" showTitle="false" colSpan="12">
+    <panel name="filtreArticlePanel" colSpan="3" itemSpan="12">
+      <field name="$articleDu" title="Article du" type="many-to-one" target="com.axelor.apps.base.db.Product" canNew="false" canEdit="false" canView="false"/>
+      <field name="$articleAu" title="au" type="many-to-one" target="com.axelor.apps.base.db.Product" canNew="false" canEdit="false" canView="false"/>
+      <field name="$famille" title="Fam. article" type="many-to-one" target="com.axelor.apps.base.db.ProductCategory" canNew="false" canEdit="false" canView="false"/>
+      <field name="$numeroLot" title="OU Lot n°" type="string" onChange="action-lvme-etat-stock-lot-refresh"/>
+    </panel>
+    <panel name="filtreFournisseurPanel" colSpan="3" itemSpan="12">
+      <field name="$fournisseurDu" title="Fournisseur du" type="many-to-one" target="com.axelor.apps.base.db.Partner" domain="self.isSupplier = true" canNew="false" canEdit="false" canView="false"/>
+      <field name="$fournisseurAu" title="au" type="many-to-one" target="com.axelor.apps.base.db.Partner" domain="self.isSupplier = true" canNew="false" canEdit="false" canView="false"/>
+      <field name="$origine" title="Origine" type="string" selection="lvme.origine.select"/>
+      <field name="$frigo" title="Frigo" type="many-to-one" target="com.axelor.apps.stock.db.StockLocation" domain="self.typeSelect = 1" canNew="false" canEdit="false" canView="false"/>
+    </panel>
+    <panel name="filtreDatesPanel" colSpan="4" itemSpan="4">
+      <field name="$entreeDu" title="Entrée du" type="date"/>
+      <field name="$entreeAu" title="au" type="date"/>
+      <field name="$entreePeriode" title="Période prédéfinie" type="integer" selection="lvme.etat.stock.periode.select" onChange="action-lvme-etat-stock-lot-periode-entree"/>
+      <field name="$ddmDu" title="D.D.M. du" type="date"/>
+      <field name="$ddmAu" title="au" type="date"/>
+      <field name="$ddmPeriode" title="Période prédéfinie" type="integer" selection="lvme.etat.stock.periode.select" onChange="action-lvme-etat-stock-lot-periode-ddm"/>
+      <field name="$livrDu" title="Livr. du" type="date"/>
+      <field name="$livrAu" title="au" type="date"/>
+      <field name="$livrPeriode" title="Période prédéfinie" type="integer" selection="lvme.etat.stock.periode.select" onChange="action-lvme-etat-stock-lot-periode-livr"/>
+    </panel>
+    <panel name="filtreOptionsPanel" colSpan="2" itemSpan="12">
+      <field name="$natureArrivage" title="Arrivage" type="integer" widget="RadioSelect" selection="lvme.etat.stock.nature.select"/>
+      <field name="$etatLot" title="Lots" type="integer" widget="RadioSelect" selection="lvme.etat.stock.etat.select"/>
+      <field name="$dispoNegatif" title="Seulement les dispo négatifs" type="boolean"/>
+      <button name="lancerRechercheBtn" title="Lancer la recherche" icon="search" css="btn-primary" onClick="action-lvme-etat-stock-lot-refresh"/>
+    </panel>
+  </panel>
+  <panel-dashlet name="lotsDashlet" title="Lots" colSpan="12" height="600"
+    action="action-lvme-etat-stock-lot-dashlet"/>
+</form>
+

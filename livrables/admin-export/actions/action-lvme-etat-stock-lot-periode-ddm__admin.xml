@@ -1,0 +1,4 @@
+<action-attrs name="action-lvme-etat-stock-lot-periode-ddm">
+  <attribute name="value" for="$ddmDu" expr="eval: [1: __date__.withDayOfMonth(1), 2: __date__.minusMonths(3), 3: __date__.minusMonths(6), 4: __date__.withDayOfYear(1), 5: __date__.minusMonths(12)][ddmPeriode as Integer]"/>
+  <attribute name="value" for="$ddmAu" expr="eval: [1: __date__.withDayOfMonth(__date__.lengthOfMonth()), 2: __date__, 3: __date__, 4: __date__.withMonth(12).withDayOfMonth(31), 5: __date__][ddmPeriode as Integer]"/>
+</action-attrs>

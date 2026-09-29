@@ -1,0 +1,8 @@
+<grid name="partner-coditour-grid" title="Clients Coditour"
+      model="com.axelor.apps.base.db.Partner">
+  <field name="id" title="ID Coditour"/>
+  <field name="partnerSeq" title="Réf. client"/>
+  <field name="name" title="Nom"/>
+  <field name="codeCoditour" title="Code Coditour"/>
+  <field name="groupement" title="Groupement"/>
+</grid>

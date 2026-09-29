@@ -1,0 +1,13 @@
+<action-view
+  name="action-view-sale-order-line-add-stock-location"
+  title="Sélectionner un emplacement"
+  model="com.axelor.apps.supplychain.db.SaleOrderLineStockLocation">
+  <view name="sale-order-line-add-stock-location-wizard" type="form"/>
+  <view-param name="popup" value="reload"/>
+  <view-param name="forceEdit" value="true"/>
+  <view-param name="show-confirm" value="false"/>
+  <view-param name="show-toolbar" value="false"/>
+  <context name="_productId" expr="eval: product?.id"/>
+  <context name="_saleOrderLineId" expr="eval: id"/>
+  <context name="companyId" expr="eval: saleOrder?.company?.id"/>
+</action-view>

@@ -1,0 +1,31 @@
+<form name="sale-order-line-add-stock-location-wizard"
+  title="Sélectionner un emplacement"
+  model="com.axelor.apps.sale.db.SaleOrderLine">
+  <panel name="mainPanel">
+    <field name="$stockLocation"
+      type="many-to-one"
+      target="com.axelor.apps.stock.db.StockLocation"
+     domain="self.typeSelect IN (1, 3)
+        AND (:companyId IS NULL OR
+             self.company.id = :companyId)
+        AND self.id IN (
+          SELECT sll.stockLocation
+          FROM StockLocationLine sll
+          WHERE sll.product.id = :_productId
+          AND sll.currentQty > 0
+        )"
+      title="Emplacement de stock"
+      colSpan="12"
+      canNew="false"
+      canEdit="false"/>
+    <field name="$qty"
+      type="decimal"
+      title="Quantité à sélectionner"
+      min="0"
+      colSpan="6"/>
+    <button name="validateBtn"
+      title="Valider"
+      onClick="action-sale-order-line-stock-location-add,close"
+      colSpan="6"/>
+  </panel>
+</form>

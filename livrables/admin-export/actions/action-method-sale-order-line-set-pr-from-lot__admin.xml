@@ -1,0 +1,4 @@
+<action-method name="action-method-sale-order-line-set-pr-from-lot">
+  <call class="com.axelor.apps.supplychain.web.SaleOrderLineController" 
+        method="setPrFromLot"/>
+</action-method>

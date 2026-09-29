@@ -1,0 +1,3 @@
+<action-attrs name="action-lvme-rotation-stock-refresh">
+  <attribute name="refresh" for="rotationDashlet" expr="eval: true"/>
+</action-attrs>

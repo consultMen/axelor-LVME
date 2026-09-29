@@ -1,0 +1,4 @@
+<action-group name="action-lvme-rotation-stock-group-recalcul">
+  <action name="action-lvme-rotation-stock-kpi"/>
+  <action name="action-lvme-rotation-stock-refresh"/>
+</action-group>

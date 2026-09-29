@@ -1,0 +1,5 @@
+<action-method name="action-purchase-order-line-method-compute-packaging">
+  <call class="com.axelor.apps.purchase.web.PurchaseOrderLineController"
+        method="computePackaging"/>
+</action-method>
+

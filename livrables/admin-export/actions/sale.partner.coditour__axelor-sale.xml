@@ -1,0 +1,11 @@
+<action-view name="sale.partner.coditour" 
+    title="Clients Coditour"
+    model="com.axelor.apps.base.db.Partner">
+  <view type="grid" name="partner-coditour-grid"/>
+  <view type="form" name="partner-form"/>
+  <domain>
+    self.isCustomer = true 
+    AND (self.groupement.code = 'CODITOUR' 
+         OR (self.codeCoditour IS NOT NULL AND self.codeCoditour != ''))
+  </domain>
+</action-view>

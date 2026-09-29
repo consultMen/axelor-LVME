@@ -1,0 +1,18 @@
+<form name="lvme-age-lot-form" title="Âge du lot"
+  model="com.axelor.apps.supplychain.db.AgeLot"
+  canNew="false" canEdit="false" canDelete="false">
+  <panel name="mainPanel" readonly="true">
+    <field name="product"/>
+    <field name="trackingNumber"/>
+    <field name="stockLocation"/>
+    <field name="qty"/>
+    <field name="stockValue"/>
+    <field name="arrivalDate"/>
+    <field name="dateSource"/>
+    <field name="ageDays"/>
+    <field name="ageBucket"/>
+    <field name="dluo"/>
+    <field name="daysToDluo"/>
+    <field name="isExpired"/>
+  </panel>
+</form>

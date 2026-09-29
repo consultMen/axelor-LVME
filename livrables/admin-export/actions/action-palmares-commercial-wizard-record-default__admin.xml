@@ -1,0 +1,5 @@
+<action-record name="action-palmares-commercial-wizard-record-default"
+                model="com.axelor.apps.supplychain.db.PalmaresCommercialWizard">
+  <field name="dateDe" expr="eval: __date__.withDayOfMonth(1)"/>
+  <field name="dateA" expr="eval: __date__"/>
+</action-record>

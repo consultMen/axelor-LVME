@@ -1,0 +1,68 @@
+<form name="tracking-number-stock-move-line-form" title="Tracking number" model="com.axelor.apps.stock.db.TrackingNumber" onLoad="action-tracking-number-attrs-set-scale,action-tracking-number-method-fill-origin-parents" onNew="action-tracking-number-stock-move-line-group-on-new,action-tracking-number-record-propagate-dluo">
+  <panel name="mainPanel">
+    <field name="trackingNumberSeq"/>
+    <field name="dateArrivage" title="Date d'arrivage" colSpan="6"/>
+    <field name="product" readonlyIf="$popup() || id != null" domain="self.dtype = 'Product'" form-view="product-form" grid-view="product-grid"/>
+    <field name="productTrackingNumberConfiguration.hasWarranty" hidden="true"/>
+    <field name="productTrackingNumberConfiguration.isPerishable" hidden="true"/>
+    <field name="productTrackingNumberConfiguration.isDimensional" hidden="true"/>
+    <field name="hasWarranty" hideIf="!productTrackingNumberConfiguration.hasWarranty"/>
+    <field name="warrantyExpirationDate" readonly="false" hideIf="!hasWarranty"/>
+    <field name="isPerishable" hideIf="!productTrackingNumberConfiguration.isPerishable"/>
+    <field name="perishableExpirationDate" readonly="false" hideIf="!isPerishable"/>
+    <field name="checkExpirationDateAtStockMoveRealization" hideIf="!isPerishable"/>
+    <field name="origin"/>
+    <field name="supplier" domain="self.isSupplier IS TRUE" form-view="partner-supplier-form" grid-view="partner-supplier-grid"/>
+    <field name="nbrOfPieces"/>
+    <field name="note" colSpan="12"/>
+    <field name="productTrackingNumberConfiguration" hidden="true" type="many-to-one" target="com.axelor.apps.stock.db.TrackingNumberConfiguration" x-dirty="false"/>
+    <field name="originParentTrackingNumberSet" hidden="true" type="many-to-many" target="com.axelor.apps.stock.db.TrackingNumber" x-dirty="false"/>
+  </panel>
+  <panel-tabs name="trackingNumberPanelTabs">
+    <panel name="stockLocationDashletPanel" title="Stock location line">
+      <panel-dashlet colSpan="12" action="action-tracking-number-view-show-details-available"/>
+      <panel-dashlet colSpan="12" action="action-tracking-number-view-show-details-unavailable"/>
+    </panel>
+    <panel name="supplierLotPanel" title="Lot Fournisseur" colSpan="12">
+      <field name="lotFournisseur" title="Lot Fournisseur" colSpan="12" canNew="true" canEdit="true" domain="(:product IS NULL OR self.product = :product) AND (:supplier IS NULL OR self.supplier = :supplier)" form-view="lot-fournisseur-form" grid-view="lot-fournisseur-grid"/>
+    </panel>
+    <panel name="dimensionsAndMassPanels" title="Dimensions and masses" showIf="productTrackingNumberConfiguration.isDimensional">
+      <panel name="dimensionsPanel" title="Dimensions" showIf="productTrackingNumberConfiguration.isDimensional" colSpan="12">
+        <field name="dimension0" showIf="productTrackingNumberConfiguration.trackingNumberConfigurationProfile.titleOfDimension0" colSpan="6"/>
+        <field name="dimension1" showIf="productTrackingNumberConfiguration.trackingNumberConfigurationProfile.titleOfDimension1" colSpan="6"/>
+        <field name="dimension2" showIf="productTrackingNumberConfiguration.trackingNumberConfigurationProfile.titleOfDimension2" colSpan="6"/>
+        <field name="dimension3" showIf="productTrackingNumberConfiguration.trackingNumberConfigurationProfile.titleOfDimension3" colSpan="6"/>
+        <field name="productTrackingNumberConfiguration" hidden="true"/>
+        <field name="productTrackingNumberConfiguration.trackingNumberConfigurationProfile" hidden="true"/>
+        <field name="productTrackingNumberConfiguration.trackingNumberConfigurationProfile.titleOfDimension0" hidden="true"/>
+        <field name="productTrackingNumberConfiguration.trackingNumberConfigurationProfile.titleOfDimension1" hidden="true"/>
+        <field name="productTrackingNumberConfiguration.trackingNumberConfigurationProfile.titleOfDimension2" hidden="true"/>
+        <field name="productTrackingNumberConfiguration.trackingNumberConfigurationProfile.titleOfDimension3" hidden="true"/>
+      </panel>
+      <panel name="massPanel" showIf="productTrackingNumberConfiguration.isDimensional" colSpan="12">
+        <field name="unitMass"/>
+        <field name="metricMass"/>
+        <field name="mass"/>
+        <field name="volume" onChange="action-tracking-number-validate-volume-change" requiredIf="productTrackingNumberConfiguration.isDimensional"/>
+        <button name="calculateBtn" title="Calculate" onClick="action-tracking-number-method-calculate-volume"/>
+        <field name="originalVolume" hidden="true" type="decimal" x-dirty="false"/>
+      </panel>
+    </panel>
+    <panel name="trackingNumberParentsPanel" title="Related tracking numbers">
+      <panel-dashlet colSpan="12" action="action-tracking-number-view-show-origin-parents"/>
+      <panel-related colSpan="12" field="parentTrackingNumberSet" form-view="tracking-number-form" grid-view="tracking-number-grid" domain="self.product != :product OR (self.product = :product AND self.trackingNumberSeq != :trackingNumberSeq)"/>
+      <panel-dashlet colSpan="12" action="action-tracking-number-view-show-children"/>
+    </panel>
+    <panel name="originPanel" title="Origin" readonly="true" colSpan="12">
+      <field name="originMoveTypeSelect" colSpan="12" widget="single-select"/>
+      <field name="createdBy" colSpan="6"/>
+      <field name="createdOn" colSpan="6"/>
+      <field name="originStockMoveLine"/>
+      <field name="originInventoryLine"/>
+      <field name="originPurchaseOrderLine"/>
+      <field name="originSaleOrderLine"/>
+      <field name="originManufOrder"/>
+    </panel>
+  </panel-tabs>
+</form>
+

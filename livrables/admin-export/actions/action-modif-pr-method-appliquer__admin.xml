@@ -1,0 +1,4 @@
+<action-method name="action-modif-pr-method-appliquer">
+  <call class="com.axelor.apps.supplychain.web.ModifPRController"
+        method="appliquerModifPR"/>
+</action-method>

@@ -1,0 +1,18 @@
+<grid name="tracking-number-grid" title="Tracking number" model="com.axelor.apps.stock.db.TrackingNumber" edit-icon="true">
+  <hilite color="danger" if="$moment(perishableExpirationDate).isBefore($moment()) || $moment(warrantyExpirationDate).isBefore($moment())"/>
+  <hilite color="warning" if="$moment(perishableExpirationDate).isBefore($moment(_datePlusTwoMonths)) || $moment(warrantyExpirationDate).isBefore($moment(_datePlusTwoMonths))"/>
+  <hilite color="success" if="$moment(perishableExpirationDate).isAfter($moment(_datePlusTwoMonths)) || $moment(warrantyExpirationDate).isAfter($moment(_datePlusTwoMonths))"/>
+  <field name="trackingNumberSeq" width="120"/>
+  <field name="dateArrivage"/>
+  <field name="lotFournisseur" title="Lot Fournisseur" width="150"/>
+  <field name="product" form-view="product-form" grid-view="product-grid"/>
+  <field name="hasWarranty"/>
+  <field name="warrantyExpirationDate"/>
+  <field name="isPerishable"/>
+  <field name="perishableExpirationDate"/>
+  <field name="checkExpirationDateAtStockMoveRealization"/>
+  <field name="$availableQty" title="Available qty" width="120" type="decimal"/>
+  <field name="origin"/>
+  <field name="supplier" form-view="partner-supplier-form" grid-view="partner-supplier-grid"/>
+  <field name="originMoveTypeSelect" widget="single-select"/>
+</grid>

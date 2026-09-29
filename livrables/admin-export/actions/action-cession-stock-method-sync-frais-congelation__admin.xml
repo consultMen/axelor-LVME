@@ -1,0 +1,3 @@
+<action-method name="action-cession-stock-method-sync-frais-congelation">
+  <call class="com.axelor.apps.stock.web.CessionStockController" method="syncFraisCongelation"/>
+</action-method>

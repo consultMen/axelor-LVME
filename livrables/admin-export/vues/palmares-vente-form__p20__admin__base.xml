@@ -1,0 +1,15 @@
+<form name="palmares-vente-form" title="Palmarès"
+      model="com.axelor.apps.supplychain.db.PalmaresVente"
+      canNew="false" canEdit="false" canDelete="false">
+  <panel title="Détail">
+    <field name="commercial" readonly="true"/>
+    <field name="client" readonly="true"/>
+    <field name="product" readonly="true"/>
+    <field name="invoiceDate" readonly="true"/>
+    <field name="nbColis" readonly="true"/>
+    <field name="qteUv" readonly="true"/>
+    <field name="poidsTotal" readonly="true"/>
+    <field name="caHt" readonly="true"/>
+    <field name="marge" readonly="true"/>
+  </panel>
+</form>

@@ -1,0 +1,13 @@
+<grid name="stock-location-line-details-grid" title="Stock Locations content" model="com.axelor.apps.stock.db.StockLocationLine" orderBy="product, trackingNumber" edit-icon="true">
+  <field name="product" domain="self.dtype = 'Product'" form-view="product-form" grid-view="product-grid"/>
+  <field name="detailsStockLocation" title="Stock location" form-view="stock-location-form" grid-view="stock-location-grid"/>
+  <field name="currentQty" aggregate="sum" x-scale="$nbDecimalDigitForQty"/>
+  <field name="futureQty" aggregate="sum" x-scale="$nbDecimalDigitForQty"/>
+  <field name="unit" form-view="unit-form" grid-view="unit-grid"/>
+  <field name="trackingNumber" domain="self.product = :product"/>
+  <field name="trackingNumber.lotFournisseur" title="N° Lot Fournisseur"/>
+  <field name="trackingNumber.lotFournisseur.dateProduction" title="Date de production"/>
+  <field name="trackingNumber.dateArrivage" title="Date d'arrivage"/>
+  <field name="rack"/>
+  <button name="stockCorrectionBtn" icon="fa-pencil-square-o" onClick="action-stock-location-line-view-open-stock-correction-form"/>
+</grid>

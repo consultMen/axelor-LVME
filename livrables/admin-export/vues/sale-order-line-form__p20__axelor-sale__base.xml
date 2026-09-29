@@ -1,0 +1,204 @@
+<form name="sale-order-line-form" title="SO line" model="com.axelor.apps.sale.db.SaleOrderLine" width="large" onLoad="action-method-sale-order-line-reload-from-db,action-sale-order-line-method-onload" onSave="action-method-sale-order-line-set-pr-from-lot,action-method-sale-order-line-compute-pr-net,action-method-sale-order-line-recompute-marge-with-pr-net" onNew="action-sale-order-line-method-onnew">
+  <panel name="productPanel" showIf="typeSelect > 0">
+    <field name="productName" title="Title" colSpan="9"/>
+    <field name="typeSelect" colSpan="3" onChange="action-sale-order-line-method-type-select-onchange" requiredIf="typeSelect != 0"/>
+    <field if="__config__.app.getApp('sale')?.enablePackManagement" name="isShowTotal" showIf="typeSelect == 3" colSpan="3" onChange="action-sale-order-line-record-reset-is-hide-unit-amounts"/>
+    <field if="__config__.app.getApp('sale')?.enablePackManagement" name="isHideUnitAmounts" showIf="typeSelect == 3 &amp;&amp; isShowTotal" colSpan="3"/>
+    <panel name="descriptionPanel" title="Description" showIf="typeSelect == 1" colSpan="12">
+      <field name="description" showTitle="false" colSpan="12" widget="Html" x-lite="true"/>
+    </panel>
+  </panel>
+  <panel-tabs name="mainPanelTab" hideIf="typeSelect > 0">
+    <panel name="informationsPanel" title="Information">
+      <panel name="productInfoPanel" readonlyIf="$isReadOnly !== false || deliveryState == 2 || deliveryState == 3 || amountInvoiced > 0" colSpan="12">
+        <panel name="tagPanel" colSpan="12">
+          <field name="$partnerLanguage" hidden="true"/>
+          <field name="$differentLanguageMessage" showTitle="false" hidden="true" readonly="true" colSpan="12">
+            <viewer depends="$partnerLanguage"><![CDATA[
+              <>{$partnerLanguage && <Badge bg="warning">{_t("The partner's language is different from the current language. Description and product name are in :")} {$partnerLanguage}</Badge>}</>
+            ]]></viewer>
+          </field>
+          <field name="$viewerTag" showTitle="false" readonly="true" showIf="product != null" colSpan="2">
+            <viewer depends="product.isUnrenewed,product.isPrototype"><![CDATA[
+                   <>
+                   	 {product?.isUnrenewed && <Badge bg="danger">{_t('Unrenewed')}</Badge>}
+                   	 {product?.isPrototype && <Badge bg="danger">{_t('Prototype')}</Badge>}
+                   </>
+
+            ]]></viewer>
+          </field>
+          <field if="__config__.app.isApp('supplychain')" if-module="axelor-supplychain" name="invoicingState" showTitle="false" showIf="id &amp;&amp; $readonly()" colSpan="2">
+            <viewer depends="invoicingState"><![CDATA[
+                      <>
+                          {invoicingState == 1 && <Badge bg="danger">{_t('Not invoiced')}</Badge>}
+                          {invoicingState == 2 && <Badge bg="warning">{_t('Partially invoiced')}</Badge>}
+                          {invoicingState == 3 && <Badge bg="success">{_t('Invoiced')}</Badge>}
+                      </>
+
+            ]]></viewer>
+          </field>
+          <field if="__config__.app.isApp('supplychain')" if-module="axelor-supplychain" name="deliveryState" showTitle="false" showIf="deliveryState > 0" colSpan="2">
+            <viewer><![CDATA[
+                   <>
+                       {deliveryState == 1 && <Badge bg="danger">{_t('Not delivered')}</Badge>}
+                       {deliveryState == 2 && <Badge bg="warning">{_t('Partially delivered')}</Badge>}
+                       {deliveryState == 3 && <Badge bg="success">{_t('Delivered')}</Badge>}
+                   </>
+			]]></viewer>
+          </field>
+          <field if="__config__.app.isApp('supplychain')" if-module="axelor-supplychain" name="$availabiltyRequest" showTitle="false" showIf="$availabiltyRequest" colSpan="2" type="boolean">
+            <viewer><![CDATA[
+              <>{$availabiltyRequest && <Badge bg="success">{_t('Availability request')}</Badge>}</>
+            ]]></viewer>
+          </field>
+          <field if="__config__.app.isApp('supplychain')" if-module="axelor-supplychain" name="isQtyRequested" showTitle="false" showIf="isQtyRequested &amp;&amp; product &amp;&amp; product.productTypeSelect != 'service'" colSpan="2">
+            <viewer><![CDATA[
+              <>{isQtyRequested && <Badge bg="success">{_t('Reservation requested')}</Badge>}</>
+            ]]></viewer>
+          </field>
+          <field if="__config__.app.isApp('production')" if-module="axelor-production" name="$productionStatus" showTitle="false" showIf="$productionStatus" colSpan="2">
+            <viewer><![CDATA[
+              <>
+                    {$productionStatus == 'FINISHED' && <Badge bg="success">{_t('Production finished')}</Badge>}
+                    {$productionStatus == 'STANDBY' && <Badge bg="warning">{_t('Production on standby')}</Badge>}
+                    {$productionStatus == 'IN_PROGRESS' && <Badge bg="primary">{_t('Production in progress')}</Badge>}
+                    {$productionStatus == 'PLANNED' && <Badge bg="warning">{_t('Production planned')}</Badge>}
+                    {$productionStatus == 'CANCELED' && <Badge bg="danger">{_t('Production canceled')}</Badge>}
+                    {$productionStatus == 'DRAFT' && <Badge bg="danger">{_t('Production in draft')}</Badge>}
+              </>
+            ]]></viewer>
+          </field>
+        </panel>
+        <field if="!__config__.app.isApp('supplychain')" name="product" canEdit="false" onChange="action-sale-order-line-method-get-product-information" onSelect="action-sale-order-line-method-domain-product" form-view="product-form" grid-view="product-grid" x-image-field="picture"/>
+        <field if="__config__.app.isApp('supplychain')" name="product" canEdit="false" onChange="action-sale-order-line-method-get-product-information,action-method-sale-order-line-copy-taux-from-sale-order,action-method-sale-order-line-set-frais-congelation-from-lot,action-method-sale-order-line-compute-pr-net" onSelect="action-sale-order-line-method-domain-product" form-view="product-form" grid-view="stock-move-line-product-grid" x-image-field="picture"/>
+        <field name="enableFreezeFields" colSpan="2"/>
+        <field name="typeSelect" colSpan="2" onChange="action-sale-order-line-method-type-select-onchange"/>
+        <field name="productName" colSpan="12"/>
+        <field name="oldQty"/>
+      </panel>
+      <field name="fraisCongelation" title="Frais Congélation (€/kg)" readonly="true" hideIf="product == null" colSpan="3" widget="Decimal" x-scale="4"/>
+      <field name="tauxRFA" title="% RFA" readonly="true" hideIf="product == null" colSpan="3" widget="Decimal" x-scale="2"/>
+      <field name="tauxCommission" title="% Commission" readonly="true" hideIf="product == null" colSpan="3" widget="Decimal" x-scale="2"/>
+      <panel name="colisPanel" title="Conditionnement / Colis" showIf="product != null" colSpan="12">
+<field name="conditionnement" colSpan="6" canNew="true"
+  onChange="action-sale-order-line-method-compute-packaging"
+  form-view="conditionnement-form" grid-view="conditionnement-grid"/>
+          <field name="nbColis" colSpan="3"
+  validIf="nbColis == null || nbColis % 1 == 0"
+  onChange="action-sale-order-line-method-compute-packaging"/>
+        <field name="nbUnitesParColis" colSpan="3"/>
+        <field name="poidsParColis" colSpan="3"/>
+        <field name="coefPoidsNet" colSpan="3"/>
+        <field name="poidsParColisNet" colSpan="3"/>
+        <field name="poidsTotalNet" colSpan="3"/>
+        <field name="qtySachetPreleve" colSpan="3"
+  onChange="action-sale-order-line-method-compute-packaging"
+  help="Quantité prélevée hors colis entiers (rupture d'UV inférieure au colis)"/>
+      </panel>
+      <panel name="productDetailPanel" colSpan="12">
+        <field name="qty" readonlyIf="$availabiltyRequest || ($isReadOnly !== false &amp;&amp; !$get('saleOrder.orderBeingEdited'))" colSpan="3" onChange="action-group-sale-saleorderline-qty-onchange,action-method-sale-order-line-compute-pr-net,action-method-sale-order-line-recompute-marge-with-pr-net" validIf="$qtyValid != false"/>
+        <field if="__config__.app.getApp('sale')?.isQuotationAndOrderSplitEnabled" name="orderedQty" readonly="true" colSpan="3" x-scale="$nbDecimalDigitForQty"/>
+        <field name="unit" readonlyIf="$isReadOnly !== false || deliveryState == 3 || $nonNegotiable" colSpan="3" canEdit="false" onChange="action-sale-order-line-method-unit-onchange" requiredIf="typeSelect == 0" form-view="unit-form" grid-view="unit-grid"/>
+        <field name="price" hidden="true" readonlyIf="$isReadOnly !== false || deliveryState == 3 || $nonNegotiable || ((subSaleOrderLineList.length > 0 || saleOrderLineDetailsList.length > 0) &amp;&amp; $computeWithSOL)" colSpan="3" onChange="action-sale-order-line-method-onchange-price,action-method-sale-order-line-recompute-marge-with-pr-net"/>
+        <field name="prixRevient" title="Prix de Revient" readonly="true" hideIf="product == null" colSpan="3" widget="Decimal" onChange="action-method-sale-order-line-compute-pr-net" x-scale="4"/>
+        <field name="prixRevientNet" title="P.R. Net" readonly="true" hideIf="product == null" colSpan="3" widget="Decimal" x-scale="4"/>
+        <field name="subTotalGrossMargin" title="Marge HT (€)" readonly="true" hideIf="product == null" colSpan="3" widget="Decimal" x-scale="2"/>
+        <field name="subMarginRate" title="% Marge" readonly="true" hideIf="product == null" colSpan="3" widget="Decimal" x-scale="2"/>
+        <field name="inTaxPrice" hidden="true" readonlyIf="$isReadOnly !== false || deliveryState == 3" colSpan="3" onChange="action-sale-order-line-method-onchange-intaxprice"/>
+        <panel name="discountPanel" readonlyIf="$isGlobalDiscount || $isReadOnly !== false || deliveryState == 3" colSpan="12">
+          <field name="discountTypeSelect" readonlyIf="$nonNegotiable" colSpan="3" onChange="action-sale-order-line-method-discount-type-onchange"/>
+          <panel name="discountAmountPanel" hideIf="discountTypeSelect == 0" colSpan="9">
+            <field name="discountAmount" readonlyIf="$nonNegotiable" colSpan="3" onChange="action-sale-order-line-method-discount-amount-onchange" validIf="!$maxDiscount || (discountTypeSelect == 1 &amp;&amp; $number(discountAmount) &lt;= ($number(discountDerogation) || $number($maxDiscount))) || (discountTypeSelect == 2 &amp;&amp; 100*$number(discountAmount)/$number(price) &lt;= ($number(discountDerogation) || $number($maxDiscount)))" x-scale="saleOrder.currency.numberOfDecimals"/>
+            <field name="discountDerogation" hideIf="$isGlobalDiscount" colSpan="3" onChange="action-sale-order-line-record-fill-discount-amount-from-derogation,action-sale-order-line-method-discount-amount-onchange"/>
+          </panel>
+          <field name="priceDiscounted" hidden="true" readonly="true" colSpan="3"/>
+          <field name="$maxDiscount" showTitle="false" readonly="true" showIf="$maxDiscount" colSpan="12">
+            <viewer><![CDATA[
+              <><Badge bg="warning">{_t('Max discount')} {$maxDiscount}%</Badge></>
+            ]]></viewer>
+          </field>
+        </panel>
+        <label name="multipleQtyNotRespectedLabel" hidden="true" colSpan="12"/>
+        <field name="discountsNeedReview" hidden="true"/>
+        <field name="$qtyValid" hidden="true" colSpan="12"/>
+        <field name="$computeWithSOL" hidden="true"/>
+      </panel>
+      <panel name="taxPanel" colSpan="12">
+        <field name="taxLineSet" readonlyIf="$isReadOnly !== false || deliveryState == 2 || deliveryState == 3 || amountInvoiced > 0" colSpan="6" widget="TagSelect" canNew="false" canEdit="false" onChange="action-sale-order-line-method-tax-line-onchange" domain="self.endDate = null or self.endDate > :__date__" form-view="tax-line-form" grid-view="tax-line-grid"/>
+        <field name="exTaxTotal" readonly="true" colSpan="3" x-scale="$currency.numberOfDecimals"/>
+        <field name="inTaxTotal" readonly="true" colSpan="3" x-scale="$currency.numberOfDecimals"/>
+        <field name="$currency" hidden="true" type="many-to-one" target="com.axelor.apps.base.db.Currency"/>
+        <field name="$currency.numberOfDecimals" hidden="true"/>
+      </panel>
+      <panel if="__config__.app.isApp('supplychain')" if-module="axelor-supplychain" name="reservationPanel" colSpan="12">
+        <field if="__config__.app.getApp('supplychain')?.getManageStockReservation()" if-module="axelor-supplychain" name="requestedReservedQty" hidden="true" colSpan="6" onChange="action-supplychain-attrs-sale-order-line-max-requested-reserved-qty"/>
+        <field if="__config__.app.getApp('supplychain')?.getManageStockReservation()" if-module="axelor-supplychain" name="reservedQty" hidden="true" readonly="true" colSpan="6"/>
+        <field name="isQtyRequested" hidden="true"/>
+        <panel if="__config__.app.getApp('supplychain')?.getManageStockReservation()" if-module="axelor-supplychain" name="requestedQtyBtnsPanel" colSpan="12">
+          <button name="updateRequestedReservedQtyBtn" title="Change requested reserved qty" hidden="true" colSpan="6" onClick="action-view-sale-order-line-requested-reserved-qty-wizard"/>
+        </panel>
+        <panel if="__config__.app.getApp('supplychain')?.getManageStockReservation()" if-module="axelor-supplychain" name="reservedQtyBtnsPanel" colSpan="12">
+          <button name="updateAllocatedQtyBtn" title="Change allocated qty" hidden="true" colSpan="6" onClick="action-view-sale-order-line-allocated-qty-wizard"/>
+        </panel>
+        <panel if="__config__.app.getApp('supplychain')?.getManageStockReservation()" if-module="axelor-supplychain" name="requestedReservedQtyBtnqPanel" colSpan="12">
+          <button name="requestQty" title="Request reservation" showIf="product &amp;&amp; product.productTypeSelect != 'service' &amp;&amp; !isQtyRequested" onClick="save,action-method-sale-order-line-request-qty"/>
+        </panel>
+        <panel if="__config__.app.getApp('supplychain')?.getManageStockReservation()" if-module="axelor-supplychain" name="cancelReservedQtyBtnqPanel" colSpan="12">
+          <button name="cancelReservation" title="Cancel reservation" showIf="product &amp;&amp; product.productTypeSelect != 'service' &amp;&amp; isQtyRequested" onClick="save,action-method-sale-order-line-cancel-reservation"/>
+        </panel>
+      </panel>
+      <field if="__config__.app.getApp('supplychain')?.getManageStockReservation()" if-module="axelor-supplychain" name="$availableStock" title="Available stock" readonly="true" showIf="product &amp;&amp; product.productTypeSelect != 'service'" colSpan="3" type="decimal"/>
+      <field if="__config__.app.getApp('supplychain')?.getManageStockReservation()" if-module="axelor-supplychain" name="$allocatedStock" title="Allocated stock" readonly="true" showIf="product &amp;&amp; product.productTypeSelect != 'service'" colSpan="3" type="decimal"/>
+      <field if="__config__.app.getApp('supplychain')?.getManageStockReservation()" if-module="axelor-supplychain" name="$totalStock" title="Total stock" readonly="true" showIf="product &amp;&amp; product.productTypeSelect != 'service'" colSpan="3" type="decimal"/>
+      <field name="taxEquiv" hidden="true" form-view="tax-equiv-form" grid-view="tax-equiv-grid"/>
+      <field name="selectedComplementaryProductList" hidden="true" showIf="selectedComplementaryProductList != null &amp;&amp; selectedComplementaryProductList.length > 0" colSpan="12" canSelect="false" canNew="false" canView="false" canEdit="false" canRemove="false" onChange="action-sale-order-line-method-complementary-product-list-onchange" form-view="complementary-product-selected-form" grid-view="complementary-product-selected-grid"/>
+      <panel name="descriptionPanel" title="Description" readonlyIf="$isReadOnly !== false" colSpan="12">
+        <field name="description" showTitle="false" colSpan="12" widget="Html" x-lite="true"/>
+      </panel>
+      <panel name="lineProductionCommentPanel" title="Line production commentary" readonlyIf="$isReadOnly !== false" colSpan="12">
+        <field name="lineProductionComment" showTitle="false" colSpan="12" widget="Html" x-lite="true"/>
+      </panel>
+      <field name="$isReadOnly" hidden="true"/>
+      <field name="product.productTypeSelect" hidden="true"/>
+    </panel>
+    <panel name="deliveryPanel" title="Delivery">
+      <field name="deliveryAddress" canNew="true" onChange="action-sale-order-line-record-compute-delivery-address-str" onSelect="action-sale-order-line-attrs-domain-delivery-address" form-view="address-form" grid-view="address-grid"/>
+      <field name="deliveryAddressStr" height="5">
+        <viewer><![CDATA[<>{deliveryAddressStr}</>]]></viewer>
+      </field>
+      <field name="desiredDeliveryDate" readonlyIf="$availabiltyRequest"/>
+      <field name="estimatedShippingDate" readonlyIf="$availabiltyRequest" onChange="action-sale-order-line-group-deliv-estimated-date-onchange"/>
+      <field name="estimatedDeliveryDate" readonlyIf="$availabiltyRequest"/>
+      <field name="deliveredQty" hidden="true" readonly="true"/>
+      <button if="__config__.app.isApp('supplychain')" name="$previewBtn" title="See stock details" colSpan="4" icon="fa-cubes" onClick="action-stock-location-line-view-for-a-product-from-saleorderline-view" widget="info-button"/>
+      <field if="__config__.app.isApp('supplychain')" if-module="axelor-supplychain" name="pickingOrderInfo" hideIf="product.productTypeSelect == 'service'" readonlyIf="$isReadOnly !== false" colSpan="12"/>
+      <panel-dashlet if="__config__.app.isApp('supplychain')" if-module="axelor-supplychain" name="stockMoveLineOfSOPanel" title="Stock Moves" readonlyIf="$isReadOnly !== false" colSpan="12" action="action-sale-order-line-view-stock-move-line"/>
+    </panel>
+    <panel if="__config__.app.isApp('supplychain')" if-module="axelor-supplychain" name="invoicingFollowUpPanel" title="Invoicing" readonlyIf="$isReadOnly !== false">
+      <field name="amountInvoiced" x-scale="$currency.numberOfDecimals"/>
+      <panel-dashlet name="invoiceLinesFromSOLinePanel" colSpan="12" action="action-sale-order-line-view-show-invoice-lines"/>
+    </panel>
+    <panel if="__config__.app.isApp('business-project') &amp;&amp; __config__.app.getApp('business-project').getProjectSaleOrderLines()" if-module="axelor-business-project" name="projectPanel" title="Business Project" readonlyIf="$isReadOnly !== false">
+      <field name="project" title="Business Project" canEdit="false" onSelect="action-sale-order-line-method-set-project-domain" form-view="business-project-form" grid-view="project-grid"/>
+      <field if="__config__.app.isApp('business-project') &amp;&amp; __config__.app.getApp('business-project').getProjectSaleOrderLines()" if-module="axelor-business-project" name="invoicingModeSelect" title="Invoicing mode" colSpan="3" onChange="action-sale-order-line-group-invoicing-mode-select-onchange"/>
+      <field name="toInvoice" hidden="true"/>
+      <panel-dashlet name="projectTaskListPanel" title="Related tasks" colSpan="12" action="action-sale-order-line-view-project-tasks"/>
+    </panel>
+  </panel-tabs>
+  <panel name="attrsPanel">
+    <field name="attrs" colSpan="12"/>
+  </panel>
+  <panel name="hiddenPanel" hidden="true">
+    <field name="saleOrder.statusSelect"/>
+    <field name="saleOrder.orderBeingEdited"/>
+    <field name="product.isUnrenewed"/>
+    <field name="product.isPrototype"/>
+    <field name="saleOrder"/>
+    <field name="subSaleOrderLineList"/>
+    <field name="saleOrderLineDetailsList"/>
+  </panel>
+  <panel-mail name="mailsPanel">
+    <mail-messages/>
+  </panel-mail>
+</form>
+

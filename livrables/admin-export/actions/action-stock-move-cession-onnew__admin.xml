@@ -1,0 +1,7 @@
+<action-record name="action-stock-move-cession-onnew"
+  model="com.axelor.apps.stock.db.StockMove">
+  <field name="isCession" expr="eval: true"/>
+  <field name="libelleMouvement" expr="eval: 'CESSION'"/>
+  <field name="typeSelect" expr="eval: 1"/>
+  <field name="company" expr="eval: __user__.activeCompany"/>
+</action-record>

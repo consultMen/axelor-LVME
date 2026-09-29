@@ -1,0 +1,118 @@
+<form name="purchase-order-line-form" title="PO line" model="com.axelor.apps.purchase.db.PurchaseOrderLine" width="large" onLoad="action-group-purchase-purchase-orderline-onload" onNew="action-group-purchase-purchase-orderline-onnew">
+  <panel name="namePanel" hideIf="!isTitleLine">
+    <field name="productName" title="Title" colSpan="10"/>
+    <field name="isTitleLine" colSpan="2" widget="boolean-switch" onChange="action-purchase-order-line-method-empty-line"/>
+  </panel>
+  <panel-tabs name="mainPanelTab" hideIf="isTitleLine">
+    <panel name="informationsPanel" title="Information">
+      <field name="$partnerLanguage" hidden="true"/>
+      <field name="$differentLanguageMessage" showTitle="false" hidden="true" readonly="true" colSpan="12">
+        <viewer depends="$partnerLanguage"><![CDATA[
+          <>{$partnerLanguage && <Badge bg="warning">{_t("The partner's language is different from the current language. Description and product name are in :")} {$partnerLanguage}</Badge>}</>
+        ]]></viewer>
+      </field>
+      <field name="$unitWarningMessage" showTitle="false" hidden="true" readonly="true" colSpan="12">
+        <viewer><![CDATA[
+          <><Badge bg="warning">{_t("The supplier catalog's unit is different from the current unit.")}</Badge></>
+        ]]></viewer>
+      </field>
+      <label name="differentSupplierLabel" hidden="true" colSpan="12"/>
+      <field if="__config__.app.isApp('supplychain')" if-module="axelor-supplychain" name="receiptState" showTitle="false" showIf="receiptState > 0" colSpan="3">
+        <viewer><![CDATA[
+	          <>
+	             {receiptState == 1 && <Badge bg="danger">{_t('Not received')}</Badge>}
+	             {receiptState == 2 && <Badge bg="warning">{_t('Partially received')}</Badge>}
+	             {receiptState == 3 && <Badge bg="success">{_t('Received')}</Badge>}
+	          </>
+         ]]></viewer>
+      </field>
+      <spacer if="__config__.app.isApp('supplychain')" name="receiptStateSpacer"/>
+      <field name="product" canEdit="false" onChange="action-group-purchase-purchase-orderline-product-onchange" onSelect="action-purchase-order-line-attrs-product-domain" form-view="product-form" grid-view="product-purchase-grid" x-image-field="picture"/>
+      <field name="enableFreezeFields" colSpan="2"/>
+      <field if="__config__.app.getApp('purchase')?.getManageSupplierCatalog()" name="$isFilterOnSupplier" title="Filter on supplier" colSpan="2" type="boolean" widget="boolean-switch"/>
+      <field name="isTitleLine" colSpan="2" widget="boolean-switch" onChange="action-purchase-order-line-method-empty-line"/>
+      <field name="productCode" colSpan="3"/>
+      <field name="productName" colSpan="9" requiredIf="!isTitleLine"/>
+      <panel name="orderDetailsPanel" colSpan="12">
+        <field name="qty" colSpan="3" onChange="action-group-purchase-purchase-orderline-qty-onchange" validIf="$qtyValid != false"/>
+        <field name="unit" colSpan="3" canEdit="false" onChange="action-purchase-order-line-attrs-display-different-unit-message" requiredIf="!isTitleLine" form-view="unit-form" grid-view="unit-grid"/>
+        <field name="conditionnement" colSpan="3"/>
+        <panel name="pricePanel" colSpan="3">
+          <field name="price" hidden="true" colSpan="12" onChange="action-purchase-order-line-method-onchange-price,action-purchase-order-line-method-compute,action-purchase-order-line-method-compute-analytic-distribution">
+            <hilite color="danger" if=" $number(maxPurchasePrice) &lt; $number(price)"/>
+          </field>
+          <field name="inTaxPrice" hidden="true" colSpan="12" onChange="action-purchase-order-line-method-onchange-intaxprice,action-purchase-order-line-method-compute,action-purchase-order-line-method-compute-analytic-distribution">
+            <hilite color="danger" if=" $number(maxPurchasePrice) &lt; $number(price)"/>
+          </field>
+        </panel>
+        <field name="maxPurchasePrice" readonly="true" colSpan="3"/>
+        <label name="qtyLimitNotRespectedLabel" hidden="true" colSpan="12"/>
+        <label name="multipleQtyNotRespectedLabel" hidden="true" colSpan="12"/>
+        <field name="$qtyValid" hidden="true" colSpan="12"/>
+      </panel>
+      <panel name="discountPanel" colSpan="12">
+        <field name="discountTypeSelect" colSpan="3" onChange="action-purchase-order-line-method-compute,action-purchase-order-line-attrs-discountamount-title,action-purchase-order-line-method-compute-analytic-distribution"/>
+        <field name="discountAmount" hideIf="discountTypeSelect == 3" colSpan="3" onChange="action-purchase-order-line-method-compute,action-purchase-order-line-method-compute-analytic-distribution"/>
+        <field name="priceDiscounted" hidden="true" readonly="true" colSpan="3"/>
+      </panel>
+      <field name="taxLineSet" widget="TagSelect" canNew="false" canEdit="false" onChange="action-group-purchase-purchase-orderline-taxline-onchange" domain="self.endDate = null or self.endDate > :__date__" form-view="tax-line-form" grid-view="tax-line-grid"/>
+      <field name="exTaxTotal" readonly="true" colSpan="3" x-scale="$currency.numberOfDecimals"/>
+      <field name="inTaxTotal" readonly="true" colSpan="3" x-scale="$currency.numberOfDecimals"/>
+      <field name="$currency" hidden="true" type="many-to-one" target="com.axelor.apps.base.db.Currency"/>
+      <field name="$currency.numberOfDecimals" hidden="true"/>
+      <field name="fixedAssets" widget="boolean-switch"/>
+      <field name="taxEquiv" hidden="true" form-view="tax-equiv-form" grid-view="tax-equiv-grid"/>
+      <panel name="descriptionPanel" title="Description" colSpan="12">
+        <field name="description" showTitle="false" colSpan="12" widget="html" x-lite="true"/>
+      </panel>
+    </panel>
+    <panel if="__config__.app.getApp('purchase')?.getSupplierRequestMgt()" if-module="axelor-supplier-management" name="supplierRequestsPanel" title="Suppliers requests">
+      <field name="$isPoSaved" showTitle="false" readonly="true" showIf="!$isPoSaved" colSpan="12">
+        <viewer><![CDATA[
+
+                   <><Badge bg="warning">{_t("You can not generate supplier requests if the order is not saved.")}</Badge></>
+
+        ]]></viewer>
+      </field>
+      <button name="generateSuppliersRequestsBtn" title="Generate suppliers requests" readonlyIf="!$isPoSaved" onClick="action-group-purchase-purchase-orderline-generate-supplierreq-click"/>
+      <field name="supplierPartner" onSelect="action-purchase-order-line-set-supplierPartner-domain" form-view="partner-form" grid-view="partner-grid"/>
+      <panel-related name="purchaseOrderSupplierLineListPanel" colSpan="12" field="purchaseOrderSupplierLineList" form-view="purchase-order-supplier-line-form" grid-view="purchase-order-supplier-line-grid"/>
+    </panel>
+    <panel-dashlet name="orderHistoryPanel" title="Order history" colSpan="12" action="action-purchase-order-line-view-show-order-line-history"/>
+    <panel name="deliveryPanel" title="Delivery" hidden="true" colSpan="12">
+      <panel name="deliveryDatePanel" colSpan="12">
+        <field if="__config__.app.isApp('supplychain')" if-module="axelor-supplychain" name="stockLocation" onSelect="action-purchase-order-line-attrs-set-stock-location-domain" form-view="stock-location-form" grid-view="stock-location-grid"/>
+        <field if="__config__.app.isApp('supplychain')" if-module="axelor-supplychain" name="stockLocation.address" form-view="address-form" grid-view="address-grid"/>
+        <field name="desiredReceiptDate"/>
+        <field name="estimatedReceiptDate"/>
+      </panel>
+      <panel name="deliveryInformationPanel" colSpan="12">
+        <field name="receivedQty" readonly="true"/>
+        <field name="supplierComment" colSpan="12"/>
+        <panel-dashlet name="POLineStockMoveLinePanel" title="In Stock Moves" colSpan="12" action="action-purchase-order-line-view-stock-move-line"/>
+      </panel>
+    </panel>
+    <panel if="__config__.app.isApp('supplychain')" if-module="axelor-account" name="invoicingPanel" title="Invoicing">
+      <field name="amountInvoiced"/>
+      <panel-dashlet name="POLineInvoicelinesPanel" colSpan="12" action="action-purchase-order-line-view-show-invoice-lines"/>
+    </panel>
+    <panel if="__config__.app.isApp('business-project') &amp;&amp; __config__.app.getApp('business-project').getProjectPurchaseOrderLines()" if-module="axelor-business-project" name="projectPanel" title="Business Project">
+      <field name="project" title="Business Project" canEdit="false" domain="self.isBusinessProject = true" requiredIf="toInvoice &amp;&amp; !isTitleLine" form-view="business-project-form" grid-view="project-grid"/>
+      <field if="__config__.app.isApp('business-project') &amp;&amp; __config__.app.getApp('business-project').getProjectPurchaseOrderLines()" if-module="axelor-business-project" name="toInvoice" colSpan="3"/>
+      <field name="invoiced" showTitle="false" showIf="toInvoice &amp;&amp; id &amp;&amp; $readonly()" colSpan="3">
+        <viewer><![CDATA[
+          <><Badge bg={invoiced ? "success" : "danger"}>{invoiced ? _t('Invoiced') : _t('Not invoiced')}</Badge></>
+        ]]></viewer>
+      </field>
+      <field name="projectTask" title="Project Task" canEdit="false" domain="self.project = :project" form-view="business-project-task-form" grid-view="business-project-task-grid"/>
+    </panel>
+  </panel-tabs>
+  <panel name="attrsPanel">
+    <field name="attrs" colSpan="12"/>
+  </panel>
+  <panel-mail name="mailPanel">
+    <mail-messages limit="4"/>
+    <mail-followers/>
+  </panel-mail>
+</form>
+

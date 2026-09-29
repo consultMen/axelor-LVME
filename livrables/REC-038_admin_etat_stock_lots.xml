@@ -1,0 +1,245 @@
+<!--
+  REC-038 — État des stocks par lots — éléments à créer / remplacer dans l'ADMINISTRATION Axelor
+  ============================================================================
+  IMPORTANT (Axelor 7.4) : le navigateur retire le « $ » des champs de filtre avant de les envoyer
+  au serveur. Dans les expressions (eval:), on écrit donc « articleDu » et PAS « $articleDu ».
+  Dans les vues (<field name="$articleDu">, for="$..."), on garde le « $ ».
+
+  A remplacer si déjà créés : A1, A2, A4, V3.  (A3, V1, V2, A6, menu : inchangés)
+  Actions « ...-group-periode-* » : ne servent plus, peuvent être supprimées.
+-->
+
+
+<!-- ======================= A1 : tableau des lots (sur le même écran) ======================= -->
+<action-view name="action-lvme-etat-stock-lot-dashlet" title="État des stocks par lots"
+  model="com.axelor.apps.supplychain.db.EtatStockLot">
+  <view type="grid" name="lvme-etat-stock-lot-grid"/>
+  <view type="form" name="lvme-etat-stock-lot-form"/>
+  <domain>(:_artDu = '' OR self.productCode &gt;= :_artDu) AND (:_artAu = '' OR self.productCode &lt;= :_artAu)
+    AND (:_fouDu = '' OR self.supplierName &gt;= :_fouDu) AND (:_fouAu = '' OR self.supplierName &lt;= :_fouAu)
+    AND (:_famille = 0 OR self.productCategory.id = :_famille)
+    AND (:_frigo = 0 OR self.stockLocation.id = :_frigo)
+    AND (:_origine = '' OR self.origine = :_origine)
+    AND LOWER(COALESCE(self.lotNumber, '')) LIKE :_lot
+    AND (:_entreeFiltre = false OR self.entryDate BETWEEN :_entreeDu AND :_entreeAu)
+    AND (:_ddmFiltre = false OR self.dluo BETWEEN :_ddmDu AND :_ddmAu)
+    AND (:_livrFiltre = false OR self.arrivalDate BETWEEN :_livrDu AND :_livrAu)
+    AND (:_nature = 0 OR self.natureArrivage = :_nature)
+    AND ((:_etat = 1 AND self.stockQty &gt; 0) OR (:_etat = 2 AND self.stockQty = 0)
+      OR (:_etat = 3 AND self.stockQty &lt; 0) OR (:_etat = 4 AND self.stockQty != 0))
+    AND (:_dispoNeg = false OR self.dispoQty &lt; 0)</domain>
+  <context name="_artDu" expr="eval: articleDu?.id ? (__repo__(Product).find(articleDu.id as Long)?.code ?: '') : ''"/>
+  <context name="_artAu" expr="eval: articleAu?.id ? (__repo__(Product).find(articleAu.id as Long)?.code ?: '') : (articleDu?.id ? (__repo__(Product).find(articleDu.id as Long)?.code ?: '') : '')"/>
+  <context name="_fouDu" expr="eval: fournisseurDu?.id ? (__repo__(Partner).find(fournisseurDu.id as Long)?.fullName ?: '') : ''"/>
+  <context name="_fouAu" expr="eval: fournisseurAu?.id ? (__repo__(Partner).find(fournisseurAu.id as Long)?.fullName ?: '') : (fournisseurDu?.id ? (__repo__(Partner).find(fournisseurDu.id as Long)?.fullName ?: '') : '')"/>
+  <context name="_famille" expr="eval: (famille?.id ?: 0) as Long"/>
+  <context name="_frigo" expr="eval: (frigo?.id ?: 0) as Long"/>
+  <context name="_origine" expr="eval: origine ? origine.toString() : ''"/>
+  <context name="_lot" expr="eval: numeroLot ? '%' + numeroLot.toString().trim().toLowerCase() + '%' : '%'"/>
+  <context name="_entreeFiltre" expr="eval: entreeDu != null || entreeAu != null"/>
+  <context name="_entreeDu" expr="eval: entreeDu ? java.time.LocalDate.parse(entreeDu.toString().substring(0, 10)) : java.time.LocalDate.of(1900, 1, 1)"/>
+  <context name="_entreeAu" expr="eval: entreeAu ? java.time.LocalDate.parse(entreeAu.toString().substring(0, 10)) : java.time.LocalDate.of(2999, 12, 31)"/>
+  <context name="_ddmFiltre" expr="eval: ddmDu != null || ddmAu != null"/>
+  <context name="_ddmDu" expr="eval: ddmDu ? java.time.LocalDate.parse(ddmDu.toString().substring(0, 10)) : java.time.LocalDate.of(1900, 1, 1)"/>
+  <context name="_ddmAu" expr="eval: ddmAu ? java.time.LocalDate.parse(ddmAu.toString().substring(0, 10)) : java.time.LocalDate.of(2999, 12, 31)"/>
+  <context name="_livrFiltre" expr="eval: livrDu != null || livrAu != null"/>
+  <context name="_livrDu" expr="eval: livrDu ? java.time.LocalDate.parse(livrDu.toString().substring(0, 10)) : java.time.LocalDate.of(1900, 1, 1)"/>
+  <context name="_livrAu" expr="eval: livrAu ? java.time.LocalDate.parse(livrAu.toString().substring(0, 10)) : java.time.LocalDate.of(2999, 12, 31)"/>
+  <context name="_nature" expr="eval: (natureArrivage ?: 0) as Integer"/>
+  <context name="_etat" expr="eval: (etatLot ?: 1) as Integer"/>
+  <context name="_dispoNeg" expr="eval: dispoNegatif ? true : false"/>
+</action-view>
+
+
+<!-- ======================= A2 : bouton « Lancer la recherche » (rafraîchit le tableau) ======================= -->
+<action-attrs name="action-lvme-etat-stock-lot-refresh">
+  <attribute name="refresh" for="lotsDashlet" expr="eval: true"/>
+</action-attrs>
+
+
+<!-- ======================= A3 : valeurs par défaut à l'ouverture (inchangé) ======================= -->
+<action-attrs name="action-lvme-etat-stock-lot-defaults">
+  <attribute name="value" for="$natureArrivage" expr="eval: 0"/>
+  <attribute name="value" for="$etatLot" expr="eval: 1"/>
+</action-attrs>
+
+
+<!-- ======================= A7 : alertes DLUO (NOUVEAU) — compte les lots en stock concernés ======================= -->
+<action-attrs name="action-lvme-etat-stock-lot-alertes-dluo">
+  <attribute name="value" for="$nbDluoDepassee"
+    expr="eval: __repo__(EtatStockLot).all().filter('self.stockQty &gt; 0 AND self.dluo &lt; ?1', __date__).count()"/>
+  <attribute name="value" for="$nbDluoProche"
+    expr="eval: __repo__(EtatStockLot).all().filter('self.stockQty &gt; 0 AND self.dluo &gt;= ?1 AND self.dluo &lt;= ?2', __date__, __date__.plusDays(30)).count()"/>
+</action-attrs>
+
+<!-- ======================= A8 : message d'information à l'ouverture (NOUVEAU) ======================= -->
+<action-validate name="action-lvme-etat-stock-lot-info-dluo">
+  <info message="Attention : des lots en stock ont une DLUO dépassée (lignes rouges) ou dans moins de 30 jours (lignes orange)."
+    if="eval: __repo__(EtatStockLot).all().filter('self.stockQty &gt; 0 AND self.dluo &lt;= ?1', __date__.plusDays(30)).count() &gt; 0"/>
+</action-validate>
+
+<!-- ======================= A9 : ouverture de l'écran = défauts + alertes + message (NOUVEAU) ======================= -->
+<action-group name="action-lvme-etat-stock-lot-group-onnew">
+  <action name="action-lvme-etat-stock-lot-defaults"/>
+  <action name="action-lvme-etat-stock-lot-alertes-dluo"/>
+  <action name="action-lvme-etat-stock-lot-info-dluo"/>
+</action-group>
+
+
+<!-- ======================= A4 : périodes prédéfinies (remplacer les 3) ======================= -->
+<action-attrs name="action-lvme-etat-stock-lot-periode-entree">
+  <attribute name="value" for="$entreeDu" expr="eval: [1: __date__.withDayOfMonth(1), 2: __date__.minusMonths(3), 3: __date__.minusMonths(6), 4: __date__.withDayOfYear(1), 5: __date__.minusMonths(12)][entreePeriode as Integer]"/>
+  <attribute name="value" for="$entreeAu" expr="eval: [1: __date__.withDayOfMonth(__date__.lengthOfMonth()), 2: __date__, 3: __date__, 4: __date__.withMonth(12).withDayOfMonth(31), 5: __date__][entreePeriode as Integer]"/>
+</action-attrs>
+
+<action-attrs name="action-lvme-etat-stock-lot-periode-ddm">
+  <attribute name="value" for="$ddmDu" expr="eval: [1: __date__.withDayOfMonth(1), 2: __date__.minusMonths(3), 3: __date__.minusMonths(6), 4: __date__.withDayOfYear(1), 5: __date__.minusMonths(12)][ddmPeriode as Integer]"/>
+  <attribute name="value" for="$ddmAu" expr="eval: [1: __date__.withDayOfMonth(__date__.lengthOfMonth()), 2: __date__, 3: __date__, 4: __date__.withMonth(12).withDayOfMonth(31), 5: __date__][ddmPeriode as Integer]"/>
+</action-attrs>
+
+<action-attrs name="action-lvme-etat-stock-lot-periode-livr">
+  <attribute name="value" for="$livrDu" expr="eval: [1: __date__.withDayOfMonth(1), 2: __date__.minusMonths(3), 3: __date__.minusMonths(6), 4: __date__.withDayOfYear(1), 5: __date__.minusMonths(12)][livrPeriode as Integer]"/>
+  <attribute name="value" for="$livrAu" expr="eval: [1: __date__.withDayOfMonth(__date__.lengthOfMonth()), 2: __date__, 3: __date__, 4: __date__.withMonth(12).withDayOfMonth(31), 5: __date__][livrPeriode as Integer]"/>
+</action-attrs>
+
+
+<!-- ======================= V1 : GRILLE (inchangé) — Type : Liste, Modèle : com.axelor.apps.supplychain.db.EtatStockLot ======================= -->
+<grid name="lvme-etat-stock-lot-grid" title="État des stocks par lots"
+  model="com.axelor.apps.supplychain.db.EtatStockLot" orderBy="productCode,arrivalDate"
+  canNew="false" canEdit="false" canDelete="false">
+  <!-- LVME : DLUO dépassée (rouge) / DLUO dans moins de 30 jours (orange), uniquement s'il reste du stock -->
+  <hilite color="danger" strong="true" if="dluo &amp;&amp; stockQty &gt; 0 &amp;&amp; $moment().diff(dluo, 'days') &gt; 0"/>
+  <hilite color="warning" if="dluo &amp;&amp; stockQty &gt; 0 &amp;&amp; $moment(dluo).diff($moment(), 'days') &lt;= 30"/>
+  <hilite color="info" if="natureArrivage == 2"/>
+  <hilite color="danger" if="stockQty &lt; 0"/>
+  <field name="productCode" width="110"/>
+  <field name="productName"/>
+  <field name="supplierName"/>
+  <field name="stockLocation" width="90"/>
+  <field name="lotNumber" width="110"/>
+  <field name="arrivalNumber" width="110"/>
+  <field name="origine" selection="lvme.origine.select" width="90"/>
+  <field name="arrivalDate" width="95"/>
+  <field name="conditionnement"/>
+  <field name="dluo" title="DLUO" width="95">
+    <hilite color="danger" strong="true" if="dluo &amp;&amp; $moment().diff(dluo, 'days') &gt; 0"/>
+    <hilite color="warning" strong="true" if="dluo &amp;&amp; $moment(dluo).diff($moment(), 'days') &lt;= 30"/>
+  </field>
+  <field name="prixRevient" width="80"/>
+  <field name="qtyPerColis" width="80"/>
+  <field name="nbColisIn" aggregate="sum" width="80"/>
+  <field name="nbColisOut" aggregate="sum" width="80"/>
+  <field name="nbColisCdes" aggregate="sum" width="80"/>
+  <field name="nbColisStock" aggregate="sum" width="85">
+    <hilite background="warning" strong="true" if="true"/>
+  </field>
+  <field name="stockQty" aggregate="sum" width="90"/>
+  <field name="stockValue" aggregate="sum" width="100"/>
+  <field name="natureLabel" width="75"/>
+  <field name="natureArrivage" hidden="true"/>
+</grid>
+
+
+<!-- ======================= V2 : FICHE DÉTAIL (inchangé) — Type : Formulaire, Modèle : com.axelor.apps.supplychain.db.EtatStockLot ======================= -->
+<form name="lvme-etat-stock-lot-form" title="Lot en stock"
+  model="com.axelor.apps.supplychain.db.EtatStockLot" canNew="false" canEdit="false" canDelete="false" canSave="false">
+  <panel name="lotPanel" title="Lot" readonly="true">
+    <field name="product"/>
+    <field name="productCategory"/>
+    <field name="trackingNumber"/>
+    <field name="arrivalNumber"/>
+    <field name="supplier"/>
+    <field name="stockLocation"/>
+    <field name="natureLabel"/>
+    <field name="origine" selection="lvme.origine.select"/>
+    <field name="conditionnement"/>
+    <field name="unit"/>
+    <field name="entryDate"/>
+    <field name="arrivalDate"/>
+    <field name="dluo"/>
+    <field name="prixRevient"/>
+  </panel>
+  <panel name="qtyPanel" title="Quantités" readonly="true" itemSpan="3">
+    <field name="qtyPerColis"/>
+    <field name="nbColisIn"/>
+    <field name="nbColisOut"/>
+    <field name="nbColisCdes"/>
+    <field name="nbColisStock"/>
+    <field name="entreeQty"/>
+    <field name="sortieQty"/>
+    <field name="cdesQty"/>
+    <field name="stockQty"/>
+    <field name="dispoQty"/>
+    <field name="stockValue"/>
+  </panel>
+</form>
+
+
+<!-- ======================= V3 : FORMULAIRE DE RECHERCHE + TABLEAU (remplacer) — Type : Formulaire, Modèle : com.axelor.utils.db.Wizard ======================= -->
+<form name="lvme-etat-stock-lot-search-form" title="État des stocks par lots"
+  model="com.axelor.utils.db.Wizard" width="large" canNew="false" canSave="false" canCopy="false" canDelete="false"
+  onNew="action-lvme-etat-stock-lot-group-onnew">
+  <!-- LVME : bandeau d'alerte DLUO -->
+  <panel name="alertesDluoPanel" showTitle="false" colSpan="12">
+    <field name="$nbDluoDepassee" type="integer" hidden="true"/>
+    <field name="$nbDluoProche" type="integer" hidden="true"/>
+    <field name="$alerteDluo" showTitle="false" readonly="true" colSpan="12" type="string">
+      <viewer depends="$nbDluoDepassee,$nbDluoProche"><![CDATA[
+        <>
+          {$nbDluoDepassee > 0 && <Badge bg="danger">{$nbDluoDepassee} lot(s) en stock avec DLUO dépassée (lignes rouges)</Badge>}
+          {' '}
+          {$nbDluoProche > 0 && <Badge bg="warning">{$nbDluoProche} lot(s) avec DLUO dans moins de 30 jours (lignes orange)</Badge>}
+          {!($nbDluoDepassee > 0) && !($nbDluoProche > 0) && <Badge bg="success">Aucun lot en stock avec DLUO dépassée ou proche</Badge>}
+        </>
+      ]]></viewer>
+    </field>
+  </panel>
+  <panel name="filtresPanel" showTitle="false" colSpan="12">
+    <panel name="filtreArticlePanel" colSpan="3" itemSpan="12">
+      <field name="$articleDu" title="Article du" type="many-to-one" target="com.axelor.apps.base.db.Product" canNew="false" canEdit="false" canView="false"/>
+      <field name="$articleAu" title="au" type="many-to-one" target="com.axelor.apps.base.db.Product" canNew="false" canEdit="false" canView="false"/>
+      <field name="$famille" title="Fam. article" type="many-to-one" target="com.axelor.apps.base.db.ProductCategory" canNew="false" canEdit="false" canView="false"/>
+      <field name="$numeroLot" title="OU Lot n°" type="string" onChange="action-lvme-etat-stock-lot-refresh"/>
+    </panel>
+    <panel name="filtreFournisseurPanel" colSpan="3" itemSpan="12">
+      <field name="$fournisseurDu" title="Fournisseur du" type="many-to-one" target="com.axelor.apps.base.db.Partner" domain="self.isSupplier = true" canNew="false" canEdit="false" canView="false"/>
+      <field name="$fournisseurAu" title="au" type="many-to-one" target="com.axelor.apps.base.db.Partner" domain="self.isSupplier = true" canNew="false" canEdit="false" canView="false"/>
+      <field name="$origine" title="Origine" type="string" selection="lvme.origine.select"/>
+      <field name="$frigo" title="Frigo" type="many-to-one" target="com.axelor.apps.stock.db.StockLocation" domain="self.typeSelect = 1" canNew="false" canEdit="false" canView="false"/>
+    </panel>
+    <panel name="filtreDatesPanel" colSpan="4" itemSpan="4">
+      <field name="$entreeDu" title="Entrée du" type="date"/>
+      <field name="$entreeAu" title="au" type="date"/>
+      <field name="$entreePeriode" title="Période prédéfinie" type="integer" selection="lvme.etat.stock.periode.select" onChange="action-lvme-etat-stock-lot-periode-entree"/>
+      <field name="$ddmDu" title="D.D.M. du" type="date"/>
+      <field name="$ddmAu" title="au" type="date"/>
+      <field name="$ddmPeriode" title="Période prédéfinie" type="integer" selection="lvme.etat.stock.periode.select" onChange="action-lvme-etat-stock-lot-periode-ddm"/>
+      <field name="$livrDu" title="Livr. du" type="date"/>
+      <field name="$livrAu" title="au" type="date"/>
+      <field name="$livrPeriode" title="Période prédéfinie" type="integer" selection="lvme.etat.stock.periode.select" onChange="action-lvme-etat-stock-lot-periode-livr"/>
+    </panel>
+    <panel name="filtreOptionsPanel" colSpan="2" itemSpan="12">
+      <field name="$natureArrivage" title="Arrivage" type="integer" widget="RadioSelect" selection="lvme.etat.stock.nature.select"/>
+      <field name="$etatLot" title="Lots" type="integer" widget="RadioSelect" selection="lvme.etat.stock.etat.select"/>
+      <field name="$dispoNegatif" title="Seulement les dispo négatifs" type="boolean"/>
+      <button name="lancerRechercheBtn" title="Lancer la recherche" icon="search" css="btn-primary" onClick="action-lvme-etat-stock-lot-refresh"/>
+    </panel>
+  </panel>
+  <panel-dashlet name="lotsDashlet" title="Lots" colSpan="12" height="600"
+    action="action-lvme-etat-stock-lot-dashlet"/>
+</form>
+
+
+<!-- ======================= A6 : ouverture de l'écran depuis le menu (inchangé) ======================= -->
+<action-view name="action-lvme-etat-stock-lot-open" title="État des stocks par lots"
+  model="com.axelor.utils.db.Wizard">
+  <view type="form" name="lvme-etat-stock-lot-search-form"/>
+  <view-param name="show-toolbar" value="false"/>
+  <view-param name="forceEdit" value="true"/>
+</action-view>
+
+
+<!-- ======================= M1 : MENU (inchangé) =======================
+  Nom : lvme-menu-etat-stock-lot / Titre : État des stocks par lots / Parent : stock-root
+  Action : action-lvme-etat-stock-lot-open / Ordre : 50
+-->

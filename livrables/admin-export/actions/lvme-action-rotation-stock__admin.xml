@@ -1,0 +1,5 @@
+<action-view name="lvme-action-rotation-stock" title="Rotation des stocks"
+  model="com.axelor.apps.supplychain.db.RotationStock">
+  <view type="grid" name="lvme-rotation-stock-grid"/>
+  <view type="form" name="lvme-rotation-stock-form"/>
+</action-view>

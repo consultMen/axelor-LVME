@@ -1,0 +1,4 @@
+<action-method name="action-method-stock-move-restore-calculs-after-realize">
+  <call class="com.axelor.apps.supplychain.web.StockMoveController" 
+        method="restoreCalculsAfterRealize"/>
+</action-method>

@@ -1,0 +1,38 @@
+<action-view name="action-lvme-etat-stock-lot-dashlet" title="État des stocks par lots"
+  model="com.axelor.apps.supplychain.db.EtatStockLot">
+  <view type="grid" name="lvme-etat-stock-lot-grid"/>
+  <view type="form" name="lvme-etat-stock-lot-form"/>
+  <domain>(:_artDu = '' OR self.productCode &gt;= :_artDu) AND (:_artAu = '' OR self.productCode &lt;= :_artAu)
+    AND (:_fouDu = '' OR self.supplierName &gt;= :_fouDu) AND (:_fouAu = '' OR self.supplierName &lt;= :_fouAu)
+    AND (:_famille = 0 OR self.productCategory.id = :_famille)
+    AND (:_frigo = 0 OR self.stockLocation.id = :_frigo)
+    AND (:_origine = '' OR self.origine = :_origine)
+    AND LOWER(COALESCE(self.lotNumber, '')) LIKE :_lot
+    AND (:_entreeFiltre = false OR self.entryDate BETWEEN :_entreeDu AND :_entreeAu)
+    AND (:_ddmFiltre = false OR self.dluo BETWEEN :_ddmDu AND :_ddmAu)
+    AND (:_livrFiltre = false OR self.arrivalDate BETWEEN :_livrDu AND :_livrAu)
+    AND (:_nature = 0 OR self.natureArrivage = :_nature)
+    AND ((:_etat = 1 AND self.stockQty &gt; 0) OR (:_etat = 2 AND self.stockQty = 0)
+      OR (:_etat = 3 AND self.stockQty &lt; 0) OR (:_etat = 4 AND self.stockQty != 0))
+    AND (:_dispoNeg = false OR self.dispoQty &lt; 0)</domain>
+  <context name="_artDu" expr="eval: articleDu?.id ? (__repo__(Product).find(articleDu.id as Long)?.code ?: '') : ''"/>
+  <context name="_artAu" expr="eval: articleAu?.id ? (__repo__(Product).find(articleAu.id as Long)?.code ?: '') : (articleDu?.id ? (__repo__(Product).find(articleDu.id as Long)?.code ?: '') : '')"/>
+  <context name="_fouDu" expr="eval: fournisseurDu?.id ? (__repo__(Partner).find(fournisseurDu.id as Long)?.fullName ?: '') : ''"/>
+  <context name="_fouAu" expr="eval: fournisseurAu?.id ? (__repo__(Partner).find(fournisseurAu.id as Long)?.fullName ?: '') : (fournisseurDu?.id ? (__repo__(Partner).find(fournisseurDu.id as Long)?.fullName ?: '') : '')"/>
+  <context name="_famille" expr="eval: (famille?.id ?: 0) as Long"/>
+  <context name="_frigo" expr="eval: (frigo?.id ?: 0) as Long"/>
+  <context name="_origine" expr="eval: origine ? origine.toString() : ''"/>
+  <context name="_lot" expr="eval: numeroLot ? '%' + numeroLot.toString().trim().toLowerCase() + '%' : '%'"/>
+  <context name="_entreeFiltre" expr="eval: entreeDu != null || entreeAu != null"/>
+  <context name="_entreeDu" expr="eval: entreeDu ? java.time.LocalDate.parse(entreeDu.toString().substring(0, 10)) : java.time.LocalDate.of(1900, 1, 1)"/>
+  <context name="_entreeAu" expr="eval: entreeAu ? java.time.LocalDate.parse(entreeAu.toString().substring(0, 10)) : java.time.LocalDate.of(2999, 12, 31)"/>
+  <context name="_ddmFiltre" expr="eval: ddmDu != null || ddmAu != null"/>
+  <context name="_ddmDu" expr="eval: ddmDu ? java.time.LocalDate.parse(ddmDu.toString().substring(0, 10)) : java.time.LocalDate.of(1900, 1, 1)"/>
+  <context name="_ddmAu" expr="eval: ddmAu ? java.time.LocalDate.parse(ddmAu.toString().substring(0, 10)) : java.time.LocalDate.of(2999, 12, 31)"/>
+  <context name="_livrFiltre" expr="eval: livrDu != null || livrAu != null"/>
+  <context name="_livrDu" expr="eval: livrDu ? java.time.LocalDate.parse(livrDu.toString().substring(0, 10)) : java.time.LocalDate.of(1900, 1, 1)"/>
+  <context name="_livrAu" expr="eval: livrAu ? java.time.LocalDate.parse(livrAu.toString().substring(0, 10)) : java.time.LocalDate.of(2999, 12, 31)"/>
+  <context name="_nature" expr="eval: (natureArrivage ?: 0) as Integer"/>
+  <context name="_etat" expr="eval: (etatLot ?: 1) as Integer"/>
+  <context name="_dispoNeg" expr="eval: dispoNegatif ? true : false"/>
+</action-view>

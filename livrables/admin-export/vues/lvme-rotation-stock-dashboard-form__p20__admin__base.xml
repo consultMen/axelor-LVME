@@ -1,0 +1,70 @@
+<form name="lvme-rotation-stock-dashboard-form" title="Rotation des stocks"
+  model="com.axelor.utils.db.Wizard" width="large" canNew="false" canSave="false" canCopy="false" canDelete="false"
+  onNew="action-lvme-rotation-stock-group-onnew">
+
+  <!-- Les 4 KPI -->
+  <panel name="kpiPanel" showTitle="false" colSpan="12">
+    <field name="$kpiStockTotal" type="string" hidden="true"/>
+    <field name="$kpiCouverture" type="string" hidden="true"/>
+    <field name="$kpiACommander" type="string" hidden="true"/>
+    <field name="$kpiRotation" type="string" hidden="true"/>
+    <field name="$kpiAge" type="string" hidden="true"/>
+    <field name="$kpiLotsAnciens" type="string" hidden="true"/>
+    <field name="$kpiDormant" type="string" hidden="true"/>
+    <field name="$kpiDormantDetail" type="string" hidden="true"/>
+    <field name="$kpiTuiles" showTitle="false" readonly="true" colSpan="12" type="string">
+      <viewer depends="$kpiStockTotal,$kpiCouverture,$kpiACommander,$kpiRotation,$kpiAge,$kpiLotsAnciens,$kpiDormant,$kpiDormantDetail"><![CDATA[
+        <>
+          <Box mb={2} style={{ color: '#555' }}>{$kpiStockTotal}</Box>
+          <Box d="grid" style={{ gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
+            <Box style={{ border: '1px solid #dc3545', borderLeft: '6px solid #dc3545', borderRadius: 8, padding: 12 }}>
+              <Box style={{ fontSize: 13, color: '#666' }}>1. Couverture moyenne</Box>
+              <Box style={{ fontSize: 26, fontWeight: 'bold' }}>{$kpiCouverture}</Box>
+              <Box style={{ fontSize: 12, color: '#dc3545' }}>{$kpiACommander}</Box>
+            </Box>
+            <Box style={{ border: '1px solid #0d6efd', borderLeft: '6px solid #0d6efd', borderRadius: 8, padding: 12 }}>
+              <Box style={{ fontSize: 13, color: '#666' }}>2. Taux de rotation</Box>
+              <Box style={{ fontSize: 26, fontWeight: 'bold' }}>{$kpiRotation}</Box>
+              <Box style={{ fontSize: 12, color: '#666' }}>Ventes 12 mois / stock actuel</Box>
+            </Box>
+            <Box style={{ border: '1px solid #fd7e14', borderLeft: '6px solid #fd7e14', borderRadius: 8, padding: 12 }}>
+              <Box style={{ fontSize: 13, color: '#666' }}>3. Âge moyen du stock</Box>
+              <Box style={{ fontSize: 26, fontWeight: 'bold' }}>{$kpiAge}</Box>
+              <Box style={{ fontSize: 12, color: '#fd7e14' }}>{$kpiLotsAnciens}</Box>
+            </Box>
+            <Box style={{ border: '1px solid #6c757d', borderLeft: '6px solid #6c757d', borderRadius: 8, padding: 12 }}>
+              <Box style={{ fontSize: 13, color: '#666' }}>4. Stock dormant</Box>
+              <Box style={{ fontSize: 26, fontWeight: 'bold' }}>{$kpiDormant}</Box>
+              <Box style={{ fontSize: 12, color: '#666' }}>{$kpiDormantDetail}</Box>
+            </Box>
+          </Box>
+        </>
+      ]]></viewer>
+    </field>
+  </panel>
+
+  <!-- Filtres -->
+  <panel name="filtresPanel" showTitle="false" colSpan="12">
+    <panel name="filtreArticlePanel" colSpan="4" itemSpan="12">
+      <field name="$articleDu" title="Article du" type="many-to-one" target="com.axelor.apps.base.db.Product" canNew="false" canEdit="false" canView="false"/>
+      <field name="$articleAu" title="au" type="many-to-one" target="com.axelor.apps.base.db.Product" canNew="false" canEdit="false" canView="false"/>
+    </panel>
+    <panel name="filtreFamillePanel" colSpan="4" itemSpan="12">
+      <field name="$famille" title="Fam. article" type="many-to-one" target="com.axelor.apps.base.db.ProductCategory" canNew="false" canEdit="false" canView="false"/>
+      <field name="$statutRotation" title="Statut" type="string" selection="lvme.rotation.statut.select"/>
+    </panel>
+    <panel name="filtreSeuilPanel" colSpan="2" itemSpan="12">
+      <field name="$couvertureMax" title="Couverture inférieure à (j)" type="integer"/>
+      <field name="$ageMin" title="Âge moyen supérieur à (j)" type="integer"/>
+    </panel>
+    <panel name="filtreActionPanel" colSpan="2" itemSpan="12">
+      <field name="$dormantsSeulement" title="Seulement les dormants" type="boolean"/>
+      <button name="lancerRechercheBtn" title="Lancer la recherche" icon="search" css="btn-primary" onClick="action-lvme-rotation-stock-refresh"/>
+      <button name="recalculBtn" title="Recalculer les KPI" icon="arrow-repeat" onClick="action-lvme-rotation-stock-group-recalcul"/>
+    </panel>
+  </panel>
+
+  <!-- Tableau par produit -->
+  <panel-dashlet name="rotationDashlet" title="Rotation par produit" colSpan="12" height="550"
+    action="action-lvme-rotation-stock-dashlet"/>
+</form>

@@ -1,0 +1,43 @@
+<grid name="sale-order-line-grid" title="SO lines" model="com.axelor.apps.sale.db.SaleOrderLine" orderBy="sequence">
+  <hilite strong="true" color="default" if="typeSelect != 0"/>
+  <hilite color="danger" if="deliveryState == 1"/>
+  <hilite color="warning" if="deliveryState == 2"/>
+  <hilite color="success" if="deliveryState == 3"/>
+  <field name="$hasWarning" hidden="true"/>
+  <button name="errorIconButton" showIf="$hasWarning" onClick="refresh" readonlyIf="true" icon="fa-exclamation-triangle"/>
+  <field name="sequence" if="__config__.app.getApp('sale')?.isDisplaySaleOrderLineNumber" width="51"/>
+  <button name="addToCartBtn" title="Add to cart" onClick="action-sale-order-line-method-add-to-cart" icon="cart-plus-fill" if="__config__.app.getApp('sale')?.getIsCartManagementEnabled()" readonlyIf="!product || typeSelect != 0"/>
+  <field name="product" hidden="true"/>
+  <field name="typeSelect" hidden="true"/>
+  <field name="deliveryState" hidden="true" if="__config__.app.isApp('supplychain')"/>
+  <field name="product.code" width="120"/>
+  <field name="productName"/>
+  <field name="$currencyNumberOfDecimals" hidden="true"/>
+  <field name="qty" aggregate="sum" x-scale="$nbDecimalDigitForQty"/>
+  <field name="orderedQty" aggregate="sum" x-scale="$nbDecimalDigitForQty" if="__config__.app.getApp('sale')?.isQuotationAndOrderSplitEnabled" readonly="true"/>
+  <field name="reservedQty" if="__config__.app.getApp('supplychain')?.manageStockReservation" aggregate="sum" x-scale="2"/>
+  <button name="allocateAll" if="__config__.app.getApp('supplychain')?.manageStockReservation" title="Allocate" icon="fa-plus-square" readonlyIf="$get('saleOrder.statusSelect') != 3 || $get('saleOrder.orderBeingEdited') || $number(reservedQty) == $number(qty) || deliveryState == 3 || $get('product.productTypeSelect') == 'service'" onClick="save,action-supplychain-sale-order-line-allocate-all"/>
+  <button name="deallocate" if="__config__.app.getApp('supplychain')?.manageStockReservation" title="Deallocate" icon="fa-minus-square" readonlyIf="$get('saleOrder.statusSelect') != 3 || $get('saleOrder.orderBeingEdited') || $number(reservedQty) == 0 || deliveryState == 3" onClick="save,action-supplychain-sale-order-line-deallocate-all"/>
+  <field name="unit" form-view="unit-form" grid-view="unit-grid"/>
+  <field name="priceDiscounted" title="Unit price W.T." x-scale="$nbDecimalDigitForUnitPrice"/>
+  <field name="exTaxTotal" aggregate="sum" x-scale="$currencyNumberOfDecimals"/>
+  <field name="inTaxTotal" aggregate="sum" x-scale="$currencyNumberOfDecimals"/>
+  <field name="estimatedShippingDate"/>
+  <field name="estimatedDeliveryDate"/>
+  <field name="budgetStr" if="__config__.app.isApp('budget')"/>
+  <field name="availableStatus" if="__config__.app.isApp('supplychain')">
+    <hilite strong="true" color="success" if="availableStatusSelect == 1"/>
+    <hilite color="danger" strong="true" if="availableStatusSelect == 2"/>
+  </field>
+  <button name="configuratorEditBtn" onClick="action-sale-order-line-group-on-configurator-edit" if="__config__.app.getApp('sale')?.getEnableConfigurator()" readonlyIf="configurator == null" icon="pencil-square"/>
+  <button name="configuratorDuplicateBtn" onClick="action-sale-order-line-group-on-configurator-duplicate" if="__config__.app.getApp('sale')?.getEnableLineDuplication()" readonlyIf="saleOrder.id == null" icon="fa-copy"/>
+  <field name="saleOrder.statusSelect" hidden="true"/>
+  <field name="saleOrder.orderBeingEdited" hidden="true"/>
+  <field name="product.productTypeSelect" hidden="true"/>
+  <field name="$nbDecimalDigitForUnitPrice" hidden="true"/>
+  <field name="$nbDecimalDigitForQty" hidden="true"/>
+  <field name="configurator" hidden="true"/>
+  <field name="saleOrder" hidden="true"/>
+  <field name="saleOrder.id" hidden="true"/>
+  <button name="lvmeDuplicateLineBtn" title="Dupliquer la ligne" icon="fa-copy" readonlyIf="id == null || $get('saleOrder.statusSelect') &gt; 2" onClick="save,action-lvme-sale-order-line-method-duplicate"/>
+</grid>

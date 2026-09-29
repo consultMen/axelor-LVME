@@ -1,0 +1,4 @@
+<action-method name="action-method-sale-order-line-reload-from-db">
+  <call class="com.axelor.apps.supplychain.web.SaleOrderLineController" 
+        method="reloadLineFromDb"/>
+</action-method>

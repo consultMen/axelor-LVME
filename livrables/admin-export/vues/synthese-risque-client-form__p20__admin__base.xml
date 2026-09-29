@@ -1,0 +1,11 @@
+<form name="synthese-risque-client-form" title="Synthèse risque client"
+      model="com.axelor.apps.supplychain.db.SyntheseRisqueClient"
+      canNew="false" canEdit="false" canDelete="false">
+  <panel title="Détail">
+    <field name="client" readonly="true"/>
+    <field name="pays" readonly="true"/>
+    <field name="encours" readonly="true"/>
+    <field name="creditAutorise" readonly="true"/>
+    <field name="montantRisque" readonly="true"/>
+  </panel>
+</form>

@@ -1,0 +1,4 @@
+<action-method name="action-method-sale-order-copy-lots-to-stock-move">
+  <call class="com.axelor.apps.supplychain.web.SaleOrderController" 
+        method="copyLotsToStockMove"/>
+</action-method>

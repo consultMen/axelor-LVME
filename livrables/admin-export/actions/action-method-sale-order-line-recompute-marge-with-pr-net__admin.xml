@@ -1,0 +1,4 @@
+<action-method name="action-method-sale-order-line-recompute-marge-with-pr-net">
+  <call class="com.axelor.apps.supplychain.web.SaleOrderLineController" 
+        method="recomputeMargeWithPrNet"/>
+</action-method>

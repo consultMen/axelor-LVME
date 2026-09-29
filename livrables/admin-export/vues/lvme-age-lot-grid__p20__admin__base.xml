@@ -1,0 +1,17 @@
+<grid name="lvme-age-lot-grid" title="Âge des lots"
+  model="com.axelor.apps.supplychain.db.AgeLot"
+  canNew="false" canEdit="false" canDelete="false" orderBy="-ageDays">
+  <hilite color="danger" if="isExpired || (daysToDluo != null &amp;&amp; daysToDluo &lt; 90) || ageDays &gt; 180"/>
+  <hilite color="warning" if="ageDays &gt; 90"/>
+  <field name="product"/>
+  <field name="trackingNumber"/>
+  <field name="stockLocation"/>
+  <field name="qty" aggregate="sum"/>
+  <field name="stockValue" aggregate="sum"/>
+  <field name="arrivalDate"/>
+  <field name="ageDays"/>
+  <field name="ageBucket"/>
+  <field name="dluo"/>
+  <field name="daysToDluo"/>
+  <field name="isExpired"/>
+</grid>

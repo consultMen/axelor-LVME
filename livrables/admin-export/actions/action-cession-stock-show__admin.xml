@@ -1,0 +1,6 @@
+<action-view name="action-cession-stock-show"
+  title="Cessions de Stock"
+  model="com.axelor.apps.stock.db.CessionStock">
+  <view type="grid" name="cession-stock-grid"/>
+  <view type="form" name="cession-stock-form"/>
+</action-view>

@@ -1,0 +1,5 @@
+<action-view name="action-synthese-risque-client-all" title="Synthèse risques clients"
+      model="com.axelor.apps.supplychain.db.SyntheseRisqueClient">
+  <view type="grid" name="synthese-risque-client-grid"/>
+  <view type="form" name="synthese-risque-client-form"/>
+</action-view>

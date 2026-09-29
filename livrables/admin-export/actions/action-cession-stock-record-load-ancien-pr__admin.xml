@@ -1,0 +1,4 @@
+<action-method name="action-cession-stock-record-load-ancien-pr">
+  <call class="com.axelor.apps.supplychain.web.ModifPRController"
+        method="loadAncienPR"/>
+</action-method>

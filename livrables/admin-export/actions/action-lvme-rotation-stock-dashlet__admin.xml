@@ -1,0 +1,18 @@
+<action-view name="action-lvme-rotation-stock-dashlet" title="Rotation des stocks"
+  model="com.axelor.apps.supplychain.db.RotationStock">
+  <view type="grid" name="lvme-rotation-stock-grid"/>
+  <view type="form" name="lvme-rotation-stock-form"/>
+  <domain>(:_artDu = '' OR self.productCode &gt;= :_artDu) AND (:_artAu = '' OR self.productCode &lt;= :_artAu)
+    AND (:_famille = 0 OR self.productCategory.id = :_famille)
+    AND (:_statut = '' OR self.statut = :_statut)
+    AND (:_couvMax = 0 OR (self.daysOfStock IS NOT NULL AND self.daysOfStock &lt; :_couvMax))
+    AND (:_ageMin = 0 OR (self.avgAgeDays IS NOT NULL AND self.avgAgeDays &gt; :_ageMin))
+    AND (:_dormant = false OR self.isDormant = true)</domain>
+  <context name="_artDu" expr="eval: articleDu?.id ? (__repo__(Product).find(articleDu.id as Long)?.code ?: '') : ''"/>
+  <context name="_artAu" expr="eval: articleAu?.id ? (__repo__(Product).find(articleAu.id as Long)?.code ?: '') : (articleDu?.id ? (__repo__(Product).find(articleDu.id as Long)?.code ?: '') : '')"/>
+  <context name="_famille" expr="eval: (famille?.id ?: 0) as Long"/>
+  <context name="_statut" expr="eval: statutRotation ? statutRotation.toString() : ''"/>
+  <context name="_couvMax" expr="eval: (couvertureMax ?: 0) as Integer"/>
+  <context name="_ageMin" expr="eval: (ageMin ?: 0) as Integer"/>
+  <context name="_dormant" expr="eval: dormantsSeulement ? true : false"/>
+</action-view>

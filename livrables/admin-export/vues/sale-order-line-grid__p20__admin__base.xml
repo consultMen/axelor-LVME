@@ -1,0 +1,10 @@
+<grid name="sale-order-line-grid" id="lvme-sale-order-line-grid-duplicate" title="SO lines"
+  model="com.axelor.apps.sale.db.SaleOrderLine" extension="true">
+  <extend target="/">
+    <insert position="inside">
+      <button name="lvmeDuplicateLineBtn" title="Dupliquer la ligne" icon="fa-copy"
+        readonlyIf="id == null || $get('saleOrder.statusSelect') &gt; 2"
+        onClick="save,action-lvme-sale-order-line-method-duplicate"/>
+    </insert>
+  </extend>
+</grid>

@@ -1,0 +1,7 @@
+<grid name="palmares-commercial-grid" title="Palmarès par commercial"
+      model="com.axelor.apps.supplychain.db.PalmaresCommercial"
+      canNew="false" >
+  <field name="commercial"/>
+  <field name="caHt" aggregate="sum"/>
+  <field name="montantCommission" aggregate="sum"/>
+</grid>

@@ -1,0 +1,6 @@
+<action-record name="action-stock-move-line-record-compute-dluo"
+               model="com.axelor.apps.stock.db.StockMoveLine">
+  <field name="dluo" 
+         expr="eval: lotFournisseur.dateProduction.plusDays(durabilite.longValue())"
+         if="lotFournisseur != null &amp;&amp; lotFournisseur.dateProduction != null &amp;&amp; durabilite != null &amp;&amp; durabilite > 0"/>
+</action-record>

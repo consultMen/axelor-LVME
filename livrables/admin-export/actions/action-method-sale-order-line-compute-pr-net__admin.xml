@@ -1,0 +1,4 @@
+<action-method name="action-method-sale-order-line-compute-pr-net">
+  <call class="com.axelor.apps.supplychain.web.SaleOrderLineController" 
+        method="computePrixRevientNet"/>
+</action-method>

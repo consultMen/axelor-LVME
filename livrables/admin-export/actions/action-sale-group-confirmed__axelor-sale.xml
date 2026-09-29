@@ -1,0 +1,8 @@
+<action-group name="action-sale-group-confirmed">
+  <action name="action-sale-order-method-check-before-confirm"/>
+  <action if="!incoterm &amp;&amp; __config__.app.getApp('stock')?.isIncotermEnabled" name="action-sale-order-method-fill-incoterm-if-required"/>
+  <action name="save"/>
+  <action if="__config__.app.isApp('business-project') &amp;&amp; __config__.app.getApp('business-project').getAutomaticProject()" name="action-business-project-method-generate-project"/>
+  <action name="action-sale-order-method-confirm"/>
+</action-group>
+

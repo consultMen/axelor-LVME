@@ -1,0 +1,10 @@
+<form name="palmares-commercial-wizard-form" title="Palmarès par commercial"
+      model="com.axelor.apps.supplychain.db.PalmaresCommercialWizard"
+      onNew="action-palmares-commercial-wizard-record-default">
+  <panel title="Sélection période">
+    <field name="dateDe"/>
+    <field name="dateA"/>
+    <button name="btnGenerate" title="Générer" colSpan="6" onClick="action-palmares-commercial-method-generate"/>
+    <button name="btnClose" title="Fermer" colSpan="6" onClick="close"/>
+  </panel>
+</form>

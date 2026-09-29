@@ -1,0 +1,6 @@
+<action-attrs name="action-stock-move-line-attrs-lot-fournisseur-domain"
+              model="com.axelor.apps.stock.db.StockMoveLine">
+  <attribute name="domain" 
+             expr="eval: &quot;self.product.id = &quot; + (product?.id ?: 0) + &quot; AND self.supplier.id = &quot; + (_parent?.partner?.id ?: stockMove?.partner?.id ?: 0)"
+             for="lotFournisseur"/>
+</action-attrs>

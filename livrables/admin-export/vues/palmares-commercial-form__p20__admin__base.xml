@@ -1,0 +1,9 @@
+<form name="palmares-commercial-form" title="Palmarès commercial"
+      model="com.axelor.apps.supplychain.db.PalmaresCommercial"
+      canNew="false" canEdit="false" canDelete="false">
+  <panel title="Détail">
+    <field name="commercial" readonly="true"/>
+    <field name="caHt" readonly="true"/>
+    <field name="montantCommission" readonly="true"/>
+  </panel>
+</form>

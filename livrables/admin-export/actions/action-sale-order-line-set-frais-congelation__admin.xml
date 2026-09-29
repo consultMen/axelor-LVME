@@ -1,0 +1,4 @@
+<action-method name="action-sale-order-line-set-frais-congelation">
+  <call class="com.axelor.apps.sale.web.SaleOrderLineController"
+        method="setFraisCongelation"/>
+</action-method>

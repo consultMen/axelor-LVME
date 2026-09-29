@@ -1,0 +1,4 @@
+<action-method name="action-method-sale-order-persist-calculs-all-lines">
+  <call class="com.axelor.apps.supplychain.web.SaleOrderController" 
+        method="persistCalculsAllLines"/>
+</action-method>

@@ -1,0 +1,3 @@
+<action-group name="action-lvme-rotation-stock-group-onnew">
+  <action name="action-lvme-rotation-stock-kpi"/>
+</action-group>

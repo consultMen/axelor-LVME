@@ -1,0 +1,4 @@
+<action-record name="action-partner-record-sync-rfa-from-groupement"
+                model="com.axelor.apps.base.db.Partner">
+  <field name="tauxRFA" expr="eval: groupement != null ? groupement.pourcRfa : tauxRFA"/>
+</action-record>

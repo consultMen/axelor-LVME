@@ -1,0 +1,3 @@
+<action-method name="action-sale-order-line-method-compute-packaging">
+  <call class="com.axelor.apps.supplychain.web.SaleOrderLineController" method="computePackaging"/>
+</action-method>

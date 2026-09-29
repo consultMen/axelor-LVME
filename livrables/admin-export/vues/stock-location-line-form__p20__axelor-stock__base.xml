@@ -1,0 +1,37 @@
+<form name="stock-location-line-form" title="Stock Location content" model="com.axelor.apps.stock.db.StockLocationLine" width="large" onLoad="action-stock-location-line-group-onload" onSave="action-stock-location-line-record-is-avg-price-changed" onNew="action-stock-location-line-group-onnew">
+  <panel name="mainPanel">
+    <field name="product" canEdit="false" domain="self.dtype = 'Product'" form-view="product-form" grid-view="product-grid"/>
+    <field name="unit" form-view="unit-form" grid-view="unit-grid"/>
+    <field name="avgPrice" readonlyIf="!$isAvgPriceEditable" colSpan="3" onChange="action-stock-location-line-group-avg-price-onchange"/>
+    <field name="$isAvgPriceEditable" hidden="true" type="boolean"/>
+    <button name="updateAvgPriceBtn" title="Update average price" hideIf="( stockLocation &amp;&amp; stockLocation.typeSelect == 3 ) || $readonly() || (!$readonly() &amp;&amp; $isAvgPriceEditable)" colSpan="3" onClick="action-stock-location-line-attrs-update-avg-price"/>
+    <field name="rack"/>
+    <field name="stockLocation"/>
+    <field name="stockLocation.typeSelect" hidden="true"/>
+
+  </panel>
+  <panel name="lastInventoryPanel" title="Last inventory">
+    <field name="lastInventoryRealQty" title="Real Qty"/>
+    <field name="lastInventoryDateT" title="Date"/>
+  </panel>
+  <panel name="actionPanel">
+    <button name="$realQtyBtn" title="Real qty" colSpan="4" icon="fa-building-o" onClick="action-stock-location-line-view-realized-stock-move-lines" widget="info-button"/>
+    <button name="$futureQtyBtn" title="Future qty" colSpan="4" icon="fa-line-chart" onClick="action-stock-location-line-view-planned-stock-move-lines" widget="info-button"/>
+    <button if="__config__.app.getApp('supplychain')?.getManageStockReservation()" if-module="axelor-supplychain" name="$reservedQtyBtn" title="Reserved qty" colSpan="4" icon="fa-cubes" onClick="action-stock-location-line-view-reserved-stock-move-lines" widget="info-button"/>
+    <panel name="simpleButtonPanel" colSpan="12">
+      <button name="showDetailedStockBtn" title="Show detailed stock" colSpan="4" onClick="action-stock-location-line-view-show-detailed-stock"/>
+      <button if="__config__.app.getApp('supplychain')?.getManageStockReservation()" name="allocateAll" title="Allocate all" colSpan="4" onClick="save,action-stock-location-line-allocate-all"/>
+      <button if="__config__.app.getApp('supplychain')?.getManageStockReservation()" name="deallocateAll" title="Deallocate all" colSpan="4" onClick="save,action-stock-location-line-deallocate-all"/>
+    </panel>
+  </panel>
+  <panel-dashlet name="productQtyPanel" title="Product quantity in other stock locations" action="action-stock-location-line-view-product-qty"/>
+  <panel-dashlet name="stockRulesPanel" title="Stock Rules" action="action-stock-location-line-view-stock-rule"/>
+  <panel-dashlet name="stockLocationLineHistoryHistoryPanel" title="Stock location line history" action="action-stock-location-line-view-stock-location-line-history"/>
+  <panel name="stockCorrectionPanel" sidebar="true">
+    <button name="stockCorrectionBtn" title="Stock Correction" onClick="action-stock-location-line-view-open-stock-correction-form"/>
+  </panel>
+  <panel-mail name="mailsPanel">
+    <mail-messages/>
+  </panel-mail>
+</form>
+

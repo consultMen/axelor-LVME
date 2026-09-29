@@ -1,0 +1,11 @@
+<grid name="encours-fournisseur-grid" title="État en-cours fournisseur"
+      model="com.axelor.apps.supplychain.db.EncoursFournisseur"
+      canNew="false" canEdit="false" canDelete="false">
+  <hilite color="danger" if="ecart > 0"/>
+  <field name="fournisseur"/>
+  <field name="numeroArrivage"/>
+  <field name="dateArrivage"/>
+  <field name="montantHtArrivage" aggregate="sum"/>
+  <field name="montantHtComptabilise" aggregate="sum"/>
+  <field name="ecart" aggregate="sum"/>
+</grid>

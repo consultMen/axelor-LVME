@@ -1,0 +1,24 @@
+<grid name="lvme-rotation-stock-grid" title="Rotation des stocks"
+  model="com.axelor.apps.supplychain.db.RotationStock" orderBy="productCode"
+  canNew="false" canEdit="false" canDelete="false">
+  <hilite color="danger" strong="true" if="statut == 'A commander'"/>
+  <hilite color="warning" if="statut == 'Dormant' || statut == 'Lot ancien'"/>
+  <field name="productCode" width="110"/>
+  <field name="productName"/>
+  <field name="productCategory" width="110"/>
+  <field name="stockQty" aggregate="sum" width="90"/>
+  <field name="stockValue" aggregate="sum" width="100"/>
+  <field name="sales90d" width="85"/>
+  <field name="avgDailySales" width="85"/>
+  <field name="daysOfStock" title="Couverture (j)" width="90">
+    <hilite background="danger" strong="true" if="statut == 'A commander'"/>
+  </field>
+  <field name="sales365d" width="90"/>
+  <field name="rotationRate" width="85"/>
+  <field name="avgAgeDays" width="85"/>
+  <field name="oldestLotAge" width="85"/>
+  <field name="lastSaleDate" width="95"/>
+  <field name="daysSinceLastSale" width="85"/>
+  <field name="dormantValue" aggregate="sum" width="100"/>
+  <field name="statut" width="110"/>
+</grid>

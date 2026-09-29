@@ -1,0 +1,6 @@
+<action-attrs name="action-lvme-etat-stock-lot-alertes-dluo">
+  <attribute name="value" for="$nbDluoDepassee"
+    expr="eval: __repo__(EtatStockLot).all().filter('self.stockQty &gt; 0 AND self.dluo &lt; ?1', __date__).count()"/>
+  <attribute name="value" for="$nbDluoProche"
+    expr="eval: __repo__(EtatStockLot).all().filter('self.stockQty &gt; 0 AND self.dluo &gt;= ?1 AND self.dluo &lt;= ?2', __date__, __date__.plusDays(30)).count()"/>
+</action-attrs>

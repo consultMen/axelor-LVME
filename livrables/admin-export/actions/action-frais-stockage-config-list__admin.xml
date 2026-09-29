@@ -1,0 +1,6 @@
+<action-view name="action-frais-stockage-config-list" 
+             title="Frais de stockage"
+             model="com.axelor.apps.stock.db.FraisStockageConfig">
+  <view type="grid" name="frais-stockage-config-grid"/>
+  <view type="form" name="frais-stockage-config-form"/>
+</action-view>

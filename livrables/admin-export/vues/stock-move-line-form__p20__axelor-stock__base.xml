@@ -1,0 +1,224 @@
+<form name="stock-move-line-form"
+      title="Stock move line"
+      model="com.axelor.apps.stock.db.StockMoveLine"
+      width="large"
+      onLoad="action-stock-move-line-group-onload"
+      onNew="action-stock-move-line-group-onnew"
+      readonlyIf="$isReadOnly"
+      canNew="false"
+      canDelete="false">
+  <!-- ===================== TITLE LINE ===================== -->
+  <panel name="productPanel" showIf="lineTypeSelect == 1">
+    <field name="productName" colSpan="9"/>
+    <field name="lineTypeSelect" colSpan="3" onChange="action-stock-move-line-method-empty-line"/>
+    <field name="qty" hidden="true" hideIf="lineTypeSelect == 1" x-scale="$nbDecimalDigitForQty"/>
+    <field name="realQty" hidden="true" hideIf="lineTypeSelect == 1" x-scale="$nbDecimalDigitForQty"/>
+  </panel>
+<!-- ===================== MAIN ===================== -->
+  <panel name="mainPanel" hideIf="lineTypeSelect == 1">
+  <field name="stockMove" readonly="true" showIf="_cutOffPreview" colSpan="12" form-view="stock-move-form"/>
+  <field name="$partnerLanguage" hidden="true"/>
+    <field name="$differentLanguageMessage" showTitle="false" hidden="true" readonly="true" colSpan="12">
+      <viewer depends="$partnerLanguage"><![CDATA[
+        <>{$partnerLanguage && <Badge bg="warning">{_t("The partner's language is different from the current language. Description and product name are in :")} {$partnerLanguage}</Badge>}</>
+      ]]></viewer>
+    </field>
+  <field name="lineTypeSelect" onChange="action-stock-move-line-method-empty-line"/>
+    <!-- ===================== TAGS / STATUS ===================== -->
+    <panel name="tagsPanel" colSpan="12">
+      <field name="availableStatus" hidden="true" readonly="true" colSpan="4">
+        <viewer><![CDATA[
+          <>
+            <Box d="flex" gap="4">
+              {($availableQty >= realQty) && product && <Badge bg="success">{_t('Available')}</Badge>}
+              {($availableQtyForProduct >= realQty) && product && <Badge bg="info">{_t('Av. for product')}</Badge>}
+              {($availableQty < realQty) && ($availableQtyForProduct < realQty) && product && <Badge bg="danger">{_t('Missing')}</Badge>}
+              {($availableQty < realQty) && ($availableQtyForProduct < realQty) && product && !$trackingNumberConfiguration && <Badge bg="danger">{$availableQty - realQty}</Badge>}
+              {($availableQty < realQty) && ($availableQtyForProduct < realQty) && product && $trackingNumberConfiguration && <Badge bg="danger">{$availableQtyForProduct - realQty}</Badge>}
+            </Box>
+          </>
+        ]]></viewer>
+      </field>
+      <field if="__config__.app.isApp('supplychain')" if-module="axelor-supplychain"
+             name="$invoiced" showTitle="false" readonly="true"
+             showIf="id &amp;&amp; stockMove.statusSelect == 3  &amp;&amp; stockMove.typeSelect != 1"
+             colSpan="4">
+        <viewer depends="qtyInvoiced,realQty"><![CDATA[
+          <>
+            {qtyInvoiced > 0 && (qtyInvoiced == realQty) && <Badge bg="success">{_t('Invoiced')}</Badge>}
+            {qtyInvoiced > 0 && (qtyInvoiced < realQty) && <Badge bg="warning">{_t('Partially invoiced')}</Badge>}
+            {qtyInvoiced == 0 && <Badge bg="danger">{_t('Not invoiced')}</Badge>}
+          </>
+        ]]></viewer>
+      </field>
+      <field if="__config__.app.isApp('supplychain')" if-module="axelor-supplychain"
+             name="isQtyRequested" showTitle="false" readonly="true"
+             showIf="isQtyRequested &amp;&amp; product &amp;&amp; product.productTypeSelect != 'service'"
+             colSpan="4">
+        <viewer><![CDATA[
+          <>{isQtyRequested && <Badge bg="success">{_t('Reservation requested')}</Badge>}</>
+        ]]></viewer>
+      </field>
+    </panel>
+    <field name="fromStockLocation" hidden="true"
+           onChange="action-stock-move-line-group-stock-location-onchange"
+           onSelect="action-stock-move-line-method-compute-from-stock-location-domain"/>
+    <field name="toStockLocation" hidden="true"
+           onChange="action-stock-move-line-group-stock-location-onchange"
+           onSelect="action-stock-move-line-method-compute-to-stock-location-domain"/>
+    <!-- ===================== PRODUCT BLOCK ===================== -->
+    <panel name="productBlockPanel" colSpan="12">
+      <field name="product"
+             readonlyIf="($get('stockMove.statusSelect') == 2 &amp;&amp; $get('stockMove.pickingIsEdited')) || $get('stockMove.statusSelect') > 2"
+             canEdit="false"
+             onChange="action-stock-move-line-tracking-number-attrs,action-group-stock-stockmoveline-product-onchange"
+             onSelect="action-stock-move-line-method-product-domain"
+             domain="self.expense = false AND self.dtype = 'Product'"
+             form-view="product-form"
+             grid-view="stock-move-line-product-grid"
+             x-image-field="picture"
+             colSpan="6"/>
+      <field if="__config__.app.getApp('base')?.getManageProductVariants()"
+             name="productModel"
+             readonlyIf="product || $get('stockMove.statusSelect') > 1"
+             canEdit="false"
+             domain="self.isModel = true"
+             form-view="product-form"
+             grid-view="product-grid"
+             colSpan="6"/>
+      <field name="productName" colSpan="12"/>
+    </panel>
+    <!-- ===================== QTY BLOCK ===================== -->
+    <panel name="qtyPanel" colSpan="12">
+      <field name="qty"
+            title="Poids/Colis-BRUT(Kg)"
+
+             readonlyIf="$get('stockMove.statusSelect') > 1"
+             colSpan="3"
+             onChange="action-stock-move-line-group-qty-onchange"
+             x-scale="$nbDecimalDigitForQty"/>
+      <field name="realQty"
+             colSpan="3"
+             onChange="action-stock-move-line-group-real-qty-onchange, action-stock-move-line-attrs-set-real-qty-modified-by-user-true"
+             x-scale="$nbDecimalDigitForQty"/>
+      <field name="qtyInvoiced" readonly="true" colSpan="3" x-scale="$nbDecimalDigitForQty"/>
+      <field name="unit" colSpan="3" canEdit="false" form-view="unit-form" grid-view="unit-grid"/>
+      <field name="isRealQtyModifiedByUser" hidden="true"/>
+      <field name="$availableQty" title="Available qty" hidden="true" readonly="true" type="decimal" x-scale="$nbDecimalDigitForQty"/>
+      <field name="$availableQtyForProduct" title="Available qty for product" hidden="true" readonly="true" type="decimal" x-scale="$nbDecimalDigitForQty"/>
+      <field name="$trackingNumberConfiguration" hidden="true"/>
+      <field name="oldQty" x-scale="$nbDecimalDigitForQty"/>
+    </panel>
+    <!-- ===================== RESERVATION ===================== -->
+    <panel if="__config__.app.getApp('supplychain')?.getManageStockReservation()"
+           if-module="axelor-supplychain"
+           name="reservationPanel"
+           colSpan="12">
+      <field name="reservedQty" readonly="true"
+             showIf="product &amp;&amp; product.productTypeSelect != 'service'"
+             colSpan="3" x-scale="$nbDecimalDigitForQty"/>
+      <field name="requestedReservedQty" hidden="true" readonly="true" colSpan="3" x-scale="$nbDecimalDigitForQty"/>
+      <button name="updateAllocatedQtyBtn" title="Change allocated qty" hidden="true" colSpan="6"
+              onClick="action-view-stock-move-line-allocated-qty-wizard"/>
+      <button name="requestQty" title="Request reservation" hidden="true"
+              onClick="save,action-method-stock-move-line-request-qty"/>
+      <button name="cancelReservation" title="Cancel reservation" showIf="isQtyRequested"
+              onClick="save,action-method-stock-move-line-cancel-reservation"/>
+    </panel>
+    <!-- ===================== PRICES / TRACKING ===================== -->
+    <panel name="priceAndTrackingPanel" colSpan="12">
+  <field name="$trackingNumberConfiguration.isPurchaseTrackingManaged" hidden="true"/>
+  <field name="$trackingNumberConfiguration.isProductionTrackingManaged" hidden="true"/>
+  <field name="$trackingNumberConfiguration.isSaleTrackingManaged" hidden="true"/>
+
+  <field name="trackingNumber"
+       readonlyIf="$get('stockMove.statusSelect') > 2"
+       canNew="product != null"
+       onChange="action-stock-move-line-record-product"
+       onSelect="action-stock-move-line-attrs-tracking-number-domain"
+       form-view="tracking-number-stock-move-line-form"
+       grid-view="tracking-number-grid"
+       colSpan="12"/>
+   <field name="lotFournisseur"
+       title="Lot Fournisseur"
+       colSpan="6"
+       canNew="true"
+       canEdit="true"
+       form-view="lot-fournisseur-form"
+       grid-view="lot-fournisseur-grid"
+       onChange="action-stock-move-line-record-lot-fournisseur-onchange,action-stock-move-line-record-compute-dluo"
+       onSelect="action-stock-move-line-attrs-lot-fournisseur-domain"/>
+<field name="stockMove.partner" hidden="true"/>
+<field name="lotFournisseur.dateProduction"
+       title="Date de production"
+       colSpan="6"
+       readonly="true"/>
+<field name="trackingNumber.dateArrivage"
+       title="Date d'arrivage"
+       colSpan="4"/>
+      <field name="unitPriceTaxed" hidden="true" x-scale="$nbDecimalDigitForUnitPrice"/>
+      <field name="companyUnitPriceUntaxed" hidden="true"/>
+      <field name="companyPurchasePrice" hidden="true"/>
+      <field name="wapPrice" hidden="true" x-scale="$nbDecimalDigitForUnitPrice"/>
+    </panel>
+<!-- ===================== PO-LIKE DETAILS ===================== -->
+    <panel name="orderDetailsPanel" colSpan="12">
+<!-- Row 1 -->
+      <field name="modePeche" title="Mode de pêche" colSpan="3" readonly="true"/>
+      <field name="origine" title="Origine" colSpan="3" readonly="true"/>
+      <field name="zonePeche" title="Zone de pêche" colSpan="3" readonly="true"/>
+      <field name="marque" title="Marque" colSpan="3" readonly="true"/>
+<!-- Row 2 : Conditionnement + Dates -->
+            <field name="purchaseOrderLine.conditionnement"
+             title="Conditionnement"
+             colSpan="3"
+             readonly="true"
+             showIf="purchaseOrderLine != null"/>
+      <field name="saleOrderLine.conditionnement"
+             title="Conditionnement"
+             colSpan="3"
+             readonly="true"
+             showIf="saleOrderLine != null &amp;&amp; purchaseOrderLine == null"/>
+      <field name="dateCongelation" title="Date de congélation" colSpan="3" readonly="true"/>
+      <field name="dluo" title="DLUO" colSpan="3" readonly="true"/>
+      <field name="durabilite" title="Durabilité (jours)" colSpan="3" readonly="true"/>
+<!-- Row 3 -->
+      <field name="nbColis" title="Nb Colis" colSpan="3" readonly="true" x-scale="3"/>
+      <field name="poidsParColis" title="Poids/Colis" colSpan="3" readonly="true" x-scale="3"/>
+       <field name="coefPoidsNet" colSpan="3" readonly="true" x-scale="3"/>
+      <field name="nbUnitesParColis" title="Nb unité/colis" colSpan="3" readonly="true" x-scale="3"/>
+      <field name="unitesTot" title="Unités Total" colSpan="3" readonly="true" x-scale="3"/>
+      <field name="poidsParColisNet" title="Poids/Colis-NET(Kg)" readonly="true" colSpan="3"/>
+<!-- Row 4 -->
+      <field name="paDevise" title="PA devise" colSpan="3" readonly="true" x-scale="$nbDecimalDigitForUnitPrice"/>
+      <field name="prKg" title="Prix de revient (U.V)" colSpan="3" readonly="true" x-scale="$nbDecimalDigitForUnitPrice"/>
+      <field name="unitPriceUntaxed" readonly="true" colSpan="3"
+             onChange="action-stock-move-line-record-price-onchange"
+             x-scale="$nbDecimalDigitForUnitPrice"/>
+      <field name="prixRevientReel" title="PR réel (avec frais) (€/kg)" colSpan="3" readonly="true" x-scale="10"
+       help="PR d'achat + frais de congélation appliqués"/>
+      <field name="fraisApprocheKg" title="Frais d'approche au kg" colSpan="3" readonly="true" x-scale="$nbDecimalDigitForUnitPrice"/>
+      <field name="margeHt" title="Marge HT (€)" colSpan="3" readonly="true" x-scale="2"
+             showIf="saleOrderLine != null"/>
+      <field name="tauxMarge" title="% Marge" colSpan="3" readonly="true" x-scale="2"
+             showIf="saleOrderLine != null"/>
+    </panel>
+    <!-- ===================== REQUIRED HIDDEN / MISC ===================== -->
+    <field name="stockMove.statusSelect" hidden="true"/>
+    <field name="stockMove.typeSelect" hidden="true"/>
+    <field name="conformitySelect" onChange="action-stock-move-attrs-change-conformity"/>
+    <field name="$isReadOnly" hidden="true"/>
+    <panel name="descriptionPanel" title="Description" colSpan="12">
+      <field name="description" showTitle="false" colSpan="12" widget="html" x-lite="true"/>
+    </panel>
+    <field name="regime"/>
+    <field name="natureOfTransaction"/>
+    <field name="$nbDecimalDigitForQty" hidden="true"/>
+    <field name="$nbDecimalDigitForUnitPrice" hidden="true"/>
+  </panel>
+  <panel-mail name="mailPanel">
+    <mail-messages limit="4"/>
+    <mail-followers/>
+  </panel-mail>
+</form>
+

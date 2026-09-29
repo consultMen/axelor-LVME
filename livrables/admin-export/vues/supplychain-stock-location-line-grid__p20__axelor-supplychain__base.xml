@@ -1,0 +1,16 @@
+<grid name="supplychain-stock-location-line-grid" title="Stock location lines by product" model="com.axelor.apps.stock.db.StockLocationLine" orderBy="product" canNew="false" canDelete="false" edit-icon="true">
+  <field name="product" width="300"/>
+  <field name="product.unit" width="100"/>
+  <field name="lotFournisseur.numeroLot" title="N° Lot Fournisseur" width="150"/>
+  <field name="lotFournisseur.dateArrivee" title="Date Arrivée" width="120"/>
+  <field name="lotFournisseur.statutFrigo" title="Frigo" width="80"/>
+  <field name="trackingNumber" title="N° Suivi" width="120"/>
+  <field name="stockLocation.company" width="120"/>
+  <field name="stockLocation.name" title="Stock location"/>
+  <field name="stockLocation.parentStockLocation.name" title="Parent Stock location"/>
+  <field name="currentQty" width="150" x-scale="2"/>
+  <field name="futureQty" title="Future quantity" width="150" x-scale="2"/>
+  <field if="__config__.app.isApp('supplychain') &amp;&amp; __config__.app.getApp('supplychain')?.getManageStockReservation()" name="reservedQty" width="150" x-scale="2"/>
+  <field if="__config__.app.isApp('supplychain') &amp;&amp; __config__.app.getApp('supplychain')?.getManageStockReservation()" name="requestedReservedQty" width="150" x-scale="2"/>
+</grid>
+

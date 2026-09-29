@@ -1,0 +1,9 @@
+<action-record name="action-tracking-number-record-propagate-dluo"
+               model="com.axelor.apps.stock.db.TrackingNumber">
+  <field name="perishableExpirationDate" 
+         expr="eval: _parent.dluo"
+         if="_parent != null &amp;&amp; _parent.dluo != null"/>
+  <field name="isPerishable" 
+         expr="eval: true"
+         if="_parent != null &amp;&amp; _parent.dluo != null"/>
+</action-record>

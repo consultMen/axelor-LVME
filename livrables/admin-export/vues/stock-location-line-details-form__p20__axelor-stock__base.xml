@@ -1,0 +1,36 @@
+<form name="stock-location-line-details-form" title="Stock Location content" model="com.axelor.apps.stock.db.StockLocationLine" onLoad="action-stock-location-line-group-details-onload" onNew="action-stock-location-line-group-onnew">
+  <panel name="mainPanel">
+    <field name="product" canEdit="false" domain="self.dtype = 'Product'" form-view="product-form" grid-view="product-grid"/>
+    <field name="currentQty"/>
+    <field name="futureQty"/>
+    <field name="unit" form-view="unit-form" grid-view="unit-grid"/>
+    <field name="avgPrice" onChange="action-stock-location-line-group-avg-price-onchange"/>
+    <field if="__config__.app.getApp('supplychain')?.getManageStockReservation()" if-module="axelor-supplychain" name="reservedQty" hidden="true"/>
+    <field name="trackingNumber" domain="self.product = :product"/>
+    <field name="rack"/>
+    <field name="detailsStockLocation"/>
+  </panel>
+  <panel name="lotFournisseurPanel" title="Lot Fournisseur" colSpan="12">
+    <field name="trackingNumber.lotFournisseur" 
+           title="N° Lot Fournisseur" 
+           colSpan="6"
+           readonly="true"
+           form-view="lot-fournisseur-form"
+           grid-view="lot-fournisseur-grid"/>
+    <field name="trackingNumber.lotFournisseur.dateProduction" 
+           title="Date de production" 
+           colSpan="6" 
+           readonly="true"/>
+  </panel>
+  <panel name="lastInventoryPanel" title="Last inventory">
+    <field name="lastInventoryRealQty" title="Real Qty"/>
+    <field name="lastInventoryDateT" title="Date"/>
+  </panel>
+  <panel name="stockCorrectionPanel" sidebar="true">
+    <button name="stockCorrectionBtn" title="Stock Correction" onClick="action-stock-location-line-view-open-stock-correction-form"/>
+  </panel>
+  <panel-mail name="mailsPanel">
+    <mail-messages/>
+  </panel-mail>
+</form>
+

@@ -1,0 +1,5 @@
+<action-method name="action-sale-order-line-stock-location-recompute">
+  <call
+    class="com.axelor.apps.supplychain.web.SaleOrderLineStockLocationController"
+    method="recomputeQtyFromStock"/>
+</action-method>

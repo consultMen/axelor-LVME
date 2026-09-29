@@ -1,0 +1,37 @@
+<form name="supplychain-stock-details-by-product-form" title="Stock details by product" model="com.axelor.utils.db.Wizard" width="large" onNew="action-group-stock-details-by-product-on-new" canNew="false" canSave="false" canCopy="false">
+  <toolbar>
+    <button if="__config__.app.getApp('sale')?.getIsCartManagementEnabled()" name="addToCartBtn" title="Add to cart" icon="cart-plus-fill" onClick="action-supplychain-method-product-add-to-cart"/>
+  </toolbar>
+  <panel name="MainFilters" colSpan="12" itemSpan="4">
+    <field name="$product" title="Product" type="many-to-one" canEdit="false" onChange="action-group-supplychain-update-indicators" target="com.axelor.apps.base.db.Product" domain="self.stockManaged = true AND self.dtype = 'Product' AND self.productTypeSelect = 'storable'" form-view="product-form" grid-view="product-grid"/>
+    <field name="$company" title="Company" showIf="$product" type="many-to-one" canEdit="false" onChange="action-record-empty-company-and-stock-location, action-group-supplychain-update-indicators" target="com.axelor.apps.base.db.Company" form-view="company-form" grid-view="company-grid"/>
+    <field name="$stockLocation" title="Stock location" showIf="$product &amp;&amp; $company" type="many-to-one" canEdit="false" onChange="action-group-supplychain-update-indicators" target="com.axelor.apps.stock.db.StockLocation" domain="self.typeSelect != 3 and self.company = :company" form-view="stock-location-form" grid-view="stock-location-grid"/>
+  </panel>
+  <panel name="mainPanelIndicators" showIf="$product">
+    <panel name="indicators" title="Indicators" colSpan="12">
+      <panel name="stockIndicators" colSpan="12" itemSpan="3">
+        <button name="$realQty" title="Real quantity" icon="fa-building-o" onClick="action-supplychain-stock-move-line-product-real-quantity" widget="info-button"/>
+        <button name="$futureQty" title="Future quantity" icon="fa-building-o" onClick="action-supplychain-stock-move-line-product-future-quantity" widget="info-button"/>
+        <button if="__config__.app.isApp('supplychain') &amp;&amp; __config__.app.getApp('supplychain')?.getManageStockReservation()" name="$reservedQty" title="Reserved quantity" icon="fa-building-o" onClick="action-supplychain-stock-move-line-product-reserved" widget="info-button"/>
+        <button if="__config__.app.isApp('supplychain') &amp;&amp; __config__.app.getApp('supplychain')?.getManageStockReservation()" name="$requestedReservedQty" title="Requested reserved quantity" icon="fa-building-o" onClick="action-method-suppplychain-stock-location-line-view-requested-reserved" widget="info-button"/>
+      </panel>
+      <panel name="supplychainIndicators" colSpan="12" itemSpan="3">
+        <button name="$saleOrderQty" title="Sale order quantity" icon="fa-shopping-cart" onClick="action-method-supplychain-sale-order-product-planned" widget="info-button"/>
+        <button name="$purchaseOrderQty" title="Purchase order quantity" icon="fa-shopping-cart" onClick="action-method-supplychain-purchase-order-product-planned" widget="info-button"/>
+        <button name="$availableQty" title="Available stock" icon="fa-building-o" onClick="action-method-supplychain-stock-available-product" widget="info-button"/>
+      </panel>
+      <panel if="__config__.app.isApp('production')" name="productionIndicators" colSpan="12" itemSpan="3">
+        <button name="$buildingQty" title="Building quantity" icon="fa-cogs" onClick="action-method-production-building-quantity-product" widget="info-button"/>
+        <button name="$consumeManufOrderQty" title="Consume manuf order quantity" icon="fa-cogs" onClick="action-method-production-consume-product" widget="info-button"/>
+        <button name="$missingManufOrderQty" title="Missing manuf order quantity" icon="fa-cogs" onClick="action-method-production-missing-product" widget="info-button"/>
+      </panel>
+      <panel name="buttonPanel" colSpan="12" itemSpan="4">
+        <button name="projectedStockButton" title="See projected stock" showIf="$product" onClick="action-supplychain-method-projected-stock"/>
+        <button name="stockHistoryButton" title="See stock history" showIf="$product &amp;&amp; $company" onClick="action-supplychain-view-projected-stock"/>
+        <field name="$stockLocationIdList" hidden="true"/>
+      </panel>
+    </panel>
+    <panel-dashlet name="dashlet-views-stock-location-line-view-by-product" readonly="true" showIf="$product" colSpan="12" height="150" action="action-stock-location-line-view-by-product"/>
+  </panel>
+</form>
+

@@ -1,0 +1,10 @@
+<grid name="synthese-risque-client-grid" title="Synthèse risques clients"
+      model="com.axelor.apps.supplychain.db.SyntheseRisqueClient"
+      canNew="false" canEdit="false" canDelete="false">
+  <hilite color="danger" if="montantRisque > 0"/>
+  <field name="client"/>
+  <field name="pays"/>
+  <field name="encours" aggregate="sum"/>
+  <field name="creditAutorise" aggregate="sum"/>
+  <field name="montantRisque" aggregate="sum"/>
+</grid>

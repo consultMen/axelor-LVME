@@ -1,0 +1,26 @@
+<form name="lvme-rotation-stock-form" title="Rotation des stocks"
+  model="com.axelor.apps.supplychain.db.RotationStock" canNew="false" canEdit="false" canDelete="false" canSave="false">
+  <panel name="mainPanel" title="Produit" readonly="true">
+    <field name="product"/>
+    <field name="productCategory"/>
+    <field name="statut"/>
+    <field name="isDormant"/>
+  </panel>
+  <panel name="kpiPanel" title="Indicateurs" readonly="true" itemSpan="3">
+    <field name="daysOfStock" title="Couverture (j)"/>
+    <field name="rotationRate"/>
+    <field name="avgAgeDays"/>
+    <field name="dormantValue"/>
+  </panel>
+  <panel name="detailPanel" title="Détail" readonly="true" itemSpan="3">
+    <field name="stockQty"/>
+    <field name="stockValue"/>
+    <field name="sales90d"/>
+    <field name="avgDailySales"/>
+    <field name="sales365d"/>
+    <field name="lastSaleDate"/>
+    <field name="daysSinceLastSale"/>
+    <field name="oldestLotDate"/>
+    <field name="oldestLotAge"/>
+  </panel>
+</form>

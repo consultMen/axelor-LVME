@@ -1,0 +1,44 @@
+<form name="groupement-form" title="Groupement" 
+      model="com.axelor.apps.sale.db.Groupement">
+  
+  <panel name="identifPanel" title="Identification" colSpan="12">
+    <field name="code" colSpan="4"/>
+    <field name="name" colSpan="6" required="true"/>
+    <field name="actif" colSpan="2" widget="boolean-switch"/>
+    <field name="pourcRfa" colSpan="4"/>
+  </panel>
+  
+  <!-- Contact principal via entité Partner (avec choix depuis la liste natif) -->
+  <panel name="contactPanel" title="Contact" colSpan="12">
+    <field name="contactPartner" 
+        colSpan="12" 
+        canNew="true"
+        canEdit="true"
+        form-view="partner-form"
+        grid-view="partner-grid"
+        domain="self.isContact = true"/>
+  </panel>
+  
+  <!-- Téléphones avec widget Phone (drapeau + indicatif auto) -->
+  <panel name="coordonneesPanel" title="Coordonnées" colSpan="12">
+    <field name="fixedPhone" colSpan="4" widget="Phone"/>
+    <field name="mobilePhone" colSpan="4" widget="Phone"/>
+    <field name="fax" colSpan="4" widget="Phone"/>
+    <field name="emailAddress" colSpan="12" widget="Email"/>
+  </panel>
+  
+  <!-- Adresse native Axelor -->
+  <panel name="adressePanel" title="Adresse" colSpan="12">
+    <field name="address" 
+        colSpan="12" 
+        canNew="true"
+        canEdit="true"
+        form-view="address-form"
+        grid-view="address-grid"/>
+  </panel>
+  
+  <panel name="obsPanel" title="Observations" colSpan="12">
+    <field name="obs" showTitle="false" colSpan="12"/>
+  </panel>
+  
+</form>

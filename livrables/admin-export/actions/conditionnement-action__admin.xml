@@ -1,0 +1,10 @@
+<action-view name="conditionnement-action"
+  title="Conditionnement"
+  model="com.axelor.apps.purchase.db.Conditionnement">
+
+
+  <view type="grid" name="conditionnement-grid"/>
+  <view type="form" name="conditionnement-form"/>
+
+
+</action-view>

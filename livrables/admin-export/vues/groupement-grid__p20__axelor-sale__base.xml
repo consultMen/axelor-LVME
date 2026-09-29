@@ -1,0 +1,10 @@
+<grid name="groupement-grid" title="Groupements" 
+      model="com.axelor.apps.sale.db.Groupement">
+  <field name="code"/>
+  <field name="name"/>
+  <field name="pourcRfa"/>
+  <field name="contact"/>
+  <field name="ville"/>
+  <field name="tel"/>
+  <field name="actif" widget="boolean-switch"/>
+</grid>

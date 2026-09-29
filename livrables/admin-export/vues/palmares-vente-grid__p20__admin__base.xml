@@ -1,0 +1,14 @@
+<grid name="palmares-vente-grid" title="Palmarès des ventes"
+      model="com.axelor.apps.supplychain.db.PalmaresVente"
+      canNew="false" canEdit="false" canDelete="false">
+  
+  <field name="commercial"/>
+  <field name="client"/>
+  <field name="product"/>
+  <field name="invoiceDate"/>
+  <field name="nbColis" aggregate="sum"/>
+  <field name="qteUv" aggregate="sum"/>
+  <field name="poidsTotal" aggregate="sum"/>
+  <field name="caHt" aggregate="sum"/>
+  <field name="marge" aggregate="sum"/>
+</grid>

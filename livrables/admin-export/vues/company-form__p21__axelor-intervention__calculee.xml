@@ -1,0 +1,82 @@
+<form name="company-form" title="Company" model="com.axelor.apps.base.db.Company" onSave="action-company-check-multi-banks" canNew="_canNew">
+  <panel name="mainPanel" readonlyIf="$popup()">
+    <panel name="logoPanel" colSpan="4">
+      <field name="logo" colSpan="12" widget="Image"/>
+      <field name="width" onChange="action-company-condition-validate-logo-height-and-width" requiredIf="height">
+        <viewer depends="width"><![CDATA[
+      <>{$fmt('width')} <span>{_t('px')}</span></>
+  ]]></viewer>
+      </field>
+      <spacer name="widthSpacer"/>
+      <field name="height" onChange="action-company-condition-validate-logo-height-and-width" requiredIf="width">
+        <viewer depends="height"><![CDATA[
+      <>{$fmt('height')} <span>{_t('px')}</span></>
+  ]]></viewer>
+      </field>
+      <spacer name="heightSpacer"/>
+    </panel>
+    <panel name="detailsPanel" colSpan="8">
+      <field name="name"/>
+      <field name="code" x-bind="{{code|unaccent|uppercase}}"/>
+      <field name="parent" form-view="company-form" grid-view="company-grid"/>
+      <field name="partner" canNew="true" domain="self.isContact = false" form-view="partner-form" grid-view="partner-grid"/>
+      <field name="address" colSpan="12" canNew="true" form-view="address-form" grid-view="address-grid"/>
+    </panel>
+  </panel>
+  <panel name="modulesConfigPanel" title="Modules configurations" hideIf="!id || $popup()" sidebar="true">
+    <button if="__config__.app.isApp('account')" if-module="axelor-account" name="accountConfigBtn" title="Account config" colSpan="6" width="100%" onClick="action-company-view-account-config"/>
+    <button if="__config__.app.isApp('bank-payment')" if-module="axelor-bank-payment" name="bankPaymentConfigBtn" title="Bank payment config" colSpan="6" width="100%" onClick="action-company-view-bank-payment-config"/>
+    <button if="__config__.app.isApp('sale')" if-module="axelor-sale" name="saleConfigBtn" title="Sale config" colSpan="6" width="100%" onClick="action-company-view-sale-config"/>
+    <button if="__config__.app.isApp('stock')" if-module="axelor-stock" name="stockConfigBtn" title="Stock config" colSpan="6" width="100%" onClick="action-company-view-stock-config"/>
+    <button if="__config__.app.isApp('purchase')" if-module="axelor-purchase" name="purchaseConfigBtn" title="Purchase config" colSpan="6" width="100%" onClick="action-company-view-purchase-config"/>
+    <button if="__config__.app.isApp('production')" if-module="axelor-production" name="productionConfigBtn" title="Production config" colSpan="6" width="100%" onClick="action-company-view-production-config"/>
+    <button if="__config__.app.isApp('employee')" if-module="axelor-human-resource" name="hrConfigBtn" title="Human Resources config" colSpan="6" width="100%" onClick="action-company-view-hr-config"/>
+    <button if="__config__.app.isApp('crm')" if-module="axelor-crm" name="crmConfigBtn" title="CRM config" colSpan="6" width="100%" onClick="action-company-view-crm-config"/>
+    <button if="__config__.app.isApp('supplychain')" if-module="axelor-supplychain" name="supplyChainConfigBtn" title="Supply Chain config" colSpan="6" width="100%" onClick="action-company-view-supply-chain-config"/>
+    <button if="__config__.app.isApp('quality')" if-module="axelor-quality" name="qualityConfigBtn" title="Quality config" colSpan="6" width="100%" onClick="action-company-view-quality-config"/>
+    <button if="__config__.app.isApp('intervention')" name="InterventionConfigBtn" title="Intervention config" colSpan="6" width="100%" onClick="action-company-view-intervention-config"/>
+  </panel>
+  <panel name="notesPanel" title="Notes" readonly="true" showIf="$popup()">
+    <field name="notes" showTitle="false" colSpan="12"/>
+  </panel>
+  <panel-tabs name="mainPanelTab" hideIf="$popup()">
+    <panel name="informationsPanel" title="Information">
+      <field name="notes" colSpan="12"/>
+      <field name="companyDepartmentList" colSpan="12" canSelect="true" domain="self.company IS NULL" form-view="company-department-company-form" grid-view="company-department-company-grid"/>
+      <field name="partnerList" colSpan="12" canSelect="true" canNew="false" domain="self.isInternal is true" form-view="partner-form" grid-view="partner-grid"/>
+      <field if="__config__.app.isApp('production') &amp;&amp; __config__.app.getApp('production')?.getManageWorkshop()" if-module="axelor-production" name="workshopList" colSpan="12" canSelect="true" canNew="false" domain="self.isWorkshop is true"/>
+    </panel>
+    <panel name="configurationsPanel" title="Configurations">
+      <field name="currency" canEdit="false" form-view="currency-form" grid-view="currency-grid"/>
+      <field name="printingSettings" canNew="true" required="true" form-view="printing-setting-form" grid-view="printing-setting-grid"/>
+      <field name="defaultPartnerTypeSelect"/>
+      <field name="defaultPartnerCategorySelect"/>
+      <field if="__config__.app.isApp('cash-management')" if-module="axelor-cash-management" name="customerPaymentDelay"/>
+      <field if="__config__.app.isApp('cash-management')" if-module="axelor-cash-management" name="supplierPaymentDelay"/>
+    <field name="fraisCongelation" title="Frais Congélation(kg/mois)" colSpan="6" widget="Decimal" x-scale="4"/>
+    <button name="btnRecalculerFraisStockage"
+    title="🔄 Recalculer tous les PR"
+    colSpan="6"
+    onClick="save,action-frais-stockage-method-recalculer"/>
+      <field if="__config__.app.getApp('base')?.enableTradingNamesManagement" name="tradingNameList" colSpan="12" canNew="true" form-view="trading-name-form" grid-view="trading-name-grid"/>
+      <field if="__config__.app.getApp('base')?.enableTradingNamesManagement" name="tradingNamePrintingSettingsList" colSpan="12" canNew="true" form-view="trading-name-printing-settings-company-form" grid-view="trading-name-printing-settings-company-grid"/>
+      <field name="weeklyPlanning" title="Weekly planning" canNew="true" form-view="weekly-planning-form" grid-view="weekly-planning-grid"/>
+      <field name="publicHolidayEventsPlanning" canNew="true" form-view="events-planning-form" grid-view="events-planning-grid"/>
+      <field name="localization" colSpan="6" canEdit="false" form-view="localization-form" grid-view="localization-grid"/>
+      <field name="timezone" colSpan="6"/>
+      <field if="__config__.app.isApp('account') &amp;&amp; __config__.app.getApp('base')?.getEnableTaxNumbers()" name="taxNumberList" colSpan="12" canSelect="true" canNew="false" canEdit="false" domain="self.company.id = :id"/>
+    </panel>
+    <panel name="bankDetailsPanel" title="Bank details">
+      <field name="defaultBankDetails" onSelect="action-company-attrs-default-bank-details-domain" form-view="bank-details-form" grid-view="bank-details-grid"/>
+      <panel-related name="bankDetailsListPanel" showTitle="false" colSpan="12" field="bankDetailsList" form-view="bank-details-form" grid-view="bank-details-grid"/>
+    </panel>
+    <panel if="__config__.app.isApp('sale')" if-module="axelor-sale" name="orderBloquedMessagePanel" title="Order Bloqued Message">
+      <field name="orderBloquedMessage"/>
+    </panel>
+    <panel-related if="__config__.app.getApp('base').getEmailAccountByCompany()" name="emailAccountListPanel" colSpan="12" field="emailAccountList" form-view="mail-account-form" grid-view="mail-account-grid"/>
+  </panel-tabs>
+  <panel-mail name="mailPanel">
+    <mail-messages limit="4"/>
+  </panel-mail>
+</form>
+

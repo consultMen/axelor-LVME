@@ -1,0 +1,4 @@
+<action-method name="action-method-sale-order-line-persist-lot-selection">
+  <call class="com.axelor.apps.supplychain.web.SaleOrderLineController" 
+        method="persistLotSelection"/>
+</action-method>
