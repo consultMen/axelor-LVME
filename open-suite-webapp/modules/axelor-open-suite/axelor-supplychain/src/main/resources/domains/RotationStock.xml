@@ -1,0 +1,61 @@
+<domain-models xmlns="http://axelor.com/xml/ns/domain-models"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://axelor.com/xml/ns/domain-models http://axelor.com/xml/ns/domain-models/domain-models_7.4.xsd">
+  <module name="supplychain" package="com.axelor.apps.supplychain.db"/>
+  <!-- REC-003 : rotation des stocks, une ligne par produit. Modele en lecture seule adosse a la vue
+    SQL lvme_rotation_stock. -->
+  <entity name="RotationStock" table="lvme_rotation_stock" cacheable="false">
+    <many-to-one name="product" ref="com.axelor.apps.base.db.Product"
+      column="product_id" title="Produit"/>
+    <decimal name="stockQty" column="stock_qty" title="Stock" precision="20" scale="3"/>
+    <decimal name="stockValue" column="stock_value" title="Valeur (€)" precision="20"
+      scale="2"/>
+    <decimal name="sales90d" column="sales_90d" title="Ventes 90 j" precision="20" scale="3"/>
+    <decimal name="avgDailySales" column="avg_daily_sales" title="Vente moy. / jour"
+      precision="20" scale="3"/>
+    <integer name="daysOfStock" column="days_of_stock" title="Jours de stock"
+      nullable="true"/>
+    <date name="lastSaleDate" column="last_sale_date" title="Dernière vente"/>
+    <date name="oldestLotDate" column="oldest_lot_date" title="Arrivage lot + ancien"/>
+    <integer name="oldestLotAge" column="oldest_lot_age" title="Âge lot + ancien (j)"
+      nullable="true"/>
+    <boolean name="isDormant" column="is_dormant" title="Dormant"/>
+    <string name="statut" column="statut" title="Statut"/>
+    <!-- REC-003 v3 : KPI de rotation -->
+    <decimal name="sales365d" column="sales_365d" title="Ventes 12 mois" precision="20"
+      scale="3"/>
+    <decimal name="rotationRate" column="rotation_rate" title="Rotation (fois/an)"
+      precision="20" scale="2"/>
+    <integer name="avgAgeDays" column="avg_age_days" title="Âge moyen stock (j)"
+      nullable="true"/>
+    <decimal name="dormantValue" column="dormant_value" title="Valeur dormante (€)"
+      precision="20" scale="2"/>
+    <integer name="daysSinceLastSale" column="days_since_last_sale"
+      title="Jours depuis dernière vente" nullable="true"/>
+    <string name="productCode" column="product_code" title="Code article"/>
+    <string name="productName" column="product_name" title="Désignation"/>
+    <many-to-one name="productCategory" ref="com.axelor.apps.base.db.ProductCategory"
+      column="product_category_id" title="Famille article"/>
+  </entity>
+  <!-- REC-003 : age des lots, une ligne par lot et par frigo. Modele en lecture seule adosse a la vue
+    SQL lvme_age_lot. -->
+  <entity name="AgeLot" table="lvme_age_lot" cacheable="false">
+    <many-to-one name="product" ref="com.axelor.apps.base.db.Product"
+      column="product_id" title="Produit"/>
+    <many-to-one name="trackingNumber" ref="com.axelor.apps.stock.db.TrackingNumber"
+      column="tracking_number_id" title="Lot"/>
+    <many-to-one name="stockLocation" ref="com.axelor.apps.stock.db.StockLocation"
+      column="stock_location_id" title="Frigo"/>
+    <decimal name="qty" column="qty" title="Qté" precision="20" scale="3"/>
+    <decimal name="stockValue" column="stock_value" title="Valeur (€)" precision="20"
+      scale="2"/>
+    <date name="arrivalDate" column="arrival_date" title="Date d'arrivage"/>
+    <string name="dateSource" column="date_source" title="Source de la date"/>
+    <integer name="ageDays" column="age_days" title="Âge (j)" nullable="true"/>
+    <string name="ageBucket" column="age_bucket" title="Tranche d'âge"/>
+    <date name="dluo" column="dluo" title="DLUO"/>
+    <integer name="daysToDluo" column="days_to_dluo" title="Jours avant DLUO"
+      nullable="true"/>
+    <boolean name="isExpired" column="is_expired" title="Périmé"/>
+  </entity>
+</domain-models>

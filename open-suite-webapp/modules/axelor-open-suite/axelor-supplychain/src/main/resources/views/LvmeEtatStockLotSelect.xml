@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<object-views xmlns="http://axelor.com/xml/ns/object-views"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://axelor.com/xml/ns/object-views http://axelor.com/xml/ns/object-views/object-views_7.4.xsd">
+
+  <!-- REC-038 : listes de choix de l'écran « État des stocks par lots » -->
+
+  <selection name="lvme.etat.stock.nature.select">
+    <option value="1">Arrivage réel</option>
+    <option value="2">Arrivage flottant</option>
+    <option value="0">Tous</option>
+  </selection>
+
+  <selection name="lvme.etat.stock.etat.select">
+    <option value="1">Lots non soldés</option>
+    <option value="2">Lots soldés</option>
+    <option value="3">Lots négatifs</option>
+    <option value="4">Lots non soldés + négatifs</option>
+  </selection>
+
+  <selection name="lvme.etat.stock.periode.select">
+    <option value="1">Mois en cours</option>
+    <option value="2">3 derniers mois</option>
+    <option value="3">6 derniers mois</option>
+    <option value="4">Année en cours</option>
+    <option value="5">12 derniers mois</option>
+    <option value="6">Toutes dates</option>
+  </selection>
+
+</object-views>

@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<object-views xmlns="http://axelor.com/xml/ns/object-views"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://axelor.com/xml/ns/object-views http://axelor.com/xml/ns/object-views/object-views_7.4.xsd">
+
+  <!-- ===================== ROTATION DES STOCKS ===================== -->
+  <grid name="lvme-rotation-stock-grid" title="Rotation des stocks"
+    model="com.axelor.apps.supplychain.db.RotationStock" canNew="false" canEdit="false"
+    canDelete="false" orderBy="daysOfStock">
+    <hilite color="danger" if="statut == 'A commander'"/>
+    <hilite color="warning" if="statut == 'Dormant' || statut == 'Lot ancien'"/>
+    <field name="product"/>
+    <field name="stockQty" aggregate="sum"/>
+    <field name="stockValue" aggregate="sum"/>
+    <field name="sales90d"/>
+    <field name="avgDailySales"/>
+    <field name="daysOfStock"/>
+    <field name="lastSaleDate"/>
+    <field name="oldestLotAge"/>
+    <field name="isDormant"/>
+    <field name="statut"/>
+  </grid>
+
+  <form name="lvme-rotation-stock-form" title="Rotation des stocks"
+    model="com.axelor.apps.supplychain.db.RotationStock" canNew="false" canEdit="false"
+    canDelete="false">
+    <panel name="mainPanel" readonly="true">
+      <field name="product"/>
+      <field name="statut"/>
+      <field name="stockQty"/>
+      <field name="stockValue"/>
+      <field name="sales90d"/>
+      <field name="avgDailySales"/>
+      <field name="daysOfStock"/>
+      <field name="lastSaleDate"/>
+      <field name="oldestLotDate"/>
+      <field name="oldestLotAge"/>
+      <field name="isDormant"/>
+    </panel>
+  </form>
+
+  <search-filters name="lvme-rotation-stock-filters"
+    model="com.axelor.apps.supplychain.db.RotationStock" title="Filtres">
+    <filter name="lvme-rotation-a-commander" title="A commander (moins de 60 j)">
+      <domain>self.statut = 'A commander'</domain>
+    </filter>
+    <filter name="lvme-rotation-dormants" title="Dormants uniquement">
+      <domain>self.isDormant = true</domain>
+    </filter>
+    <filter name="lvme-rotation-lot-ancien" title="Lot de plus de 180 j">
+      <domain>self.oldestLotAge &gt; 180</domain>
+    </filter>
+  </search-filters>
+
+  <action-view name="lvme-action-rotation-stock" title="Rotation des stocks"
+    model="com.axelor.apps.supplychain.db.RotationStock">
+    <view type="grid" name="lvme-rotation-stock-grid"/>
+    <view type="form" name="lvme-rotation-stock-form"/>
+    <view-param name="search-filters" value="lvme-rotation-stock-filters"/>
+  </action-view>
+
+  <!-- ======================== AGE DES LOTS ======================== -->
+  <grid name="lvme-age-lot-grid" title="Âge des lots"
+    model="com.axelor.apps.supplychain.db.AgeLot" canNew="false" canEdit="false" canDelete="false"
+    orderBy="-ageDays">
+    <hilite color="danger"
+      if="isExpired || (daysToDluo != null &amp;&amp; daysToDluo &lt; 90) || ageDays &gt; 180"/>
+    <hilite color="warning" if="ageDays &gt; 90"/>
+    <field name="product"/>
+    <field name="trackingNumber"/>
+    <field name="stockLocation"/>
+    <field name="qty" aggregate="sum"/>
+    <field name="stockValue" aggregate="sum"/>
+    <field name="arrivalDate"/>
+    <field name="ageDays"/>
+    <field name="ageBucket"/>
+    <field name="dluo"/>
+    <field name="daysToDluo"/>
+    <field name="isExpired"/>
+  </grid>
+
+  <form name="lvme-age-lot-form" title="Âge du lot"
+    model="com.axelor.apps.supplychain.db.AgeLot" canNew="false" canEdit="false" canDelete="false">
+    <panel name="mainPanel" readonly="true">
+      <field name="product"/>
+      <field name="trackingNumber"/>
+      <field name="stockLocation"/>
+      <field name="qty"/>
+      <field name="stockValue"/>
+      <field name="arrivalDate"/>
+      <field name="dateSource"/>
+      <field name="ageDays"/>
+      <field name="ageBucket"/>
+      <field name="dluo"/>
+      <field name="daysToDluo"/>
+      <field name="isExpired"/>
+    </panel>
+  </form>
+
+  <search-filters name="lvme-age-lot-filters"
+    model="com.axelor.apps.supplychain.db.AgeLot" title="Filtres">
+    <filter name="lvme-age-lot-perimes" title="Périmés">
+      <domain>self.isExpired = true</domain>
+    </filter>
+    <filter name="lvme-age-lot-dluo-90" title="DLUO dans moins de 90 j">
+      <domain>self.daysToDluo &gt;= 0 AND self.daysToDluo &lt; 90</domain>
+    </filter>
+    <filter name="lvme-age-lot-180" title="Plus de 180 j">
+      <domain>self.ageDays &gt; 180</domain>
+    </filter>
+  </search-filters>
+
+  <action-view name="lvme-action-age-lot" title="Âge des lots"
+    model="com.axelor.apps.supplychain.db.AgeLot">
+    <view type="grid" name="lvme-age-lot-grid"/>
+    <view type="form" name="lvme-age-lot-form"/>
+    <view-param name="search-filters" value="lvme-age-lot-filters"/>
+  </action-view>
+
+  <!-- Menus sous Stocks (menu racine stock-root) -->
+  <menuitem name="lvme-menu-rotation-stock" parent="stock-root" title="Rotation des stocks"
+    action="lvme-action-rotation-stock"/>
+  <menuitem name="lvme-menu-age-lot" parent="stock-root" title="Âge des lots"
+    action="lvme-action-age-lot"/>
+
+</object-views>
