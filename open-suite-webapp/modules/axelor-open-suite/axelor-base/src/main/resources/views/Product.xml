@@ -272,6 +272,12 @@
           <field name="internalDescription" showTitle="false" colSpan="12" widget="html"/>
         </panel>
       </panel>
+      <panel name="ficheTechniquePanel" title="Fiche technique">
+        <field name="numAgrementUsine" colSpan="6"/>
+        <spacer colSpan="6"/>
+        <field name="descriptifDetaille" colSpan="12" widget="text" height="4"/>
+        <field name="compositionAdditifs" colSpan="12" widget="text" height="4"/>
+      </panel>
       <panel name="purchaseCostsPanel" title="Purchase/Costs" showTitle="false">
         <panel name="purchasePanel" title="Purchases" colSpan="6">
           <field name="purchasable" colSpan="12"/>

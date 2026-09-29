@@ -7,7 +7,21 @@
     id="supplychain-sale-order-form" extension="true">
     <extend target="/">
       <attribute name="onLoad" value="action-group-supplychain-saleorder-onload"/>
-      <attribute name="onSave" value="action-supplychain-saleorder-onsave"/>
+      <attribute name="onSave"
+        value="action-supplychain-saleorder-onsave,action-lvme-sale-order-method-refresh-stock-location"/>
+    </extend>
+    <!-- LVME : mise à jour de l'emplacement de l'en-tête à la fermeture d'une ligne -->
+    <extend target="//panel-related[@name='detailLinesPanel']">
+      <attribute name="onChange"
+        value="action-sale-order-method-on-line-change,action-lvme-sale-order-method-refresh-stock-location"/>
+    </extend>
+    <extend target="//panel-related[@name='saleOrderLineEditableTreePanel']">
+      <attribute name="onChange"
+        value="action-sale-order-method-on-line-change,action-lvme-sale-order-method-refresh-stock-location"/>
+    </extend>
+    <extend target="//panel-related[@name='editableDetailLinesPanel']">
+      <attribute name="onChange"
+        value="action-sale-order-method-on-line-change,action-lvme-sale-order-method-refresh-stock-location"/>
     </extend>
     <extend target="//field[@name='versionNumber']">
       <insert position="after">
@@ -40,7 +54,6 @@
         value="action-sale-order-record-freight-carrier,supplychain-action-update-shipment-cost-line"/>
     </extend>
   </form>
-
   <form name="sale-order-form-partner" title="Sale order"
     model="com.axelor.apps.sale.db.SaleOrder" id="supplychain-sale-order-form-partner"
     onNew="action-sale-order-method-onnew,action-group-partner-saleorder-onnew"
@@ -150,6 +163,10 @@
   </action-group>
 
   <!-- ACTION METHOD -->
+  <action-method name="action-lvme-sale-order-method-refresh-stock-location">
+    <call class="com.axelor.apps.supplychain.web.SaleOrderStockLocationLvmeController"
+      method="refreshStockLocation"/>
+  </action-method>
 
   <action-method name="action-supplychain-saleorder-onsave">
     <call class="com.axelor.apps.supplychain.web.SaleOrderController" method="onSave"/>

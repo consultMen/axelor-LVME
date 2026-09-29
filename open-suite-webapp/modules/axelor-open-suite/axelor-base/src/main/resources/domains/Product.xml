@@ -193,6 +193,12 @@
       <field name="costTypeSelect"/>
       <message if="true" on="UPDATE">Product updated</message>
     </track>
+    <!-- LVME REC-008 : descriptif, composition et agrément par produit -->
+    <string name="descriptifDetaille" title="Descriptif détaillé" large="true"
+      multiline="true"/>
+    <string name="compositionAdditifs" title="Composition / Additifs" large="true"
+      multiline="true"/>
+    <string name="numAgrementUsine" title="N° d'agrément fabricant / usine"/>
   </entity>
 
 </domain-models>

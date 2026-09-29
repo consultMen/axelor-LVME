@@ -25,7 +25,9 @@ import com.axelor.apps.sale.db.SaleOrder;
 import com.axelor.apps.sale.db.repo.SaleOrderManagementRepository;
 import com.axelor.apps.sale.service.saleorder.SaleOrderCopyService;
 import com.axelor.apps.sale.service.saleorder.SaleOrderOrderingStatusService;
+import com.axelor.apps.stock.db.StockLocation;
 import com.axelor.apps.supplychain.service.AccountingSituationSupplychainService;
+import com.axelor.apps.supplychain.service.SaleOrderLineStockLocationService;
 import com.axelor.apps.supplychain.service.saleorderline.SaleOrderLineAnalyticService;
 import com.axelor.inject.Beans;
 import com.google.inject.Inject;
@@ -62,6 +64,28 @@ public class SaleOrderSupplychainRepository extends SaleOrderManagementRepositor
       TraceBackService.traceExceptionFromSaveMethod(e);
       throw new PersistenceException(e.getMessage(), e);
     }
+
+    updateStockLocationFromAllocations(saleOrder);
+
     return super.save(saleOrder);
+  }
+
+  /**
+   * LVME : tant que la commande n'est pas confirmée, l'emplacement de l'en-tête suit l'emplacement
+   * physique alloué dans le panneau « Réservations Stocks » (s'il est unique). Après confirmation,
+   * on ne touche plus à l'emplacement (le BL existe déjà).
+   */
+  protected void updateStockLocationFromAllocations(SaleOrder saleOrder) {
+    if (saleOrder.getId() == null
+        || saleOrder.getStatusSelect() == null
+        || saleOrder.getStatusSelect() >= STATUS_ORDER_CONFIRMED) {
+      return;
+    }
+    StockLocation candidate =
+        Beans.get(SaleOrderLineStockLocationService.class)
+            .computeSaleOrderStockLocation(saleOrder.getId(), null);
+    if (candidate != null) {
+      saleOrder.setStockLocation(candidate);
+    }
   }
 }

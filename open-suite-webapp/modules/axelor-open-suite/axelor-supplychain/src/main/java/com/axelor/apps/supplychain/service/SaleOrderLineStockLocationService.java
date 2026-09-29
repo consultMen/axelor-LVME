@@ -72,4 +72,7 @@ public interface SaleOrderLineStockLocationService {
    */
   void transferVirtualToPhysical(SaleOrderLine sol, StockLocation stockLocationPhysique)
       throws AxelorException;
+
+  StockLocation computeSaleOrderStockLocation(
+      Long saleOrderId, StockLocation extraPhysicalLocation);
 }

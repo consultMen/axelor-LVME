@@ -2784,7 +2784,7 @@ RETURNS table(inv_id bigint, product_name varchar, description text,
     "productCategory" bigint, "showTotal" boolean, "hideUnitAmounts" boolean,
     "PackHideUnitAmounts" boolean,number_of_decimals int,invoice_line_id bigint, 
     "coefficient" numeric, "ExpenseDate" date,"groupingPeriodSelect" varchar, "previousProgress" numeric, "newProgress" numeric,
-    "display_previous_progress" bigint, "display_new_progress" bigint, "previous_project_invoice_date" date) as
+    "display_previous_progress" bigint, "display_new_progress" bigint, "previous_project_invoice_date" date, "customsCode" varchar) as
 $func$
 DECLARE
 sql_query text;    
@@ -2859,13 +2859,14 @@ newProgress ||
 display_previous_progress ||  
 display_new_progress ||  
 previous_project_invoice_date ||  
+', CASE WHEN COALESCE((Partner.partner_attrs->>''displayCustomsCode'')::boolean, false) THEN CustomsCode.code ELSE NULL END as "customsCode"' ||  
 ' from account_invoice_line as InvoiceLine  
 inner join account_invoice as Invoice on (InvoiceLine.invoice = Invoice.id)  
 left outer join base_product as Product on (InvoiceLine.product = Product.id)  
 left outer join base_product_category as ProductCategory on (Product.product_category = ProductCategory.id)  
 left outer join base_unit as Unit on (InvoiceLine.unit = Unit.id)  
 left outer join base_currency as Currency on (Invoice.currency = Currency.id)  
-left outer join sale_sale_order_line as SaleOrderLine on InvoiceLine.sale_order_line = SaleOrderLine.id';  
+left outer join sale_sale_order_line as SaleOrderLine on InvoiceLine.sale_order_line = SaleOrderLine.id left outer join base_partner as Partner on (Invoice.partner = Partner.id) left outer join stock_customs_code_nomenclature as CustomsCode on (Product.customs_code_nomenclature = CustomsCode.id)';  
 IF (SELECT COUNT(to_regclass('sale_customer_catalog')) != 0) THEN  
 	sql_query := sql_query || ' left outer join sale_customer_catalog as CustomerCatalog on (CustomerCatalog.product = Product.id and CustomerCatalog.customer_partner = Invoice.partner)';  
 END IF;  
@@ -3538,6 +3539,13 @@ else if(row["groupingPeriodSelect"] == "week"){
                     <property name="dataType">date</property>
                     <property name="nativeDataType">0</property>
                 </structure>
+                <structure>
+                    <property name="position">33</property>
+                    <property name="name">customsCode</property>
+                    <property name="nativeName">customsCode</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
             </list-property>
             <xml-property name="queryText"><![CDATA[WITH INV AS (
     select * from invoice_line_proc(cast(? as bigint))
@@ -3575,7 +3583,8 @@ select
     INV."newProgress",
     INV."display_previous_progress",
     INV."display_new_progress",
-    INV."previous_project_invoice_date"
+    INV."previous_project_invoice_date",
+    INV."customsCode"
     from INV
     LEFT JOIN studio_app_base AppBase ON (AppBase.id = (SELECT max(id) FROM studio_app_base))
     LEFT JOIN account_invoice Invoice ON (INV.inv_id = Invoice.id)
@@ -3625,7 +3634,8 @@ select
     SUM(INV."newProgress") as "newProgress",
     SUM(INV."display_previous_progress") as "display_previous_progress",
     SUM(INV."display_new_progress") as "display_new_progress",
-    MAX(INV."previous_project_invoice_date") as "previous_project_invoice_date"
+    MAX(INV."previous_project_invoice_date") as "previous_project_invoice_date",
+    null::varchar as "customsCode"
     from INV
     LEFT JOIN base_product_category as ProductCategory on (INV."productCategory" = ProductCategory.id)
     LEFT JOIN studio_app_base AppBase ON (AppBase.id = (SELECT max(id) FROM studio_app_base))
@@ -3679,7 +3689,8 @@ select
     SUM(INV."newProgress") as "newProgress",
     SUM(INV."display_previous_progress") as "display_previous_progress",
     SUM(INV."display_new_progress") as "display_new_progress",
-    MAX(INV."previous_project_invoice_date") as "previous_project_invoice_date"
+    MAX(INV."previous_project_invoice_date") as "previous_project_invoice_date",
+    null::varchar as "customsCode"
 from INV
 LEFT JOIN studio_app_base AppBase ON (AppBase.id = (SELECT max(id) FROM studio_app_base))
 LEFT JOIN account_invoice Invoice ON (INV.inv_id = Invoice.id)
@@ -7516,6 +7527,12 @@ if(params["__locale"].value.substring(0, 2) == 'en')row["StockMoveRealDate"]</VA
                                 <expression name="expression" type="javascript">dataSetRow["previous_project_invoice_date"]</expression>
                                 <property name="dataType">date</property>
                             </structure>
+                            <structure>
+                                <property name="name">customsCode</property>
+                                <text-property name="displayName">customsCode</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["customsCode"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
                         </list-property>
                         <list-property name="sort">
                             <structure>
@@ -8535,6 +8552,19 @@ if(params["__locale"].value.substring(0, 2) == 'en')row["StockMoveRealDate"]</VA
                                         <method name="onRender"><![CDATA[this.getStyle().fontSize = this.getRowData().getColumnValue("tableFontSize")]]></method>
                                         <property name="resultSetColumn">customerproductname</property>
                                     </data>
+                                    <text id="9101">
+                                        <property name="fontSize">8pt</property>
+                                        <property name="fontStyle">italic</property>
+                                        <list-property name="visibility">
+                                            <structure>
+                                                <property name="format">all</property>
+                                                <expression name="valueExpr" type="javascript">!row["customsCode"]</expression>
+                                            </structure>
+                                        </list-property>
+                                        <method name="onRender"><![CDATA[this.getStyle().fontSize = this.getRowData().getColumnValue("tableFontSize")]]></method>
+                                        <property name="contentType">html</property>
+                                        <text-property name="content"><![CDATA[Code NC : <VALUE-OF>row["customsCode"]</VALUE-OF>]]></text-property>
+                                    </text>
                                     <text id="5385">
                                         <property name="fontSize">8pt</property>
                                         <list-property name="visibility">
