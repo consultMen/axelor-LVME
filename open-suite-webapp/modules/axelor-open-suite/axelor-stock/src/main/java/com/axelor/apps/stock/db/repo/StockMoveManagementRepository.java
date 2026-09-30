@@ -69,8 +69,9 @@ public class StockMoveManagementRepository extends StockMoveRepository {
         }
       }
     }
-    stockMove.setNbColisTotal(nbColis);
-    stockMove.setPoidsTotal(poids);
+    // les champs totaux ont 3 décimales, les lignes davantage : arrondir sinon l'enregistrement est refusé
+    stockMove.setNbColisTotal(nbColis.setScale(3, java.math.RoundingMode.HALF_UP));
+    stockMove.setPoidsTotal(poids.setScale(3, java.math.RoundingMode.HALF_UP));
   }
 
   @Override
