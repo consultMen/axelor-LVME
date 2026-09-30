@@ -1,3 +1,51 @@
+# Déploiement prod LVME — lot « écrans GESCOM » du 30/09/2026 (PROD_7 à PROD_13)
+
+## Contenu du lot (validé en local)
+| Script | Écran GESCOM |
+|---|---|
+| PROD_7  | Fiche Commande client : en-tête GESCOM + grille des lignes |
+| PROD_8  | Fiche Commande fournisseur : en-tête (devises, blocs Fournisseur / Arrivage, Nature) + grille des lignes |
+| PROD_9  | Arrivages : menu, recherche, liste, fiche Arrivage, lignes, référentiels Bateaux / Containers |
+| PROD_10 | Liste des achats fournisseurs + Listes Commandes Clients (filtres, totaux, Nature des commandes) |
+| PROD_11 | Listes Clients / Fournisseurs / Articles + Gencode, Réf. fournisseur, Poids Colis, P.Vente TTC |
+| PROD_12 | « Recherche rapide par » Clients / Fournisseurs / Articles (prérequis : PROD_11) |
+| PROD_13 | Stocks > Lots Vérifiés (+ vue lvme_etat_stock_lot mise à jour) |
+
+**Hors lot** : PROD_14 (Historique Produit), pas encore testé ; son code n'est pas commité.
+Ne pas le déployer seul : sans son script, Axelor créerait une table à la place de la vue.
+
+## Ordre de déploiement
+0. **Sur le PC** : `git push` (les commits du lot doivent être sur `origin/main`).
+1. **Sauvegarde de la base prod** :
+   `pg_dump -U axelor -Fc axelor > ~/sauvegarde_axelor_$(date +%F_%H%M).dump`
+2. **Sur le serveur**, dans `~/src/axelor-LVME` : `git pull`, puis build comme d'habitude
+   (`./gradlew build -x test -x :modules:axelor-human-resource:buildFront`). Axelor n'est pas encore redémarré.
+3. **Contrôle (lecture seule)** :
+   `psql -U axelor axelor -f livrables/PROD_7-13_controle_avant.sql`
+   → « manquant » doit être vide ; sale-order-form, purchase-order-form, product-form trouvées. Sinon, on s'arrête.
+4. **Scripts, dans l'ordre**, depuis la racine du dépôt (chacun en une transaction : en cas d'erreur, rien n'est écrit
+   et on s'arrête là) :
+   ```
+   psql -U axelor axelor -v ON_ERROR_STOP=1 -f livrables/PROD_7_ui_commande_client.sql
+   psql -U axelor axelor -v ON_ERROR_STOP=1 -f livrables/PROD_8_ui_commande_fournisseur.sql
+   psql -U axelor axelor -v ON_ERROR_STOP=1 -f livrables/PROD_9_arrivages.sql
+   psql -U axelor axelor -v ON_ERROR_STOP=1 -f livrables/PROD_10_listes_achats_commandes.sql
+   psql -U axelor axelor -v ON_ERROR_STOP=1 -f livrables/PROD_11_listes_tiers_articles.sql
+   psql -U axelor axelor -v ON_ERROR_STOP=1 -f livrables/PROD_12_recherche_tiers_articles.sql
+   psql -U axelor axelor -v ON_ERROR_STOP=1 -f livrables/PROD_13_lots_verifies.sql
+   ```
+5. **Redémarrer Axelor** (obligatoire : cache des vues ; création des tables Bateaux / Containers et des nouvelles colonnes).
+   **Ne pas lancer `gradlew database --update`.**
+6. **Vérifications** après connexion : Ventes > Commandes clients (liste + une fiche), Achats > Commandes fournisseurs
+   (liste + une fiche), Stocks > Arrivages, Stocks > Configuration > Bateaux / Containers, listes Clients /
+   Fournisseurs / Articles, Stocks > Lots Vérifiés.
+   Si une liste n'a pas les bonnes colonnes pour un utilisateur : engrenage de la liste > « Réinitialiser ».
+7. **Retour arrière** si besoin : restaurer la sauvegarde de l'étape 1 (`pg_restore`) et revenir au commit précédent.
+
+Règle : ne jamais réenregistrer ces vues depuis l'écran d'administration (Axelor régénérerait une vue calculée).
+
+---
+
 # Déploiement prod LVME — lot du 29/09/2026
 
 ## Contenu du lot
