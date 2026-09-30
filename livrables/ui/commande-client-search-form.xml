@@ -8,6 +8,8 @@
     <panel name="filtreClientPanel" colSpan="3" itemSpan="12">
       <field name="$client" title="Client" type="many-to-one" target="com.axelor.apps.base.db.Partner"
         domain="self.isCustomer = true" canNew="false" canEdit="false" canView="false"/>
+      <field name="$commercialFiltre" title="Commercial" type="many-to-one" target="com.axelor.auth.db.User"
+        canNew="false" canEdit="false" canView="false"/>
       <button name="nouvelleCdeBtn" title="Nouvelle Cde" icon="plus" onClick="action-lvme-cde-client-new"/>
     </panel>
     <panel name="filtreDatePanel" colSpan="3" itemSpan="12">

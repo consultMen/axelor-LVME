@@ -130,10 +130,12 @@ INSERT INTO meta_action (id, version, created_on, name, type, model, xml, home, 
     AND ((:_etat = 1 AND self.statusSelect = 3 AND self.deliveryState != 3)
          OR (:_etat = 2 AND (self.statusSelect = 4 OR self.deliveryState = 3)) OR :_etat = 3)
     AND (:_client = 0 OR self.clientPartner.id = :_client)
+    AND (:_commercial = 0 OR self.commercial.id = :_commercial)
     AND (:_dateFiltre = false OR COALESCE(self.orderDate, self.creationDate) BETWEEN :_dateDu AND :_dateAu)
     AND (:_livFiltre = false OR self.estimatedDeliveryDate BETWEEN :_livDu AND :_livAu)</domain>
   <context name="_etat" expr="eval: (etatCommande ?: 1) as Integer"/>
   <context name="_client" expr="eval: (client?.id ?: 0) as Long"/>
+  <context name="_commercial" expr="eval: (commercialFiltre?.id ?: 0) as Long"/>
   <context name="_dateFiltre" expr="eval: dateDu != null || dateAu != null"/>
   <context name="_dateDu" expr="eval: dateDu ? java.time.LocalDate.parse(dateDu.toString().substring(0, 10)) : java.time.LocalDate.of(1900, 1, 1)"/>
   <context name="_dateAu" expr="eval: dateAu ? java.time.LocalDate.parse(dateAu.toString().substring(0, 10)) : java.time.LocalDate.of(2999, 12, 31)"/>

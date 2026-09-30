@@ -1,0 +1,11 @@
+<form name="lvme-fournisseur-search-form" title="Fournisseurs" model="com.axelor.utils.db.Wizard" width="large"
+  canNew="false" canSave="false" canCopy="false" canDelete="false" onNew="action-lvme-recherche-defaults">
+  <!-- LVME : écran « Fournisseurs » de GESCOM : « Recherche rapide par » + liste -->
+  <panel name="rechercheRapidePanel" title="Recherche" colSpan="12">
+    <field name="$critere" title="Recherche rapide par" type="integer" selection="lvme.recherche.fournisseur.select" colSpan="3"/>
+    <field name="$valeur" showTitle="false" type="string" colSpan="5" onChange="action-lvme-recherche-refresh"/>
+    <button name="rechercheBtn" title="Recherche" icon="search" css="btn-primary" colSpan="2" onClick="action-lvme-recherche-refresh"/>
+    <button name="nouveauBtn" title="Nouveau fournisseur" icon="plus" colSpan="2" onClick="action-lvme-fournisseur-new"/>
+  </panel>
+  <panel-dashlet name="listeDashlet" title="Fournisseurs" colSpan="12" height="650" action="action-lvme-fournisseur-dashlet"/>
+</form>

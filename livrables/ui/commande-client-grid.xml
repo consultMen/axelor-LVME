@@ -10,8 +10,8 @@
   <field name="exTaxTotal" title="Montant HT" aggregate="sum" width="110"/>
   <field name="totalGrossMargin" title="Marge ht" aggregate="sum" width="100"/>
   <field name="marginRate" title="% Marge" width="80"/>
-  <field name="commercial" title="Commercial" width="110"/>
-  <field name="contactPartner" title="Nom responsable" width="140"/>
+  <field name="commercial.code" title="Commercial" width="100"/>
+  <field name="commercial.name" title="Nom responsable" width="150"/>
   <field name="estimatedDeliveryDate" title="Date livraison" width="100"/>
   <field name="externalReference" title="Ref Cde Client" width="120"/>
   <field name="statusSelect" hidden="true"/>
