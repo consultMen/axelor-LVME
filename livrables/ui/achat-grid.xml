@@ -1,0 +1,19 @@
+<grid name="lvme-achat-grid" title="Achats fournisseurs" model="com.axelor.apps.purchase.db.PurchaseOrder" orderBy="-orderDate,-id" canNew="false">
+  <!-- LVME : colonnes de « liste des achats fournisseurs » GESCOM -->
+  <hilite color="success" if="receiptState == 3"/>
+  <hilite color="warning" if="receiptState != 3"/>
+  <field name="purchaseOrderSeq" title="N°" width="110"/>
+  <field name="supplierPartner.partnerSeq" title="Fournisseur" width="100"/>
+  <field name="supplierPartner.name" title="Nom" width="220"/>
+  <field name="receiptState" title="Nature" width="120"/>
+  <field name="orderDate" title="Date Arrivage" width="100"/>
+  <field name="estimatedReceiptDate" title="Date Arrivée" width="100"/>
+  <field name="shipmentMode" title="Type transport" width="100"/>
+  <field name="nbColisTotal" title="Nb Colis" aggregate="sum" width="85"/>
+  <field name="qtyTotal" title="Nb unités" aggregate="sum" width="90"/>
+  <field name="poidsTotal" title="Tonnage en kg" aggregate="sum" width="100"/>
+  <field name="exTaxTotal" title="Mt Arrivage H.T." aggregate="sum" width="120"/>
+  <field name="currency" title="Devise" width="80"/>
+  <field name="stockLocation" title="Frigo" width="90"/>
+  <field name="statusSelect" title="Statut" width="90"/>
+</grid>

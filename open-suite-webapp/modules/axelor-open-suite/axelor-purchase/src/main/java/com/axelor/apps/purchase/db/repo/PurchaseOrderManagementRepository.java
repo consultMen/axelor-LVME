@@ -63,10 +63,38 @@ public class PurchaseOrderManagementRepository extends PurchaseOrderRepository {
     return copy;
   }
 
+  /** LVME : totaux de la commande (Nb Colis, Nb unités, Tonnage) = somme des lignes. */
+  protected void computeLvmeTotals(PurchaseOrder purchaseOrder) {
+    java.math.BigDecimal nbColis = java.math.BigDecimal.ZERO;
+    java.math.BigDecimal qty = java.math.BigDecimal.ZERO;
+    java.math.BigDecimal poids = java.math.BigDecimal.ZERO;
+    if (purchaseOrder.getPurchaseOrderLineList() != null) {
+      for (com.axelor.apps.purchase.db.PurchaseOrderLine line :
+          purchaseOrder.getPurchaseOrderLineList()) {
+        if (Boolean.TRUE.equals(line.getIsTitleLine())) {
+          continue;
+        }
+        if (line.getNbColis() != null) {
+          nbColis = nbColis.add(line.getNbColis());
+        }
+        if (line.getQty() != null) {
+          qty = qty.add(line.getQty());
+        }
+        if (line.getPoidsTotalNet() != null) {
+          poids = poids.add(line.getPoidsTotalNet());
+        }
+      }
+    }
+    purchaseOrder.setNbColisTotal(nbColis);
+    purchaseOrder.setQtyTotal(qty);
+    purchaseOrder.setPoidsTotal(poids);
+  }
+
   @Override
   public PurchaseOrder save(PurchaseOrder purchaseOrder) {
 
     try {
+      computeLvmeTotals(purchaseOrder);
       purchaseOrder = super.save(purchaseOrder);
       purchaseOrderSequenceService.setDraftSequence(purchaseOrder);
       return purchaseOrder;

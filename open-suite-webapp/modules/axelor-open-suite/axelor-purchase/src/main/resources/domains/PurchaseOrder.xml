@@ -90,6 +90,10 @@
     <boolean name="groupProductsOnPrintings" title="Group products on printings"
       default="false"/>
     <date name="supplierShipmentDate" title="Heure réelle d'arrivée"/>
+    <!-- LVME : totaux de la commande (liste des achats GESCOM), calculés à l'enregistrement -->
+    <decimal name="nbColisTotal" title="Nb Colis" precision="20" scale="3" readonly="true"/>
+    <decimal name="qtyTotal" title="Nb unités" precision="20" scale="3" readonly="true"/>
+    <decimal name="poidsTotal" title="Tonnage en kg" precision="20" scale="3" readonly="true"/>
 
 
     <many-to-one name="companyCurrency" transient="true"

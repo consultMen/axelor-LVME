@@ -1,0 +1,30 @@
+<form name="lvme-commande-client-search-form" title="Listes Commandes Clients" model="com.axelor.utils.db.Wizard" width="large"
+  canNew="false" canSave="false" canCopy="false" canDelete="false" onNew="action-lvme-cde-client-defaults">
+  <!-- LVME : écran « Listes Commandes Clients » de GESCOM : filtres + liste des commandes clients -->
+  <panel name="rechercheCdePanel" title="Recherche" colSpan="12">
+    <panel name="filtreEtatPanel" colSpan="3" itemSpan="12">
+      <field name="$etatCommande" showTitle="false" type="integer" widget="RadioSelect" selection="lvme.commande.client.etat.select"/>
+    </panel>
+    <panel name="filtreClientPanel" colSpan="3" itemSpan="12">
+      <field name="$client" title="Client" type="many-to-one" target="com.axelor.apps.base.db.Partner"
+        domain="self.isCustomer = true" canNew="false" canEdit="false" canView="false"/>
+      <field name="$commercialFiltre" title="Commercial" type="many-to-one" target="com.axelor.auth.db.User"
+        canNew="false" canEdit="false" canView="false"/>
+      <button name="nouvelleCdeBtn" title="Nouvelle Cde" icon="plus" onClick="action-lvme-cde-client-new"/>
+    </panel>
+    <panel name="filtreDatePanel" colSpan="3" itemSpan="12">
+      <field name="$dateDu" title="Date du" type="date"/>
+      <field name="$dateAu" title="au" type="date"/>
+      <field name="$datePeriode" title="Période prédéfinie" type="integer" selection="lvme.etat.stock.periode.select"
+        onChange="action-lvme-cde-client-periode-date"/>
+    </panel>
+    <panel name="filtreLivraisonPanel" colSpan="3" itemSpan="12">
+      <field name="$livraisonDu" title="Livraison du" type="date"/>
+      <field name="$livraisonAu" title="au" type="date"/>
+      <field name="$livraisonPeriode" title="Période prédéfinie" type="integer" selection="lvme.etat.stock.periode.select"
+        onChange="action-lvme-cde-client-periode-livraison"/>
+      <button name="lancerRechercheBtn" title="Lancer la recherche" icon="search" css="btn-primary" onClick="action-lvme-cde-client-refresh"/>
+    </panel>
+  </panel>
+  <panel-dashlet name="commandesDashlet" title="Commandes clients" colSpan="12" height="600" action="action-lvme-cde-client-dashlet"/>
+</form>

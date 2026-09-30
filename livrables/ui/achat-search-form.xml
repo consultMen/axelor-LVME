@@ -1,0 +1,32 @@
+<form name="lvme-achat-search-form" title="liste des achats fournisseurs" model="com.axelor.utils.db.Wizard" width="large"
+  canNew="false" canSave="false" canCopy="false" canDelete="false" onNew="action-lvme-achat-defaults">
+  <!-- LVME : écran « liste des achats fournisseurs » de GESCOM : filtres + liste des commandes fournisseurs -->
+  <panel name="rechercheAchatPanel" title="Recherche" colSpan="12">
+    <panel name="filtreDatePanel" colSpan="3" itemSpan="12">
+      <field name="$dateDu" title="Date du" type="date"/>
+      <field name="$dateAu" title="au" type="date"/>
+      <field name="$datePeriode" title="Période prédéfinie" type="integer" selection="lvme.etat.stock.periode.select"
+        onChange="action-lvme-achat-periode-date"/>
+    </panel>
+    <panel name="filtreArriveePanel" colSpan="3" itemSpan="12">
+      <field name="$arriveeDu" title="Arrivée du" type="date"/>
+      <field name="$arriveeAu" title="au" type="date"/>
+      <field name="$arriveePeriode" title="Période prédéfinie" type="integer" selection="lvme.etat.stock.periode.select"
+        onChange="action-lvme-achat-periode-arrivee"/>
+    </panel>
+    <panel name="filtreFournisseurPanel" colSpan="3" itemSpan="12">
+      <field name="$fournisseurDu" title="Fournisseur du" type="many-to-one" target="com.axelor.apps.base.db.Partner"
+        domain="self.isSupplier = true" canNew="false" canEdit="false" canView="false"/>
+      <field name="$fournisseurAu" title="au" type="many-to-one" target="com.axelor.apps.base.db.Partner"
+        domain="self.isSupplier = true" canNew="false" canEdit="false" canView="false"/>
+      <field name="$typeTransport" title="Type transport" type="many-to-one" target="com.axelor.apps.stock.db.ShipmentMode"
+        canNew="false" canEdit="false" canView="false"/>
+    </panel>
+    <panel name="filtreNaturePanel" colSpan="3" itemSpan="12">
+      <field name="$natureAchat" showTitle="false" type="integer" widget="RadioSelect" selection="lvme.achat.nature.select"/>
+      <button name="lancerRechercheBtn" title="Lancer la recherche" icon="search" css="btn-primary" onClick="action-lvme-achat-refresh"/>
+      <button name="nouvelleCommandeBtn" title="Nouvelle commande" icon="plus" onClick="action-lvme-achat-new"/>
+    </panel>
+  </panel>
+  <panel-dashlet name="achatsDashlet" title="Achats fournisseurs" colSpan="12" height="600" action="action-lvme-achat-dashlet"/>
+</form>
