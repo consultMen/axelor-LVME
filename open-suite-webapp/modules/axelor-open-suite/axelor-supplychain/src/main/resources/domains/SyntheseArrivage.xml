@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<domain-models xmlns="http://axelor.com/xml/ns/domain-models"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://axelor.com/xml/ns/domain-models http://axelor.com/xml/ns/domain-models/domain-models_7.4.xsd">
+
+  <module name="supplychain" package="com.axelor.apps.supplychain.db"/>
+
+  <!-- LVME : écran « Synthèse des Arrivages » de GESCOM (diapo 24), une ligne par ligne d'arrivage
+    réel. Modèle en lecture seule adossé à la vue SQL lvme_synthese_arrivage
+    (sql/lvme_synthese_arrivage.sql). -->
+  <entity name="SyntheseArrivage" table="lvme_synthese_arrivage" cacheable="false">
+    <many-to-one name="stockMove" ref="com.axelor.apps.stock.db.StockMove"
+      column="stock_move_id" title="Arrivage"/>
+    <many-to-one name="stockMoveLine" ref="com.axelor.apps.stock.db.StockMoveLine"
+      column="stock_move_line_id" title="Ligne d'arrivage"/>
+    <string name="arrivage" column="arrivage" title="N°Arrivage"/>
+    <string name="entete" column="entete" title="Arrivage"/>
+    <many-to-one name="supplier" ref="com.axelor.apps.base.db.Partner"
+      column="supplier_id" title="Fournisseur"/>
+    <string name="fournisseur" column="fournisseur" title="Fournisseur"/>
+    <string name="codeFournisseur" column="code_fournisseur" title="Code Fournisseur"/>
+    <date name="dateEmbarquement" column="date_embarquement" title="Date Embarq."/>
+    <date name="dateArrivee" column="date_arrivee" title="Date Arrivée"/>
+    <many-to-one name="product" ref="com.axelor.apps.base.db.Product"
+      column="product_id" title="Produit"/>
+    <string name="productCode" column="product_code" title="Produit"/>
+    <string name="designation" column="designation" title="Désignation"/>
+    <string name="origine" column="origine" title="Origine"
+      selection="purchase.purchase.order.line.origine.select"/>
+    <string name="conditionnement" column="conditionnement" title="Conditionnement"/>
+    <string name="frigo" column="frigo" title="Frigo"/>
+    <many-to-one name="trackingNumber" ref="com.axelor.apps.stock.db.TrackingNumber"
+      column="tracking_number_id" title="N° Lot"/>
+    <string name="lotNumber" column="lot_number" title="N° Lot"/>
+    <date name="dlc" column="dlc" title="D. L. C."/>
+    <string name="unite" column="unite" title="Unité"/>
+    <decimal name="nbColis" column="nb_colis" title="Nb Colis Entrées" precision="20" scale="3"/>
+    <decimal name="poidsColis" column="poids_colis" title="Poids Colis" precision="20" scale="3"/>
+    <decimal name="poidsTotal" column="poids_total" title="Poids Total" precision="20" scale="3"/>
+    <decimal name="pa" column="pa" title="pa" precision="20" scale="4"/>
+  </entity>
+
+</domain-models>

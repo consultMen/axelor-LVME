@@ -1,3 +1,24 @@
+# Déploiement prod LVME — lot « Historique Produit / Synthèse des Arrivages » (PROD_14, PROD_15)
+
+| Script | Écran GESCOM |
+|---|---|
+| PROD_14 | Stocks > Historique Produit (diapo 11) : vue SQL lvme_historique_produit, écran, liste, détail |
+| PROD_15 | Stocks > Arrivages > Synthèse des Arrivages (diapo 24) : vue SQL lvme_synthese_arrivage, écran, liste, détail |
+
+**Ordre impératif** : les deux scripts passent AVANT que Tomcat démarre sur le nouveau code
+(sinon Axelor crée des tables vides à la place des vues).
+1. Sauvegarde : `pg_dump -U axelor -Fc axelor > ~/sauvegarde_axelor_$(date +%F_%H%M).dump`
+2. `cd ~/src && rm -rf axelor-LVME axelor-version_app axelor-version_app.war && git clone https://github.com/consultMen/axelor-LVME.git`
+3. Depuis `~/src/axelor-LVME` (l'ancienne appli tourne encore) :
+   ```
+   psql -U axelor axelor -v ON_ERROR_STOP=1 -f livrables/PROD_14_historique_produit.sql
+   psql -U axelor axelor -v ON_ERROR_STOP=1 -f livrables/PROD_15_synthese_arrivages.sql
+   ```
+4. `cd open-suite-webapp && ./gradlew war`, dézipper, **recopier `~/axelor-config.prod.properties`**, bascule Tomcat
+   (procédure habituelle, cf. lot ci-dessous).
+
+---
+
 # Déploiement prod LVME — lot « écrans GESCOM » du 30/09/2026 (PROD_7 à PROD_13)
 
 ## Contenu du lot (validé en local)

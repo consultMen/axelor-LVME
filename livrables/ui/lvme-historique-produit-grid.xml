@@ -1,0 +1,17 @@
+<grid name="lvme-historique-produit-grid" title="Historique Produit" model="com.axelor.apps.supplychain.db.HistoriqueProduit"
+  orderBy="dateMvt,id" canNew="false" canEdit="false" canDelete="false">
+  <!-- LVME : colonnes de l'écran « Historique Produit » GESCOM -->
+  <field name="arrivage" title="Arrivage" width="100"/>
+  <field name="dateMvt" title="Date" width="90"/>
+  <field name="lotNumber" title="N° Lot" width="110"/>
+  <field name="libelle" title="Libellé Mvts" width="260"/>
+  <field name="typeMvt" title="Type" width="55"/>
+  <field name="refTiers" title="Référence Tiers" width="100"/>
+  <field name="prixVente" title="Prix Vente" x-scale="2" width="75"/>
+  <field name="prixRevient" title="Prix Revient" x-scale="2" width="75"/>
+  <field name="poidsColis" title="Poids du colis" x-scale="0" width="70"/>
+  <field name="nbColis" title="Nb colis" aggregate="sum" x-scale="0" width="70"/>
+  <field name="poidsEntree" title="Poids Entrées" aggregate="sum" x-scale="3" width="90"/>
+  <field name="poidsSortie" title="Poids Sorties" aggregate="sum" x-scale="3" width="90"/>
+  <field name="stockMove" hidden="true"/>
+</grid>

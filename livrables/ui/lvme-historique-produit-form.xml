@@ -1,0 +1,31 @@
+<form name="lvme-historique-produit-form" title="Historique Produit" model="com.axelor.utils.db.Wizard" width="large"
+  canNew="false" canSave="false" canCopy="false" canDelete="false" onNew="action-lvme-historique-produit-defaults">
+  <!-- LVME : écran « Historique Produit » de GESCOM (diapo 11) -->
+  <panel name="filtresHistoriquePanel" showTitle="false" colSpan="12">
+    <panel name="filtreProduitPanel" colSpan="5">
+      <field name="$produit" title="Produit" type="many-to-one" target="com.axelor.apps.base.db.Product" target-name="code"
+        colSpan="4" canNew="false" canEdit="false" canView="false" onChange="action-lvme-historique-produit-designation"/>
+      <field name="$designation" showTitle="false" type="string" readonly="true" colSpan="8"/>
+    </panel>
+    <panel name="filtreEntreePanel" colSpan="3" itemSpan="12">
+      <field name="$entreeDu" title="Entrée du" type="date"/>
+      <field name="$entreeAu" title="au" type="date"/>
+    </panel>
+    <panel name="filtrePeriodePanel" colSpan="2" itemSpan="12">
+      <field name="$entreePeriode" title="Période prédéfinie" type="integer" selection="lvme.etat.stock.periode.select"
+        onChange="action-lvme-historique-produit-periode"/>
+    </panel>
+    <panel name="filtreBoutonPanel" colSpan="2" itemSpan="12">
+      <button name="validerBtn" title="Valider" icon="check-circle" css="btn-success" onClick="action-lvme-historique-produit-valider"/>
+      <button name="fermerBtn" title="Fermer(F12)" icon="x-circle" css="btn-danger" onClick="close"/>
+    </panel>
+  </panel>
+  <panel-dashlet name="historiqueDashlet" title="Historique Produit" showTitle="false" colSpan="12" height="560"
+    action="action-lvme-historique-produit-dashlet"/>
+  <panel name="totauxPanel" showTitle="false" colSpan="12">
+    <field name="$totalColis" title="Total colis" type="decimal" readonly="true" colSpan="3" x-scale="0"/>
+    <field name="$stockPeriode" title="Stock Période" type="decimal" readonly="true" colSpan="3" x-scale="3"/>
+    <field name="$poidsEntrees" title="Poids Entrées" type="decimal" readonly="true" colSpan="3" x-scale="3"/>
+    <field name="$poidsSorties" title="Poids Sorties" type="decimal" readonly="true" colSpan="3" x-scale="3"/>
+  </panel>
+</form>

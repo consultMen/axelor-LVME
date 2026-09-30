@@ -1,0 +1,24 @@
+<grid name="lvme-synthese-arrivage-grid" title="Synthèse des Arrivages" model="com.axelor.apps.supplychain.db.SyntheseArrivage"
+  groupBy="entete" orderBy="arrivage,productCode,lotNumber" canNew="false" canEdit="false" canDelete="false">
+  <!-- LVME : colonnes de l'écran « Synthèse des Arrivages » GESCOM, regroupées par arrivage -->
+  <hilite color="pink" if="true"/>
+  <field name="entete" hidden="true"/>
+  <field name="arrivage" title="N°Arrivage" width="95"/>
+  <field name="fournisseur" title="Fournisseur" width="140"/>
+  <field name="codeFournisseur" title="Code Fournisseur" width="90"/>
+  <field name="dateEmbarquement" title="Date Embarq." width="85"/>
+  <field name="dateArrivee" title="Date Arrivée" width="85"/>
+  <field name="productCode" title="Produit" width="110"/>
+  <field name="designation" title="Désignation" width="230"/>
+  <field name="origine" title="Origine" width="90"/>
+  <field name="conditionnement" title="Conditionnement" width="110"/>
+  <field name="frigo" title="Frigo" width="80"/>
+  <field name="lotNumber" title="N° Lot" width="100"/>
+  <field name="dlc" title="D. L. C." width="85"/>
+  <field name="unite" title="Unité" width="55"/>
+  <field name="nbColis" title="Nb Colis Entrées" aggregate="sum" x-scale="0" width="80"/>
+  <field name="poidsColis" title="Poids Colis" x-scale="0" width="70"/>
+  <field name="poidsTotal" title="Poids Total" aggregate="sum" x-scale="0" width="85"/>
+  <field name="pa" title="pa" x-scale="2" width="65"/>
+  <field name="stockMove" hidden="true"/>
+</grid>

@@ -1,0 +1,24 @@
+<form name="lvme-synthese-arrivage-form" title="Synthèse des Arrivages" model="com.axelor.utils.db.Wizard" width="large"
+  canNew="false" canSave="false" canCopy="false" canDelete="false" onNew="action-lvme-synthese-arrivage-defaults">
+  <!-- LVME : écran « Synthèse des Arrivages » de GESCOM (diapo 24) -->
+  <panel name="filtresSynthesePanel" showTitle="false" colSpan="12">
+    <panel name="filtreNumeroPanel" colSpan="3" itemSpan="12">
+      <field name="$arrivageDu" title="Arrivage N° du" type="string"/>
+      <field name="$arrivageAu" title="au" type="string"/>
+    </panel>
+    <panel name="filtreArriveePanel" colSpan="4" itemSpan="12" css="bg-warning-subtle">
+      <field name="$arriveeDu" title="Arrivée du" type="date"/>
+      <field name="$arriveeAu" title="au" type="date"/>
+      <field name="$arriveePeriode" title="Période prédéfinie" type="integer" selection="lvme.etat.stock.periode.select"
+        onChange="action-lvme-synthese-arrivage-periode"/>
+    </panel>
+    <panel name="filtreBoutonPanel" colSpan="3" itemSpan="12">
+      <button name="lancerRechercheBtn" title="Lancer la recherche" icon="search" onClick="action-lvme-synthese-arrivage-refresh"/>
+    </panel>
+    <panel name="filtreFermerPanel" colSpan="2" itemSpan="12">
+      <button name="fermerBtn" title="Fermer" icon="x-circle" css="btn-danger" onClick="close"/>
+    </panel>
+  </panel>
+  <panel-dashlet name="syntheseDashlet" title="Synthèse des Arrivages" showTitle="false" colSpan="12" height="620"
+    action="action-lvme-synthese-arrivage-dashlet"/>
+</form>

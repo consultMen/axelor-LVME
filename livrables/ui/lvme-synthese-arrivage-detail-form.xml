@@ -1,0 +1,29 @@
+<form name="lvme-synthese-arrivage-detail-form" title="Ligne d'arrivage" model="com.axelor.apps.supplychain.db.SyntheseArrivage"
+  canNew="false" canEdit="false" canSave="false" canCopy="false" canDelete="false" width="large">
+  <!-- LVME : détail d'une ligne de la Synthèse des Arrivages (lecture seule) -->
+  <panel name="arrivagePanel" title="Arrivage" readonly="true">
+    <field name="arrivage" title="N°Arrivage" colSpan="3"/>
+    <field name="fournisseur" title="Fournisseur" colSpan="5"/>
+    <field name="codeFournisseur" title="Code Fournisseur" colSpan="4"/>
+    <field name="dateEmbarquement" title="Date Embarq." colSpan="3"/>
+    <field name="dateArrivee" title="Date Arrivée" colSpan="3"/>
+    <field name="frigo" title="Frigo" colSpan="3"/>
+  </panel>
+  <panel name="produitPanel" title="Produit" readonly="true">
+    <field name="productCode" title="Produit" colSpan="3"/>
+    <field name="designation" title="Désignation" colSpan="9"/>
+    <field name="origine" title="Origine" colSpan="3"/>
+    <field name="conditionnement" title="Conditionnement" colSpan="3"/>
+    <field name="lotNumber" title="N° Lot" colSpan="3"/>
+    <field name="dlc" title="D. L. C." colSpan="3"/>
+    <field name="unite" title="Unité" colSpan="3"/>
+    <field name="nbColis" title="Nb Colis Entrées" colSpan="3"/>
+    <field name="poidsColis" title="Poids Colis" colSpan="3"/>
+    <field name="poidsTotal" title="Poids Total" colSpan="3"/>
+    <field name="pa" title="pa" colSpan="3"/>
+  </panel>
+  <panel name="actionsPanel" showTitle="false">
+    <button name="ouvrirArrivageBtn" title="Ouvrir l'arrivage" icon="box-arrow-up-right" colSpan="3"
+      onClick="action-lvme-synthese-arrivage-ouvrir"/>
+  </panel>
+</form>

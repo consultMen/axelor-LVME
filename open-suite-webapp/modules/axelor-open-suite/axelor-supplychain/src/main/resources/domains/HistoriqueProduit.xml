@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<domain-models xmlns="http://axelor.com/xml/ns/domain-models"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://axelor.com/xml/ns/domain-models http://axelor.com/xml/ns/domain-models/domain-models_7.4.xsd">
+
+  <module name="supplychain" package="com.axelor.apps.supplychain.db"/>
+
+  <!-- LVME : écran « Historique Produit » de GESCOM (diapo 11), une ligne par mouvement réalisé et
+    par sens. Modèle en lecture seule adossé à la vue SQL lvme_historique_produit
+    (sql/lvme_historique_produit.sql). -->
+  <entity name="HistoriqueProduit" table="lvme_historique_produit" cacheable="false">
+    <many-to-one name="product" ref="com.axelor.apps.base.db.Product"
+      column="product_id" title="Produit"/>
+    <many-to-one name="stockMoveLine" ref="com.axelor.apps.stock.db.StockMoveLine"
+      column="stock_move_line_id" title="Ligne de mouvement"/>
+    <many-to-one name="stockMove" ref="com.axelor.apps.stock.db.StockMove"
+      column="stock_move_id" title="Mouvement"/>
+    <many-to-one name="trackingNumber" ref="com.axelor.apps.stock.db.TrackingNumber"
+      column="tracking_number_id" title="N° Lot"/>
+    <string name="arrivage" column="arrivage" title="Arrivage"/>
+    <date name="dateMvt" column="date_mvt" title="Date"/>
+    <string name="lotNumber" column="lot_number" title="N° Lot"/>
+    <string name="libelle" column="libelle" title="Libellé Mvts"/>
+    <string name="typeMvt" column="type_mvt" title="Type"/>
+    <string name="refTiers" column="ref_tiers" title="Référence Tiers"/>
+    <decimal name="prixVente" column="prix_vente" title="Prix Vente" precision="20" scale="4"/>
+    <decimal name="prixRevient" column="prix_revient" title="Prix Revient" precision="20"
+      scale="4"/>
+    <decimal name="poidsColis" column="poids_colis" title="Poids du colis" precision="20"
+      scale="3"/>
+    <decimal name="nbColis" column="nb_colis" title="Nb colis" precision="20" scale="3"/>
+    <decimal name="poidsEntree" column="poids_entree" title="Poids Entrées" precision="20"
+      scale="3"/>
+    <decimal name="poidsSortie" column="poids_sortie" title="Poids Sorties" precision="20"
+      scale="3"/>
+    <!-- E = entrée, S = sortie -->
+    <string name="sens" column="sens" title="Sens"/>
+  </entity>
+
+</domain-models>

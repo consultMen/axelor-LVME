@@ -1,0 +1,26 @@
+<form name="lvme-historique-produit-detail-form" title="Mouvement" model="com.axelor.apps.supplychain.db.HistoriqueProduit"
+  canNew="false" canEdit="false" canSave="false" canCopy="false" canDelete="false" width="large">
+  <!-- LVME : détail d'une ligne de l'Historique Produit (lecture seule) -->
+  <panel name="mouvementPanel" title="Mouvement" readonly="true">
+    <field name="dateMvt" title="Date" colSpan="3"/>
+    <field name="typeMvt" title="Type" colSpan="3"/>
+    <field name="arrivage" title="Arrivage" colSpan="3"/>
+    <field name="lotNumber" title="N° Lot" colSpan="3"/>
+    <field name="libelle" title="Libellé Mvts" colSpan="9"/>
+    <field name="refTiers" title="Référence Tiers" colSpan="3"/>
+    <field name="product" title="Produit" colSpan="6" canView="false"/>
+    <field name="stockMove" title="Mouvement" colSpan="6" canView="false"/>
+  </panel>
+  <panel name="quantitesPanel" title="Prix et quantités" readonly="true">
+    <field name="prixVente" title="Prix Vente" colSpan="3"/>
+    <field name="prixRevient" title="Prix Revient" colSpan="3"/>
+    <field name="poidsColis" title="Poids du colis" colSpan="3"/>
+    <field name="nbColis" title="Nb colis" colSpan="3"/>
+    <field name="poidsEntree" title="Poids Entrées" colSpan="3"/>
+    <field name="poidsSortie" title="Poids Sorties" colSpan="3"/>
+  </panel>
+  <panel name="actionsPanel" showTitle="false">
+    <button name="ouvrirMouvementBtn" title="Ouvrir le mouvement" icon="box-arrow-up-right" colSpan="3"
+      onClick="action-lvme-historique-produit-ouvrir-mvt"/>
+  </panel>
+</form>
