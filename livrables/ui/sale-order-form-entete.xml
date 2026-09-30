@@ -1,0 +1,50 @@
+<panel name="lvmeClientPanel" title="Client" colSpan="6">
+      <field name="clientPartner" hideIf="company == null" readonlyIf="statusSelect > 1" colSpan="12" onChange="action-sale-order-method-client-partner-onchange,action-sale-order-record-set-remise-rfa" onSelect="action-sale-order-method-set-client-partner-domain" required="true" form-view="partner-form" grid-view="partner-grid" x-image-field="picture"/>
+      <field name="clientPartner.groupement" title="Groupement" readonly="true" colSpan="12" showIf="clientPartner != null &amp;&amp; clientPartner.groupement != null"/>
+      <field name="mainInvoicingAddress" title="Adresse" colSpan="12" hideIf="$readonly() || (statusSelect > 1 &amp;&amp; !orderBeingEdited)" canNew="true" canEdit="false" onChange="action-sale-order-method-address-str" onSelect="action-sale-order-attrs-domain-main-invoicing-address" form-view="address-form" grid-view="address-grid"/>
+      <field name="mainInvoicingAddressStr" title="Adresse" colSpan="12" readonlyIf="statusSelect > 1 &amp;&amp; !orderBeingEdited" height="3">
+        <viewer><![CDATA[<>{mainInvoicingAddressStr}</>]]></viewer>
+      </field>
+      <field name="contactPartner" title="Contact" colSpan="6" canEdit="false" onChange="action-record-so-contact-partner-change" onSelect="action-sale-order-domain-on-contact-partner" domain="self.isContact = true" form-view="partner-contact-form" grid-view="partner-contact-grid" x-image-field="picture"/>
+      <field name="clientPartner.fixedPhone" title="Téléphone" readonly="true" colSpan="6"/>
+      <field name="commercial" title="Commercial" colSpan="6" canEdit="false" hideIf="clientPartner == null" form-view="user-form" grid-view="user-grid"/>
+      <field name="paymentMode" title="Règlement" colSpan="6" readonlyIf="statusSelect > 2" canEdit="false" onChange="action-sale-order-method-fill-company-bank-details" domain="self.inOutSelect = 1" form-view="payment-mode-form" grid-view="payment-mode-grid"/>
+      <field name="paymentCondition" title="Echéance" colSpan="6" readonlyIf="statusSelect > 2" canEdit="false" onChange="action-sale-order-method-set-advance-payment" onSelect="action-sale-order-attrs-payment-condition-set-domain" form-view="payment-condition-form" grid-view="payment-condition-grid"/>
+      <field name="remiseFacture" title="% Rem/Fact." hideIf="clientPartner == null" readonlyIf="statusSelect > 1" colSpan="2"/>
+      <field name="tauxRFA" title="% RFA" hideIf="clientPartner == null" readonlyIf="statusSelect > 1" colSpan="2"/>
+      <field name="tauxCommission" title="% Frais Commission" colSpan="2" widget="Decimal" x-scale="2" readonlyIf="statusSelect > 1"/>
+    </panel>
+
+    <panel name="lvmeCommandePanel" title="Commande" colSpan="6">
+      <field name="salespersonUser" title="Opérateur" colSpan="6" canNew="false" canView="false" canEdit="false" form-view="user-form" grid-view="user-grid"/>
+      <field name="externalReference" title="Ref Cde" colSpan="6" hideIf="company == null" onChange="action-sale-sale-order-attrs-external-reference"/>
+      <field name="creationDate" title="Date Commande" readonlyIf="statusSelect != 1" colSpan="6" onChange="action-sale-order-record-compute-end-of-validity-date"/>
+      <field name="estimatedDeliveryDate" title="Date Livraison" colSpan="6" onChange="action-supplychain-sale-order-group-estimated-delivery-date-change"/>
+      <field name="carrierPartner" title="Transporteur" colSpan="6" canEdit="false" domain="self.isCarrier = TRUE AND (self.companySet IS EMPTY OR :company MEMBER OF self.companySet)" form-view="partner-form" grid-view="partner-grid" x-image-field="picture"/>
+      <field name="portPaye" title="Port Payé" colSpan="3"/>
+      <field name="coutPortKg" title="Coût port/kg" colSpan="3"/>
+      <field if="__config__.app.getApp('base')?.activatePartnerRelations" name="invoicedPartner" title="Tiers facturé" hideIf="company == null || clientPartner == null" readonlyIf="statusSelect > 1" colSpan="6" onChange="action-group-sale-order-supplychain-set-main-invoicing-address" onSelect="action-sale-order-supplychain-method-set-invoiced-partner-domain" form-view="partner-form" grid-view="partner-grid" x-image-field="picture"/>
+      <field if="__config__.app.getApp('base')?.activatePartnerRelations" name="deliveredPartner" title="Tiers livré" hideIf="company == null || clientPartner == null" readonlyIf="statusSelect > 1" colSpan="6" onChange="action-group-sale-order-supplychain-set-delivery-address" onSelect="action-sale-order-supplychain-method-set-delivered-partner-domain" form-view="partner-form" grid-view="partner-grid" x-image-field="picture"/>
+      <field name="deliveryAddress" title="Adresse de livraison" colSpan="12" hideIf="$readonly() || (statusSelect > 1 &amp;&amp; !orderBeingEdited)" canNew="true" canEdit="false" onChange="action-sale-order-group-delivery-address-change" onSelect="action-sale-order-attrs-domain-delivery-address" form-view="address-form" grid-view="address-grid"/>
+      <field name="deliveryAddressStr" title="Adresse de livraison" colSpan="12" readonlyIf="statusSelect > 1 &amp;&amp; !orderBeingEdited" height="3">
+        <viewer><![CDATA[<>{deliveryAddressStr}</>]]></viewer>
+      </field>
+    </panel>
+
+    <panel name="generalInfoPanel" title="Paramètres" colSpan="12" canCollapse="true" collapseIf="true">
+      <field name="company" readonlyIf="statusSelect == 3 || clientPartner != null" colSpan="3" widget="SuggestBox" canEdit="false" onChange="action-sale-order-method-company-onchange" form-view="company-form" grid-view="company-grid"/>
+      <field if="__config__.app.getApp('base')?.enableTradingNamesManagement" name="tradingName" hidden="true" hideIf="company.tradingNameList == null || company.tradingNameList.length == 0" readonlyIf="!createdByInterco &amp;&amp; ((saleOrderLineList &amp;&amp; saleOrderLineList.length > 0) || statusSelect >= 2)" colSpan="3" canEdit="false" onChange="action-sale-method-printing-settings-default-values,action-sale-order-record-set-stock-location" domain="self.company = :company" requiredIf="company.tradingNameList != null &amp;&amp; company.tradingNameList.length != 0" form-view="trading-name-form" grid-view="trading-name-grid"/>
+      <field name="currency" readonlyIf="(saleOrderLineList &amp;&amp; saleOrderLineList.length > 0) || statusSelect >= 2" colSpan="3" canEdit="false" required="true" form-view="currency-form" grid-view="currency-grid"/>
+      <field name="priceList" hideIf="company == null" readonlyIf="(saleOrderLineList &amp;&amp; saleOrderLineList.length > 0) || statusSelect >= 2" colSpan="3" canEdit="false" onChange="action-sale-order-record-hide-discount" onSelect="action-sale-order-method-price-list-domain" form-view="price-list-form" grid-view="price-list-grid"/>
+      <field if="__config__.app.getApp('sale')?.getManageSaleOrderVersion()" name="versionNumber" colSpan="3"/>
+      <field name="directOrderLocation" colSpan="3" widget="boolean-switch" onChange="action-sale-order-record-direct-order-location-onchange"/>
+      <field if="__config__.app.getApp('base')?.getEnableTaxNumbers()" name="taxNumber" readonlyIf="statusSelect > 1 &amp;&amp; !orderBeingEdited" colSpan="3" canNew="false" canEdit="false" onChange="action-sale-order-method-empty-fiscal-position-if-not-compatible,action-sale-order-method-fiscal-position-on-change,action-sale-order-method-on-line-change" onSelect="action-sale-order-attrs-compute-tax-number-domain"/>
+      <field name="fiscalPosition" readonlyIf="statusSelect > 1 &amp;&amp; !orderBeingEdited" colSpan="3" canNew="false" canEdit="false" onChange="action-sale-order-method-fiscal-position-on-change,action-sale-order-method-on-line-change" onSelect="action-sale-order-supplychain-attrs-fiscal-position-domain"/>
+      <panel name="otherInfoPanel" colSpan="3">
+        <field name="inAti" hidden="true" readonlyIf="(saleOrderLineList &amp;&amp; saleOrderLineList.length > 0) || statusSelect >= 2" widget="boolean-switch" onChange="action-sale-order-attrs-in-ati"/>
+        <field if="__config__.app.isApp('supplychain')" if-module="axelor-supplychain" name="interco" hidden="true" colSpan="6" widget="boolean-switch"/>
+        <field if="__config__.app.isApp('supplychain')" if-module="axelor-supplychain" name="createdByInterco" readonly="true" showIf="createdByInterco" colSpan="6"/>
+        <field name="currency.numberOfDecimals" hidden="true"/>
+      </panel>
+    </panel>
+

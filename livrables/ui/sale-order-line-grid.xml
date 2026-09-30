@@ -1,0 +1,53 @@
+<grid name="sale-order-line-grid" title="Lignes commande" model="com.axelor.apps.sale.db.SaleOrderLine" orderBy="sequence">
+  <!-- LVME : grille des lignes de commande client, colonnes et libellés de la « Fiche Commande client » GESCOM -->
+  <hilite strong="true" color="default" if="typeSelect != 0"/>
+  <hilite color="danger" if="deliveryState == 1"/>
+  <hilite color="warning" if="deliveryState == 2"/>
+  <hilite color="success" if="deliveryState == 3"/>
+  <field name="$hasWarning" hidden="true"/>
+  <button name="errorIconButton" showIf="$hasWarning" onClick="refresh" readonlyIf="true" icon="fa-exclamation-triangle"/>
+  <field name="sequence" if="__config__.app.getApp('sale')?.isDisplaySaleOrderLineNumber" width="51"/>
+  <field name="product" hidden="true"/>
+  <field name="typeSelect" hidden="true"/>
+  <field name="deliveryState" hidden="true" if="__config__.app.isApp('supplychain')"/>
+  <field name="product.code" title="Référence" width="120"/>
+  <field name="productName" title="Désignation"/>
+  <field name="taxLineSet" title="Taux TVA" width="80"/>
+  <field name="estimatedDeliveryDate" title="Date Livraison" width="95"/>
+  <field name="nbUnitesParColis" title="Unt/colis" width="75"/>
+  <field name="poidsParColis" title="Pds du colis" width="80"/>
+  <field name="nbColis" title="Colis Cdes" aggregate="sum" width="80">
+    <hilite background="yellow" if="true"/>
+  </field>
+  <field name="unit" title="Unité Vente" form-view="unit-form" grid-view="unit-grid" width="80"/>
+  <field name="poidsTotalNet" title="Poids en KG" aggregate="sum" width="85"/>
+  <field name="$currencyNumberOfDecimals" hidden="true"/>
+  <field name="qty" title="Nb unités ou Poids cdés" aggregate="sum" x-scale="$nbDecimalDigitForQty" width="100">
+    <hilite background="yellow" if="true"/>
+  </field>
+  <field name="orderedQty" aggregate="sum" x-scale="$nbDecimalDigitForQty" if="__config__.app.getApp('sale')?.isQuotationAndOrderSplitEnabled" readonly="true"/>
+  <field name="prixRevient" title="Prix Revient" width="85"/>
+  <field name="priceDiscounted" title="Prix Vente" x-scale="$nbDecimalDigitForUnitPrice" width="85">
+    <hilite background="yellow" strong="true" if="true"/>
+  </field>
+  <field name="exTaxTotal" title="Montant" aggregate="sum" x-scale="$currencyNumberOfDecimals" width="95"/>
+  <field name="subMarginRate" title="% Marge" width="75"/>
+  <field name="subTotalGrossMargin" title="Marge" aggregate="sum" width="85"/>
+  <field name="reservedQty" if="__config__.app.getApp('supplychain')?.manageStockReservation" aggregate="sum" x-scale="2"/>
+  <button name="allocateAll" if="__config__.app.getApp('supplychain')?.manageStockReservation" title="Allocate" icon="fa-plus-square" readonlyIf="$get('saleOrder.statusSelect') != 3 || $get('saleOrder.orderBeingEdited') || $number(reservedQty) == $number(qty) || deliveryState == 3 || $get('product.productTypeSelect') == 'service'" onClick="save,action-supplychain-sale-order-line-allocate-all"/>
+  <button name="deallocate" if="__config__.app.getApp('supplychain')?.manageStockReservation" title="Deallocate" icon="fa-minus-square" readonlyIf="$get('saleOrder.statusSelect') != 3 || $get('saleOrder.orderBeingEdited') || $number(reservedQty) == 0 || deliveryState == 3" onClick="save,action-supplychain-sale-order-line-deallocate-all"/>
+  <field name="availableStatus" title="Dispo" if="__config__.app.isApp('supplychain')">
+    <hilite strong="true" color="success" if="availableStatusSelect == 1"/>
+    <hilite color="danger" strong="true" if="availableStatusSelect == 2"/>
+  </field>
+  <field name="saleOrder.statusSelect" hidden="true"/>
+  <field name="saleOrder.orderBeingEdited" hidden="true"/>
+  <field name="product.productTypeSelect" hidden="true"/>
+  <field name="$nbDecimalDigitForUnitPrice" hidden="true"/>
+  <field name="$nbDecimalDigitForQty" hidden="true"/>
+  <field name="configurator" hidden="true"/>
+  <field name="saleOrder" hidden="true"/>
+  <field name="saleOrder.id" hidden="true"/>
+  <field name="availableStatusSelect" hidden="true"/>
+  <button name="lvmeDuplicateLineBtn" title="Dupliquer la ligne" icon="fa-copy" readonlyIf="id == null || $get('saleOrder.statusSelect') &gt; 2" onClick="save,action-lvme-sale-order-line-method-duplicate"/>
+</grid>
