@@ -1,0 +1,26 @@
+<grid name="partner-supplier-grid" title="Fournisseurs" model="com.axelor.apps.base.db.Partner" orderBy="name" edit-icon="true">
+  <!-- LVME : colonnes de la liste « Fournisseurs » GESCOM -->
+  <menubar>
+    <menu name="partnerReportsMenu" title="Reports" showTitle="true" icon="fa-files-o">
+      <item name="contactPhoneBookItem" title="Contact PhoneBook" action="action-print-phonebook"/>
+      <item if="__config__.app.isApp('employee')" name="companyPhoneBookItem" title="Company phoneBook" action="action-print-company-phonebook"/>
+    </menu>
+    <menu name="partnerToolsMenu" title="Tools" showTitle="true" icon="fa-wrench">
+      <item name="checkDuplicateItem" title="Check Duplicate" action="action-general-check-duplicate-records"/>
+      <item name="mergeDuplicatedItem" title="Merge duplicated" action="action-validate-select-object-message,action-duplicate-object-wizard-open"/>
+    </menu>
+  </menubar>
+  <field name="partnerSeq" title="Référence" width="110"/>
+  <field name="name" title="Nom" width="260"/>
+  <field name="commercial" title="Commercial" width="130"/>
+  <field name="fixedPhone" title="tel" widget="phone" x-placeholder-number-type="FIXED_LINE" width="120"/>
+  <field name="mobilePhone" title="portable" widget="phone" width="120"/>
+  <field name="emailAddress.address" title="Email" width="200"/>
+  <field name="mainAddress.zip" title="Code Postal" width="90"/>
+  <field name="mainAddress.city" title="Ville" width="140"/>
+  <field name="mainAddress.country" title="Pays" width="110"/>
+  <field if="__config__.app.getApp('base')?.getEnableMultiCompany()" name="companySet" widget="TagSelect"/>
+  <field if="__config__.app.isApp('account')" name="das2Activity" hidden="true"/>
+  <button if="__config__.app.isApp('crm')" if-module="axelor-crm" name="scheduleEventBtn" title="Schedule Event" icon="fa-group" onClick="action-partner-view-schedule-event"/>
+  <button if="__config__.app.isApp('crm')" if-module="axelor-crm" name="sendByEmailBtn" title="Send Email" icon="fa-envelope" onClick="action-send-by-email-with-template"/>
+</grid>

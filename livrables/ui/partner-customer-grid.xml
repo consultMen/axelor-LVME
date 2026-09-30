@@ -1,0 +1,26 @@
+<grid name="partner-customer-grid" title="Clients" model="com.axelor.apps.base.db.Partner" orderBy="name" edit-icon="true">
+  <!-- LVME : colonnes de la liste « Clients » GESCOM -->
+  <menubar>
+    <menu name="partnerReportsMenu" title="Reports" showTitle="true" icon="fa-files-o">
+      <item name="contactPhoneBookItem" title="Contact PhoneBook" action="action-print-phonebook"/>
+      <item if="__config__.app.isApp('employee')" name="companyPhoneBookItem" title="Company phoneBook" action="action-print-company-phonebook"/>
+    </menu>
+    <menu name="partnerToolsMenu" title="Tools" showTitle="true" icon="fa-wrench">
+      <item name="checkDuplicateItem" title="Check Duplicate" action="action-general-check-duplicate-records"/>
+      <item name="mergeDuplicatedItem" title="Merge duplicated" action="action-validate-select-object-message,action-duplicate-object-wizard-open"/>
+    </menu>
+  </menubar>
+  <field name="partnerSeq" title="Réf." width="110"/>
+  <field name="name" title="Client" width="260"/>
+  <field name="fixedPhone" title="Téléphone" widget="phone" x-placeholder-number-type="FIXED_LINE" width="120"/>
+  <field name="mobilePhone" title="Portable" widget="phone" width="120"/>
+  <field name="emailAddress.address" title="Email" width="200"/>
+  <field name="mainAddress.zip" title="Code Postal" width="90"/>
+  <field name="mainAddress.city" title="Ville" width="140"/>
+  <field name="commercial" title="Vendeur" width="120"/>
+  <field name="partnerCategory" title="Famille" form-view="partner-category-form" grid-view="partner-category-grid" width="120"/>
+  <field name="groupement" title="Groupe" width="120"/>
+  <field if="__config__.app.getApp('base')?.getEnableMultiCompany()" name="companySet" widget="TagSelect"/>
+  <button if="__config__.app.isApp('crm')" if-module="axelor-crm" name="scheduleEventBtn" title="Schedule Event" icon="fa-group" onClick="action-partner-view-schedule-event"/>
+  <button if="__config__.app.isApp('crm')" if-module="axelor-crm" name="sendByEmailBtn" title="Send Email" icon="fa-envelope" onClick="action-send-by-email-with-template"/>
+</grid>

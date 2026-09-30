@@ -1,0 +1,20 @@
+<grid name="product-purchase-grid" title="Articles" model="com.axelor.apps.base.db.Product" orderBy="code,name" edit-icon="true">
+  <!-- LVME : colonnes de la liste « Articles » GESCOM -->
+  <toolbar>
+    <button name="catalogBtn" title="Catalog" icon="fa-book" onClick="action-print-product-catalog"/>
+    <button name="checkDuplicateBtn" title="Check Duplicate" onClick="action-general-check-duplicate-records"/>
+  </toolbar>
+  <field name="code" title="Référence" width="120" x-bind="{{code|unaccent|uppercase}}"/>
+  <field name="name" title="Désignation article" width="300"/>
+  <field name="defaultSupplierPartner" title="Fournisseur" width="180"/>
+  <field name="gencode" title="Gencode" width="130"/>
+  <field name="unit" title="Unité" width="70" form-view="unit-form" grid-view="unit-grid"/>
+  <field name="netMass" title="Poids Unitaire" width="95"/>
+  <field name="purchasePrice" title="P.Achat HT" x-scale="2" width="100"/>
+  <field name="salePrice" title="P.Vente HT" x-scale="2" width="100"/>
+  <field name="productCategory" title="Famille" form-view="product-category-form" grid-view="product-category-grid" width="120"/>
+  <field name="internalDescription" title="Commentaires" width="300" widget="html"/>
+  <field name="productTypeSelect" hidden="true"/>
+  <button name="sendByEmailBtn" title="Send Email" icon="fa-envelope" onClick="action-send-by-email-with-template"/>
+
+</grid>

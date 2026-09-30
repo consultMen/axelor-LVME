@@ -199,6 +199,8 @@
     <string name="compositionAdditifs" title="Composition / Additifs" large="true"
       multiline="true"/>
     <string name="numAgrementUsine" title="N° d'agrément fabricant / usine"/>
+    <!-- LVME : code-barres article (GENCODE / EAN), repris de GESCOM -->
+    <string name="gencode" title="Gencode"/>
   </entity>
 
 </domain-models>
