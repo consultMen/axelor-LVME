@@ -22,12 +22,14 @@
       </panel>
 
       <panel name="lvmeArrivagePanel" title="Arrivage" colSpan="5">
-        <field name="$etatArrivage" showTitle="false" readonly="true" colSpan="12" type="string">
-          <viewer depends="statusSelect,receiptState"><![CDATA[
+        <field name="$natureArrivage" title="Nature" readonly="true" colSpan="12" type="string">
+          <viewer depends="$natureArrivage"><![CDATA[
             <>
-              {(statusSelect == 1 || statusSelect == 2) && <Badge bg="info">A Embarquer</Badge>}
-              {(statusSelect == 3 || statusSelect == 4) && receiptState != 3 && <Badge bg="warning">Flottant</Badge>}
-              {receiptState == 3 && <Badge bg="success">Réel</Badge>}
+              {$natureArrivage == 'Réel' && <Badge bg="success">Réel</Badge>}
+              {$natureArrivage == 'Flottant' && <Badge bg="warning">Flottant</Badge>}
+              {$natureArrivage == 'En cours de production' && <Badge bg="info">En cours de production (à embarquer)</Badge>}
+              {$natureArrivage == 'Brouillon' && <Badge bg="secondary">Brouillon</Badge>}
+              {!$natureArrivage && <Badge bg="light" text="dark">Pas encore de réception</Badge>}
             </>
           ]]></viewer>
         </field>

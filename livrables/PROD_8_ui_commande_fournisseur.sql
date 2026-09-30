@@ -3,8 +3,8 @@
 --   1. Grille des lignes (livrables/ui/purchase-order-line-purchase-order-grid.xml) : colonnes GESCOM,
 --      colonnes jaunes Prix Achat / Nb Colis / Nb unités ou poids, bouton Dupliquer.
 --   2. En-tête (livrables/ui/purchase-order-form-entete.xml) : ligne Société / Devise d'achat /
---      Devise comptable / Liste de prix ; bloc « Fournisseur » ; bloc « Arrivage » avec l'état
---      A Embarquer / Flottant / Réel ; paramètres techniques repliés. Onglets et colonne de droite conservés.
+--      Devise comptable / Liste de prix ; bloc « Fournisseur » ; bloc « Arrivage » avec la Nature
+--      de la réception (En cours de production / Flottant / Réel) ; paramètres techniques repliés. Onglets et colonne de droite conservés.
 --      Construit à partir de la vue de module ACTUELLE de cette base (celle de la prod contient déjà
 --      la devise comptable) ; seuls l'en-tête et les 8 champs remontés sont modifiés.
 -- Vues admin de priorité 30 (durables), remplacent la copie faite par PROD_6. Relançable.
@@ -57,6 +57,24 @@ BEGIN
   b := position('<field name="supplierPartner.purchaseOrderInformation"' IN res);
   IF a = 0 OR b = 0 OR b < a THEN RAISE EXCEPTION 'Bloc d''en-tête non trouvé : arrêt, rien n''est modifié'; END IF;
   res := substr(res, 1, a - 1) || current_setting('lvme.entete') || substr(res, b);
+
+  -- Nature de l'arrivage (champ LVME de la réception : En cours de production / Flottant / Réel),
+  -- lue au chargement de la fiche : mêmes valeurs que sur la réception fournisseur
+  IF position('action-lvme-purchase-order-attrs-nature' IN res) = 0 THEN
+    IF substring(res FROM '<form [^>]*>') LIKE '%onLoad="%' THEN
+      res := regexp_replace(res, '(<form [^>]*onLoad=")([^"]*)"', '\1\2,action-lvme-purchase-order-attrs-nature"');
+    ELSE
+      res := regexp_replace(res, '<form ', '<form onLoad="action-lvme-purchase-order-attrs-nature" ');
+    END IF;
+  END IF;
+
+  DELETE FROM meta_action WHERE name = 'action-lvme-purchase-order-attrs-nature' AND module IS NULL;
+  INSERT INTO meta_action (id, version, created_on, name, type, model, xml, home, is_custom)
+  VALUES (nextval('meta_action_seq'), 0, now(), 'action-lvme-purchase-order-attrs-nature', 'action-attrs', NULL,
+'<action-attrs name="action-lvme-purchase-order-attrs-nature">
+  <attribute name="value" for="$natureArrivage"
+    expr="eval: def sm = id ? __repo__(StockMove).all().filter(''?1 MEMBER OF self.purchaseOrderSet AND self.typeSelect = 3 AND self.statusSelect != 4'', id).order(''-id'').fetchOne() : null; def v = sm?.nature?.value; sm == null ? '''' : (v == 3 ? ''Réel'' : (v == 2 ? ''Flottant'' : (v == 1 ? ''En cours de production'' : ''Brouillon'')))"/>
+</action-attrs>', false, false);
 
   DELETE FROM meta_view WHERE name = 'purchase-order-form' AND module IS NULL AND priority = 30;
   INSERT INTO meta_view (id, version, created_on, name, title, type, model, priority, xml, extension, computed)
