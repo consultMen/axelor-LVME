@@ -1,0 +1,109 @@
+<form name="lvme-arrivage-form" title="Arrivage" model="com.axelor.apps.stock.db.StockMove" width="large"
+  onLoad="action-group-stock-stockmove-onload, action-stock-move-attrs-fill-ctx, action-lvme-arrivage-attrs-devise"
+  onSave="action-stock-move-group-save-and-update-stocks"
+  onNew="action-group-stock-stockmove-onnew, action-stock-move-attrs-fill-ctx">
+  <!-- LVME : fiche « Arrivages » de GESCOM = réception fournisseur Axelor (mêmes actions que la fiche standard) -->
+  <menubar>
+    <menu name="stockMoveReportsMenu" title="Editer" icon="fa-files-o">
+      <item name="printIncomingMoveItem" title="Imprimer l'arrivage" readonlyIf="statusSelect == 1" action="action-stock-move-group-save-and-update-stocks,action-stock-move-group-print-stock-move"/>
+      <item name="printCertificateOfConformityItem" title="Print certificate of conformity" showIf="statusSelect != 1 &amp;&amp; isNeedingConformityCertificate" action="action-stock-move-group-save-and-update-stocks,action-method-print-conformity-certificate"/>
+    </menu>
+    <menu name="stockMoveToolsMenu" title="Tools" icon="fa-wrench">
+      <item name="splitIntoItem" title="Split into 2" showIf="statusSelect &lt;= 2" action="action-stock-move-group-save-and-update-stocks,action-stock-move-split-into-2"/>
+      <item name="splitByUnitItem" title="Split by unit" showIf="statusSelect &lt;= 2" action="action-stock-move-group-save-and-update-stocks,action-stock-move-method-split-stock-move-lines-unit"/>
+      <item name="specialSplitItem" title="Special split" showIf="statusSelect &lt;= 2" action="action-stock-move-group-save-and-update-stocks,action-stock-move-wizard-special-split"/>
+      <item name="shipReceiveAllProductsItem" title="Ship/Receive all products" action="action-stock-move-group-save-and-update-stocks,action-stock-move-ship-recieve-all-products"/>
+      <item name="fillRealQties" title="Fill real quantities" action="action-supplychain-stock-move-method-fill-real-quantities"/>
+    </menu>
+  </menubar>
+
+  <panel name="mainPanel" colSpan="12">
+    <field name="statusSelect" showTitle="false" colSpan="8" widget="NavSelect"/>
+    <field name="nature" showTitle="false" readonly="true" colSpan="4">
+      <viewer depends="nature"><![CDATA[
+        <>
+          {nature == 'EN_COURS_DE_PRODUCTION' && <Badge bg="info" style={{ fontSize: 16 }}>En cours de production (à embarquer)</Badge>}
+          {nature == 'FLOTTANT' && <Badge bg="warning" style={{ fontSize: 16 }}>Flottant</Badge>}
+          {nature == 'REEL' && <Badge bg="success" style={{ fontSize: 16 }}>Réel</Badge>}
+          {nature == 'DRAFT' && <Badge bg="secondary" style={{ fontSize: 16 }}>Brouillon</Badge>}
+          {nature == 'ANNULE' && <Badge bg="danger" style={{ fontSize: 16 }}>Annulé</Badge>}
+        </>
+      ]]></viewer>
+    </field>
+
+    <panel name="lvmeFournisseurPanel" title="Fournisseur" colSpan="5" itemSpan="6">
+      <field name="partner" title="Fournisseur" colSpan="12" readonlyIf="statusSelect != 1" canEdit="false" onChange="action-stock-move-group-partner-onchange" domain="self.isContact = false AND :company member of self.companySet" form-view="partner-form" grid-view="partner-grid" x-image-field="picture"/>
+      <field name="partner.partnerSeq" title="Code" readonly="true"/>
+      <field name="partner.fixedPhone" title="Tél." readonly="true"/>
+      <field name="partner.emailAddress" title="Email" readonly="true" colSpan="12"/>
+      <field name="fromAddress" title="Adresse" colSpan="12" readonlyIf="statusSelect == 3 || statusSelect == 4" onChange="action-stock-move-method-set-addresses-str" onSelect="action-stock-move-attrs-domain-address" form-view="address-form"/>
+      <field name="fromAddressStr" title="Adresse" colSpan="12" hideIf="statusSelect > 2" height="3">
+        <viewer><![CDATA[<>{fromAddressStr}</>]]></viewer>
+      </field>
+    </panel>
+
+    <panel name="lvmeArrivagePanel" title="Arrivage" colSpan="4" itemSpan="6">
+      <field name="stockMoveSeq" title="Arrivage N°" readonly="true"/>
+      <field name="createdOn" title="Du" readonly="true"/>
+      <field name="purchaseOrderSet" title="Commande d'achat" colSpan="12" readonly="true" widget="TagSelect" form-view="purchase-order-form" grid-view="purchase-order-grid"/>
+      <field name="supplierShipmentDate" title="Date Départ" showIf="!isReversion"/>
+      <field name="estimatedDate" title="Arrivée prévue" readonlyIf="(statusSelect != 1 &amp;&amp; statusSelect != 2) || pickingIsEdited"/>
+      <field name="realDate" title="Arrivée réelle" readonly="true"/>
+      <field name="supplierShipmentRef" title="Réf. fournisseur" showIf="!isReversion"/>
+      <field name="shipmentMode" title="Type transport" canEdit="false" form-view="shipment-mode-form" grid-view="shipment-mode-grid"/>
+      <field name="bateau" title="Bateau"/>
+      <field name="trackingNumber" title="Containers"/>
+      <field name="forwarderPartner" title="Transitaire" canEdit="false" domain="self.isContact = FALSE AND (self.isCarrier = TRUE OR self.isSupplier = TRUE) AND :company MEMBER OF self.companySet" form-view="partner-form" grid-view="partner-grid"/>
+      <field name="toStockLocation" title="Frigo" colSpan="12" canEdit="false" onChange="action-stock-move-group-to-location-onchange" domain="self.company = :company AND self.typeSelect != 3 AND (self.usableOnPurchaseOrder = true AND :isReversion = false OR self.usableOnSaleOrder = true AND :isReversion = true)" form-view="stock-location-form" grid-view="stock-location-grid"/>
+    </panel>
+
+    <panel name="actionPanel" colSpan="3" itemSpan="12">
+      <button name="planBtn" title="Plan" showIf="statusSelect == 1" icon="fa-calendar" onClick="action-group-stock-stockmove-plan-click"/>
+      <button name="lvmeFlottantBtn" title="A Embarquer -> Flottant" showIf="statusSelect == 2 &amp;&amp; nature != 'FLOTTANT'" css="btn-info" onClick="action-lvme-arrivage-record-flottant,save"/>
+      <button name="lvmeEmbarquerBtn" title="Flottant -> A Embarquer" showIf="statusSelect == 2 &amp;&amp; nature == 'FLOTTANT'" css="btn-info" onClick="action-lvme-arrivage-record-embarquer,save"/>
+      <button name="realizeBtn" title="Saisie Réel" showIf="statusSelect == 2" css="btn-success" icon="fa-check" prompt="Are you sure you want to realize this stock move?" onClick="action-group-stock-stockmove-realize-click"/>
+      <button if="__config__.app.isApp('supplychain') &amp;&amp; __config__.app.getApp('account')?.getActivatePassedForPayment()" if-module="axelor-supplychain" name="passedForPaymentAuthorizedBtn" title="PFP authorized" showIf="pfpValidateStatusSelect != 2" onClick="action-stock-move-group-save-and-update-stocks,action-stock-move-record-pfp-validate,save"/>
+      <button if="__config__.app.isApp('supplychain') &amp;&amp; __config__.app.getApp('account')?.getActivatePassedForPayment()" if-module="axelor-supplychain" name="refusalToPayLitigationBtn" title="PFP litigation" showIf="pfpValidateStatusSelect != 3" onClick="action-stock-move-group-save-and-update-stocks,action-stock-move-record-pfp-refusal-to-pay,save"/>
+      <button if="__config__.app.isApp('supplychain') &amp;&amp; __config__.app.getApp('supplychain')?.getGenerateInvoiceFromStockMove()" if-module="axelor-supplychain" name="generateInvoiceBtn" title="Factures" hidden="true" icon="fa-file-o" onClick="save,action-supplychain-stock-move-validate-invoicing-block,action-supplychain-stock-move-method-invoicing-wizard"/>
+      <button name="generateReversionBtn" title="Generate reversion" showIf="statusSelect == 3 &amp;&amp; !isReversion" icon="fa-undo" onClick="save,action-stock-move-method-generate-reversion"/>
+      <button name="cancelBtn" title="Cancel" showIf="id != null &amp;&amp; statusSelect > 1 &amp;&amp; statusSelect &lt; 4" css="btn-danger" icon="fa-times-circle" onClick="action-group-stock-stockmove-cancel-click"/>
+      <button name="draftBtn" title="Draft" showIf="statusSelect == 4" onClick="action-stock-move-method-draft"/>
+    </panel>
+
+    <panel name="lvmeRecapPanel" title="Récapitulatif" colSpan="12" itemSpan="3">
+      <field name="$deviseAchat" title="Devise" type="string" readonly="true"/>
+      <field name="exTaxTotal" title="Mt Achat HT" readonly="true"/>
+      <field name="nbColisTotal" title="Nb Colis" readonly="true"/>
+      <field name="poidsTotal" title="Poids Total (kg)" readonly="true"/>
+    </panel>
+  </panel>
+
+  <panel-related name="stockMoveLineListPanel" title="Lignes Arrivages" readonlyIf="company == null || fromStockLocation == null || toStockLocation == null || statusSelect == 3" height="14" field="stockMoveLineList" form-view="stock-move-line-form" grid-view="lvme-arrivage-line-grid" orderBy="sequence" onNew="action-stock-move-line-record-filter-on-available-products, action-stock-move-line-record-fill-stock-location" onChange="action-stock-move-line-change-group" canNew="true" canRemove="!(statusSelect == 2 &amp;&amp; pickingIsEdited)" canMove="true"/>
+
+  <panel name="lvmeNotePanel" title="Obs." colSpan="12" canCollapse="true">
+    <field name="note" showTitle="false" colSpan="12" widget="html" x-lite="true"/>
+  </panel>
+
+  <panel name="lvmeParametresPanel" title="Paramètres" colSpan="12" canCollapse="true" collapseIf="true">
+    <field name="company" readonlyIf="statusSelect != 1" canEdit="false" onChange="action-stock-move-group-onchange-company" form-view="company-form" grid-view="company-grid"/>
+    <field if="__config__.app.getApp('base')?.enableTradingNamesManagement" name="tradingName" readonlyIf="statusSelect >= 2" canEdit="false" onChange="action-stock-move-method-printing-settings-default-value,action-stock-move-record-set-trading-name-stock-locations-default" domain="self.company = :company" form-view="trading-name-form" grid-view="trading-name-grid"/>
+    <field name="fromStockLocation" canEdit="false" form-view="stock-location-form" grid-view="stock-location-grid"/>
+    <field name="freightCarrierMode" canEdit="false" onChange="action-stock-move-record-freight-carrier" domain="self.shipmentMode = :shipmentMode" form-view="freight-carrier-mode-form" grid-view="freight-carrier-mode-grid"/>
+    <field name="carrierPartner" canEdit="false" form-view="partner-form" grid-view="partner-grid"/>
+    <field name="incoterm" canEdit="false" form-view="incoterm-form" grid-view="incoterm-grid"/>
+    <field name="isWithBackorder"/>
+    <field name="conformitySelect" showIf="statusSelect == 2" onChange="action-stock-move-method-change-conformity"/>
+    <field name="typeSelect" readonly="true"/>
+    <field name="isReversion" hidden="true"/>
+    <field name="pickingIsEdited" hidden="true"/>
+    <field name="invoicingStatusSelect" hidden="true"/>
+    <field name="isNeedingConformityCertificate" hidden="true"/>
+    <field name="toStockLocation.typeSelect" hidden="true"/>
+    <field if="__config__.app.isApp('supplychain')" if-module="axelor-supplychain" name="pfpValidateStatusSelect" hidden="true"/>
+  </panel>
+
+  <panel-mail name="mailPanel">
+    <mail-messages limit="4"/>
+    <mail-followers/>
+  </panel-mail>
+</form>

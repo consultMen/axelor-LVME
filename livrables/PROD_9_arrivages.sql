@@ -2,14 +2,19 @@
 -- PROD étape 9 : menu « Arrivages » = réceptions fournisseur, écran de recherche à la manière de GESCOM
 --   - Nature renseignée sur les anciennes réceptions (même règle que le code : statut -> nature)
 --   - Nb Colis / Poids Total des réceptions existantes (somme des lignes, comme le code)
---   - Liste de choix « Nature » du filtre, actions, écran de recherche, liste des arrivages
+--   - Liste de choix « Nature » du filtre, actions, écran de recherche, liste des arrivages,
+--     fiche « Arrivage » dédiée (lvme-arrivage-form) et grille de ses lignes ; la fiche de réception
+--     standard (stock-move-form, aussi utilisée par les BL) n'est pas modifiée
 --   - Menu « Réceptions fournisseur » renommé « Arrivages » et ouvert sur l'écran de recherche
 -- Le script crée lui-même les colonnes bateau / nb_colis_total / poids_total (déclarées aussi dans le code).
 -- À lancer depuis la racine du dépôt, puis redémarrer Axelor. Relançable. Une seule transaction.
 -- =====================================================================
 \set grille `cat livrables/ui/arrivage-grid.xml`
 \set recherche `cat livrables/ui/arrivage-search-form.xml`
-SELECT set_config('lvme.grille', :'grille', false), set_config('lvme.recherche', :'recherche', false);
+\set fiche `cat livrables/ui/arrivage-form.xml`
+\set lignes `cat livrables/ui/arrivage-line-grid.xml`
+SELECT set_config('lvme.grille', :'grille', false), set_config('lvme.recherche', :'recherche', false),
+       set_config('lvme.fiche', :'fiche', false), set_config('lvme.lignes', :'lignes', false);
 
 BEGIN;
 
@@ -40,9 +45,13 @@ WHERE s.name = 'lvme.arrivage.nature.select'
   AND NOT EXISTS (SELECT 1 FROM meta_select_item i WHERE i.select_id = s.id AND i.value = v.value);
 
 -- ---------- Actions ----------
+-- (le menu est détaché le temps de recréer son action : script relançable)
+UPDATE meta_menu SET action = NULL WHERE name = 'stock-root-suparrivals'
+  AND action IN (SELECT id FROM meta_action WHERE name = 'action-lvme-arrivage-open' AND module IS NULL);
 DELETE FROM meta_action WHERE module IS NULL AND name IN ('action-lvme-arrivage-open', 'action-lvme-arrivage-dashlet',
   'action-lvme-arrivage-refresh', 'action-lvme-arrivage-defaults', 'action-lvme-arrivage-periode-date',
-  'action-lvme-arrivage-periode-arrivee', 'action-lvme-arrivage-new');
+  'action-lvme-arrivage-periode-arrivee', 'action-lvme-arrivage-new', 'action-lvme-arrivage-record-flottant',
+  'action-lvme-arrivage-record-embarquer', 'action-lvme-arrivage-attrs-devise');
 
 INSERT INTO meta_action (id, version, created_on, name, type, model, xml, home, is_custom) VALUES
 (nextval('meta_action_seq'), 0, now(), 'action-lvme-arrivage-open', 'action-view', 'com.axelor.utils.db.Wizard',
@@ -55,7 +64,7 @@ INSERT INTO meta_action (id, version, created_on, name, type, model, xml, home, 
 (nextval('meta_action_seq'), 0, now(), 'action-lvme-arrivage-dashlet', 'action-view', 'com.axelor.apps.stock.db.StockMove',
 '<action-view name="action-lvme-arrivage-dashlet" title="Arrivages" model="com.axelor.apps.stock.db.StockMove">
   <view type="grid" name="lvme-arrivage-grid"/>
-  <view type="form" name="stock-move-form"/>
+  <view type="form" name="lvme-arrivage-form"/>
   <domain>self.typeSelect = 3 AND self.isReversion = FALSE
     AND (:_fou = 0 OR self.partner.id = :_fou)
     AND (:_dateFiltre = false OR self.createdOn BETWEEN :_dateDu AND :_dateAu)
@@ -100,20 +109,41 @@ INSERT INTO meta_action (id, version, created_on, name, type, model, xml, home, 
 
 (nextval('meta_action_seq'), 0, now(), 'action-lvme-arrivage-new', 'action-view', 'com.axelor.apps.stock.db.StockMove',
 '<action-view name="action-lvme-arrivage-new" title="Arrivage" model="com.axelor.apps.stock.db.StockMove">
-  <view type="form" name="stock-move-form"/>
+  <view type="form" name="lvme-arrivage-form"/>
   <view-param name="forceEdit" value="true"/>
   <context name="_typeSelect" expr="eval: __repo__(StockMove).TYPE_INCOMING"/>
   <context name="_newDate" expr="eval: __config__.date.plusWeeks(1)"/>
   <context name="_isReversion" expr="eval: false"/>
-</action-view>', false, false);
+</action-view>', false, false),
+
+(nextval('meta_action_seq'), 0, now(), 'action-lvme-arrivage-record-flottant', 'action-record', 'com.axelor.apps.stock.db.StockMove',
+'<action-record name="action-lvme-arrivage-record-flottant" model="com.axelor.apps.stock.db.StockMove">
+  <field name="nature" expr="eval: ''FLOTTANT''"/>
+</action-record>', false, false),
+
+(nextval('meta_action_seq'), 0, now(), 'action-lvme-arrivage-record-embarquer', 'action-record', 'com.axelor.apps.stock.db.StockMove',
+'<action-record name="action-lvme-arrivage-record-embarquer" model="com.axelor.apps.stock.db.StockMove">
+  <field name="nature" expr="eval: ''EN_COURS_DE_PRODUCTION''"/>
+</action-record>', false, false),
+
+(nextval('meta_action_seq'), 0, now(), 'action-lvme-arrivage-attrs-devise', 'action-attrs', NULL,
+'<action-attrs name="action-lvme-arrivage-attrs-devise">
+  <attribute name="value" for="$deviseAchat"
+    expr="eval: def sm = id ? __repo__(StockMove).find(id) : null; def po = sm?.purchaseOrderSet?.find { true }; (po?.currency?.code ?: '''') + '' / devise comptable '' + (sm?.company?.currency?.code ?: '''')"/>
+</action-attrs>', false, false);
 
 -- ---------- Vues ----------
-DELETE FROM meta_view WHERE module IS NULL AND name IN ('lvme-arrivage-grid', 'lvme-arrivage-search-form');
+DELETE FROM meta_view WHERE module IS NULL AND name IN ('lvme-arrivage-grid', 'lvme-arrivage-search-form', 'lvme-arrivage-form',
+  'lvme-arrivage-line-grid');
 INSERT INTO meta_view (id, version, created_on, name, title, type, model, priority, xml, extension, computed) VALUES
 (nextval('meta_view_seq'), 0, now(), 'lvme-arrivage-grid', 'Arrivages', 'grid', 'com.axelor.apps.stock.db.StockMove', 20,
  current_setting('lvme.grille'), false, false),
 (nextval('meta_view_seq'), 0, now(), 'lvme-arrivage-search-form', 'Arrivages', 'form', 'com.axelor.utils.db.Wizard', 20,
- current_setting('lvme.recherche'), false, false);
+ current_setting('lvme.recherche'), false, false),
+(nextval('meta_view_seq'), 0, now(), 'lvme-arrivage-form', 'Arrivage', 'form', 'com.axelor.apps.stock.db.StockMove', 20,
+ current_setting('lvme.fiche'), false, false),
+(nextval('meta_view_seq'), 0, now(), 'lvme-arrivage-line-grid', 'Lignes Arrivages', 'grid', 'com.axelor.apps.stock.db.StockMoveLine', 20,
+ current_setting('lvme.lignes'), false, false);
 
 -- ---------- Menu « Réceptions fournisseur » -> « Arrivages » ----------
 UPDATE meta_menu SET title = 'Arrivages',
