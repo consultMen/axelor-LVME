@@ -47,8 +47,8 @@
       <field name="createdOn" title="Du" readonly="true"/>
       <field name="purchaseOrderSet" title="Commande d'achat" colSpan="12" readonly="true" widget="TagSelect" form-view="purchase-order-form" grid-view="purchase-order-grid"/>
       <field name="supplierShipmentDate" title="Date Départ" showIf="!isReversion"/>
-      <field name="estimatedDate" title="Arrivée prévue" readonlyIf="(statusSelect != 1 &amp;&amp; statusSelect != 2) || pickingIsEdited"/>
-      <field name="realDate" title="Arrivée réelle" readonly="true"/>
+      <field name="estimatedDate" title="Arrivée" readonlyIf="(statusSelect != 1 &amp;&amp; statusSelect != 2) || pickingIsEdited"/>
+      <field name="realDate" title="Arrivée le" readonly="true"/>
       <field name="supplierShipmentRef" title="Réf. fournisseur" showIf="!isReversion"/>
       <field name="shipmentMode" title="Type transport" canEdit="false" form-view="shipment-mode-form" grid-view="shipment-mode-grid"/>
       <field name="bateau" title="Bateau" canNew="true" form-view="lvme-bateau-form" grid-view="lvme-bateau-grid"/>
@@ -59,7 +59,7 @@
 
     <panel name="actionPanel" colSpan="3" itemSpan="12">
       <button name="planBtn" title="Plan" showIf="statusSelect == 1" icon="fa-calendar" onClick="action-group-stock-stockmove-plan-click"/>
-      <button name="lvmeFlottantBtn" title="A Embarquer -> Flottant" showIf="statusSelect == 2 &amp;&amp; nature != 'FLOTTANT'" css="btn-info" onClick="action-lvme-arrivage-record-flottant,save"/>
+      <button name="lvmeFlottantBtn" title="A Embarquer -> flottant" showIf="statusSelect == 2 &amp;&amp; nature != 'FLOTTANT'" css="btn-info" onClick="action-lvme-arrivage-record-flottant,save"/>
       <button name="lvmeEmbarquerBtn" title="Flottant -> A Embarquer" showIf="statusSelect == 2 &amp;&amp; nature == 'FLOTTANT'" css="btn-info" onClick="action-lvme-arrivage-record-embarquer,save"/>
       <button name="realizeBtn" title="Saisie Réel" showIf="statusSelect == 2" css="btn-success" icon="fa-check" prompt="Are you sure you want to realize this stock move?" onClick="action-group-stock-stockmove-realize-click"/>
       <button if="__config__.app.isApp('supplychain') &amp;&amp; __config__.app.getApp('account')?.getActivatePassedForPayment()" if-module="axelor-supplychain" name="passedForPaymentAuthorizedBtn" title="PFP authorized" showIf="pfpValidateStatusSelect != 2" onClick="action-stock-move-group-save-and-update-stocks,action-stock-move-record-pfp-validate,save"/>
@@ -71,11 +71,11 @@
     </panel>
 
     <panel name="lvmeRecapPanel" title="Récapitulatif" colSpan="12" itemSpan="3">
-      <field name="$deviseAchat" title="Devise d'achat" type="string" readonly="true"/>
+      <field name="$deviseAchat" title="Devise" type="string" readonly="true"/>
       <field name="$deviseComptable" title="Devise comptable" type="string" readonly="true"/>
       <field name="$currencySymbol" type="string" hidden="true"/>
       <field name="nbColisTotal" title="Nb Colis" readonly="true"/>
-      <field name="poidsTotal" title="Poids Total (kg)" readonly="true"/>
+      <field name="poidsTotal" title="Poids Total" readonly="true"/>
       <field name="exTaxTotal" title="Mt Achat HT" readonly="true" colSpan="6">
         <viewer depends="exTaxTotal,$currencySymbol"><![CDATA[
           <>
@@ -88,7 +88,7 @@
 
   <panel-related name="stockMoveLineListPanel" title="Lignes Arrivages" readonlyIf="company == null || fromStockLocation == null || toStockLocation == null || statusSelect == 3" height="14" field="stockMoveLineList" form-view="stock-move-line-form" grid-view="lvme-arrivage-line-grid" orderBy="sequence" onNew="action-stock-move-line-record-filter-on-available-products, action-stock-move-line-record-fill-stock-location" onChange="action-stock-move-line-change-group" canNew="true" canRemove="!(statusSelect == 2 &amp;&amp; pickingIsEdited)" canMove="true"/>
 
-  <panel name="lvmeNotePanel" title="Obs." colSpan="12" canCollapse="true">
+  <panel name="lvmeNotePanel" title="Obs" colSpan="12" canCollapse="true">
     <field name="note" showTitle="false" colSpan="12" widget="html" x-lite="true"/>
   </panel>
 

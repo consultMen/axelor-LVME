@@ -6,7 +6,7 @@
   <field name="productName" title="Désignation" readonlyIf="($get('stockMove.statusSelect') == 2 &amp;&amp; $get('stockMove.pickingIsEdited')) || $get('stockMove.statusSelect') == 3" width="200px" required="true"/>
   <field name="toStockLocation" title="Frigo" width="110px" onChange="action-stock-move-line-group-stock-location-onchange" onSelect="action-stock-move-line-method-compute-to-stock-location-domain"/>
   <field name="trackingNumber" title="N° Lot" width="120px" readonlyIf="lineTypeSelect == 1 || $get('stockMove.statusSelect') > 2" canNew="($get('stockMove.typeSelect') == 3 &amp;&amp; $get('$trackingNumberConfiguration.isPurchaseTrackingManaged')) || ($get('stockMove.typeSelect') == 1 &amp;&amp; !$get('$trackingNumberConfiguration.isPurchaseTrackingManaged') &amp;&amp; $get('$trackingNumberConfiguration.isProductionTrackingManaged')) || ($get('stockMove.typeSelect') == 2 &amp;&amp; !$get('$trackingNumberConfiguration.isPurchaseTrackingManaged') &amp;&amp; !$get('$trackingNumberConfiguration.isProductionTrackingManaged') &amp;&amp; $get('$trackingNumberConfiguration.isSaleTrackingManaged'))" onSelect="action-stock-move-line-attrs-tracking-number-domain" form-view="tracking-number-stock-move-line-form" grid-view="tracking-number-grid"/>
-  <field name="lotFournisseur" title="Lot Fourn." width="120px" onChange="action-stock-move-line-record-lot-fournisseur-onchange" onSelect="action-stock-move-line-attrs-lot-fournisseur-domain" form-view="lot-fournisseur-form" grid-view="lot-fournisseur-grid"/>
+  <field name="lotFournisseur" title="N° Lot Fourn." width="120px" onChange="action-stock-move-line-record-lot-fournisseur-onchange" onSelect="action-stock-move-line-attrs-lot-fournisseur-domain" form-view="lot-fournisseur-form" grid-view="lot-fournisseur-grid"/>
   <field name="origine" title="Origine" readonly="true" width="100px"/>
   <field name="purchaseOrderLine.conditionnement" title="Conditionn." readonly="true" width="120px"/>
   <field name="unitPriceUntaxed" title="Prix Achat" readonlyIf="lineTypeSelect == 1 || $get('stockMove.pickingIsEdited') || saleOrderLine || purchaseOrderLine" width="95px" onChange="action-stock-move-line-record-price-onchange" x-scale="$nbDecimalDigitForUnitPrice">
@@ -17,15 +17,15 @@
   <field name="nbColis" title="Nb Colis" readonly="true" aggregate="sum" width="80px" x-scale="3">
     <hilite background="yellow" if="true"/>
   </field>
-  <field name="nbUnitesParColis" title="Nb unt / Colis" readonly="true" width="85px" x-scale="3"/>
-  <field name="poidsParColis" title="Poids / Colis" readonly="true" width="85px" x-scale="3"/>
-  <field name="qty" title="Qté prévue" readonlyIf="$get('stockMove.statusSelect') > 1 || lineTypeSelect == 1" width="90px" onChange="action-stock-move-line-group-qty-onchange" aggregate="sum" x-scale="$nbDecimalDigitForQty"/>
-  <field name="realQty" title="Nb unités ou poids (réel)" readonlyIf="($get('stockMove.statusSelect') == 2 &amp;&amp; $get('stockMove.pickingIsEdited')) || $get('stockMove.statusSelect') == 3 || lineTypeSelect == 1" width="110px" onChange="action-stock-move-line-group-real-qty-onchange, action-stock-move-line-attrs-set-real-qty-modified-by-user-true" aggregate="sum" x-scale="$nbDecimalDigitForQty">
+  <field name="nbUnitesParColis" title="Nb unt /Colis" readonly="true" width="85px" x-scale="3"/>
+  <field name="poidsParColis" title="Poids /Colis" readonly="true" width="85px" x-scale="3"/>
+  <field name="qty" title="Flottant" readonlyIf="$get('stockMove.statusSelect') > 1 || lineTypeSelect == 1" width="90px" onChange="action-stock-move-line-group-qty-onchange" aggregate="sum" x-scale="$nbDecimalDigitForQty"/>
+  <field name="realQty" title="Nb unités ou poids" readonlyIf="($get('stockMove.statusSelect') == 2 &amp;&amp; $get('stockMove.pickingIsEdited')) || $get('stockMove.statusSelect') == 3 || lineTypeSelect == 1" width="110px" onChange="action-stock-move-line-group-real-qty-onchange, action-stock-move-line-attrs-set-real-qty-modified-by-user-true" aggregate="sum" x-scale="$nbDecimalDigitForQty">
     <hilite background="yellow" if="true"/>
   </field>
   <field name="poidsTotalNet" title="Poids Kg" readonly="true" aggregate="sum" width="90px" x-scale="3"/>
-  <field name="montantReel" title="Montant" readonly="true" aggregate="sum" width="100px"/>
-  <field name="dluo" title="D.L.C. / D.L.U.O." readonly="true" width="100px"/>
+  <field name="montantReel" title="Montant ht" readonly="true" aggregate="sum" width="100px"/>
+  <field name="dluo" title="D.L.C./ D.L.U.O" readonly="true" width="100px"/>
   <field name="zonePeche" title="Zone pêche" readonly="true" width="100px"/>
   <field name="marque" title="Marque" readonly="true" width="100px"/>
   <field name="modePeche" title="Mode pêche" readonly="true" width="100px"/>
