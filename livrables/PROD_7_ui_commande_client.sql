@@ -4,9 +4,11 @@
 --      colonnes jaunes Colis Cdes / Nb unités ou Poids cdés / Prix Vente, bouton Dupliquer.
 --   2. En-tête de la fiche (livrables/ui/sale-order-form-entete.xml) : bloc « Client » et bloc
 --      « Commande » visibles d'un coup (règlement, échéance, opérateur, ref cde, dates, transporteur,
---      port payé, coût port/kg remontés des panneaux repliés), paramètres techniques repliés.
+--      port payé, coût port/kg, commentaire remontés des panneaux repliés), bloc « Livraison »
+--      (tiers livré, adresse, emplacement, date et mode d'expédition, conditions), paramètres repliés.
+--      Les onglets et la colonne de droite d'Axelor sont conservés.
 --      La fiche est construite à partir de la vue calculée ACTUELLE de cette base : seul le bloc
---      d'en-tête est remplacé et les 7 champs remontés sont retirés de leur ancien emplacement.
+--      d'en-tête est remplacé et les 12 champs remontés sont retirés de leur ancien emplacement.
 -- Les deux vues sont des vues admin de priorité 30 (durables). Relançable.
 -- À lancer depuis la racine du dépôt :  psql -U axelor axelor -v ON_ERROR_STOP=1 -f livrables/PROD_7_ui_commande_client.sql
 -- Puis redémarrer Axelor (cache des vues).
@@ -21,7 +23,8 @@ DO $$
 DECLARE
   src text; res text; a int; b int; n int; p text; f text;
   moved text[] := ARRAY['estimatedDeliveryDate', 'carrierPartner', 'paymentMode', 'paymentCondition',
-                        'externalReference', 'creationDate', 'salespersonUser'];
+                        'externalReference', 'creationDate', 'salespersonUser', 'internalNote',
+                        'stockLocation', 'estimatedShippingDate', 'shipmentMode', 'deliveryCondition'];
 BEGIN
   -- ---------- 1. Grille des lignes ----------
   DELETE FROM meta_view WHERE name = 'sale-order-line-grid' AND module IS NULL AND priority = 30;
@@ -31,8 +34,10 @@ BEGIN
   RAISE NOTICE '1. Grille des lignes installée';
 
   -- ---------- 2. Fiche commande ----------
+  -- source : la vue de module d'origine (jamais une vue déjà transformée ou régénérée depuis la nôtre)
   SELECT xml INTO src FROM meta_view
    WHERE name = 'sale-order-form' AND module IS NOT NULL AND COALESCE(extension, false) = false
+     AND xml NOT LIKE '%lvmeEntetePanel%'
    ORDER BY priority DESC, COALESCE(computed, false) DESC LIMIT 1;
   IF src IS NULL THEN RAISE EXCEPTION 'sale-order-form introuvable'; END IF;
 
@@ -45,6 +50,9 @@ BEGIN
     res := regexp_replace(res, p, '');
   END LOOP;
 
+  -- le panneau latéral « Note interne », vidé, est retiré
+  res := regexp_replace(res, '<panel name="internalNotePanel"(?:[^"/>]|"[^"]*")*>\s*</panel>', '');
+
   -- remplace le bloc d'en-tête (generalInfoPanel + addressPanel)
   a := position('<panel name="generalInfoPanel"' IN res);
   b := position('<field name="clientPartner.saleOrderInformation"' IN res);
@@ -55,6 +63,7 @@ BEGIN
   INSERT INTO meta_view (id, version, created_on, name, title, type, model, priority, xml, extension, computed)
   SELECT nextval('meta_view_seq'), 0, now(), name, title, type, model, 30, res, false, false
   FROM meta_view WHERE name = 'sale-order-form' AND module IS NOT NULL AND COALESCE(extension, false) = false
+    AND xml NOT LIKE '%lvmeEntetePanel%'
   ORDER BY priority DESC, COALESCE(computed, false) DESC LIMIT 1;
   RAISE NOTICE '2. Fiche commande installée (en-tête GESCOM)';
 END $$;
