@@ -11,13 +11,24 @@
 
 -- ---------- CONTRÔLE (lecture seule) ----------
 -- type : 'r' = table (à remplacer), 'v' = vue (déjà bonne), vide = n'existe pas
-SELECT n.name,
+axelor@axelor-erp-v2:~/src$ psql -U axelor axelor 
+psql (15.19 (Debian 15.19-0+deb12u1))
+Type "help" for help.
+
+axelor=> SELECT n.name,
        c.relkind AS type,
        CASE WHEN c.relkind = 'r' THEN (xpath('/row/c/text()',
             query_to_xml(format('SELECT count(*) AS c FROM %I', n.name), false, true, '')))[1]::text::int END AS nb_lignes
 FROM (VALUES ('lvme_age_lot'), ('lvme_rotation_stock'), ('lvme_etat_stock_lot')) AS n(name)
 LEFT JOIN pg_class c ON c.relname = n.name AND c.relnamespace = 'public'::regnamespace;
+        name         | type | nb_lignes 
+---------------------+------+-----------
+ lvme_age_lot        | r    |         0
+ lvme_rotation_stock | r    |         0
+ lvme_etat_stock_lot | r    |         0
+(3 rows)
 
+axelor=> 
 -- ---------- CORRECTION ----------
 BEGIN;
 

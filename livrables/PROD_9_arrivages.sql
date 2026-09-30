@@ -6,7 +6,8 @@
 --     fiche « Arrivage » dédiée (lvme-arrivage-form) et grille de ses lignes ; la fiche de réception
 --     standard (stock-move-form, aussi utilisée par les BL) n'est pas modifiée
 --   - Menu « Réceptions fournisseur » renommé « Arrivages » et ouvert sur l'écran de recherche
--- Le script crée lui-même les colonnes bateau / nb_colis_total / poids_total (déclarées aussi dans le code).
+-- Le script crée lui-même les colonnes nb_colis_total / poids_total (déclarées aussi dans le code) ;
+-- la table des bateaux et la colonne « bateau » sont créées par Axelor au redémarrage.
 -- À lancer depuis la racine du dépôt, puis redémarrer Axelor. Relançable. Une seule transaction.
 -- =====================================================================
 \set grille `cat livrables/ui/arrivage-grid.xml`
@@ -18,7 +19,6 @@ SELECT set_config('lvme.grille', :'grille', false), set_config('lvme.recherche',
 
 BEGIN;
 
-ALTER TABLE stock_stock_move ADD COLUMN IF NOT EXISTS bateau varchar(255);
 ALTER TABLE stock_stock_move ADD COLUMN IF NOT EXISTS nb_colis_total numeric(20,3);
 ALTER TABLE stock_stock_move ADD COLUMN IF NOT EXISTS poids_total numeric(20,3);
 
@@ -129,7 +129,11 @@ INSERT INTO meta_action (id, version, created_on, name, type, model, xml, home, 
 (nextval('meta_action_seq'), 0, now(), 'action-lvme-arrivage-attrs-devise', 'action-attrs', NULL,
 '<action-attrs name="action-lvme-arrivage-attrs-devise">
   <attribute name="value" for="$deviseAchat"
-    expr="eval: def sm = id ? __repo__(StockMove).find(id) : null; def po = sm?.purchaseOrderSet?.find { true }; (po?.currency?.code ?: '''') + '' / devise comptable '' + (sm?.company?.currency?.code ?: '''')"/>
+    expr="eval: def sm = id ? __repo__(StockMove).find(id) : null; sm?.purchaseOrderSet?.find { true }?.currency?.code ?: (sm?.company?.currency?.code ?: '''')"/>
+  <attribute name="value" for="$currencySymbol"
+    expr="eval: def sm = id ? __repo__(StockMove).find(id) : null; sm?.purchaseOrderSet?.find { true }?.currency?.symbol ?: (sm?.company?.currency?.symbol ?: '''')"/>
+  <attribute name="value" for="$deviseComptable"
+    expr="eval: def sm = id ? __repo__(StockMove).find(id) : null; sm?.company?.currency?.code ?: ''''"/>
 </action-attrs>', false, false);
 
 -- ---------- Vues ----------
@@ -144,6 +148,38 @@ INSERT INTO meta_view (id, version, created_on, name, title, type, model, priori
  current_setting('lvme.fiche'), false, false),
 (nextval('meta_view_seq'), 0, now(), 'lvme-arrivage-line-grid', 'Lignes Arrivages', 'grid', 'com.axelor.apps.stock.db.StockMoveLine', 20,
  current_setting('lvme.lignes'), false, false);
+
+-- ---------- Référentiel des bateaux (Stocks > Configuration > Bateaux) ----------
+DELETE FROM meta_view WHERE module IS NULL AND name IN ('lvme-bateau-grid', 'lvme-bateau-form');
+INSERT INTO meta_view (id, version, created_on, name, title, type, model, priority, xml, extension, computed) VALUES
+(nextval('meta_view_seq'), 0, now(), 'lvme-bateau-grid', 'Bateaux', 'grid', 'com.axelor.apps.stock.db.Bateau', 20,
+'<grid name="lvme-bateau-grid" title="Bateaux" model="com.axelor.apps.stock.db.Bateau" orderBy="name" editable="true">
+  <field name="name"/>
+</grid>', false, false),
+(nextval('meta_view_seq'), 0, now(), 'lvme-bateau-form', 'Bateau', 'form', 'com.axelor.apps.stock.db.Bateau', 20,
+'<form name="lvme-bateau-form" title="Bateau" model="com.axelor.apps.stock.db.Bateau">
+  <panel name="mainPanel">
+    <field name="name" colSpan="12"/>
+  </panel>
+</form>', false, false);
+
+UPDATE meta_menu SET action = NULL WHERE name = 'lvme-menu-bateau'
+  AND action IN (SELECT id FROM meta_action WHERE name = 'action-lvme-bateau' AND module IS NULL);
+DELETE FROM meta_action WHERE name = 'action-lvme-bateau' AND module IS NULL;
+INSERT INTO meta_action (id, version, created_on, name, type, model, xml, home, is_custom) VALUES
+(nextval('meta_action_seq'), 0, now(), 'action-lvme-bateau', 'action-view', 'com.axelor.apps.stock.db.Bateau',
+'<action-view name="action-lvme-bateau" title="Bateaux" model="com.axelor.apps.stock.db.Bateau">
+  <view type="grid" name="lvme-bateau-grid"/>
+  <view type="form" name="lvme-bateau-form"/>
+</action-view>', false, false);
+
+INSERT INTO meta_menu (id, version, created_on, name, title, parent, action, order_seq, priority, hidden, left_menu, mobile_menu, tag_count)
+SELECT nextval('meta_menu_seq'), 0, now(), 'lvme-menu-bateau', 'Bateaux',
+       (SELECT id FROM meta_menu WHERE name = 'stock-root-conf' ORDER BY priority DESC LIMIT 1),
+       (SELECT id FROM meta_action WHERE name = 'action-lvme-bateau' AND module IS NULL), 100, 0, false, true, false, false
+WHERE NOT EXISTS (SELECT 1 FROM meta_menu WHERE name = 'lvme-menu-bateau');
+UPDATE meta_menu SET action = (SELECT id FROM meta_action WHERE name = 'action-lvme-bateau' AND module IS NULL)
+WHERE name = 'lvme-menu-bateau';
 
 -- ---------- Menu « Réceptions fournisseur » -> « Arrivages » ----------
 UPDATE meta_menu SET title = 'Arrivages',

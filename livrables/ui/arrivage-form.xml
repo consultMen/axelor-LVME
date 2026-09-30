@@ -19,7 +19,7 @@
 
   <panel name="mainPanel" colSpan="12">
     <field name="statusSelect" showTitle="false" colSpan="8" widget="NavSelect"/>
-    <field name="nature" showTitle="false" readonly="true" colSpan="4">
+    <field name="nature" title="Nature" readonly="true" colSpan="4">
       <viewer depends="nature"><![CDATA[
         <>
           {nature == 'EN_COURS_DE_PRODUCTION' && <Badge bg="info" style={{ fontSize: 16 }}>En cours de production (à embarquer)</Badge>}
@@ -51,7 +51,7 @@
       <field name="realDate" title="Arrivée réelle" readonly="true"/>
       <field name="supplierShipmentRef" title="Réf. fournisseur" showIf="!isReversion"/>
       <field name="shipmentMode" title="Type transport" canEdit="false" form-view="shipment-mode-form" grid-view="shipment-mode-grid"/>
-      <field name="bateau" title="Bateau"/>
+      <field name="bateau" title="Bateau" canNew="true" form-view="lvme-bateau-form" grid-view="lvme-bateau-grid"/>
       <field name="trackingNumber" title="Containers"/>
       <field name="forwarderPartner" title="Transitaire" canEdit="false" domain="self.isContact = FALSE AND (self.isCarrier = TRUE OR self.isSupplier = TRUE) AND :company MEMBER OF self.companySet" form-view="partner-form" grid-view="partner-grid"/>
       <field name="toStockLocation" title="Frigo" colSpan="12" canEdit="false" onChange="action-stock-move-group-to-location-onchange" domain="self.company = :company AND self.typeSelect != 3 AND (self.usableOnPurchaseOrder = true AND :isReversion = false OR self.usableOnSaleOrder = true AND :isReversion = true)" form-view="stock-location-form" grid-view="stock-location-grid"/>
@@ -71,10 +71,18 @@
     </panel>
 
     <panel name="lvmeRecapPanel" title="Récapitulatif" colSpan="12" itemSpan="3">
-      <field name="$deviseAchat" title="Devise" type="string" readonly="true"/>
-      <field name="exTaxTotal" title="Mt Achat HT" readonly="true"/>
+      <field name="$deviseAchat" title="Devise d'achat" type="string" readonly="true"/>
+      <field name="$deviseComptable" title="Devise comptable" type="string" readonly="true"/>
+      <field name="$currencySymbol" type="string" hidden="true"/>
       <field name="nbColisTotal" title="Nb Colis" readonly="true"/>
       <field name="poidsTotal" title="Poids Total (kg)" readonly="true"/>
+      <field name="exTaxTotal" title="Mt Achat HT" readonly="true" colSpan="6">
+        <viewer depends="exTaxTotal,$currencySymbol"><![CDATA[
+          <>
+            <Box as="span" fontWeight="bold" fontSize={5}>{$fmt('exTaxTotal')} {$currencySymbol}</Box>
+          </>
+        ]]></viewer>
+      </field>
     </panel>
   </panel>
 
