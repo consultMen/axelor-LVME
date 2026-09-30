@@ -1,0 +1,54 @@
+<panel name="lvmeDevisePanel" showTitle="false" colSpan="12">
+      <field name="company" readonlyIf="statusSelect >= 3 || supplierPartner != null" colSpan="3" widget="SuggestBox" canEdit="false" onChange="action-group-purchase-order-company-change-actions" form-view="company-form" grid-view="company-grid"/>
+      <field name="currency" title="Devise d'achat" domain="self.code IN ('EUR', 'USD')" readonlyIf="(purchaseOrderLineList &amp;&amp; purchaseOrderLineList.length > 0) || statusSelect >= 3" colSpan="3" canEdit="false" form-view="currency-form" grid-view="currency-grid"/>
+      <field name="company.currency" title="Devise comptable" readonly="true" colSpan="3" form-view="currency-form" grid-view="currency-grid"/>
+      <field name="priceList" hideIf="company == null" readonlyIf="(purchaseOrderLineList &amp;&amp; purchaseOrderLineList.length > 0) || statusSelect >= 3" colSpan="3" onSelect="action-purchase-order-method-price-list-domain" form-view="price-list-form" grid-view="price-list-grid"/>
+    </panel>
+
+    <panel name="lvmeEntetePanel" showTitle="false" colSpan="12">
+      <panel name="lvmeFournisseurPanel" title="Fournisseur" colSpan="7">
+        <panel name="lvmeFournisseurGauche" showTitle="false" colSpan="6" itemSpan="12">
+          <field name="supplierPartner" title="Fournisseur" hideIf="company == null" readonlyIf="statusSelect >= 3" canEdit="false" onChange="action-group-purchase-order-partner-onchange" onSelect="action-set-supplier-partner-domain" form-view="partner-form" grid-view="partner-grid" x-image-field="picture"/>
+          <field name="supplierPartner.partnerSeq" title="Code" readonly="true"/>
+          <field name="supplierPartner.mainAddress" title="Adresse" readonly="true" form-view="address-form" grid-view="address-grid"/>
+        </panel>
+        <panel name="lvmeFournisseurDroite" showTitle="false" colSpan="6" itemSpan="12">
+          <field name="contactPartner" title="Contact" hideIf="company == null" onChange="action-record-po-contact-partner-change" onSelect="action-attrs-po-domain-on-contact-partner" domain="self.isContact = true" form-view="partner-contact-form" grid-view="partner-contact-grid" x-image-field="picture"/>
+          <field name="supplierPartner.fixedPhone" title="Tél." readonly="true"/>
+          <field name="supplierPartner.emailAddress" title="Email" readonly="true"/>
+          <field if="__config__.app.isApp('supplychain')" if-module="axelor-account" name="paymentMode" title="Règlement" canEdit="false" onChange="action-purchase-order-method-fill-company-bank-details" domain="self.inOutSelect = 2" form-view="payment-mode-form" grid-view="payment-mode-grid"/>
+          <field if="__config__.app.isApp('supplychain')" if-module="axelor-account" name="paymentCondition" title="Echéance" canEdit="false" onSelect="action-purchase-order-attrs-payment-condition-set-domain" form-view="payment-condition-form" grid-view="payment-condition-grid"/>
+        </panel>
+      </panel>
+
+      <panel name="lvmeArrivagePanel" title="Arrivage" colSpan="5">
+        <field name="$etatArrivage" showTitle="false" readonly="true" colSpan="12" type="string">
+          <viewer depends="statusSelect,receiptState"><![CDATA[
+            <>
+              {(statusSelect == 1 || statusSelect == 2) && <Badge bg="info">A Embarquer</Badge>}
+              {(statusSelect == 3 || statusSelect == 4) && receiptState != 3 && <Badge bg="warning">Flottant</Badge>}
+              {receiptState == 3 && <Badge bg="success">Réel</Badge>}
+            </>
+          ]]></viewer>
+        </field>
+        <field name="buyerUser" title="Opérateur" colSpan="6" canNew="false" canView="false" canEdit="false" form-view="user-form" grid-view="user-grid"/>
+        <field name="orderDate" title="Du" colSpan="6"/>
+        <field name="supplierShipmentDate" title="Date Départ" colSpan="6"/>
+        <field name="estimatedReceiptDate" title="Arrivée" colSpan="6" onChange="action-purchase-order-method-update-purchase-order-lines-estimated-receipt-date"/>
+        <field if="__config__.app.isApp('stock')" if-module="axelor-stock" name="shipmentMode" title="Type transport" colSpan="6" onChange="action-purchase-order-record-empty-freight-carrier-mode,supplychain-action-create-shipment-cost-line-purchase" form-view="shipment-mode-form" grid-view="shipment-mode-grid" readOnlyIf="statusSelect > 1"/>
+        <field if="__config__.app.isApp('supplychain')" if-module="axelor-supplychain" name="stockLocation" title="Frigo" colSpan="6" canEdit="false" onChange="action-purchase-order-group-stock-location-change" onSelect="action-purchase-order-attrs-set-stock-location-domain" form-view="stock-location-form" grid-view="stock-location-grid"/>
+      </panel>
+    </panel>
+
+    <panel name="lvmeParametresPanel" title="Paramètres" colSpan="12" canCollapse="true" collapseIf="true">
+      <field if="__config__.app.getApp('base')?.enableTradingNamesManagement" name="tradingName" readonlyIf="!createdByInterco &amp;&amp;((purchaseOrderLineList &amp;&amp; purchaseOrderLineList.length > 0) || statusSelect >= 3)" colSpan="3" canEdit="false" onChange="action-purchase-order-method-printing-settings-default-value,action-purchase-order-record-set-stock-location" domain="self.company = :company" requiredIf="company.tradingNameList != null &amp;&amp; company.tradingNameList.length != 0" form-view="trading-name-form" grid-view="trading-name-grid"/>
+      <field name="attrs" colSpan="4"/>
+      <field if="__config__.app.getApp('purchase')?.getManagePurchaseOrderVersion()" name="versionNumber" colSpan="3"/>
+      <panel name="inAtiAndIntercoPanel" colSpan="3">
+        <field name="inAti" readonlyIf="(purchaseOrderLineList &amp;&amp; purchaseOrderLineList.length > 0) || statusSelect >= 3" onChange="action-purchase-order-attrs-in-ati"/>
+        <field if="__config__.app.isApp('supplychain')" if-module="axelor-supplychain" name="interco" hidden="true" widget="boolean-switch"/>
+        <field if="__config__.app.isApp('supplychain')" if-module="axelor-supplychain" name="createdByInterco" readonly="true" showIf="createdByInterco"/>
+      </panel>
+      <field if="__config__.app.getApp('base')?.getEnableTaxNumbers()" name="taxNumber" readonlyIf="statusSelect > 2" colSpan="3" canNew="false" canEdit="false" onChange="action-purchase-order-method-empty-fiscal-position-if-not-compatible,action-purchase-order-method-fiscal-position-on-change" onSelect="action-purchase-order-attrs-compute-tax-number-domain"/>
+      <field name="fiscalPosition" readonlyIf="statusSelect > 2" colSpan="3" canNew="false" canEdit="false" onChange="action-purchase-order-method-fiscal-position-on-change,action-purchase-order-method-compute" onSelect="action-purchase-order-attrs-fiscal-position-domain"/>
+    </panel>

@@ -1,0 +1,44 @@
+<grid name="purchase-order-line-purchase-order-grid" title="Lignes arrivage" model="com.axelor.apps.purchase.db.PurchaseOrderLine">
+  <!-- LVME : grille des lignes de commande fournisseur, colonnes et libellés de la fiche « Arrivages » GESCOM -->
+  <hilite color="default" strong="true" if="isTitleLine == true"/>
+  <hilite color="danger" if="receiptState == 1"/>
+  <hilite color="warning" if="receiptState == 2"/>
+  <hilite color="success" if="receiptState == 3"/>
+  <field name="$hasWarning" hidden="true"/>
+  <button name="errorIconButton" showIf="$hasWarning" onClick="refresh" readonlyIf="true" icon="fa-exclamation-triangle"/>
+  <field name="sequence" if="__config__.app.getApp('purchase')?.isDisplayPurchaseOrderLineNumber" width="51"/>
+  <field name="product" hidden="true"/>
+  <field name="receiptState" hidden="true" if="__config__.app.isApp('supplychain')"/>
+  <field name="product.code" title="Produit" width="110"/>
+  <field name="productName" title="Désignation"/>
+  <field name="origine" title="Origine" width="90"/>
+  <field name="conditionnement" title="Conditionn." width="110"/>
+  <field name="purchaseOrder.currency" hidden="true"/>
+  <field name="purchaseOrder.currency.numberOfDecimals" hidden="true"/>
+  <field name="priceDiscounted" title="Prix Achat" x-scale="$nbDecimalDigitForUnitPrice" width="85">
+    <hilite background="yellow" if="true"/>
+  </field>
+  <field name="prixRevientReel" title="Prix Revient" width="85"/>
+  <field name="unit" title="Unité" form-view="unit-form" grid-view="unit-grid" width="75"/>
+  <field name="nbColis" title="Nb Colis" aggregate="sum" width="75">
+    <hilite background="yellow" if="true"/>
+  </field>
+  <field name="nbUnitesParColis" title="Nb unt / Colis" width="80"/>
+  <field name="poidsParColis" title="Poids / Colis" width="80"/>
+  <field name="qty" title="Nb unités ou poids" aggregate="sum" x-scale="$nbDecimalDigitForQty" width="95">
+    <hilite background="yellow" if="true"/>
+  </field>
+  <field name="poidsTotalNet" title="Poids Kg" aggregate="sum" width="85"/>
+  <field name="exTaxTotal" title="Montant ht" aggregate="sum" x-scale="purchaseOrder.currency.numberOfDecimals" width="100"/>
+  <field name="dluo" title="D.L.C. / D.L.U.O." width="95"/>
+  <field name="zonePeche" title="Zone pêche" width="90"/>
+  <field name="productCode" title="Code fourn." width="90"/>
+  <field name="budgetStr" if="__config__.app.getApp('budget') &amp;&amp; __config__.app.getApp('budget').getManageMultiBudget()"/>
+  <field name="budget" if="__config__.app.getApp('budget') &amp;&amp; !__config__.app.getApp('budget').getManageMultiBudget()"/>
+  <field name="isTitleLine" hidden="true"/>
+  <field name="estimatedReceiptDate" title="Arrivée"/>
+  <field name="$nbDecimalDigitForUnitPrice" hidden="true"/>
+  <field name="$nbDecimalDigitForQty" hidden="true"/>
+  <field name="purchaseOrder.statusSelect" hidden="true"/>
+  <button name="lvmeDuplicateLineBtn" title="Dupliquer la ligne" icon="fa-copy" readonlyIf="id == null || $get('purchaseOrder.statusSelect') &gt; 2" onClick="save,action-lvme-purchase-order-line-method-duplicate"/>
+</grid>
