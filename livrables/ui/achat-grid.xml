@@ -8,12 +8,8 @@
   <field name="receiptState" title="Nature" width="120"/>
   <field name="orderDate" title="Date Arrivage" width="100"/>
   <field name="estimatedReceiptDate" title="Date Arrivée" width="100"/>
-  <field name="shipmentMode" title="Type transport" width="100"/>
-  <field name="nbColisTotal" title="Nb Colis" aggregate="sum" width="85"/>
   <field name="qtyTotal" title="Nb unités" aggregate="sum" width="90"/>
   <field name="poidsTotal" title="Tonnage en kg" aggregate="sum" width="100"/>
   <field name="exTaxTotal" title="Mt Arrivage H.T." aggregate="sum" width="120"/>
-  <field name="currency" title="Devise" width="80"/>
-  <field name="stockLocation" title="Frigo" width="90"/>
-  <field name="statusSelect" title="Statut" width="90"/>
+  <field name="statusSelect" hidden="true"/>
 </grid>
