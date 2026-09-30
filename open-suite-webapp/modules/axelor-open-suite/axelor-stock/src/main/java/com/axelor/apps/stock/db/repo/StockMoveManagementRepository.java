@@ -55,9 +55,28 @@ public class StockMoveManagementRepository extends StockMoveRepository {
     return copy;
   }
 
+  /** LVME : totaux de l'arrivage (Nb Colis, Poids Total) = somme des lignes. */
+  protected void computeLvmeTotals(StockMove stockMove) {
+    java.math.BigDecimal nbColis = java.math.BigDecimal.ZERO;
+    java.math.BigDecimal poids = java.math.BigDecimal.ZERO;
+    if (stockMove.getStockMoveLineList() != null) {
+      for (StockMoveLine line : stockMove.getStockMoveLineList()) {
+        if (line.getNbColis() != null) {
+          nbColis = nbColis.add(line.getNbColis());
+        }
+        if (line.getPoidsTotalNet() != null) {
+          poids = poids.add(line.getPoidsTotalNet());
+        }
+      }
+    }
+    stockMove.setNbColisTotal(nbColis);
+    stockMove.setPoidsTotal(poids);
+  }
+
   @Override
   public StockMove save(StockMove entity) {
     try {
+      computeLvmeTotals(entity);
       StockMove stockMove = super.save(entity);
       SequenceService sequenceService = Beans.get(SequenceService.class);
 

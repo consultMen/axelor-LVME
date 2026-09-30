@@ -1,0 +1,23 @@
+<grid name="lvme-arrivage-grid" title="Arrivages" model="com.axelor.apps.stock.db.StockMove" orderBy="-estimatedDate,-id" canNew="false">
+  <!-- LVME : liste des arrivages (réceptions fournisseur), colonnes de l'écran « Arrivages » GESCOM -->
+  <hilite color="success" if="nature == 'REEL'"/>
+  <hilite color="warning" if="nature == 'FLOTTANT'"/>
+  <hilite color="info" if="nature == 'EN_COURS_DE_PRODUCTION'"/>
+  <field name="partner" title="Fournisseur" width="200"/>
+  <field name="stockMoveSeq" title="N° Arrivage" width="110"/>
+  <field name="nature" title="Nature" width="110"/>
+  <field name="supplierShipmentDate" title="Date Départ" width="95"/>
+  <field name="estimatedDate" title="Arrivée prévue" width="95"/>
+  <field name="realDate" title="Arrivée le" width="95"/>
+  <field name="shipmentMode" title="Type transport" width="100"/>
+  <field name="bateau" title="Bateau" width="120"/>
+  <field name="nbColisTotal" title="Nb Colis" aggregate="sum" width="80"/>
+  <field name="poidsTotal" title="Poids Total" aggregate="sum" width="90"/>
+  <field name="exTaxTotal" title="Montant Achat HT" aggregate="sum" width="110"/>
+  <field name="partner.fixedPhone" title="Téléphone" width="110"/>
+  <field name="fromAddress.city" title="Ville" width="110"/>
+  <field name="fromAddress.country" title="Pays" width="100"/>
+  <field name="toStockLocation" title="Frigo" width="100"/>
+  <field name="statusSelect" hidden="true"/>
+  <field name="typeSelect" hidden="true"/>
+</grid>

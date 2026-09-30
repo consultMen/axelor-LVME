@@ -107,6 +107,12 @@
     <date name="pickingEditDate" title="Picking order edit date"/>
     <enum name="modeOfTransport" ref="com.axelor.apps.stock.db.ModeOfTransport"/>
     <enum name="nature" ref="com.axelor.apps.stock.db.Nature" title="Nature"/>
+    <!-- LVME : arrivage (réception fournisseur) comme dans GESCOM -->
+    <string name="bateau" title="Bateau" help="Nom du navire (type de transport BATEAU)"/>
+    <decimal name="nbColisTotal" title="Nb Colis" precision="20" scale="3" readonly="true"
+      help="Somme des colis des lignes, calculée à l'enregistrement"/>
+    <decimal name="poidsTotal" title="Poids Total" precision="20" scale="3" readonly="true"
+      help="Somme des poids nets des lignes (kg), calculée à l'enregistrement"/>
 
     <string name="note" title="Notes" large="true"/>
 
@@ -196,11 +202,11 @@
 
   </enum>
   <enum name="Nature" numeric="true">
-    <item name="DRAFT" value="0"/>
-    <item name="EN_COURS_DE_PRODUCTION" value="1"/>
-    <item name="FLOTTANT" value="2"/>
-    <item name="REEL" value="3"/>
-    <item name="ANNULE" value="4"/>
+    <item name="DRAFT" value="0" title="Brouillon"/>
+    <item name="EN_COURS_DE_PRODUCTION" value="1" title="En cours de production"/>
+    <item name="FLOTTANT" value="2" title="Flottant"/>
+    <item name="REEL" value="3" title="Réel"/>
+    <item name="ANNULE" value="4" title="Annulé"/>
 
   </enum>
 

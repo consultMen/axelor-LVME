@@ -1,0 +1,28 @@
+<form name="lvme-arrivage-search-form" title="Arrivages" model="com.axelor.utils.db.Wizard" width="large"
+  canNew="false" canSave="false" canCopy="false" canDelete="false" onNew="action-lvme-arrivage-defaults">
+  <!-- LVME : écran « Arrivages » de GESCOM : cadre Recherche + liste des arrivages (réceptions fournisseur) -->
+  <panel name="rechercheArrivagePanel" title="Recherche" colSpan="12">
+    <panel name="filtreFournisseurPanel" colSpan="3" itemSpan="12">
+      <field name="$fournisseur" title="Fournisseur" type="many-to-one" target="com.axelor.apps.base.db.Partner"
+        domain="self.isSupplier = true" canNew="false" canEdit="false" canView="false"/>
+      <button name="nouvelArrivageBtn" title="Nouvel Arrivage" icon="plus" onClick="action-lvme-arrivage-new"/>
+    </panel>
+    <panel name="filtreDatePanel" colSpan="3" itemSpan="12">
+      <field name="$dateDu" title="Date du" type="date"/>
+      <field name="$dateAu" title="au" type="date"/>
+      <field name="$datePeriode" title="Période prédéfinie" type="integer" selection="lvme.etat.stock.periode.select"
+        onChange="action-lvme-arrivage-periode-date"/>
+    </panel>
+    <panel name="filtreArriveePanel" colSpan="3" itemSpan="12">
+      <field name="$arriveeDu" title="Arrivée du" type="date"/>
+      <field name="$arriveeAu" title="au" type="date"/>
+      <field name="$arriveePeriode" title="Période prédéfinie" type="integer" selection="lvme.etat.stock.periode.select"
+        onChange="action-lvme-arrivage-periode-arrivee"/>
+    </panel>
+    <panel name="filtreNaturePanel" title="Nature" colSpan="3" itemSpan="12">
+      <field name="$natureFiltre" showTitle="false" type="integer" widget="RadioSelect" selection="lvme.arrivage.nature.select"/>
+      <button name="lancerRechercheBtn" title="Lancer la recherche" icon="search" css="btn-primary" onClick="action-lvme-arrivage-refresh"/>
+    </panel>
+  </panel>
+  <panel-dashlet name="arrivagesDashlet" title="Arrivages" colSpan="12" height="600" action="action-lvme-arrivage-dashlet"/>
+</form>
