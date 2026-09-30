@@ -65,6 +65,8 @@ INSERT INTO meta_action (id, version, created_on, name, type, model, xml, home, 
 '<action-view name="action-lvme-client-dashlet" title="Clients" model="com.axelor.apps.base.db.Partner">
   <view type="grid" name="partner-customer-grid"/>
   <view type="form" name="partner-customer-form"/>
+  <view-param name="popup" value="true"/>
+  <view-param name="popup-save" value="true"/>
   <domain>self.isContact = false AND (self.isCustomer = true OR self.isProspect = true)
     AND (:_val = ''%'' OR (:_crit = 1 AND LOWER(self.name) LIKE :_val) OR (:_crit = 2 AND LOWER(self.partnerSeq) LIKE :_val)
       OR (:_crit = 3 AND EXISTS (SELECT 1 FROM Address a WHERE a = self.mainAddress AND LOWER(a.city.name) LIKE :_val))
@@ -93,6 +95,8 @@ INSERT INTO meta_action (id, version, created_on, name, type, model, xml, home, 
 '<action-view name="action-lvme-fournisseur-dashlet" title="Fournisseurs" model="com.axelor.apps.base.db.Partner">
   <view type="grid" name="partner-supplier-grid"/>
   <view type="form" name="partner-supplier-form"/>
+  <view-param name="popup" value="true"/>
+  <view-param name="popup-save" value="true"/>
   <domain>self.isContact = false AND self.isSupplier = true
     AND (:_val = ''%'' OR (:_crit = 1 AND LOWER(self.name) LIKE :_val) OR (:_crit = 2 AND LOWER(self.partnerSeq) LIKE :_val)
       OR (:_crit = 3 AND EXISTS (SELECT 1 FROM Address a WHERE a = self.mainAddress AND LOWER(a.city.name) LIKE :_val))
@@ -120,6 +124,8 @@ INSERT INTO meta_action (id, version, created_on, name, type, model, xml, home, 
 '<action-view name="action-lvme-article-dashlet" title="Articles" model="com.axelor.apps.base.db.Product">
   <view type="grid" name="product-grid"/>
   <view type="form" name="product-form"/>
+  <view-param name="popup" value="true"/>
+  <view-param name="popup-save" value="true"/>
   <domain>self.isModel = false AND self.sellable = true AND self.isShippingCostsProduct = false AND self.dtype = ''Product''
     AND (:_val = ''%'' OR (:_crit = 1 AND LOWER(self.code) LIKE :_val) OR (:_crit = 2 AND LOWER(self.name) LIKE :_val)
       OR (:_crit = 3 AND self.gencode LIKE :_val)
@@ -146,6 +152,8 @@ INSERT INTO meta_action (id, version, created_on, name, type, model, xml, home, 
 '<action-view name="action-lvme-article-achat-dashlet" title="Articles" model="com.axelor.apps.base.db.Product">
   <view type="grid" name="product-purchase-grid"/>
   <view type="form" name="product-form"/>
+  <view-param name="popup" value="true"/>
+  <view-param name="popup-save" value="true"/>
   <domain>self.isModel = false AND self.purchasable = true AND self.dtype = ''Product''
     AND (:_val = ''%'' OR (:_crit = 1 AND LOWER(self.code) LIKE :_val) OR (:_crit = 2 AND LOWER(self.name) LIKE :_val)
       OR (:_crit = 3 AND self.gencode LIKE :_val)

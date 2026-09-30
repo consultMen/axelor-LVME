@@ -46,6 +46,8 @@ INSERT INTO meta_action (id, version, created_on, name, type, model, xml, home, 
 '<action-view name="action-lvme-lots-verifies-dashlet" title="Lots" model="com.axelor.apps.supplychain.db.EtatStockLot">
   <view type="grid" name="lvme-lots-verifies-grid"/>
   <view type="form" name="lvme-etat-stock-lot-form"/>
+  <view-param name="popup" value="true"/>
+  <view-param name="popup-save" value="true"/>
   <domain>(:_prod = 0 OR self.product.id = :_prod)
     AND LOWER(COALESCE(self.lotNumber, '''')) LIKE :_lot
     AND (:_entFiltre = false OR self.entryDate BETWEEN :_du AND :_au)

@@ -34,6 +34,8 @@ INSERT INTO meta_action (id, version, created_on, name, type, model, xml, home, 
 '<action-view name="action-lvme-historique-produit-dashlet" title="Historique Produit" model="com.axelor.apps.supplychain.db.HistoriqueProduit">
   <view type="grid" name="lvme-historique-produit-grid"/>
   <view type="form" name="lvme-historique-produit-detail-form"/>
+  <view-param name="popup" value="true"/>
+  <view-param name="popup-save" value="true"/>
   <domain>self.product.id = :_prod AND self.dateMvt BETWEEN :_du AND :_au</domain>
   <context name="_prod" expr="eval: (produit?.id ?: 0) as Long"/>
   <context name="_du" expr="eval: entreeDu ? java.time.LocalDate.parse(entreeDu.toString().substring(0, 10)) : java.time.LocalDate.of(1900, 1, 1)"/>

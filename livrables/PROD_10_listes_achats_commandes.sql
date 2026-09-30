@@ -78,6 +78,9 @@ INSERT INTO meta_action (id, version, created_on, name, type, model, xml, home, 
 '<action-view name="action-lvme-achat-dashlet" title="Achats fournisseurs" model="com.axelor.apps.purchase.db.PurchaseOrder">
   <view type="grid" name="lvme-achat-grid"/>
   <view type="form" name="purchase-order-form"/>
+  <view-param name="popup" value="true"/>
+  <view-param name="popup-save" value="true"/>
+  <view-param name="popup.maximized" value="true"/>
   <domain>self.statusSelect IN (3, 4)
     AND (:_dateFiltre = false OR self.orderDate BETWEEN :_dateDu AND :_dateAu)
     AND (:_arrFiltre = false OR self.estimatedReceiptDate BETWEEN :_arrDu AND :_arrAu)
@@ -138,6 +141,9 @@ INSERT INTO meta_action (id, version, created_on, name, type, model, xml, home, 
 '<action-view name="action-lvme-cde-client-dashlet" title="Commandes clients" model="com.axelor.apps.sale.db.SaleOrder">
   <view type="grid" name="lvme-commande-client-grid"/>
   <view type="form" name="sale-order-form"/>
+  <view-param name="popup" value="true"/>
+  <view-param name="popup-save" value="true"/>
+  <view-param name="popup.maximized" value="true"/>
   <domain>self.template = false AND self.statusSelect IN (3, 4)
     AND ((:_etat = 1 AND self.statusSelect = 3 AND self.deliveryState != 3)
          OR (:_etat = 2 AND (self.statusSelect = 4 OR self.deliveryState = 3)) OR :_etat = 3)

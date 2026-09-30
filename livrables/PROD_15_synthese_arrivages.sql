@@ -34,6 +34,8 @@ INSERT INTO meta_action (id, version, created_on, name, type, model, xml, home, 
 '<action-view name="action-lvme-synthese-arrivage-dashlet" title="Synthèse des Arrivages" model="com.axelor.apps.supplychain.db.SyntheseArrivage">
   <view type="grid" name="lvme-synthese-arrivage-grid"/>
   <view type="form" name="lvme-synthese-arrivage-detail-form"/>
+  <view-param name="popup" value="true"/>
+  <view-param name="popup-save" value="true"/>
   <domain>self.arrivage &gt;= :_numDu AND self.arrivage &lt;= :_numAu
     AND self.dateArrivee BETWEEN :_du AND :_au</domain>
   <context name="_numDu" expr="eval: arrivageDu ? arrivageDu.toString().trim() : ''''"/>
