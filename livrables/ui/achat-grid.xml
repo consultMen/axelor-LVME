@@ -1,11 +1,12 @@
 <grid name="lvme-achat-grid" title="Achats fournisseurs" model="com.axelor.apps.purchase.db.PurchaseOrder" orderBy="-orderDate,-id" canNew="false">
   <!-- LVME : colonnes de « liste des achats fournisseurs » GESCOM -->
-  <hilite color="success" if="receiptState == 3"/>
-  <hilite color="warning" if="receiptState != 3"/>
+  <hilite color="success" if="nature == 'REEL'"/>
+  <hilite color="warning" if="nature == 'FLOTTANT'"/>
+  <hilite color="info" if="nature == 'EN_COURS_DE_PRODUCTION'"/>
   <field name="purchaseOrderSeq" title="N°" width="110"/>
   <field name="supplierPartner.partnerSeq" title="Fournisseur" width="100"/>
   <field name="supplierPartner.name" title="Nom" width="220"/>
-  <field name="receiptState" title="Nature" width="120"/>
+  <field name="nature" title="Nature" width="150"/>
   <field name="orderDate" title="Date Arrivage" width="100"/>
   <field name="estimatedReceiptDate" title="Date Arrivée" width="100"/>
   <field name="qtyTotal" title="Nb unités" aggregate="sum" width="90"/>

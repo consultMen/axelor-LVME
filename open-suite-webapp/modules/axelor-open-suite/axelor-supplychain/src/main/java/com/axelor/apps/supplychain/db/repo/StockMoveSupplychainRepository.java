@@ -48,4 +48,30 @@ public class StockMoveSupplychainRepository extends StockMoveManagementRepositor
 
     return copy;
   }
+
+  @Override
+  public StockMove save(StockMove stockMove) {
+    StockMove saved = super.save(stockMove);
+    syncNatureToPurchaseOrders(saved);
+    return saved;
+  }
+
+  /**
+   * LVME : la commande fournisseur porte la Nature de son arrivage (En cours de production / Flottant
+   * / Réel), recopiée à chaque enregistrement de la réception. Une réception annulée ne l'écrase pas.
+   */
+  protected void syncNatureToPurchaseOrders(StockMove stockMove) {
+    if (stockMove == null
+        || stockMove.getTypeSelect() == null
+        || stockMove.getTypeSelect() != StockMoveRepository.TYPE_INCOMING
+        || Boolean.TRUE.equals(stockMove.getIsReversion())
+        || stockMove.getNature() == null
+        || stockMove.getNature() == com.axelor.apps.stock.db.Nature.ANNULE
+        || stockMove.getPurchaseOrderSet() == null) {
+      return;
+    }
+    for (com.axelor.apps.purchase.db.PurchaseOrder purchaseOrder : stockMove.getPurchaseOrderSet()) {
+      purchaseOrder.setNature(stockMove.getNature());
+    }
+  }
 }

@@ -26,6 +26,8 @@
     <boolean name="interco" title="Interco"/>
     <boolean name="createdByInterco" default="false"/>
     <many-to-one name="shipmentMode" ref="com.axelor.apps.stock.db.ShipmentMode"/>
+    <!-- LVME : Nature de l'arrivage (recopiée depuis la réception fournisseur) -->
+    <enum name="nature" ref="com.axelor.apps.stock.db.Nature" title="Nature" readonly="true"/>
     <many-to-one name="freightCarrierMode"
       ref="com.axelor.apps.stock.db.FreightCarrierMode"/>
 
