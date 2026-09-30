@@ -7,7 +7,7 @@
 --     standard (stock-move-form, aussi utilisée par les BL) n'est pas modifiée
 --   - Menu « Réceptions fournisseur » renommé « Arrivages » et ouvert sur l'écran de recherche
 -- Le script crée lui-même les colonnes nb_colis_total / poids_total (déclarées aussi dans le code) ;
--- la table des bateaux et la colonne « bateau » sont créées par Axelor au redémarrage.
+-- les tables des bateaux / containers et leurs liens sont créés par Axelor au redémarrage.
 -- À lancer depuis la racine du dépôt, puis redémarrer Axelor. Relançable. Une seule transaction.
 -- =====================================================================
 \set grille `cat livrables/ui/arrivage-grid.xml`
@@ -149,8 +149,9 @@ INSERT INTO meta_view (id, version, created_on, name, title, type, model, priori
 (nextval('meta_view_seq'), 0, now(), 'lvme-arrivage-line-grid', 'Lignes Arrivages', 'grid', 'com.axelor.apps.stock.db.StockMoveLine', 20,
  current_setting('lvme.lignes'), false, false);
 
--- ---------- Référentiel des bateaux (Stocks > Configuration > Bateaux) ----------
-DELETE FROM meta_view WHERE module IS NULL AND name IN ('lvme-bateau-grid', 'lvme-bateau-form');
+-- ---------- Référentiels des bateaux et des containers (Stocks > Configuration) ----------
+DELETE FROM meta_view WHERE module IS NULL AND name IN ('lvme-bateau-grid', 'lvme-bateau-form', 'lvme-container-grid',
+  'lvme-container-form');
 INSERT INTO meta_view (id, version, created_on, name, title, type, model, priority, xml, extension, computed) VALUES
 (nextval('meta_view_seq'), 0, now(), 'lvme-bateau-grid', 'Bateaux', 'grid', 'com.axelor.apps.stock.db.Bateau', 20,
 '<grid name="lvme-bateau-grid" title="Bateaux" model="com.axelor.apps.stock.db.Bateau" orderBy="name" editable="true">
@@ -161,16 +162,31 @@ INSERT INTO meta_view (id, version, created_on, name, title, type, model, priori
   <panel name="mainPanel">
     <field name="name" colSpan="12"/>
   </panel>
+</form>', false, false),
+(nextval('meta_view_seq'), 0, now(), 'lvme-container-grid', 'Containers', 'grid', 'com.axelor.apps.stock.db.Container', 20,
+'<grid name="lvme-container-grid" title="Containers" model="com.axelor.apps.stock.db.Container" orderBy="name" editable="true">
+  <field name="name"/>
+</grid>', false, false),
+(nextval('meta_view_seq'), 0, now(), 'lvme-container-form', 'Container', 'form', 'com.axelor.apps.stock.db.Container', 20,
+'<form name="lvme-container-form" title="Container" model="com.axelor.apps.stock.db.Container">
+  <panel name="mainPanel">
+    <field name="name" colSpan="12"/>
+  </panel>
 </form>', false, false);
 
-UPDATE meta_menu SET action = NULL WHERE name = 'lvme-menu-bateau'
-  AND action IN (SELECT id FROM meta_action WHERE name = 'action-lvme-bateau' AND module IS NULL);
-DELETE FROM meta_action WHERE name = 'action-lvme-bateau' AND module IS NULL;
+UPDATE meta_menu SET action = NULL WHERE name IN ('lvme-menu-bateau', 'lvme-menu-container')
+  AND action IN (SELECT id FROM meta_action WHERE name IN ('action-lvme-bateau', 'action-lvme-container') AND module IS NULL);
+DELETE FROM meta_action WHERE name IN ('action-lvme-bateau', 'action-lvme-container') AND module IS NULL;
 INSERT INTO meta_action (id, version, created_on, name, type, model, xml, home, is_custom) VALUES
 (nextval('meta_action_seq'), 0, now(), 'action-lvme-bateau', 'action-view', 'com.axelor.apps.stock.db.Bateau',
 '<action-view name="action-lvme-bateau" title="Bateaux" model="com.axelor.apps.stock.db.Bateau">
   <view type="grid" name="lvme-bateau-grid"/>
   <view type="form" name="lvme-bateau-form"/>
+</action-view>', false, false),
+(nextval('meta_action_seq'), 0, now(), 'action-lvme-container', 'action-view', 'com.axelor.apps.stock.db.Container',
+'<action-view name="action-lvme-container" title="Containers" model="com.axelor.apps.stock.db.Container">
+  <view type="grid" name="lvme-container-grid"/>
+  <view type="form" name="lvme-container-form"/>
 </action-view>', false, false);
 
 INSERT INTO meta_menu (id, version, created_on, name, title, parent, action, order_seq, priority, hidden, left_menu, mobile_menu, tag_count)
@@ -180,6 +196,13 @@ SELECT nextval('meta_menu_seq'), 0, now(), 'lvme-menu-bateau', 'Bateaux',
 WHERE NOT EXISTS (SELECT 1 FROM meta_menu WHERE name = 'lvme-menu-bateau');
 UPDATE meta_menu SET action = (SELECT id FROM meta_action WHERE name = 'action-lvme-bateau' AND module IS NULL)
 WHERE name = 'lvme-menu-bateau';
+INSERT INTO meta_menu (id, version, created_on, name, title, parent, action, order_seq, priority, hidden, left_menu, mobile_menu, tag_count)
+SELECT nextval('meta_menu_seq'), 0, now(), 'lvme-menu-container', 'Containers',
+       (SELECT id FROM meta_menu WHERE name = 'stock-root-conf' ORDER BY priority DESC LIMIT 1),
+       (SELECT id FROM meta_action WHERE name = 'action-lvme-container' AND module IS NULL), 101, 0, false, true, false, false
+WHERE NOT EXISTS (SELECT 1 FROM meta_menu WHERE name = 'lvme-menu-container');
+UPDATE meta_menu SET action = (SELECT id FROM meta_action WHERE name = 'action-lvme-container' AND module IS NULL)
+WHERE name = 'lvme-menu-container';
 
 -- ---------- Menu « Réceptions fournisseur » -> « Arrivages » ----------
 UPDATE meta_menu SET title = 'Arrivages',

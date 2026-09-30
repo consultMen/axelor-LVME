@@ -10,4 +10,9 @@
     <string name="name" title="Bateau" namecolumn="true" required="true" unique="true"/>
   </entity>
 
+  <!-- LVME : référentiel des containers utilisés sur les arrivages -->
+  <entity name="Container">
+    <string name="name" title="Container" namecolumn="true" required="true" unique="true"/>
+  </entity>
+
 </domain-models>

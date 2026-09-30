@@ -52,7 +52,7 @@
       <field name="supplierShipmentRef" title="Réf. fournisseur" showIf="!isReversion"/>
       <field name="shipmentMode" title="Type transport" canEdit="false" form-view="shipment-mode-form" grid-view="shipment-mode-grid"/>
       <field name="bateau" title="Bateau" canNew="true" form-view="lvme-bateau-form" grid-view="lvme-bateau-grid"/>
-      <field name="trackingNumber" title="Containers"/>
+      <field name="containerSet" title="Containers" widget="TagSelect" canNew="true" form-view="lvme-container-form" grid-view="lvme-container-grid"/>
       <field name="forwarderPartner" title="Transitaire" canEdit="false" domain="self.isContact = FALSE AND (self.isCarrier = TRUE OR self.isSupplier = TRUE) AND :company MEMBER OF self.companySet" form-view="partner-form" grid-view="partner-grid"/>
       <field name="toStockLocation" title="Frigo" colSpan="12" canEdit="false" onChange="action-stock-move-group-to-location-onchange" domain="self.company = :company AND self.typeSelect != 3 AND (self.usableOnPurchaseOrder = true AND :isReversion = false OR self.usableOnSaleOrder = true AND :isReversion = true)" form-view="stock-location-form" grid-view="stock-location-grid"/>
     </panel>

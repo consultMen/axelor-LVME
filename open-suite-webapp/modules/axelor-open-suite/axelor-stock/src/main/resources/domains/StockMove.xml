@@ -110,6 +110,8 @@
     <!-- LVME : arrivage (réception fournisseur) comme dans GESCOM -->
     <many-to-one name="bateau" ref="com.axelor.apps.stock.db.Bateau" title="Bateau"
       help="Navire (type de transport BATEAU), choisi dans la liste des bateaux"/>
+    <many-to-many name="containerSet" ref="com.axelor.apps.stock.db.Container" title="Containers"
+      help="Containers de l'arrivage, choisis dans la liste des containers"/>
     <decimal name="nbColisTotal" title="Nb Colis" precision="20" scale="3" readonly="true"
       help="Somme des colis des lignes, calculée à l'enregistrement"/>
     <decimal name="poidsTotal" title="Poids Total" precision="20" scale="3" readonly="true"
