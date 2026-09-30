@@ -2,6 +2,7 @@
 -- LVME : vue lvme_synthese_arrivage (modèle Axelor SyntheseArrivage)
 -- Reproduit l'écran « Synthèse des Arrivages » de GESCOM (diapo 24).
 -- Une ligne par ligne d'arrivage réel (réception fournisseur réalisée, hors retours).
+-- Date Arrivée : date réelle, sinon date prévue (les arrivages repris de GESCOM n'ont que la date prévue).
 --
 -- Déploiement : exécuter AVANT le premier démarrage d'Axelor avec le
 -- modèle SyntheseArrivage, sinon Hibernate crée une table du même nom.
@@ -25,12 +26,12 @@ SELECT sml.id                            AS id,
        sm.stock_move_seq::varchar        AS arrivage,
        (sm.stock_move_seq || '   ' || COALESCE(pa.name, '') || '   ' || COALESCE(pa.partner_seq, '')
           || COALESCE('   Embarq. ' || to_char(sm.supplier_shipment_date, 'DD/MM/YYYY'), '')
-          || COALESCE('   Arrivée ' || to_char(sm.real_date, 'DD/MM/YYYY'), ''))::varchar AS entete,
+          || COALESCE('   Arrivée ' || to_char(COALESCE(sm.real_date, sm.estimated_date), 'DD/MM/YYYY'), ''))::varchar AS entete,
        pa.id                             AS supplier_id,
        pa.name::varchar                  AS fournisseur,
        pa.partner_seq::varchar           AS code_fournisseur,
        sm.supplier_shipment_date         AS date_embarquement,
-       sm.real_date                      AS date_arrivee,
+       COALESCE(sm.real_date, sm.estimated_date) AS date_arrivee,
        sml.product                       AS product_id,
        p.code::varchar                   AS product_code,
        COALESCE(sml.product_name, p.name)::varchar AS designation,

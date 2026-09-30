@@ -9,6 +9,7 @@
 -- Type : AR arrivage fournisseur, BL livraison client, RC retour client,
 --        RF retour fournisseur, CE transfert interne, IN inventaire / correction
 -- Arrivage : N° du BR fournisseur d'origine du lot
+-- Date    : date réelle du mouvement, sinon date prévue (les arrivages repris de GESCOM n'ont que la date prévue)
 -- Poids   : quantité réelle de la ligne
 --
 -- Déploiement : exécuter AVANT le premier démarrage d'Axelor avec le
@@ -22,7 +23,7 @@ WITH mvts AS (
            sml.product,
            sml.tracking_number,
            sm.id                                                 AS stock_move_id,
-           sm.real_date,
+           COALESCE(sm.real_date, sm.estimated_date) AS real_date,
            sm.stock_move_seq,
            sm.type_select,
            COALESCE(sm.is_reversion, false)                      AS is_reversion,
