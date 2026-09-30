@@ -1,4 +1,11 @@
-<panel name="lvmeEntetePanel" showTitle="false" colSpan="12">
+<panel name="lvmeDevisePanel" showTitle="false" colSpan="12">
+      <field name="company" readonlyIf="statusSelect == 3 || clientPartner != null" colSpan="3" widget="SuggestBox" canEdit="false" onChange="action-sale-order-method-company-onchange" form-view="company-form" grid-view="company-grid"/>
+      <field name="currency" title="Devise client" readonlyIf="(saleOrderLineList &amp;&amp; saleOrderLineList.length > 0) || statusSelect >= 2" colSpan="3" canEdit="false" required="true" form-view="currency-form" grid-view="currency-grid"/>
+      <field name="company.currency" title="Devise comptable" readonly="true" colSpan="3" form-view="currency-form" grid-view="currency-grid"/>
+      <field name="priceList" hideIf="company == null" readonlyIf="(saleOrderLineList &amp;&amp; saleOrderLineList.length > 0) || statusSelect >= 2" colSpan="3" canEdit="false" onChange="action-sale-order-record-hide-discount" onSelect="action-sale-order-method-price-list-domain" form-view="price-list-form" grid-view="price-list-grid"/>
+    </panel>
+
+    <panel name="lvmeEntetePanel" showTitle="false" colSpan="12">
       <panel name="lvmeClientPanel" title="Client" colSpan="7">
         <panel name="lvmeClientGauche" showTitle="false" colSpan="6" itemSpan="12">
           <field name="clientPartner" title="Client" hideIf="company == null" readonlyIf="statusSelect > 1" onChange="action-sale-order-method-client-partner-onchange,action-sale-order-record-set-remise-rfa" onSelect="action-sale-order-method-set-client-partner-domain" required="true" form-view="partner-form" grid-view="partner-grid" x-image-field="picture"/>
@@ -46,10 +53,7 @@
     </panel>
 
     <panel name="generalInfoPanel" title="Paramètres" colSpan="12" canCollapse="true" collapseIf="true">
-      <field name="company" readonlyIf="statusSelect == 3 || clientPartner != null" colSpan="3" widget="SuggestBox" canEdit="false" onChange="action-sale-order-method-company-onchange" form-view="company-form" grid-view="company-grid"/>
       <field if="__config__.app.getApp('base')?.enableTradingNamesManagement" name="tradingName" hidden="true" hideIf="company.tradingNameList == null || company.tradingNameList.length == 0" readonlyIf="!createdByInterco &amp;&amp; ((saleOrderLineList &amp;&amp; saleOrderLineList.length > 0) || statusSelect >= 2)" colSpan="3" canEdit="false" onChange="action-sale-method-printing-settings-default-values,action-sale-order-record-set-stock-location" domain="self.company = :company" requiredIf="company.tradingNameList != null &amp;&amp; company.tradingNameList.length != 0" form-view="trading-name-form" grid-view="trading-name-grid"/>
-      <field name="currency" readonlyIf="(saleOrderLineList &amp;&amp; saleOrderLineList.length > 0) || statusSelect >= 2" colSpan="3" canEdit="false" required="true" form-view="currency-form" grid-view="currency-grid"/>
-      <field name="priceList" hideIf="company == null" readonlyIf="(saleOrderLineList &amp;&amp; saleOrderLineList.length > 0) || statusSelect >= 2" colSpan="3" canEdit="false" onChange="action-sale-order-record-hide-discount" onSelect="action-sale-order-method-price-list-domain" form-view="price-list-form" grid-view="price-list-grid"/>
       <field if="__config__.app.getApp('sale')?.getManageSaleOrderVersion()" name="versionNumber" colSpan="3"/>
       <field name="directOrderLocation" colSpan="3" widget="boolean-switch" onChange="action-sale-order-record-direct-order-location-onchange"/>
       <field if="__config__.app.getApp('base')?.getEnableTaxNumbers()" name="taxNumber" readonlyIf="statusSelect > 1 &amp;&amp; !orderBeingEdited" colSpan="3" canNew="false" canEdit="false" onChange="action-sale-order-method-empty-fiscal-position-if-not-compatible,action-sale-order-method-fiscal-position-on-change,action-sale-order-method-on-line-change" onSelect="action-sale-order-attrs-compute-tax-number-domain"/>
