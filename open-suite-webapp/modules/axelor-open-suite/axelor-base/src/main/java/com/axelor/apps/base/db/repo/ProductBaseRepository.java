@@ -45,6 +45,48 @@ public class ProductBaseRepository extends ProductRepository {
 
   @Inject protected ProductFireService productFireService;
 
+  /**
+   * LVME : P.Vente TTC = P.Vente HT x (1 + taux de la TVA de vente de l'article), comme la liste Articles
+   * GESCOM. Taux pris sur la gestion comptable de l'article, sinon sur celle de sa famille comptable.
+   */
+  protected void computeSalePriceTtc(Product product) {
+    java.math.BigDecimal ht = product.getSalePrice();
+    if (ht == null) {
+      product.setSalePriceTtc(null);
+      return;
+    }
+    java.math.BigDecimal rate = saleTaxRate(product.getAccountManagementList());
+    if (rate == null && product.getProductFamily() != null) {
+      rate = saleTaxRate(product.getProductFamily().getAccountManagementList());
+    }
+    if (rate == null) {
+      rate = java.math.BigDecimal.ZERO;
+    }
+    product.setSalePriceTtc(
+        ht.multiply(
+                java.math.BigDecimal.ONE.add(
+                    rate.divide(new java.math.BigDecimal("100"), 10, java.math.RoundingMode.HALF_UP)))
+            .setScale(4, java.math.RoundingMode.HALF_UP));
+  }
+
+  private static java.math.BigDecimal saleTaxRate(
+      java.util.List<com.axelor.apps.account.db.AccountManagement> accountManagementList) {
+    if (accountManagementList == null) {
+      return null;
+    }
+    for (com.axelor.apps.account.db.AccountManagement accountManagement : accountManagementList) {
+      if (accountManagement.getSaleTaxSet() == null) {
+        continue;
+      }
+      for (com.axelor.apps.account.db.Tax tax : accountManagement.getSaleTaxSet()) {
+        if (tax.getActiveTaxLine() != null && tax.getActiveTaxLine().getValue() != null) {
+          return tax.getActiveTaxLine().getValue();
+        }
+      }
+    }
+    return null;
+  }
+
   @Override
   public Product save(Product product) {
     try {
@@ -58,6 +100,7 @@ public class ProductBaseRepository extends ProductRepository {
     }
 
     product.setFullName(String.format(FULL_NAME_FORMAT, product.getCode(), product.getName()));
+    computeSalePriceTtc(product);
 
     if (product.getId() != null) {
       Product oldProduct = Beans.get(ProductRepository.class).find(product.getId());

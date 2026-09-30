@@ -3,8 +3,9 @@
   <!-- LVME : écran « Articles » de GESCOM : « Recherche rapide par » + liste -->
   <panel name="rechercheRapidePanel" title="Recherche" colSpan="12">
     <field name="$critere" title="Recherche rapide par" type="integer" selection="lvme.recherche.article.select" colSpan="3"/>
-    <field name="$valeur" showTitle="false" type="string" colSpan="5" onChange="action-lvme-recherche-refresh"/>
+    <field name="$valeur" showTitle="false" type="string" colSpan="3" onChange="action-lvme-recherche-refresh"/>
     <button name="rechercheBtn" title="Recherche" icon="search" css="btn-primary" colSpan="2" onClick="action-lvme-recherche-refresh"/>
+    <button name="rechercheAvanceeBtn" title="Recherche avancée" icon="funnel" colSpan="2" onClick="sc.root.purchase.products"/>
     <button name="nouveauBtn" title="Nouvel article" icon="plus" colSpan="2" onClick="action-lvme-article-achat-new"/>
   </panel>
   <panel-dashlet name="listeDashlet" title="Articles" colSpan="12" height="650" action="action-lvme-article-achat-dashlet"/>

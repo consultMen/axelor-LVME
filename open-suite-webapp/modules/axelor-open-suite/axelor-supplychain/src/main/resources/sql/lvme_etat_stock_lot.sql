@@ -29,6 +29,7 @@ WITH arrivages AS (
            MAX(sml.origine)                                                AS origine,
            MAX(COALESCE(NULLIF(cond.label, ''), cond.code))                  AS conditionnement,
            MAX(sml.dluo)                                                   AS dluo_ligne,
+           MAX(sml.date_congelation)                                       AS date_congelation_ligne,
            MAX(sml.prix_revient_reel)                                      AS pr_ligne,
            MAX(sml.unit)                                                   AS unit,
            MIN(COALESCE(sm.real_date, sm.estimated_date))                  AS entry_date,
@@ -76,7 +77,7 @@ base AS (
            COALESCE(a.frigo, s.frigo)                     AS frigo,
            COALESCE(a.product, s.product)                 AS product,
            a.supplier, a.arrival_number, a.origine, a.conditionnement,
-           a.dluo_ligne, a.pr_ligne, a.unit, a.entry_date,
+           a.dluo_ligne, a.pr_ligne, a.unit, a.entry_date, a.date_congelation_ligne,
            COALESCE(a.is_flottant, false)                 AS is_flottant,
            COALESCE(a.entree_qty, 0)                      AS entree_qty,
            COALESCE(a.nb_colis_in, 0)                     AS nb_colis_in,
@@ -90,6 +91,7 @@ base AS (
 calc AS (
     SELECT b.*,
            t.tracking_number_seq,
+           COALESCE(t.lot_verifie, false)                                 AS lot_verifie,
            COALESCE(t.perishable_expiration_date, b.dluo_ligne)            AS dluo,
            COALESCE(NULLIF(t.prix_revient_reel, 0), b.pr_ligne, 0)         AS prix_revient,
            COALESCE(t.date_arrivage, b.entry_date)                         AS arrival_date,
@@ -148,7 +150,10 @@ SELECT ((c.tracking_number * 1000000 + COALESCE(c.frigo, 0)) * 10 + CASE WHEN c.
        c.stock_qty - c.cdes_qty          AS dispo_qty,
        ROUND(CASE WHEN c.montant_in > 0 AND c.entree_qty > 0
                   THEN c.montant_in * c.stock_qty / c.entree_qty
-                  ELSE c.stock_qty * c.prix_revient END, 2) AS stock_value
+                  ELSE c.stock_qty * c.prix_revient END, 2) AS stock_value,
+       -- ajouts « Lots Vérifiés » (colonnes en fin de vue : CREATE OR REPLACE VIEW)
+       c.date_congelation_ligne          AS date_congelation,
+       c.lot_verifie                     AS lot_verifie
 FROM calc c
 JOIN base_product p ON p.id = c.product
 LEFT JOIN base_partner pa ON pa.id = c.supplier_id;

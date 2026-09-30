@@ -7,12 +7,14 @@
   <field name="code" title="Référence" width="120" x-bind="{{code|unaccent|uppercase}}"/>
   <field name="name" title="Désignation article" width="300"/>
   <field name="defaultSupplierPartner" title="Fournisseur" width="180"/>
+  <field name="refFournisseur" title="Référence Fournisseur" width="120"/>
   <field name="gencode" title="Gencode" width="130"/>
   <field name="unit" title="Unité" width="70" form-view="unit-form" grid-view="unit-grid"/>
   <field name="netMass" title="Poids Unitaire" width="95"/>
+  <field name="poidsColis" title="Poids Colis" width="90"/>
   <field name="purchasePrice" title="P.Achat HT" x-scale="2" width="100"/>
-  <field name="salePrice" title="P.Vente HT" x-scale="2" width="100"/>
-  <field name="productCategory" title="Famille" form-view="product-category-form" grid-view="product-category-grid" width="120"/>
+  <field name="salePrice" title="P.Vente HT" x-scale="3" width="100"/>
+  <field name="salePriceTtc" title="P.Vente TTC" x-scale="3" width="100"/>
   <field name="internalDescription" title="Commentaires" width="300" widget="html"/>
   <field name="productTypeSelect" hidden="true"/>
   <button name="sendByEmailBtn" title="Send Email" icon="fa-envelope" onClick="action-send-by-email-with-template"/>

@@ -2,7 +2,8 @@
 -- PROD étape 11 : listes Clients / Fournisseurs / Articles à la manière de GESCOM (diapos 30, 5, 9)
 --   - partner-customer-grid, partner-supplier-grid, product-grid, product-purchase-grid :
 --     vues admin de priorité 30 avec les colonnes et libellés GESCOM
---   - champ Gencode sur l'article (colonne créée ici, déclarée aussi dans le code) et ajouté
+--   - champs Gencode, Référence Fournisseur, Poids Colis, P.Vente TTC sur l'article (colonnes créées ici,
+--     déclarées aussi dans le code) ; Gencode, Réf. fournisseur et Poids Colis ajoutés
 --     sur la fiche article juste après le Code (fiche construite à partir de la vue actuelle de la base)
 -- À lancer depuis la racine du dépôt, puis redémarrer Axelor. Relançable. Une seule transaction.
 -- Si un utilisateur a personnalisé ses colonnes (engrenage de la liste), il doit faire « Réinitialiser ».
@@ -17,6 +18,22 @@ SELECT set_config('lvme.cli', :'cli', false), set_config('lvme.fou', :'fou', fal
 BEGIN;
 
 ALTER TABLE base_product ADD COLUMN IF NOT EXISTS gencode varchar(255);
+ALTER TABLE base_product ADD COLUMN IF NOT EXISTS ref_fournisseur varchar(255);
+ALTER TABLE base_product ADD COLUMN IF NOT EXISTS poids_colis numeric(20,3);
+ALTER TABLE base_product ADD COLUMN IF NOT EXISTS sale_price_ttc numeric(20,4);
+
+-- P.Vente TTC des articles existants : même calcul que le code (TVA de vente de l'article, sinon de sa famille)
+UPDATE base_product p
+SET sale_price_ttc = ROUND(p.sale_price * (1 + COALESCE(
+      (SELECT tl.value FROM account_account_management am
+         JOIN account_account_management_sale_tax_set st ON st.account_account_management = am.id
+         JOIN account_tax t ON t.id = st.sale_tax_set JOIN account_tax_line tl ON tl.id = t.active_tax_line
+       WHERE am.product = p.id ORDER BY am.id LIMIT 1),
+      (SELECT tl.value FROM account_account_management am
+         JOIN account_account_management_sale_tax_set st ON st.account_account_management = am.id
+         JOIN account_tax t ON t.id = st.sale_tax_set JOIN account_tax_line tl ON tl.id = t.active_tax_line
+       WHERE am.product_family = p.product_family ORDER BY am.id LIMIT 1), 0) / 100), 4)
+WHERE p.sale_price IS NOT NULL;
 
 -- ---------- Listes ----------
 DELETE FROM meta_view WHERE module IS NULL AND priority = 30
@@ -40,7 +57,7 @@ BEGIN
   p := '(<field if="!__config__[^"]*GenerateProductSequence\(\)" name="code"(?:[^"/>]|"[^"]*")*/>)';
   SELECT count(*) INTO n FROM regexp_matches(src, p, 'g');
   IF n <> 1 THEN RAISE EXCEPTION 'Champ Code de la fiche article trouvé % fois (1 attendu) : arrêt', n; END IF;
-  res := regexp_replace(src, p, '\1<field name="gencode" title="Gencode" colSpan="3"/>');
+  res := regexp_replace(src, p, '\1<field name="gencode" title="Gencode" colSpan="3"/><field name="refFournisseur" title="Référence Fournisseur" colSpan="3"/><field name="poidsColis" title="Poids Colis" colSpan="3"/><field name="salePriceTtc" title="P.Vente TTC" colSpan="3" readonly="true"/>');
 
   DELETE FROM meta_view WHERE name = 'product-form' AND module IS NULL AND priority = 30;
   INSERT INTO meta_view (id, version, created_on, name, title, type, model, priority, xml, extension, computed)

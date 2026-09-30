@@ -55,6 +55,8 @@
     <decimal name="dispoQty" column="dispo_qty" title="Disponible" precision="20" scale="3"/>
     <decimal name="stockValue" column="stock_value" title="Montant HT stock" precision="20"
       scale="2"/>
+    <date name="dateCongelation" column="date_congelation" title="Date Congélation"/>
+    <boolean name="lotVerifie" column="lot_verifie" title="Vérif"/>
   </entity>
 
 </domain-models>

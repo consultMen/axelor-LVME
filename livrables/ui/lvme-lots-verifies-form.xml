@@ -1,0 +1,30 @@
+<form name="lvme-lots-verifies-form" title="Lots Vérifiés" model="com.axelor.utils.db.Wizard" width="large"
+  canNew="false" canSave="false" canCopy="false" canDelete="false" onNew="action-lvme-lots-verifies-defaults">
+  <!-- LVME : écran « Lots Vérifiés » de GESCOM (diapo 21) -->
+  <panel name="filtresLotsPanel" showTitle="false" colSpan="12">
+    <panel name="filtreProduitPanel" colSpan="4" itemSpan="12">
+      <field name="$produit" title="Référence Produit" type="many-to-one" target="com.axelor.apps.base.db.Product"
+        canNew="false" canEdit="false" canView="false"/>
+      <field name="$numeroLot" title="ou Lot n°" type="string"/>
+    </panel>
+    <panel name="filtreEntreePanel" colSpan="3" itemSpan="12">
+      <field name="$entreeDu" title="Entrées du" type="date"/>
+      <field name="$entreeAu" title="au" type="date"/>
+      <field name="$entreePeriode" title="Période prédéfinie" type="integer" selection="lvme.etat.stock.periode.select"
+        onChange="action-lvme-lots-verifies-periode"/>
+    </panel>
+    <panel name="filtreSelectionPanel" title="Sélection" colSpan="3" itemSpan="12">
+      <field name="$selectionLots" showTitle="false" type="integer" widget="RadioSelect" selection="lvme.lots.selection.select"/>
+    </panel>
+    <panel name="filtreBoutonPanel" colSpan="2" itemSpan="12">
+      <button name="afficherLotsBtn" title="Afficher Lots" icon="check-circle" css="btn-success" onClick="action-lvme-lots-verifies-refresh"/>
+    </panel>
+  </panel>
+  <panel-dashlet name="lotsDashlet" title="Lots" colSpan="12" height="520" action="action-lvme-lots-verifies-dashlet"/>
+  <panel name="verificationPanel" showTitle="false" colSpan="12">
+    <field name="$lotAVerifier" title="N° Lot" type="many-to-one" target="com.axelor.apps.stock.db.TrackingNumber"
+      colSpan="4" canNew="false" canEdit="false" canView="false"/>
+    <field name="$verification" showTitle="false" type="integer" widget="RadioSelect" selection="lvme.lots.verification.select" colSpan="4"/>
+    <button name="validerVerifBtn" title="Valider" icon="check" css="btn-success" colSpan="2" onClick="action-lvme-lots-verifies-valider"/>
+  </panel>
+</form>

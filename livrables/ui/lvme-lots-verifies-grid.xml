@@ -1,0 +1,21 @@
+<grid name="lvme-lots-verifies-grid" title="Lots Vérifiés" model="com.axelor.apps.supplychain.db.EtatStockLot" orderBy="entryDate" canNew="false" canEdit="false" canDelete="false">
+  <!-- LVME : colonnes de l'écran « Lots Vérifiés » GESCOM -->
+  <hilite color="success" if="lotVerifie"/>
+  <field name="lotNumber" title="N° Lot" width="110"/>
+  <field name="arrivalNumber" title="N° Arrivage" width="100"/>
+  <field name="origine" title="Origine" selection="lvme.origine.select" width="90"/>
+  <field name="conditionnement" title="Conditionnement" width="120"/>
+  <field name="supplierName" title="Fournisseur" width="170"/>
+  <field name="entryDate" title="Entrée le" width="90"/>
+  <field name="dateCongelation" title="Date Congélation" width="95"/>
+  <field name="dluo" title="D. L. C." width="90"/>
+  <field name="prixRevient" title="Prix Revient" width="85"/>
+  <field name="unit" title="Unité" width="70"/>
+  <field name="qtyPerColis" title="Poids Unitaire" width="80"/>
+  <field name="entreeQty" title="Poids Entrées" aggregate="sum" width="90"/>
+  <field name="sortieQty" title="Poids Sorties" aggregate="sum" width="90"/>
+  <field name="cdesQty" title="Poids en Cdes Clt" aggregate="sum" width="95"/>
+  <field name="dispoQty" title="Poids Dispo" aggregate="sum" width="90"/>
+  <field name="lotVerifie" title="Vérif" width="60"/>
+  <field name="trackingNumber" hidden="true"/>
+</grid>
