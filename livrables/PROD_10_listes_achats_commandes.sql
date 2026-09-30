@@ -24,7 +24,7 @@ ALTER TABLE purchase_purchase_order ADD COLUMN IF NOT EXISTS nature integer;
 -- Nature de la commande = Nature de son arrivage le plus récent (non annulé), comme le code
 UPDATE purchase_purchase_order po
 SET nature = (SELECT sm.nature FROM stock_stock_move sm
-              JOIN stock_stock_move_purchase_order_set r ON r.stock_move = sm.id
+              JOIN stock_stock_move_purchase_order_set r ON r.stock_stock_move = sm.id
               WHERE r.purchase_order_set = po.id AND sm.type_select = 3 AND COALESCE(sm.is_reversion, false) = false
                 AND sm.nature IS NOT NULL AND sm.nature <> 4
               ORDER BY sm.id DESC LIMIT 1);
