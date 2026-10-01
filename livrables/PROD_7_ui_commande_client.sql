@@ -59,6 +59,15 @@ BEGIN
   IF a = 0 OR b = 0 OR b < a THEN RAISE EXCEPTION 'Bloc d''en-tête non trouvé : arrêt, rien n''est modifié'; END IF;
   res := substr(res, 1, a - 1) || current_setting('lvme.entete') || substr(res, b);
 
+  -- REC-009 : droits sur les réservations contrôlés à chaque enregistrement
+  IF position('action-lvme-reservation-check-droits' IN res) = 0 THEN
+    IF substring(res FROM '<form [^>]*>') LIKE '%onSave="%' THEN
+      res := regexp_replace(res, '(<form [^>]*onSave=")', '\1action-lvme-reservation-check-droits,');
+    ELSE
+      res := regexp_replace(res, '<form ', '<form onSave="action-lvme-reservation-check-droits" ');
+    END IF;
+  END IF;
+
   DELETE FROM meta_view WHERE name = 'sale-order-form' AND module IS NULL AND priority = 30;
   INSERT INTO meta_view (id, version, created_on, name, title, type, model, priority, xml, extension, computed)
   SELECT nextval('meta_view_seq'), 0, now(), name, title, type, model, 30, res, false, false

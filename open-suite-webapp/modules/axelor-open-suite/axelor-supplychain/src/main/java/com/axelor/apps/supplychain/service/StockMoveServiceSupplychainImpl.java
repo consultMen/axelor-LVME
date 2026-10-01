@@ -165,6 +165,20 @@ public class StockMoveServiceSupplychainImpl extends StockMoveServiceImpl
           I18n.get(SupplychainExceptionMessage.CUSTOMER_HAS_BLOCKED_ACCOUNT));
     }
 
+    // LVME REC-009 : le BL d'une commande de réservation ne part pas tant qu'elle n'est pas ferme
+    if (stockMove.getTypeSelect() == StockMoveRepository.TYPE_OUTGOING
+        && stockMove.getSaleOrderSet() != null) {
+      for (SaleOrder saleOrder : stockMove.getSaleOrderSet()) {
+        if (Boolean.TRUE.equals(saleOrder.getIsReservation())) {
+          throw new AxelorException(
+              TraceBackRepository.CATEGORY_INCONSISTENCY,
+              "La commande %s est une réservation : convertissez-la en commande ferme avant de"
+                  + " livrer.",
+              saleOrder.getSaleOrderSeq());
+        }
+      }
+    }
+
     if (!appSupplyChainService.isApp("supplychain")) {
       return super.realizeStockMove(stockMove, check);
     }

@@ -23,6 +23,8 @@
     <decimal name="tauxCommission" title="Taux Commission (%)" precision="5" scale="2"
       min="0" max="100"/>
     <many-to-one name="commercial" ref="com.axelor.auth.db.User" title="Commercial"/>
+    <!-- LVME REC-009 : client sous contrat, ses réservations ne sont modifiables que par son commercial -->
+    <boolean name="sousContrat" title="Sous contrat"/>
     <boolean name="portPaye" title="Port Payé"/>
 
     <!-- UC-01 - Rattachement groupement (spec VEN-020, VEN-021) -->

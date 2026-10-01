@@ -79,6 +79,17 @@
     <many-to-one name="commercial" ref="com.axelor.auth.db.User" title="Commercial"/>
     <boolean name="portPaye" title="Port Payé"/>
     <decimal name="coutPortKg" title="Coût port/kg (€/kg)" precision="10" scale="4"/>
+    <!-- LVME REC-009 : commande de réservation (stock bloqué, convertible en commande ferme) -->
+    <boolean name="isReservation" title="Réservation"/>
+    <many-to-one name="reservationValidatedBy" ref="com.axelor.auth.db.User"
+      title="Réservation validée par"/>
+    <datetime name="reservationValidatedOn" title="Réservation validée le"/>
+    <datetime name="reservationConvertedOn" title="Convertie en commande ferme le"/>
+    <integer name="reservationAge" title="Âge réservation (j)" formula="true">
+      <![CDATA[
+      CASE WHEN is_reservation THEN current_date - DATE(COALESCE(confirmation_date_time, created_on)) END
+      ]]>
+    </integer>
 
     <!-- Margins -->
     <decimal name="accountedRevenue" title="Accounted Revenue" precision="20" scale="3"/>
@@ -243,7 +254,13 @@
       <field name="creationDate" on="CREATE"/>
       <field name="confirmationDateTime" on="UPDATE"/>
       <field name="inTaxTotal"/>
+      <field name="isReservation"/>
+      <field name="reservationValidatedBy"/>
+      <field name="reservationConvertedOn"/>
       <message if="true" on="CREATE">Quotation/sale order created</message>
+      <message if="isReservation == true" on="CREATE" tag="info">Commande de réservation créée</message>
+      <message if="reservationValidatedBy != null" fields="reservationValidatedBy" tag="info">Réservation validée par le gestionnaire</message>
+      <message if="reservationConvertedOn != null" fields="reservationConvertedOn" tag="success">Réservation convertie en commande ferme</message>
       <message if="statusSelect == 1" tag="important">Draft quotation</message>
       <message if="statusSelect == 2" tag="info">Finalized quotation</message>
       <message if="statusSelect == 3" tag="success">Order confirmed</message>

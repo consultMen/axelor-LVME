@@ -1,7 +1,10 @@
 <grid name="lvme-commande-client-grid" title="Commandes clients" model="com.axelor.apps.sale.db.SaleOrder" orderBy="-orderDate,-id" canNew="false">
   <!-- LVME : colonnes de « Listes Commandes Clients » GESCOM -->
   <hilite color="danger" if="totalGrossMargin &lt; 0"/>
+  <hilite color="warning" if="isReservation"/>
   <field name="saleOrderSeq" title="N° Commande" width="110"/>
+  <field name="isReservation" title="Réservation" width="95"/>
+  <field name="reservationAge" title="Âge résa (j)" width="90"/>
   <field name="orderDate" title="Date" width="95"/>
   <field name="clientPartner.name" title="Client" width="220"/>
   <field name="clientPartner.partnerSeq" title="Code" width="90"/>

@@ -71,6 +71,10 @@ public class SaleOrderCopyServiceImpl implements SaleOrderCopyService {
     copy.setManualUnblock(false);
     copy.setBlockedOnCustCreditExceed(false);
     copy.setOrderingStatus(null);
+    // LVME REC-009 : une copie repart sans validation ni conversion de réservation
+    copy.setReservationValidatedBy(null);
+    copy.setReservationValidatedOn(null);
+    copy.setReservationConvertedOn(null);
     if (copy.getAdvancePaymentAmountNeeded().compareTo(copy.getAdvanceTotal()) <= 0) {
       copy.setAdvancePaymentAmountNeeded(BigDecimal.ZERO);
       copy.setAdvancePaymentNeeded(false);

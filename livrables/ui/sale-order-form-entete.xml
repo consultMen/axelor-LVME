@@ -36,6 +36,31 @@
         <field name="portPaye" title="Port Payé" colSpan="6"/>
         <field name="coutPortKg" title="Coût port/kg" colSpan="6"/>
         <field name="internalNote" title="Commentaire" colSpan="12" widget="Html" x-lite="true"/>
+        <!-- LVME REC-009 : réservation (Réservé / Vendu, validation, conversion en commande ferme) -->
+        <panel name="lvmeReservationPanel" title="Réservation" colSpan="12" itemSpan="6">
+          <field name="isReservation" title="Réservation" widget="boolean-switch" readonlyIf="statusSelect > 3 || reservationConvertedOn != null"/>
+          <field name="$statutReservation" showTitle="false" readonly="true" type="string">
+            <viewer depends="isReservation,statusSelect,reservationConvertedOn"><![CDATA[
+              <>
+                {isReservation && <Badge bg="warning">Réservé</Badge>}
+                {!isReservation && statusSelect >= 3 && <Badge bg="success">Vendu</Badge>}
+                {reservationConvertedOn && <Badge bg="info">Issue d'une réservation</Badge>}
+              </>
+            ]]></viewer>
+          </field>
+          <field name="reservationAge" title="Âge (jours)" readonly="true" showIf="isReservation &amp;&amp; id"/>
+          <field name="clientPartner.sousContrat" title="Client sous contrat" readonly="true" showIf="isReservation"/>
+          <field name="clientPartner.commercial" title="Commercial référent" readonly="true" showIf="isReservation &amp;&amp; clientPartner.sousContrat"/>
+          <field name="reservationValidatedBy" title="Validée par" readonly="true" showIf="reservationValidatedBy"/>
+          <field name="reservationValidatedOn" title="Validée le" readonly="true" showIf="reservationValidatedBy"/>
+          <field name="reservationConvertedOn" title="Convertie en ferme le" readonly="true" showIf="reservationConvertedOn"/>
+          <button name="lvmeValiderReservationBtn" title="Valider la réservation" css="btn-info" icon="check"
+            showIf="isReservation &amp;&amp; id &amp;&amp; !clientPartner.sousContrat &amp;&amp; !reservationValidatedBy"
+            onClick="save,action-lvme-reservation-group-valider"/>
+          <button name="lvmeConvertirBtn" title="Convertir en commande ferme" css="btn-success" icon="arrow-right-circle"
+            showIf="isReservation &amp;&amp; id &amp;&amp; (clientPartner.sousContrat || reservationValidatedBy)"
+            onClick="save,action-lvme-reservation-group-convertir"/>
+        </panel>
       </panel>
     </panel>
 

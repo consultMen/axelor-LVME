@@ -50,7 +50,8 @@ JOIN (VALUES ('lvme.achat.nature.select', '1', 'Arrivages réels', 1),
              ('lvme.achat.nature.select', '3', 'Tous', 4),
              ('lvme.commande.client.etat.select', '1', 'Commandes en cours', 1),
              ('lvme.commande.client.etat.select', '2', 'Commandes soldées', 2),
-             ('lvme.commande.client.etat.select', '3', 'Toutes commandes', 3)) AS v(sel, value, title, seq)
+             ('lvme.commande.client.etat.select', '3', 'Toutes commandes', 3),
+             ('lvme.commande.client.etat.select', '4', 'Réservations', 4)) AS v(sel, value, title, seq)
   ON v.sel = s.name
 WHERE NOT EXISTS (SELECT 1 FROM meta_select_item i WHERE i.select_id = s.id AND i.value = v.value);
 
@@ -145,8 +146,9 @@ INSERT INTO meta_action (id, version, created_on, name, type, model, xml, home, 
   <view-param name="popup-save" value="true"/>
   <view-param name="popup.maximized" value="true"/>
   <domain>self.template = false AND self.statusSelect IN (3, 4)
-    AND ((:_etat = 1 AND self.statusSelect = 3 AND self.deliveryState != 3)
-         OR (:_etat = 2 AND (self.statusSelect = 4 OR self.deliveryState = 3)) OR :_etat = 3)
+    AND ((:_etat = 1 AND self.statusSelect = 3 AND self.deliveryState != 3 AND (self.isReservation IS NULL OR self.isReservation = false))
+         OR (:_etat = 2 AND (self.statusSelect = 4 OR self.deliveryState = 3)) OR :_etat = 3
+         OR (:_etat = 4 AND self.isReservation = true AND self.statusSelect = 3))
     AND (:_client = 0 OR self.clientPartner.id = :_client)
     AND (:_commercial = 0 OR self.commercial.id = :_commercial)
     AND (:_dateFiltre = false OR COALESCE(self.orderDate, self.creationDate) BETWEEN :_dateDu AND :_dateAu)
