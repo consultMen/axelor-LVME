@@ -1,9 +1,8 @@
 -- =====================================================================
 -- PROD étape 20 : REC-011 — envoi automatique des factures clients par email à la ventilation
 --   Circuit : facture Validée (impression de contrôle) -> Ventilée (approbation) -> email automatique
---   1. Modèle d'email « Facture client LVME » (facture PDF en pièce jointe)
---      >>> PHASE DE TEST : destinataire forcé à zakarialaachiri2@gmail.com (aucun email aux vrais clients) <<<
---      Passage en réel : relancer avec la variable destinataire (voir en bas du fichier).
+--   1. Modèle d'email « Facture client LVME » (facture PDF en pièce jointe), envoyé à l'adresse email
+--      de la fiche du client facturé. Pour un test : mettre l'adresse voulue sur la fiche du client de test.
 --   2. Configuration comptable de la société : envoi automatique à la ventilation + ce modèle
 --   3. Situation comptable de chaque client : idem (Axelor recopie ces réglages client par client)
 -- Prérequis : un compte email d'envoi (SMTP) créé dans Administration > Comptes email (par vous :
@@ -12,7 +11,7 @@
 -- =====================================================================
 \if :{?destinataire}
 \else
-  \set destinataire 'zakarialaachiri2@gmail.com'
+  \set destinataire '$Invoice.partner.emailAddress.address$'
 \endif
 SELECT set_config('lvme.destinataire', :'destinataire', false);
 
@@ -69,6 +68,3 @@ SELECT (SELECT count(*) FROM account_accounting_situation s JOIN base_partner p 
         WHERE p.is_customer AND s.invoice_automatic_mail) AS clients_envoi_auto,
        (SELECT count(*) FROM message_email_account) AS comptes_email,
        (SELECT to_recipients FROM message_template WHERE name = 'Facture client LVME') AS destinataire;
-
--- Passage en réel (après validation des tests) : envoi à l'adresse email du client
---   psql -U axelor axelor -v ON_ERROR_STOP=1 -v destinataire='$Invoice.partner.emailAddress.address$' -f livrables/PROD_20_email_factures.sql
