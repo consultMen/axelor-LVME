@@ -40,6 +40,65 @@
       using="saleOrderSet,statusSelect" all="true"
       filter="(:saleOrderSet) MEMBER OF self.saleOrderSet AND self.statusSelect = :statusSelect"/>
 
+    <!-- LVME REC-012 : Listes Dossiers (écran GESCOM). Champs calculés en lecture seule. -->
+    <date name="lvmeDateLivraison" title="Date" formula="true">
+      <![CDATA[
+      COALESCE(real_date, estimated_date)
+      ]]>
+    </date>
+    <string name="lvmeTypeDoc" title="Type" formula="true">
+      <![CDATA[
+      CASE WHEN is_reversion THEN 'Retour' ELSE 'BL' END
+      ]]>
+    </string>
+    <!-- factures liées au BL : directement, ou par les lignes de commande livrées -->
+    <string name="lvmeFactureNumeros" title="Facture N°" formula="true">
+      <![CDATA[
+      (SELECT string_agg(DISTINCT account_invoice.invoice_id, ', ') FROM account_invoice
+        WHERE account_invoice.status_select IN (2, 3)
+          AND (account_invoice.id IN (SELECT account_invoice_stock_move_set.invoice_set FROM account_invoice_stock_move_set
+                                      WHERE account_invoice_stock_move_set.stock_move_set = id)
+            OR account_invoice.id IN (SELECT account_invoice_line.invoice FROM account_invoice_line
+                                      WHERE account_invoice_line.sale_order_line IN (SELECT stock_stock_move_line.sale_order_line
+                                        FROM stock_stock_move_line WHERE stock_stock_move_line.stock_move = id))))
+      ]]>
+    </string>
+    <boolean name="lvmeEstFacture" title="Facturé" formula="true">
+      <![CDATA[
+      EXISTS (SELECT 1 FROM account_invoice
+        WHERE account_invoice.status_select IN (2, 3)
+          AND (account_invoice.id IN (SELECT account_invoice_stock_move_set.invoice_set FROM account_invoice_stock_move_set
+                                      WHERE account_invoice_stock_move_set.stock_move_set = id)
+            OR account_invoice.id IN (SELECT account_invoice_line.invoice FROM account_invoice_line
+                                      WHERE account_invoice_line.sale_order_line IN (SELECT stock_stock_move_line.sale_order_line
+                                        FROM stock_stock_move_line WHERE stock_stock_move_line.stock_move = id))))
+      ]]>
+    </boolean>
+    <string name="lvmeRefCdeClient" title="Ref Cde Client" formula="true">
+      <![CDATA[
+      (SELECT string_agg(DISTINCT sale_sale_order.external_reference, ', ') FROM sale_sale_order
+        WHERE sale_sale_order.id IN (SELECT stock_stock_move_sale_order_set.sale_order_set FROM stock_stock_move_sale_order_set
+                                     WHERE stock_stock_move_sale_order_set.stock_stock_move = id))
+      ]]>
+    </string>
+
+    <string name="lvmeVille" title="Ville" formula="true">
+      <![CDATA[
+      (SELECT base_address.town_name FROM base_address WHERE base_address.id = to_address)
+      ]]>
+    </string>
+    <string name="lvmeTelephone" title="Téléphone" formula="true">
+      <![CDATA[
+      (SELECT base_partner.fixed_phone FROM base_partner WHERE base_partner.id = partner)
+      ]]>
+    </string>
+
+    <string name="lvmeCommentaire" title="Commentaire" formula="true">
+      <![CDATA[
+      regexp_replace(regexp_replace(note, '<[^>]*>', ' ', 'g'), '&nbsp;', ' ', 'g')
+      ]]>
+    </string>
+
     <extra-code>
     <![CDATA[
 		// INVOICE

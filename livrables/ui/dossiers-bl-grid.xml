@@ -1,0 +1,17 @@
+<grid name="lvme-dossiers-bl-grid" title="BL / BL retour" model="com.axelor.apps.stock.db.StockMove"
+  orderBy="-lvmeDateLivraison,-stockMoveSeq" canNew="false" canEdit="false" canDelete="false">
+  <!-- LVME REC-012 : colonnes de « Listes Dossiers » GESCOM (+ transporteur et point de livraison, cahier REC-012) -->
+  <field name="lvmeDateLivraison" title="Date" width="90"/>
+  <field name="lvmeFactureNumeros" title="Facture N°" width="100"/>
+  <field name="stockMoveSeq" title="Pré-facture N°" width="100"/>
+  <field name="lvmeTypeDoc" title="Type" width="60"/>
+  <field name="partner" title="Client" width="200"/>
+  <field name="lvmeVille" title="Ville" width="130"/>
+  <field name="lvmeTelephone" title="Téléphone" width="110"/>
+  <field name="exTaxTotal" title="Montant HT" aggregate="sum" width="100"/>
+  <field name="pickingIsEdited" title="Prép" width="50"/>
+  <field name="lvmeRefCdeClient" title="Ref Cde Client" width="110"/>
+  <field name="lvmeCommentaire" title="Commentaire" width="200"/>
+  <field name="carrierPartner" title="Transporteur" width="150"/>
+  <field name="toAddressStr" title="Point de livraison" width="250"/>
+</grid>

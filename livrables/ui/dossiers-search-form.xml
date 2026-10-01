@@ -1,0 +1,38 @@
+<form name="lvme-dossiers-search-form" title="Listes Dossiers" model="com.axelor.utils.db.Wizard" width="large"
+  canNew="false" canSave="false" canCopy="false" canDelete="false" onNew="action-lvme-dossiers-group-onnew">
+  <!-- LVME REC-012 : écran « Listes Dossiers » de GESCOM (BL / BL retour, Facture / Avoir) + vue transporteur -->
+  <panel name="rechercheDossiersPanel" title="Recherche" colSpan="12">
+    <panel name="filtreTypePanel" colSpan="3" itemSpan="12">
+      <field name="$typeDoc" title="Type doc" type="integer" selection="lvme.dossier.type.select" onChange="action-lvme-dossiers-refresh"/>
+      <field name="$client" title="Client" type="many-to-one" target="com.axelor.apps.base.db.Partner"
+        domain="self.isCustomer = true" canNew="false" canEdit="false" canView="false"/>
+      <field name="$transporteur" title="Transporteur" type="many-to-one" target="com.axelor.apps.base.db.Partner"
+        domain="self.isCarrier = true" canNew="false" canEdit="false" canView="false" showIf="$typeDoc != 2"/>
+    </panel>
+    <panel name="filtreLivraisonPanel" colSpan="3" itemSpan="12">
+      <field name="$livraisonDu" title="Livraison du" type="date"/>
+      <field name="$livraisonAu" title="au" type="date"/>
+      <field name="$livraisonPeriode" title="Période prédéfinie" type="integer" selection="lvme.etat.stock.periode.select"
+        onChange="action-lvme-dossiers-group-periode"/>
+    </panel>
+    <panel name="filtreFacturePanel" colSpan="3" itemSpan="12">
+      <field name="$blFacture" showTitle="false" type="integer" widget="RadioSelect" selection="lvme.dossier.facture.select"
+        showIf="$typeDoc != 2" onChange="action-lvme-dossiers-refresh"/>
+      <field name="$detailProduits" title="Détail produits" type="boolean" showIf="$typeDoc != 2" onChange="action-lvme-dossiers-refresh"/>
+      <button name="lancerRechercheBtn" title="Lancer la recherche" icon="search" css="btn-primary" onClick="action-lvme-dossiers-refresh"/>
+    </panel>
+    <panel name="boutonsDossiersPanel" colSpan="3" itemSpan="12">
+      <button name="quitterBtn" title="Quitter" icon="x-circle" css="btn-danger" onClick="close"/>
+      <button name="nouveauBlBtn" title="Nouveau BL" icon="file-earmark-plus" onClick="action-lvme-dossiers-nouveau-bl"/>
+      <button name="nouveauRetourBtn" title="Nouveau retour" icon="file-earmark-plus" onClick="action-lvme-dossiers-nouveau-retour"/>
+      <button name="suppressionBtn" title="Suppression" icon="dash-circle" onClick="action-lvme-dossiers-suppression"/>
+    </panel>
+    <field name="$numero" title="Recherche direct par N°" type="string" colSpan="3" onChange="action-lvme-dossiers-refresh"/>
+  </panel>
+  <panel-dashlet name="blDashlet" title="BL / BL retour" colSpan="12" height="600"
+    action="action-lvme-dossiers-bl-dashlet" showIf="$typeDoc != 2 &amp;&amp; !$detailProduits"/>
+  <panel-dashlet name="lignesDashlet" title="Détail produits des BL" colSpan="12" height="600"
+    action="action-lvme-dossiers-lignes-dashlet" showIf="$typeDoc != 2 &amp;&amp; $detailProduits"/>
+  <panel-dashlet name="facturesDashlet" title="Facture / Avoir" colSpan="12" height="600"
+    action="action-lvme-dossiers-factures-dashlet" showIf="$typeDoc == 2"/>
+</form>

@@ -1,0 +1,31 @@
+<grid name="lvme-rotation-lot-grid" title="Rotation de stock par lot"
+  model="com.axelor.apps.supplychain.db.RotationLot" orderBy="productCode,arrivalDate" groupBy="productCode"
+  canNew="false" canEdit="false" canDelete="false">
+  <!-- LVME REC-012 : colonnes de l'écran GESCOM « Rotation de Stock » -->
+  <field name="productCode" width="110"/>
+  <field name="productName" width="220"/>
+  <field name="supplierName" width="170"/>
+  <field name="stockLocation" width="90"/>
+  <field name="lotNumber" width="100"/>
+  <field name="arrivalNumber" title="N° Arrivage" width="90"/>
+  <field name="origine" width="70"/>
+  <field name="conditionnement" width="110"/>
+  <field name="marque" width="70"/>
+  <field name="gencode" width="110"/>
+  <field name="arrivalDate" title="Arrivée le" width="90"/>
+  <field name="dluo" title="D. L. C." width="90"/>
+  <field name="prixRevient" title="Prix Revient" width="80"/>
+  <field name="poidsColis" title="Poids Colis" width="70"/>
+  <field name="poidsEntrees" title="Poids Entrées" aggregate="sum" width="95"/>
+  <field name="nbColisIn" title="Nb Colis Entrées" aggregate="sum" width="85"/>
+  <field name="nbColisStock" title="Nb colis Stock" aggregate="sum" width="85"/>
+  <field name="poidsStock" title="Poids Stock" aggregate="sum" width="90"/>
+  <field name="stockValue" aggregate="sum" width="100"/>
+  <field name="stockDays" aggregate="max" width="80">
+    <hilite color="danger" strong="true" if="stockDays &gt; 180"/>
+  </field>
+  <field name="lastSaleDate" title="Date dernière Sortie" width="95"/>
+  <field name="rotationDays" title="Nbre Jours Rotation" aggregate="avg" width="90">
+    <hilite background="warning" strong="true" if="true"/>
+  </field>
+</grid>

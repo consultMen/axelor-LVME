@@ -26,6 +26,28 @@
     <datetime name="reservationDateTime" readonly="true"/>
 
 
+    <!-- LVME REC-012 : Listes Dossiers, détail produits des BL (vue transporteur). Champs calculés. -->
+    <date name="lvmeBlDate" title="Date" formula="true">
+      <![CDATA[
+      (SELECT COALESCE(stock_stock_move.real_date, stock_stock_move.estimated_date) FROM stock_stock_move WHERE stock_stock_move.id = stock_move)
+      ]]>
+    </date>
+    <string name="lvmeBlClient" title="Client" formula="true">
+      <![CDATA[
+      (SELECT base_partner.full_name FROM base_partner WHERE base_partner.id = (SELECT stock_stock_move.partner FROM stock_stock_move WHERE stock_stock_move.id = stock_move))
+      ]]>
+    </string>
+    <string name="lvmeBlTransporteur" title="Transporteur" formula="true">
+      <![CDATA[
+      (SELECT base_partner.full_name FROM base_partner WHERE base_partner.id = (SELECT stock_stock_move.carrier_partner FROM stock_stock_move WHERE stock_stock_move.id = stock_move))
+      ]]>
+    </string>
+    <string name="lvmeBlPointLivraison" title="Point de livraison" formula="true">
+      <![CDATA[
+      (SELECT stock_stock_move.to_address_str FROM stock_stock_move WHERE stock_stock_move.id = stock_move)
+      ]]>
+    </string>
+
     <finder-method name="findForDeclarationOfExchanges"
       using="LocalDate:fromDate,LocalDate:toDate,String:productTypeSelect,int:stockMoveTypeSelect,com.axelor.apps.base.db.Country:country,com.axelor.apps.base.db.Company:company "
       filter="

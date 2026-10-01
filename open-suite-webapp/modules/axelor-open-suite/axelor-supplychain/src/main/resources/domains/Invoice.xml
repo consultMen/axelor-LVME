@@ -17,6 +17,40 @@
     <boolean name="createdByInterco" default="false"/>
     <many-to-one name="incoterm" ref="com.axelor.apps.stock.db.Incoterm"/>
 
+    <!-- LVME REC-012 : Listes Dossiers (écran GESCOM) : BL de la facture (pré-facture) -->
+    <string name="lvmePreFactureNumeros" title="Pré-facture N°" formula="true">
+      <![CDATA[
+      (SELECT string_agg(DISTINCT stock_stock_move.stock_move_seq, ', ') FROM stock_stock_move
+        WHERE stock_stock_move.id IN (SELECT account_invoice_stock_move_set.stock_move_set FROM account_invoice_stock_move_set
+                                      WHERE account_invoice_stock_move_set.invoice_set = id)
+           OR stock_stock_move.id IN (SELECT stock_stock_move_line.stock_move FROM stock_stock_move_line
+                                      WHERE stock_stock_move_line.sale_order_line IN (SELECT account_invoice_line.sale_order_line
+                                        FROM account_invoice_line WHERE account_invoice_line.invoice = id)))
+      ]]>
+    </string>
+
+    <string name="lvmeVille" title="Ville" formula="true">
+      <![CDATA[
+      (SELECT base_address.town_name FROM base_address WHERE base_address.id = address)
+      ]]>
+    </string>
+    <string name="lvmeTelephone" title="Téléphone" formula="true">
+      <![CDATA[
+      (SELECT base_partner.fixed_phone FROM base_partner WHERE base_partner.id = partner)
+      ]]>
+    </string>
+
+    <string name="lvmeCommentaire" title="Commentaire" formula="true">
+      <![CDATA[
+      regexp_replace(regexp_replace(note, '<[^>]*>', ' ', 'g'), '&nbsp;', ' ', 'g')
+      ]]>
+    </string>
+    <string name="lvmeTypeDoc" title="Type" formula="true">
+      <![CDATA[
+      CASE WHEN operation_type_select = 4 THEN 'Avoir' ELSE 'Facture' END
+      ]]>
+    </string>
+
     <extra-code><![CDATA[
 
 	    // OPERATION TYPE SUB SELECT

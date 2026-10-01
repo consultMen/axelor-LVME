@@ -1,0 +1,41 @@
+<panel name="filtresPanel" showTitle="false" colSpan="12">
+    <!-- LVME REC-012 : affichage par lot (écran GESCOM « Rotation de Stock ») ou par produit (KPI REC-003) -->
+    <field name="$affichage" title="Affichage" type="integer" widget="RadioSelect" selection="lvme.rotation.affichage.select" colSpan="12" onChange="action-lvme-rotation-stock-refresh"/>
+    <panel name="filtreArticlePanel" colSpan="3" itemSpan="12">
+      <field name="$articleDu" title="Article du" type="many-to-one" target="com.axelor.apps.base.db.Product" canNew="false" canEdit="false" canView="false"/>
+      <field name="$articleAu" title="au" type="many-to-one" target="com.axelor.apps.base.db.Product" canNew="false" canEdit="false" canView="false"/>
+      <field name="$famille" title="Fam.Article" type="many-to-one" target="com.axelor.apps.base.db.ProductCategory" canNew="false" canEdit="false" canView="false"/>
+    </panel>
+    <panel name="filtreFournisseurPanel" colSpan="3" itemSpan="12" showIf="$affichage != 2">
+      <field name="$fournisseurDu" title="Fournisseur du" type="many-to-one" target="com.axelor.apps.base.db.Partner" domain="self.isSupplier = true" canNew="false" canEdit="false" canView="false"/>
+      <field name="$fournisseurAu" title="au" type="many-to-one" target="com.axelor.apps.base.db.Partner" domain="self.isSupplier = true" canNew="false" canEdit="false" canView="false"/>
+      <field name="$origine" title="Origine" type="string" selection="lvme.origine.select"/>
+      <field name="$frigo" title="Frigo" type="many-to-one" target="com.axelor.apps.stock.db.StockLocation" domain="self.typeSelect = 1" canNew="false" canEdit="false" canView="false"/>
+    </panel>
+    <panel name="filtreEntreePanel" colSpan="4" itemSpan="12" showIf="$affichage != 2">
+      <field name="$entreeDu" title="Entrée du" type="date"/>
+      <field name="$entreeAu" title="au" type="date"/>
+      <field name="$entreePeriode" title="Période prédéfinie" type="integer" selection="lvme.etat.stock.periode.select" onChange="action-lvme-rotation-lot-group-periode-entree"/>
+    </panel>
+    <panel name="filtreProduitPanel" colSpan="4" itemSpan="12" showIf="$affichage == 2">
+      <field name="$statutRotation" title="Statut" type="string" selection="lvme.rotation.statut.select"/>
+      <field name="$couvertureMax" title="Couverture inférieure à (j)" type="integer"/>
+      <field name="$ageMin" title="Âge moyen supérieur à (j)" type="integer"/>
+    </panel>
+    <panel name="filtreDormantPanel" colSpan="3" itemSpan="12" showIf="$affichage == 2">
+      <field name="$dormantsSeulement" title="Seulement les dormants" type="boolean"/>
+    </panel>
+    <panel name="filtreActionPanel" colSpan="2" itemSpan="12">
+      <button name="lancerRechercheBtn" title="Lancer la recherche" icon="search" css="btn-primary" onClick="action-lvme-rotation-stock-refresh"/>
+      <button name="recalculBtn" title="Recalculer les KPI" icon="arrow-repeat" onClick="action-lvme-rotation-stock-group-recalcul"/>
+    </panel>
+  </panel>
+
+  <!-- Tableau par lot (GESCOM) -->
+  <panel-dashlet name="rotationLotDashlet" title="Rotation par lot" colSpan="12" height="550"
+    action="action-lvme-rotation-lot-dashlet" showIf="$affichage != 2"/>
+
+  <!-- Tableau par produit -->
+  <panel-dashlet name="rotationDashlet" title="Rotation par produit" colSpan="12" height="550"
+    action="action-lvme-rotation-stock-dashlet" showIf="$affichage == 2"/>
+</form>

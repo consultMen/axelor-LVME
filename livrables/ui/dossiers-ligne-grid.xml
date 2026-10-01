@@ -1,0 +1,16 @@
+<grid name="lvme-dossiers-ligne-grid" title="Détail produits des BL" model="com.axelor.apps.stock.db.StockMoveLine"
+  orderBy="-lvmeBlDate,stockMove,sequence" canNew="false" canEdit="false" canDelete="false">
+  <!-- LVME REC-012 : vue transporteur (cahier REC-012) : BL + produits + points de livraison -->
+  <field name="stockMove" title="Pré-facture N°" width="100"/>
+  <field name="lvmeBlDate" title="Date" width="90"/>
+  <field name="lvmeBlTransporteur" title="Transporteur" width="150"/>
+  <field name="lvmeBlClient" title="Client" width="180"/>
+  <field name="lvmeBlPointLivraison" title="Point de livraison" width="230"/>
+  <field name="product.code" title="Produit" width="110"/>
+  <field name="productName" title="Désignation" width="200"/>
+  <field name="trackingNumber" title="N° Lot" width="100"/>
+  <field name="nbColis" title="Colis" aggregate="sum" width="70"/>
+  <field name="poidsTotalNet" title="Poids" aggregate="sum" width="80"/>
+  <field name="realQty" title="Qté" aggregate="sum" width="80"/>
+  <field name="unit" title="Unité" width="70"/>
+</grid>

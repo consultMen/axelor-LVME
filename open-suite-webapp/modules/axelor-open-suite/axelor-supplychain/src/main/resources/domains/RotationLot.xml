@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<domain-models xmlns="http://axelor.com/xml/ns/domain-models"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://axelor.com/xml/ns/domain-models http://axelor.com/xml/ns/domain-models/domain-models_7.4.xsd">
+
+  <module name="supplychain" package="com.axelor.apps.supplychain.db"/>
+
+  <!-- REC-012 : rotation de stock par lot (écran GESCOM « Rotation de Stock »). Modèle en lecture
+    seule adossé à la vue SQL lvme_rotation_lot (sql/lvme_rotation_lot.sql). -->
+  <entity name="RotationLot" table="lvme_rotation_lot" cacheable="false">
+    <many-to-one name="product" ref="com.axelor.apps.base.db.Product"
+      column="product_id" title="Produit"/>
+    <string name="productCode" column="product_code" title="Produit"/>
+    <string name="productName" column="product_name" title="Désignation"/>
+    <many-to-one name="productCategory" ref="com.axelor.apps.base.db.ProductCategory"
+      column="product_category_id" title="Famille article"/>
+    <many-to-one name="supplier" ref="com.axelor.apps.base.db.Partner"
+      column="supplier_id" title="Fournisseur"/>
+    <string name="supplierName" column="supplier_name" title="Fournisseur"/>
+    <many-to-one name="stockLocation" ref="com.axelor.apps.stock.db.StockLocation"
+      column="stock_location_id" title="Frigo"/>
+    <many-to-one name="trackingNumber" ref="com.axelor.apps.stock.db.TrackingNumber"
+      column="tracking_number_id" title="N° Lot"/>
+    <string name="lotNumber" column="lot_number" title="N° Lot"/>
+    <string name="arrivalNumber" column="arrival_number" title="N° Arrivage"/>
+    <string name="origine" column="origine" title="Origine"/>
+    <string name="conditionnement" column="conditionnement" title="Conditionnement"/>
+    <string name="marque" column="marque" title="Marque"/>
+    <string name="gencode" column="gencode" title="Gencode"/>
+    <date name="entryDate" column="entry_date" title="Entrée le"/>
+    <date name="arrivalDate" column="arrival_date" title="Arrivée le"/>
+    <date name="dluo" column="dluo" title="D.L.C."/>
+    <decimal name="prixRevient" column="prix_revient" title="Prix revient" precision="20"
+      scale="4"/>
+    <decimal name="poidsColis" column="poids_colis" title="Poids colis" precision="20"
+      scale="3"/>
+    <decimal name="poidsEntrees" column="poids_entrees" title="Poids entrées" precision="20"
+      scale="3"/>
+    <decimal name="nbColisIn" column="nb_colis_in" title="Nb colis entrées" precision="20"
+      scale="3"/>
+    <decimal name="nbColisStock" column="nb_colis_stock" title="Nb colis stock" precision="20"
+      scale="3"/>
+    <decimal name="poidsStock" column="poids_stock" title="Poids stock" precision="20"
+      scale="3"/>
+    <decimal name="stockQty" column="stock_qty" title="Stock" precision="20" scale="3"/>
+    <decimal name="stockValue" column="stock_value" title="Valeur stock (€)" precision="20"
+      scale="2"/>
+    <date name="lastSaleDate" column="last_sale_date" title="Date dernière sortie"/>
+    <integer name="rotationDays" column="rotation_days" title="Nbre jours rotation"/>
+    <integer name="stockDays" column="stock_days" title="Jours en stock" nullable="true"/>
+  </entity>
+
+</domain-models>
