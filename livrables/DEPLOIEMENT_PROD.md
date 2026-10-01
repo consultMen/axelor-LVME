@@ -1,3 +1,58 @@
+# Déploiement prod LVME — lot « Recette phase 1 » du 01/10/2026 (PROD_17 à PROD_25)
+
+Vérifié en prod le 01/10 (lecture seule) : PROD_17 à PROD_25 **pas encore passés**. Ce lot remplace le lot
+« PROD_17, 18, 19 » ci-dessous (jamais déployé).
+Code à déployer : tout `main` jusqu'au commit a6342fd.
+
+| Script | Contenu | Recette |
+|---|---|---|
+| PROD_17 | Écrans de recherche : la fiche s'ouvre en fenêtre par-dessus la liste | — |
+| PROD_18 | Commande fournisseur : réceptions ouvertes sur la fiche Arrivage (+ Java) | — |
+| PROD_19 | État des stocks par lots : filtre DLUO, boutons lots périmés / DLUO proche | — |
+| PROD_20 | Envoi automatique des factures clients par email à la ventilation | REC-011 |
+| PROD_7 (relance) | Fiche commande client : panneau Réservation + contrôle des droits à l'enregistrement | REC-009 |
+| PROD_21 | Commandes de réservation : colonnes, actions, état « Réservations », client « Sous contrat » | REC-009 |
+| PROD_22 | Rotation de Stock par lot (GESCOM) + 4 KPI ; palmarès dans le menu Ventes — **vue SQL** | REC-012 |
+| PROD_23 | Ventes > Listes Dossiers (BL / factures, vue transporteur) | REC-012 |
+| PROD_24 | Ventes > Rapport d'incohérences — **vue SQL** | REC-012 |
+| PROD_25 | Chrono mensuelle (FC/AC/SO + AAMM), périodes 2026 mois par mois, droits de clôture | REC-010 |
+
+**Avant** : créer le compte email d'envoi (Administration > Comptes email, SMTP + mot de passe) — sinon
+la ventilation passe mais l'email de facture ne part pas (PROD_20).
+
+1. **PC** : `git push origin main`
+2. **Serveur — sauvegarde** :
+   `pg_dump -U axelor -Fc axelor > ~/sauvegarde_axelor_$(date +%F_%H%M).dump`
+3. `cd ~/src && rm -rf axelor-LVME axelor-version_app axelor-version_app.war && git clone https://github.com/consultMen/axelor-LVME.git && cd axelor-LVME`
+4. **Scripts, dans cet ordre, AVANT de basculer Tomcat** (l'ancienne appli tourne encore ; PROD_22 et PROD_24
+   créent des vues SQL qui doivent exister avant le démarrage, sinon Axelor crée des tables vides) :
+   ```
+   psql -U axelor axelor -v ON_ERROR_STOP=1 -f livrables/PROD_17_fiches_en_fenetre.sql
+   psql -U axelor axelor -v ON_ERROR_STOP=1 -f livrables/PROD_18_commande_fournisseur_arrivages.sql
+   psql -U axelor axelor -v ON_ERROR_STOP=1 -f livrables/PROD_19_filtre_dluo.sql
+   psql -U axelor axelor -v ON_ERROR_STOP=1 -f livrables/PROD_20_email_factures.sql
+   psql -U axelor axelor -v ON_ERROR_STOP=1 -f livrables/PROD_7_ui_commande_client.sql
+   psql -U axelor axelor -v ON_ERROR_STOP=1 -f livrables/PROD_21_reservations.sql
+   psql -U axelor axelor -v ON_ERROR_STOP=1 -f livrables/PROD_22_rotation_lots.sql
+   psql -U axelor axelor -v ON_ERROR_STOP=1 -f livrables/PROD_23_listes_dossiers.sql
+   psql -U axelor axelor -v ON_ERROR_STOP=1 -f livrables/PROD_24_rapport_incoherences.sql
+   psql -U axelor axelor -v ON_ERROR_STOP=1 -f livrables/PROD_25_chrono_mensuelle.sql
+   ```
+   Chaque script est une seule transaction : en cas d'erreur rien n'est écrit, on s'arrête et on m'envoie le message.
+5. **Build + bascule** (procédure habituelle) : `cd open-suite-webapp && ./gradlew war`, dézipper dans
+   `~/src/axelor-version_app`, **recopier `~/axelor-config.prod.properties`** dans `WEB-INF/classes/axelor-config.properties`,
+   `systemctl stop axelor-tomcat`, remplacer `ROOT`, redémarrer axelor-tomcat + nginx.
+   **Ne pas lancer `gradlew database --update`.**
+6. **Vérifications** (se reconnecter ; si une liste n'a pas les bonnes colonnes : engrenage > « Réinitialiser ») :
+   - Ventes > Commandes clients : fiche avec panneau « Réservation » ; liste, état « Réservations »
+   - Ventes > Listes Dossiers ; Ventes > Rapport d'incohérences ; Ventes > Palmarès des ventes / par commercial
+   - Stocks > Rotation des stocks : 4 KPI + « Par lot » ; Stocks > État des stocks par lots : filtre DLUO
+   - Comptabilité > Configuration > Périodes : 12 mois en 2026, boutons de clôture visibles
+   - Prochain devis finalisé : n° SO + AAMM + 0001 ; prochaine facture ventilée : FC + AAMM + 0001
+7. **Retour arrière** : `pg_restore` de la sauvegarde de l'étape 2 et redéploiement du war précédent.
+
+---
+
 # Déploiement prod LVME — lot du 01/10/2026 (PROD_17, 18, 19)
 
 Déjà en prod (vérifié le 01/10) : PROD_7 à PROD_16 (Historique Produit, Synthèse des Arrivages et dates comprises).
