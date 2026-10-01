@@ -7,7 +7,7 @@
       <field name="$client" title="Client" type="many-to-one" target="com.axelor.apps.base.db.Partner"
         domain="self.isCustomer = true" canNew="false" canEdit="false" canView="false"/>
       <field name="$transporteur" title="Transporteur" type="many-to-one" target="com.axelor.apps.base.db.Partner"
-        domain="self.isCarrier = true" canNew="false" canEdit="false" canView="false" showIf="$typeDoc != 2"/>
+        domain="self.isCarrier = true OR self.id IN (SELECT sm.carrierPartner.id FROM StockMove sm WHERE sm.carrierPartner IS NOT NULL)" canNew="false" canEdit="false" canView="false" showIf="$typeDoc != 2"/>
     </panel>
     <panel name="filtreLivraisonPanel" colSpan="3" itemSpan="12">
       <field name="$livraisonDu" title="Livraison du" type="date"/>
