@@ -1,13 +1,10 @@
-# Déploiement prod LVME — lot du 01/10/2026 (PROD_14, 15, 17, 18, 19)
+# Déploiement prod LVME — lot du 01/10/2026 (PROD_17, 18, 19)
 
-Déjà en prod (30/09, commit f432d71) : PROD_7 à PROD_13 + logo LVME.
-À déployer : code des commits 933990b → ba344e1 + scripts ci-dessous.
-PROD_16 n'est pas à lancer : PROD_14 et PROD_15 chargent déjà les vues SQL à jour.
+Déjà en prod (vérifié le 01/10) : PROD_7 à PROD_16 (Historique Produit, Synthèse des Arrivages et dates comprises).
+À déployer : le code jusqu'au commit ba344e1 (arrondis des totaux, Java de PROD_18) + les 3 scripts ci-dessous.
 
 | Script | Contenu |
 |---|---|
-| PROD_14 | Stocks > Historique Produit (vue SQL + écran) |
-| PROD_15 | Stocks > Arrivages > Synthèse des Arrivages (vue SQL + écran) |
 | PROD_17 | Écrans de recherche : la fiche s'ouvre en fenêtre par-dessus la liste |
 | PROD_18 | Commande fournisseur : réceptions ouvertes sur la fiche Arrivage (+ Java) |
 | PROD_19 | État des stocks par lots : filtre DLUO, boutons « Voir les lots périmés / à DLUO proche » |
@@ -17,8 +14,6 @@ PROD_16 n'est pas à lancer : PROD_14 et PROD_15 chargent déjà les vues SQL à
 3. `cd ~/src && rm -rf axelor-LVME && git clone https://github.com/consultMen/axelor-LVME.git && cd axelor-LVME`
 4. Scripts, **avant** de basculer Tomcat (l'ancienne appli tourne encore) :
    ```
-   psql -U axelor axelor -v ON_ERROR_STOP=1 -f livrables/PROD_14_historique_produit.sql
-   psql -U axelor axelor -v ON_ERROR_STOP=1 -f livrables/PROD_15_synthese_arrivages.sql
    psql -U axelor axelor -v ON_ERROR_STOP=1 -f livrables/PROD_17_fiches_en_fenetre.sql
    psql -U axelor axelor -v ON_ERROR_STOP=1 -f livrables/PROD_18_commande_fournisseur_arrivages.sql
    psql -U axelor axelor -v ON_ERROR_STOP=1 -f livrables/PROD_19_filtre_dluo.sql
