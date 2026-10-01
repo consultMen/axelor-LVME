@@ -22,7 +22,8 @@
     <field name="nature" title="Nature" readonly="true" colSpan="4">
       <viewer depends="nature"><![CDATA[
         <>
-          {nature == 'EN_COURS_DE_PRODUCTION' && <Badge bg="info" style={{ fontSize: 16 }}>En cours de production (à embarquer)</Badge>}
+          {nature == 'EN_COURS_DE_PRODUCTION' && <Badge bg="warning" style={{ fontSize: 16 }}>Flottant</Badge>}
+          {nature == 'EN_COURS_DE_PRODUCTION' && <Badge bg="info" style={{ fontSize: 16, marginLeft: 6 }}>À embarquer</Badge>}
           {nature == 'FLOTTANT' && <Badge bg="warning" style={{ fontSize: 16 }}>Flottant</Badge>}
           {nature == 'REEL' && <Badge bg="success" style={{ fontSize: 16 }}>Réel</Badge>}
           {nature == 'DRAFT' && <Badge bg="secondary" style={{ fontSize: 16 }}>Brouillon</Badge>}
@@ -74,6 +75,11 @@
     <panel name="lvmeRecapPanel" title="Récapitulatif" colSpan="12" itemSpan="3">
       <field name="$deviseAchat" title="Devise" type="string" readonly="true"/>
       <field name="$deviseComptable" title="Devise comptable" type="string" readonly="true"/>
+      <!-- LVME : taux de change GESCOM, archivage seulement (aucun calcul) -->
+      <field name="lvmeCours" title="Cours"/>
+      <field name="lvmeCouvert" title="Couvert"/>
+      <field name="lvmeFlottant" title="Flottant"/>
+      <field name="lvmeReel" title="Réel"/>
       <field name="$currencySymbol" type="string" hidden="true"/>
       <field name="nbColisTotal" title="Nb Colis" readonly="true"/>
       <field name="poidsTotal" title="Poids Total" readonly="true"/>
@@ -81,6 +87,13 @@
         <viewer depends="exTaxTotal,$currencySymbol"><![CDATA[
           <>
             <Box as="span" fontWeight="bold" fontSize={5}>{$fmt('exTaxTotal')} {$currencySymbol}</Box>
+          </>
+        ]]></viewer>
+      </field>
+      <field name="lvmeMontantSociete" title="Équivalent" readonly="true" colSpan="6" showIf="$deviseAchat != $deviseComptable">
+        <viewer depends="lvmeMontantSociete,$deviseComptable"><![CDATA[
+          <>
+            <Box as="span" fontWeight="bold">{$fmt('lvmeMontantSociete')} {$deviseComptable}</Box>
           </>
         ]]></viewer>
       </field>

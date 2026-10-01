@@ -85,7 +85,7 @@ BEGIN
   VALUES (nextval('meta_action_seq'), 0, now(), 'action-lvme-purchase-order-attrs-nature', 'action-attrs', NULL,
 '<action-attrs name="action-lvme-purchase-order-attrs-nature">
   <attribute name="value" for="$natureArrivage"
-    expr="eval: def sm = id ? __repo__(StockMove).all().filter(''?1 MEMBER OF self.purchaseOrderSet AND self.typeSelect = 3 AND self.statusSelect != 4'', id).order(''-id'').fetchOne() : null; def v = sm?.nature?.value; sm == null ? '''' : (v == 3 ? ''Réel'' : (v == 2 ? ''Flottant'' : (v == 1 ? ''En cours de production'' : ''Brouillon'')))"/>
+    expr="eval: def sm = id ? __repo__(StockMove).all().filter(''?1 MEMBER OF self.purchaseOrderSet AND self.typeSelect = 3 AND self.statusSelect != 4'', id).order(''-id'').fetchOne() : null; def v = sm?.nature?.value; sm == null ? '''' : (v == 3 ? ''Réel'' : (v == 2 ? ''Flottant'' : (v == 1 ? ''Flottant à embarquer'' : ''Brouillon'')))"/>
 </action-attrs>', false, false);
 
   DELETE FROM meta_view WHERE name = 'purchase-order-form' AND module IS NULL AND priority = 30;

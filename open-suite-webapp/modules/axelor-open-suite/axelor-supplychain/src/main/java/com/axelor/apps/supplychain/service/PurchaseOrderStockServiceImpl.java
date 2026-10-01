@@ -244,6 +244,11 @@ public class PurchaseOrderStockServiceImpl implements PurchaseOrderStockService 
     stockMove.setOrigin(purchaseOrder.getPurchaseOrderSeq());
     stockMove.setTradingName(purchaseOrder.getTradingName());
     stockMove.setGroupProductsOnPrintings(purchaseOrder.getGroupProductsOnPrintings());
+    // LVME : taux de change de la commande recopiés sur l'arrivage (archivage seulement)
+    stockMove.setLvmeCours(purchaseOrder.getLvmeCours());
+    stockMove.setLvmeCouvert(purchaseOrder.getLvmeCouvert());
+    stockMove.setLvmeFlottant(purchaseOrder.getLvmeFlottant());
+    stockMove.setLvmeReel(purchaseOrder.getLvmeReel());
 
     qualityStockMove.setPurchaseOrderSet(Sets.newHashSet(purchaseOrder));
     qualityStockMove.setOrigin(purchaseOrder.getPurchaseOrderSeq());

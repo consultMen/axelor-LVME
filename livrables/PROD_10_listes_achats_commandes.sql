@@ -46,7 +46,6 @@ SELECT nextval('meta_select_item_seq'), 0, s.id, v.value, v.title, v.seq
 FROM meta_select s
 JOIN (VALUES ('lvme.achat.nature.select', '1', 'Arrivages réels', 1),
              ('lvme.achat.nature.select', '2', 'Arrivages flottants', 2),
-             ('lvme.achat.nature.select', '4', 'En cours de production (à embarquer)', 3),
              ('lvme.achat.nature.select', '3', 'Tous', 4),
              ('lvme.commande.client.etat.select', '1', 'Commandes en cours', 1),
              ('lvme.commande.client.etat.select', '2', 'Commandes soldées', 2),
@@ -87,8 +86,7 @@ INSERT INTO meta_action (id, version, created_on, name, type, model, xml, home, 
     AND (:_arrFiltre = false OR self.estimatedReceiptDate BETWEEN :_arrDu AND :_arrAu)
     AND (:_fouDu = '''' OR self.supplierPartner.name &gt;= :_fouDu) AND (:_fouAu = '''' OR self.supplierPartner.name &lt;= :_fouAu)
     AND (:_transport = 0 OR self.shipmentMode.id = :_transport)
-    AND ((:_nature = 1 AND self.nature = 3) OR (:_nature = 2 AND self.nature = 2)
-         OR (:_nature = 4 AND self.nature = 1) OR :_nature = 3)</domain>
+    AND ((:_nature = 1 AND self.nature = 3) OR (:_nature = 2 AND self.nature IN (1, 2)) OR :_nature = 3)</domain>
   <context name="_dateFiltre" expr="eval: dateDu != null || dateAu != null"/>
   <context name="_dateDu" expr="eval: dateDu ? java.time.LocalDate.parse(dateDu.toString().substring(0, 10)) : java.time.LocalDate.of(1900, 1, 1)"/>
   <context name="_dateAu" expr="eval: dateAu ? java.time.LocalDate.parse(dateAu.toString().substring(0, 10)) : java.time.LocalDate.of(2999, 12, 31)"/>

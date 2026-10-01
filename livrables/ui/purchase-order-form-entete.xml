@@ -2,6 +2,12 @@
       <field name="company" readonlyIf="statusSelect >= 3 || supplierPartner != null" colSpan="3" widget="SuggestBox" canEdit="false" onChange="action-group-purchase-order-company-change-actions" form-view="company-form" grid-view="company-grid"/>
       <field name="currency" title="Devise d'achat" domain="self.code IN ('EUR', 'USD')" readonlyIf="(purchaseOrderLineList &amp;&amp; purchaseOrderLineList.length > 0) || statusSelect >= 3" colSpan="3" canEdit="false" form-view="currency-form" grid-view="currency-grid"/>
       <field name="company.currency" title="Devise comptable" readonly="true" colSpan="3" form-view="currency-form" grid-view="currency-grid"/>
+      <!-- LVME : taux de change GESCOM, archivage seulement (aucun calcul) -->
+      <field name="lvmeCours" title="Cours" colSpan="2"/>
+      <field name="lvmeCouvert" title="Couvert" colSpan="2"/>
+      <field name="lvmeFlottant" title="Flottant" colSpan="2"/>
+      <field name="lvmeReel" title="Réel" colSpan="2"/>
+      <field name="companyExTaxTotal" title="Équivalent HT (devise comptable)" readonly="true" colSpan="4" showIf="currency &amp;&amp; company.currency &amp;&amp; currency.id != company.currency.id"/>
       <field name="priceList" hideIf="company == null" readonlyIf="(purchaseOrderLineList &amp;&amp; purchaseOrderLineList.length > 0) || statusSelect >= 3" colSpan="3" onSelect="action-purchase-order-method-price-list-domain" form-view="price-list-form" grid-view="price-list-grid"/>
     </panel>
 
@@ -26,8 +32,8 @@
           <viewer depends="$natureArrivage"><![CDATA[
             <>
               {$natureArrivage == 'Réel' && <Badge bg="success">Réel</Badge>}
-              {$natureArrivage == 'Flottant' && <Badge bg="warning">Flottant</Badge>}
-              {$natureArrivage == 'En cours de production' && <Badge bg="info">En cours de production (à embarquer)</Badge>}
+              {($natureArrivage == 'Flottant' || $natureArrivage == 'Flottant à embarquer') && <Badge bg="warning">Flottant</Badge>}
+              {$natureArrivage == 'Flottant à embarquer' && <Badge bg="info" style={{ marginLeft: 6 }}>À embarquer</Badge>}
               {$natureArrivage == 'Brouillon' && <Badge bg="secondary">Brouillon</Badge>}
               {!$natureArrivage && <Badge bg="light" text="dark">Pas encore de réception</Badge>}
             </>

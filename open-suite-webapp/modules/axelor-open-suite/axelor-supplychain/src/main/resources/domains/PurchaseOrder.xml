@@ -28,6 +28,16 @@
     <many-to-one name="shipmentMode" ref="com.axelor.apps.stock.db.ShipmentMode"/>
     <!-- LVME : Nature de l'arrivage (recopiée depuis la réception fournisseur) -->
     <enum name="nature" ref="com.axelor.apps.stock.db.Nature" title="Nature" readonly="true"/>
+    <!-- LVME : taux de change de l'écran GESCOM, pour archivage seulement (n'entre dans aucun calcul) -->
+    <decimal name="lvmeCours" title="Cours" precision="20" scale="4"/>
+    <decimal name="lvmeCouvert" title="Couvert" precision="20" scale="4"/>
+    <decimal name="lvmeFlottant" title="Flottant" precision="20" scale="4"/>
+    <decimal name="lvmeReel" title="Réel" precision="20" scale="4"/>
+    <boolean name="lvmeAEmbarquer" title="À embarquer" formula="true">
+      <![CDATA[
+      nature = 1
+      ]]>
+    </boolean>
     <many-to-one name="freightCarrierMode"
       ref="com.axelor.apps.stock.db.FreightCarrierMode"/>
 

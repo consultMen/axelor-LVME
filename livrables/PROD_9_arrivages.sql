@@ -40,7 +40,7 @@ INSERT INTO meta_select_item (id, version, select_id, value, title, order_seq)
 SELECT nextval('meta_select_item_seq'), 0, s.id, v.value, v.title, v.seq
 FROM meta_select s
 CROSS JOIN (VALUES ('1', 'Arrivages Flottant + Réel', 1), ('2', 'Arrivage Réel', 2), ('3', 'Arrivage Flottant', 3),
-                   ('5', 'En cours de production (à embarquer)', 4), ('4', 'Arrivages Archivés', 5)) AS v(value, title, seq)
+                   ('4', 'Arrivages Archivés', 5)) AS v(value, title, seq)
 WHERE s.name = 'lvme.arrivage.nature.select'
   AND NOT EXISTS (SELECT 1 FROM meta_select_item i WHERE i.select_id = s.id AND i.value = v.value);
 
@@ -74,7 +74,7 @@ INSERT INTO meta_action (id, version, created_on, name, type, model, xml, home, 
     AND (:_arrFiltre = false OR (self.realDate BETWEEN :_arrDu AND :_arrAu)
          OR (self.realDate IS NULL AND self.estimatedDate BETWEEN :_arrDu AND :_arrAu))
     AND ((:_nature = 1 AND self.nature IN (0, 1, 2, 3)) OR (:_nature = 2 AND self.nature = 3)
-         OR (:_nature = 3 AND self.nature = 2) OR (:_nature = 5 AND self.nature = 1)
+         OR (:_nature = 3 AND self.nature IN (1, 2))
          OR (:_nature = 4 AND self.nature = 4))</domain>
   <context name="_fou" expr="eval: (fournisseur?.id ?: 0) as Long"/>
   <context name="_dateFiltre" expr="eval: dateDu != null || dateAu != null"/>
