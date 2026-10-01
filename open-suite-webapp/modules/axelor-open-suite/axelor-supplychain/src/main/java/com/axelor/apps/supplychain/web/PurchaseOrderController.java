@@ -61,23 +61,22 @@ public class PurchaseOrderController {
                     Beans.get(PurchaseOrderRepository.class).find(purchaseOrder.getId()));
 
         if (stockMoveList != null && stockMoveList.size() == 1) {
+          // LVME : la réception générée s'ouvre sur la fiche « Arrivage » (comme le menu Arrivages)
           response.setView(
-              ActionView.define(I18n.get("Stock move"))
+              ActionView.define("Arrivage")
                   .model(StockMove.class.getName())
-                  .add("grid", "stock-move-grid")
-                  .add("form", "stock-move-form")
-                  .param("search-filters", "internal-stock-move-filters")
+                  .add("form", "lvme-arrivage-form")
+                  .add("grid", "lvme-arrivage-grid")
                   .param("forceEdit", "true")
                   .domain("self.id = " + stockMoveList.get(0))
                   .context("_showRecord", String.valueOf(stockMoveList.get(0)))
                   .map());
         } else if (stockMoveList != null && stockMoveList.size() > 1) {
           response.setView(
-              ActionView.define(I18n.get("Stock move"))
+              ActionView.define("Arrivages")
                   .model(StockMove.class.getName())
-                  .add("grid", "stock-move-grid")
-                  .add("form", "stock-move-form")
-                  .param("search-filters", "internal-stock-move-filters")
+                  .add("grid", "lvme-arrivage-grid")
+                  .add("form", "lvme-arrivage-form")
                   .domain("self.id in (" + Joiner.on(",").join(stockMoveList) + ")")
                   .map());
         } else {
