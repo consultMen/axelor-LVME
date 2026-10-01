@@ -1,0 +1,26 @@
+<form name="lvme-incoherence-search-form" title="Rapport d'incohérences" model="com.axelor.utils.db.Wizard" width="large"
+  canNew="false" canSave="false" canCopy="false" canDelete="false" onNew="action-lvme-incoherence-group-onnew">
+  <!-- LVME REC-012 : rapport d'incohérences Commandes VS Réceptions VS BL VS Facturé -->
+  <panel name="rechercheIncoherencePanel" title="Recherche" colSpan="12">
+    <panel name="filtreTypePanel" colSpan="3" itemSpan="12">
+      <field name="$typeEcart" title="Type d'écart" type="integer" selection="lvme.incoherence.type.select"
+        placeholder="Tous" onChange="action-lvme-incoherence-refresh"/>
+      <field name="$tiers" title="Tiers" type="many-to-one" target="com.axelor.apps.base.db.Partner"
+        domain="self.isCustomer = true OR self.isSupplier = true" canNew="false" canEdit="false" canView="false"/>
+    </panel>
+    <panel name="filtreDatePanel" colSpan="3" itemSpan="12">
+      <field name="$dateDu" title="Date du" type="date"/>
+      <field name="$dateAu" title="au" type="date"/>
+      <field name="$datePeriode" title="Période prédéfinie" type="integer" selection="lvme.etat.stock.periode.select"
+        onChange="action-lvme-incoherence-group-periode"/>
+    </panel>
+    <panel name="filtreActionPanel" colSpan="3" itemSpan="12">
+      <button name="lancerRechercheBtn" title="Lancer la recherche" icon="search" css="btn-primary" onClick="action-lvme-incoherence-refresh"/>
+    </panel>
+    <panel name="boutonsPanel" colSpan="3" itemSpan="12">
+      <button name="quitterBtn" title="Quitter" icon="x-circle" css="btn-danger" onClick="close"/>
+    </panel>
+  </panel>
+  <panel-dashlet name="incoherencesDashlet" title="Incohérences" colSpan="12" height="600"
+    action="action-lvme-incoherence-dashlet"/>
+</form>

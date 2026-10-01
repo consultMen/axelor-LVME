@@ -1,0 +1,24 @@
+<grid name="lvme-incoherence-grid" title="Incohérences" model="com.axelor.apps.supplychain.db.Incoherence"
+  orderBy="typeEcart,-dateDoc,orderRef" canNew="false" canEdit="false" canDelete="false">
+  <!-- LVME REC-012 : rapport d'incohérences Commandes VS Réceptions VS BL VS Facturé -->
+  <field name="typeLabel" width="210"/>
+  <field name="orderRef" width="90"/>
+  <field name="dateDoc" width="90"/>
+  <field name="partner" width="180"/>
+  <field name="product" width="110"/>
+  <field name="productName" width="200"/>
+  <field name="qtyCde" width="90"/>
+  <field name="qtyMvt" width="95"/>
+  <field name="qtyFacturee" width="90"/>
+  <field name="ecart" width="80">
+    <hilite color="danger" strong="true" if="ecart != 0"/>
+  </field>
+  <field name="colisCde" width="80"/>
+  <field name="colisMvt" width="80"/>
+  <field name="prixCde" width="80"/>
+  <field name="prixFacture" width="85">
+    <hilite color="danger" strong="true" if="prixFacture != null &amp;&amp; prixFacture != prixCde"/>
+  </field>
+  <field name="mvtNumeros" width="110"/>
+  <field name="factureNumeros" width="100"/>
+</grid>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<domain-models xmlns="http://axelor.com/xml/ns/domain-models"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://axelor.com/xml/ns/domain-models http://axelor.com/xml/ns/domain-models/domain-models_7.4.xsd">
+
+  <module name="supplychain" package="com.axelor.apps.supplychain.db"/>
+
+  <!-- REC-012 : rapport d'incohérences Commandes VS Réceptions VS BL VS Facturé. Modèle en lecture
+    seule adossé à la vue SQL lvme_incoherence (sql/lvme_incoherence.sql). -->
+  <entity name="Incoherence" table="lvme_incoherence" cacheable="false">
+    <integer name="typeEcart" column="type_ecart" title="Code écart"/>
+    <string name="typeLabel" column="type_label" title="Type d'écart"/>
+    <many-to-one name="partner" ref="com.axelor.apps.base.db.Partner" column="partner_id"
+      title="Tiers"/>
+    <many-to-one name="saleOrder" ref="com.axelor.apps.sale.db.SaleOrder"
+      column="sale_order_id" title="Commande client"/>
+    <many-to-one name="purchaseOrder" ref="com.axelor.apps.purchase.db.PurchaseOrder"
+      column="purchase_order_id" title="Commande fournisseur"/>
+    <string name="orderRef" column="order_ref" title="N° Cde"/>
+    <date name="dateDoc" column="date_doc" title="Date"/>
+    <many-to-one name="product" ref="com.axelor.apps.base.db.Product" column="product_id"
+      title="Produit"/>
+    <string name="productName" column="product_name" title="Désignation"/>
+    <decimal name="qtyCde" column="qty_cde" title="Qté commandée" precision="20" scale="3"/>
+    <decimal name="qtyMvt" column="qty_mvt" title="Qté livrée / reçue" precision="20"
+      scale="3"/>
+    <decimal name="qtyFacturee" column="qty_facturee" title="Qté facturée" precision="20"
+      scale="3"/>
+    <decimal name="ecart" column="ecart" title="Écart" precision="20" scale="3"/>
+    <decimal name="colisCde" column="colis_cde" title="Colis cdés" precision="20" scale="3"/>
+    <decimal name="colisMvt" column="colis_mvt" title="Colis reçus" precision="20" scale="3"/>
+    <decimal name="prixCde" column="prix_cde" title="Prix Cde" precision="20" scale="4"/>
+    <decimal name="prixFacture" column="prix_facture" title="Prix facturé" precision="20"
+      scale="4"/>
+    <string name="mvtNumeros" column="mvt_numeros" title="BL / Réception"/>
+    <string name="factureNumeros" column="facture_numeros" title="Facture"/>
+  </entity>
+
+</domain-models>

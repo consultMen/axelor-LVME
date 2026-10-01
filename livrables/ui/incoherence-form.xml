@@ -1,0 +1,25 @@
+<form name="lvme-incoherence-form" title="Incohérence" model="com.axelor.apps.supplychain.db.Incoherence"
+  canNew="false" canEdit="false" canDelete="false" canSave="false" canCopy="false">
+  <!-- LVME REC-012 : détail d'une incohérence, avec accès à la commande -->
+  <panel name="mainPanel" title="Écart" readonly="true">
+    <field name="typeLabel" colSpan="6"/>
+    <field name="dateDoc" colSpan="3"/>
+    <field name="partner" colSpan="3"/>
+    <field name="saleOrder" colSpan="6" showIf="saleOrder" form-view="sale-order-form" grid-view="sale-order-grid"/>
+    <field name="purchaseOrder" colSpan="6" showIf="purchaseOrder" form-view="purchase-order-form" grid-view="purchase-order-grid"/>
+    <field name="product" colSpan="3"/>
+    <field name="productName" colSpan="3"/>
+  </panel>
+  <panel name="qtyPanel" title="Quantités et prix" readonly="true" itemSpan="3">
+    <field name="qtyCde"/>
+    <field name="qtyMvt"/>
+    <field name="qtyFacturee"/>
+    <field name="ecart"/>
+    <field name="colisCde"/>
+    <field name="colisMvt"/>
+    <field name="prixCde"/>
+    <field name="prixFacture"/>
+    <field name="mvtNumeros"/>
+    <field name="factureNumeros"/>
+  </panel>
+</form>
