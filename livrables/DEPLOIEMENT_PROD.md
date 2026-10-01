@@ -1,3 +1,34 @@
+# Déploiement prod LVME — lot du 01/10/2026 (PROD_14, 15, 17, 18, 19)
+
+Déjà en prod (30/09, commit f432d71) : PROD_7 à PROD_13 + logo LVME.
+À déployer : code des commits 933990b → ba344e1 + scripts ci-dessous.
+PROD_16 n'est pas à lancer : PROD_14 et PROD_15 chargent déjà les vues SQL à jour.
+
+| Script | Contenu |
+|---|---|
+| PROD_14 | Stocks > Historique Produit (vue SQL + écran) |
+| PROD_15 | Stocks > Arrivages > Synthèse des Arrivages (vue SQL + écran) |
+| PROD_17 | Écrans de recherche : la fiche s'ouvre en fenêtre par-dessus la liste |
+| PROD_18 | Commande fournisseur : réceptions ouvertes sur la fiche Arrivage (+ Java) |
+| PROD_19 | État des stocks par lots : filtre DLUO, boutons « Voir les lots périmés / à DLUO proche » |
+
+1. **PC** : `git push origin main`
+2. **Serveur** : sauvegarde `pg_dump -U axelor -Fc axelor > ~/sauvegarde_axelor_$(date +%F_%H%M).dump`
+3. `cd ~/src && rm -rf axelor-LVME && git clone https://github.com/consultMen/axelor-LVME.git && cd axelor-LVME`
+4. Scripts, **avant** de basculer Tomcat (l'ancienne appli tourne encore) :
+   ```
+   psql -U axelor axelor -v ON_ERROR_STOP=1 -f livrables/PROD_14_historique_produit.sql
+   psql -U axelor axelor -v ON_ERROR_STOP=1 -f livrables/PROD_15_synthese_arrivages.sql
+   psql -U axelor axelor -v ON_ERROR_STOP=1 -f livrables/PROD_17_fiches_en_fenetre.sql
+   psql -U axelor axelor -v ON_ERROR_STOP=1 -f livrables/PROD_18_commande_fournisseur_arrivages.sql
+   psql -U axelor axelor -v ON_ERROR_STOP=1 -f livrables/PROD_19_filtre_dluo.sql
+   ```
+5. Build + bascule Tomcat (procédure habituelle) : `cd open-suite-webapp && ./gradlew war`, dézipper,
+   **recopier `~/axelor-config.prod.properties`**, `systemctl stop axelor-tomcat`, remplacer ROOT, redémarrer.
+   Ne pas lancer `gradlew database --update`.
+
+---
+
 # Déploiement prod LVME — lot « Historique Produit / Synthèse des Arrivages » (PROD_14, PROD_15)
 
 | Script | Écran GESCOM |
