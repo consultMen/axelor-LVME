@@ -92,6 +92,7 @@ calc AS (
     SELECT b.*,
            t.tracking_number_seq,
            COALESCE(t.lot_verifie, false)                                 AS lot_verifie,
+           COALESCE(t.archived, false)                                    AS lot_archive,
            COALESCE(t.perishable_expiration_date, b.dluo_ligne)            AS dluo,
            COALESCE(NULLIF(t.prix_revient_reel, 0), b.pr_ligne, 0)         AS prix_revient,
            COALESCE(t.date_arrivage, b.entry_date)                         AS arrival_date,
@@ -153,7 +154,9 @@ SELECT ((c.tracking_number * 1000000 + COALESCE(c.frigo, 0)) * 10 + CASE WHEN c.
                   ELSE c.stock_qty * c.prix_revient END, 2) AS stock_value,
        -- ajouts « Lots Vérifiés » (colonnes en fin de vue : CREATE OR REPLACE VIEW)
        c.date_congelation_ligne          AS date_congelation,
-       c.lot_verifie                     AS lot_verifie
+       c.lot_verifie                     AS lot_verifie,
+       -- ajout « archivage des lots » (en fin de vue : CREATE OR REPLACE VIEW)
+       c.lot_archive                     AS lot_archive
 FROM calc c
 JOIN base_product p ON p.id = c.product
 LEFT JOIN base_partner pa ON pa.id = c.supplier_id;

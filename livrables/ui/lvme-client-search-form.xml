@@ -6,8 +6,8 @@
     <field name="$valeur" showTitle="false" type="string" colSpan="5" onChange="action-lvme-recherche-refresh"/>
     <button name="rechercheBtn" title="Recherche" icon="search" css="btn-primary" colSpan="2" onClick="action-lvme-recherche-refresh"/>
     <button name="nouveauBtn" title="Nouveau client" icon="plus" colSpan="2" onClick="action-lvme-client-new"/>
-    <field name="$archives" title="Archivés" type="boolean" colSpan="2" onChange="action-lvme-recherche-refresh"/>
-    <button colSpan="3" name="lvmeArchivageBtn" title="Archiver / Désarchiver" icon="archive" onClick="action-lvme-client-dashlet"/>
+    <field name="$archives" title="Archivés" type="boolean" colSpan="8" onChange="action-lvme-recherche-refresh"/>
+    <button colSpan="4" name="lvmeArchivageBtn" title="Archiver / Désarchiver" icon="archive" onClick="action-lvme-client-dashlet"/>
   </panel>
   <panel-dashlet name="listeDashlet" title="Clients" colSpan="12" height="650" action="action-lvme-client-dashlet"/>
 </form>

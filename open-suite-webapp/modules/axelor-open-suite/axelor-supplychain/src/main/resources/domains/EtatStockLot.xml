@@ -57,6 +57,7 @@
       scale="2"/>
     <date name="dateCongelation" column="date_congelation" title="Date Congélation"/>
     <boolean name="lotVerifie" column="lot_verifie" title="Vérif"/>
+    <boolean name="lotArchive" column="lot_archive" title="Lot archivé"/>
   </entity>
 
 </domain-models>
