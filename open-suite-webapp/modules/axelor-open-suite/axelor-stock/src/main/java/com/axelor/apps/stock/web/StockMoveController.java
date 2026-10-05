@@ -730,8 +730,14 @@ public class StockMoveController {
           PrintingTemplateHelper.getFileLink(
               Beans.get(PrintingTemplatePrintService.class)
                   .getPrintFile(printingTemplate, new PrintingGenFactoryContext(stockMove)));
+      // ouvert par-dessus la fiche (elle-même souvent en fenêtre) : sinon le PDF part dans un onglet caché
       response.setView(
-          ActionView.define("Arrivage " + stockMove.getStockMoveSeq()).add("html", fileLink).map());
+          ActionView.define("Arrivage " + stockMove.getStockMoveSeq())
+              .add("html", fileLink)
+              .param("popup", "true")
+              .param("popup.maximized", "true")
+              .param("show-toolbar", "false")
+              .map());
     } catch (Exception e) {
       TraceBackService.trace(response, e);
     }
