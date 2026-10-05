@@ -70,7 +70,7 @@ SELECT
       + num(f"(SELECT SUM(CASE WHEN sm.status_select = 3 THEN l.real_qty ELSE l.qty END * COALESCE(l.company_unit_price_untaxed, 0)) FROM stock_stock_move_line l WHERE l.stock_move = sm.id)")
       + " || ' ' || COALESCE(ccur.code, '') END"),
      ('Nb Colis', num('sm.nb_colis_total', 0)),
-     ('Poids Total', num('sm.poids_total', 3))])} AS bloc3
+     ('Poids Total', num('sm.poids_total', 2))])} AS bloc3
 FROM stock_stock_move sm
 LEFT JOIN base_partner p ON p.id = sm.partner
 LEFT JOIN message_email_address em ON em.id = p.email_address
@@ -105,7 +105,7 @@ COLS = [
     ('colis', 'Nb Colis', num('l.nb_colis', 0), 0.55, True),
     ('parcolis', 'Nb unt ou Poids /Colis', num('COALESCE(NULLIF(l.nb_unites_par_colis, 0), l.poids_par_colis)', 0), 0.65, True),
     ('qte', 'Nb unités ou poids', num(QTE, 0), 0.7, True),
-    ('poids', 'Poids Kg', num('l.poids_total_net', 0), 0.6, True),
+    ('poids', 'Poids Kg', num('l.poids_total_net', 2), 0.6, True),
     ('montant', 'Montant ht', num(f'COALESCE(NULLIF(l.montant_reel, 0), ({QTE}) * l.unit_price_untaxed)', 2), 0.85, True),
     ('dluo', 'D.L.C. / D.L.U.O', "to_char(l.dluo, 'DD/MM/YYYY')", 0.75, False),
     ('zone', 'Zone pêche', 'l.zone_peche', 0.9, False),
@@ -113,7 +113,7 @@ COLS = [
 TOTAL = {
     'colis': num('SUM(l.nb_colis)', 0),
     'qte': num(f'SUM({QTE})', 0),
-    'poids': num('SUM(l.poids_total_net)', 0),
+    'poids': num('SUM(l.poids_total_net)', 2),
     'montant': num(f'SUM(COALESCE(NULLIF(l.montant_reel, 0), ({QTE}) * l.unit_price_untaxed))', 2),
 }
 JOINS = """FROM stock_stock_move_line l
