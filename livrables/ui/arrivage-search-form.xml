@@ -23,6 +23,7 @@
     <panel name="filtreNaturePanel" title="Nature" colSpan="3" itemSpan="12">
       <field name="$natureFiltre" showTitle="false" type="integer" widget="RadioSelect" selection="lvme.arrivage.nature.select"/>
       <button name="lancerRechercheBtn" title="Lancer la recherche" icon="search" css="btn-primary" onClick="action-lvme-arrivage-refresh"/>
+      <button name="lvmeArchivageBtn" title="Archiver / Désarchiver" icon="archive" onClick="action-lvme-arrivage-dashlet"/>
     </panel>
   </panel>
   <panel-dashlet name="arrivagesDashlet" title="Arrivages" colSpan="12" height="600" action="action-lvme-arrivage-dashlet"/>

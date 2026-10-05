@@ -14,6 +14,10 @@
       <item name="mergeDuplicatedItem" title="Merge duplicated" action="action-validate-select-object-message,action-duplicate-object-wizard-open"/>
     </menu>
   </menubar>
+  <!-- LVME : archiver / désarchiver depuis la liste -->
+  <field name="archived" hidden="true"/>
+  <button name="lvmeArchiverBtn" title="Archiver" icon="archive" hideIf="archived" onClick="action-lvme-basculer-archivage"/>
+  <button name="lvmeDesarchiverBtn" title="Désarchiver" icon="arrow-counterclockwise" showIf="archived" onClick="action-lvme-basculer-archivage"/>
   <field name="partnerSeq" title="Référence" width="110"/>
   <field name="name" title="Nom" width="260"/>
   <field name="commercial" title="Commercial" width="130"/>
@@ -27,8 +31,4 @@
   <field if="__config__.app.isApp('account')" name="das2Activity" hidden="true"/>
   <button if="__config__.app.isApp('crm')" if-module="axelor-crm" name="scheduleEventBtn" title="Schedule Event" icon="fa-group" onClick="action-partner-view-schedule-event"/>
   <button if="__config__.app.isApp('crm')" if-module="axelor-crm" name="sendByEmailBtn" title="Send Email" icon="fa-envelope" onClick="action-send-by-email-with-template"/>
-  <!-- LVME : archiver / désarchiver depuis la liste -->
-  <field name="archived" hidden="true"/>
-  <button name="lvmeArchiverBtn" title="Archiver" icon="archive" hideIf="archived" onClick="action-lvme-basculer-archivage"/>
-  <button name="lvmeDesarchiverBtn" title="Désarchiver" icon="arrow-counterclockwise" showIf="archived" onClick="action-lvme-basculer-archivage"/>
 </grid>

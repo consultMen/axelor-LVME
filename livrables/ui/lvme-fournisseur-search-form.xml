@@ -7,6 +7,7 @@
     <button name="rechercheBtn" title="Recherche" icon="search" css="btn-primary" colSpan="2" onClick="action-lvme-recherche-refresh"/>
     <button name="nouveauBtn" title="Nouveau fournisseur" icon="plus" colSpan="2" onClick="action-lvme-fournisseur-new"/>
     <field name="$archives" title="Archivés" type="boolean" colSpan="2" onChange="action-lvme-recherche-refresh"/>
+    <button colSpan="3" name="lvmeArchivageBtn" title="Archiver / Désarchiver" icon="archive" onClick="action-lvme-fournisseur-dashlet"/>
   </panel>
   <panel-dashlet name="listeDashlet" title="Fournisseurs" colSpan="12" height="650" action="action-lvme-fournisseur-dashlet"/>
 </form>
