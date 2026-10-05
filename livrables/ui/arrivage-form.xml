@@ -5,7 +5,7 @@
   <!-- LVME : fiche « Arrivages » de GESCOM = réception fournisseur Axelor (mêmes actions que la fiche standard) -->
   <menubar>
     <menu name="stockMoveReportsMenu" title="Editer" icon="fa-files-o">
-      <item name="printIncomingMoveItem" title="Imprimer l'arrivage" readonlyIf="statusSelect == 1" action="action-stock-move-group-save-and-update-stocks,action-stock-move-group-print-stock-move"/>
+      <item name="printIncomingMoveItem" title="Imprimer l'arrivage" readonlyIf="statusSelect == 1" action="save,action-lvme-arrivage-imprimer"/>
       <item name="printCertificateOfConformityItem" title="Print certificate of conformity" showIf="statusSelect != 1 &amp;&amp; isNeedingConformityCertificate" action="action-stock-move-group-save-and-update-stocks,action-method-print-conformity-certificate"/>
     </menu>
     <menu name="stockMoveToolsMenu" title="Tools" icon="fa-wrench">
@@ -60,9 +60,10 @@
     </panel>
 
     <panel name="actionPanel" colSpan="3" itemSpan="12">
+      <!-- LVME : bouton « Editer » de GESCOM (impression de l'arrivage), visible aussi quand la fiche s'ouvre en fenêtre -->
+      <button name="lvmeEditerBtn" title="Editer" icon="printer" showIf="id &amp;&amp; statusSelect != 1" onClick="save,action-lvme-arrivage-imprimer"/>
       <button name="planBtn" title="Plan" showIf="statusSelect == 1" icon="fa-calendar" onClick="action-group-stock-stockmove-plan-click"/>
       <button name="lvmeFlottantBtn" title="A Embarquer -> flottant" showIf="statusSelect == 2 &amp;&amp; nature != 'FLOTTANT'" css="btn-info" onClick="action-lvme-arrivage-record-flottant,save"/>
-      <button name="lvmeEmbarquerBtn" title="Flottant -> A Embarquer" showIf="statusSelect == 2 &amp;&amp; nature == 'FLOTTANT'" css="btn-info" onClick="action-lvme-arrivage-record-embarquer,save"/>
       <button name="realizeBtn" title="Saisie Réel" showIf="statusSelect == 2" css="btn-success" icon="fa-check" prompt="Are you sure you want to realize this stock move?" onClick="action-group-stock-stockmove-realize-click"/>
       <button if="__config__.app.isApp('supplychain') &amp;&amp; __config__.app.getApp('account')?.getActivatePassedForPayment()" if-module="axelor-supplychain" name="passedForPaymentAuthorizedBtn" title="PFP authorized" showIf="pfpValidateStatusSelect != 2" onClick="action-stock-move-group-save-and-update-stocks,action-stock-move-record-pfp-validate,save"/>
       <button if="__config__.app.isApp('supplychain') &amp;&amp; __config__.app.getApp('account')?.getActivatePassedForPayment()" if-module="axelor-supplychain" name="refusalToPayLitigationBtn" title="PFP litigation" showIf="pfpValidateStatusSelect != 3" onClick="action-stock-move-group-save-and-update-stocks,action-stock-move-record-pfp-refusal-to-pay,save"/>

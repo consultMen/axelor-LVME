@@ -20,11 +20,16 @@ package com.axelor.apps.stock.web;
 
 import com.axelor.apps.base.AxelorException;
 import com.axelor.apps.base.ResponseMessageType;
+import com.axelor.apps.base.db.PrintingTemplate;
 import com.axelor.apps.base.db.Product;
 import com.axelor.apps.base.db.TraceBack;
+import com.axelor.apps.base.db.repo.PrintingTemplateRepository;
 import com.axelor.apps.base.db.repo.TraceBackRepository;
 import com.axelor.apps.base.service.TradingNameService;
 import com.axelor.apps.base.service.exception.TraceBackService;
+import com.axelor.apps.base.service.printing.template.PrintingTemplateHelper;
+import com.axelor.apps.base.service.printing.template.PrintingTemplatePrintService;
+import com.axelor.apps.base.service.printing.template.model.PrintingGenFactoryContext;
 import com.axelor.apps.stock.db.StockLocation;
 import com.axelor.apps.stock.db.StockMove;
 import com.axelor.apps.stock.db.StockMoveLine;
@@ -703,5 +708,32 @@ public class StockMoveController {
       gridViewName = "stock-move-in-grid";
     }
     return gridViewName;
+  }
+
+  /** LVME : impression de l'arrivage telle que l'écran GESCOM (modèle d'impression « Arrivage LVME »). */
+  public void printArrivageLvme(ActionRequest request, ActionResponse response) {
+    try {
+      StockMove stockMove =
+          Beans.get(StockMoveRepository.class)
+              .find(request.getContext().asType(StockMove.class).getId());
+      PrintingTemplate printingTemplate =
+          Beans.get(PrintingTemplateRepository.class)
+              .all()
+              .filter("self.name = ?1", "Arrivage LVME")
+              .fetchOne();
+      if (stockMove == null || printingTemplate == null) {
+        throw new AxelorException(
+            TraceBackRepository.CATEGORY_CONFIGURATION_ERROR,
+            "Modèle d'impression « Arrivage LVME » introuvable (script PROD_27).");
+      }
+      String fileLink =
+          PrintingTemplateHelper.getFileLink(
+              Beans.get(PrintingTemplatePrintService.class)
+                  .getPrintFile(printingTemplate, new PrintingGenFactoryContext(stockMove)));
+      response.setView(
+          ActionView.define("Arrivage " + stockMove.getStockMoveSeq()).add("html", fileLink).map());
+    } catch (Exception e) {
+      TraceBackService.trace(response, e);
+    }
   }
 }

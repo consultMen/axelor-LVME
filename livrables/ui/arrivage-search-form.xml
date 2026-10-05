@@ -5,6 +5,7 @@
     <panel name="filtreFournisseurPanel" colSpan="3" itemSpan="12">
       <field name="$fournisseur" title="Fournisseur" type="many-to-one" target="com.axelor.apps.base.db.Partner"
         domain="self.isSupplier = true" canNew="false" canEdit="false" canView="false"/>
+      <field name="$numeroArrivage" title="N° Arrivage" type="string" onChange="action-lvme-arrivage-refresh"/>
       <button name="nouvelArrivageBtn" title="Nouveau Arrivage" icon="plus" onClick="action-lvme-arrivage-new"/>
     </panel>
     <panel name="filtreDatePanel" colSpan="3" itemSpan="12">

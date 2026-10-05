@@ -69,6 +69,7 @@ INSERT INTO meta_action (id, version, created_on, name, type, model, xml, home, 
   <view-param name="popup-save" value="true"/>
   <view-param name="popup.maximized" value="true"/>
   <domain>self.typeSelect = 3 AND self.isReversion = FALSE
+    AND LOWER(COALESCE(self.stockMoveSeq, '''')) LIKE :_num
     AND (:_fou = 0 OR self.partner.id = :_fou)
     AND (:_dateFiltre = false OR self.createdOn BETWEEN :_dateDu AND :_dateAu)
     AND (:_arrFiltre = false OR (self.realDate BETWEEN :_arrDu AND :_arrAu)
@@ -76,6 +77,7 @@ INSERT INTO meta_action (id, version, created_on, name, type, model, xml, home, 
     AND ((:_nature = 1 AND self.nature IN (0, 1, 2, 3)) OR (:_nature = 2 AND self.nature = 3)
          OR (:_nature = 3 AND self.nature IN (1, 2))
          OR (:_nature = 4 AND self.nature = 4))</domain>
+  <context name="_num" expr="eval: numeroArrivage ? ''%'' + numeroArrivage.toString().trim().toLowerCase() + ''%'' : ''%''"/>
   <context name="_fou" expr="eval: (fournisseur?.id ?: 0) as Long"/>
   <context name="_dateFiltre" expr="eval: dateDu != null || dateAu != null"/>
   <context name="_dateDu" expr="eval: dateDu ? java.time.LocalDate.parse(dateDu.toString().substring(0, 10)).atStartOfDay() : java.time.LocalDateTime.of(1900, 1, 1, 0, 0)"/>

@@ -1,0 +1,1077 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.23" id="1">
+    <property name="createdBy">LVME</property>
+    <property name="units">in</property>
+    <text-property name="title">Arrivage</text-property>
+    <parameters>
+        <scalar-parameter name="StockMoveId" id="2">
+            <property name="hidden">true</property>
+            <property name="valueType">static</property>
+            <property name="isRequired">true</property>
+            <property name="dataType">decimal</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+    </parameters>
+    <data-sources>
+        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="Data Source" id="3">
+            <property name="odaDriverClass">org.postgresql.Driver</property>
+            <property name="odaURL">jdbc:postgresql://localhost:5432/</property>
+        </oda-data-source>
+    </data-sources>
+    <data-sets>
+        <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="Entete" id="198">
+            <list-property name="parameters">
+                <structure>
+                    <property name="name">param_1</property>
+                    <property name="paramName">StockMoveId</property>
+                    <property name="dataType">decimal</property>
+                    <property name="nativeDataType">2</property>
+                    <property name="position">1</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+            </list-property>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">numero</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">2</property>
+                        <property name="name">bloc1</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">3</property>
+                        <property name="name">bloc2</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">4</property>
+                        <property name="name">bloc3</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <property name="dataSource">Data Source</property>
+            <list-property name="resultSet">
+                <structure>
+                    <property name="position">1</property>
+                    <property name="name">numero</property>
+                    <property name="nativeName">numero</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">2</property>
+                    <property name="name">bloc1</property>
+                    <property name="nativeName">bloc1</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">3</property>
+                    <property name="name">bloc2</property>
+                    <property name="nativeName">bloc2</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">4</property>
+                    <property name="name">bloc3</property>
+                    <property name="nativeName">bloc3</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+            </list-property>
+            <xml-property name="queryText"><![CDATA[
+SELECT
+  sm.stock_move_seq AS numero,
+  '<div style="font-weight:bold;border-bottom:1px solid #999;margin-bottom:2px">Fournisseur</div><table style="font-size:8pt">' || '<tr><td style="color:#666;padding-right:6px">Fournisseur</td><td><b>' || replace(replace(replace(COALESCE((p.full_name)::text, ''), '&', '&amp;'), '<', '&lt;'), '>', '&gt;') || '</b></td></tr>' || '<tr><td style="color:#666;padding-right:6px">Code</td><td><b>' || replace(replace(replace(COALESCE((p.partner_seq)::text, ''), '&', '&amp;'), '<', '&lt;'), '>', '&gt;') || '</b></td></tr>' || '<tr><td style="color:#666;padding-right:6px">Adresse</td><td><b>' || replace(replace(replace(COALESCE((replace(COALESCE(sm.from_address_str, ''), chr(10), ' '))::text, ''), '&', '&amp;'), '<', '&lt;'), '>', '&gt;') || '</b></td></tr>' || '<tr><td style="color:#666;padding-right:6px">Contact</td><td><b>' || replace(replace(replace(COALESCE((ct.full_name)::text, ''), '&', '&amp;'), '<', '&lt;'), '>', '&gt;') || '</b></td></tr>' || '<tr><td style="color:#666;padding-right:6px">Tél.</td><td><b>' || replace(replace(replace(COALESCE((p.fixed_phone)::text, ''), '&', '&amp;'), '<', '&lt;'), '>', '&gt;') || '</b></td></tr>' || '<tr><td style="color:#666;padding-right:6px">Email</td><td><b>' || replace(replace(replace(COALESCE((em.address)::text, ''), '&', '&amp;'), '<', '&lt;'), '>', '&gt;') || '</b></td></tr>' || '<tr><td style="color:#666;padding-right:6px">Règlement</td><td><b>' || replace(replace(replace(COALESCE((pm.name)::text, ''), '&', '&amp;'), '<', '&lt;'), '>', '&gt;') || '</b></td></tr>' || '<tr><td style="color:#666;padding-right:6px">Échéance</td><td><b>' || replace(replace(replace(COALESCE((pc.name)::text, ''), '&', '&amp;'), '<', '&lt;'), '>', '&gt;') || '</b></td></tr>' || '</table>' AS bloc1,
+  '<div style="font-weight:bold;border-bottom:1px solid #999;margin-bottom:2px">Arrivage</div><table style="font-size:8pt">' || '<tr><td style="color:#666;padding-right:6px">Opérateur</td><td><b>' || replace(replace(replace(COALESCE((bu.full_name)::text, ''), '&', '&amp;'), '<', '&lt;'), '>', '&gt;') || '</b></td></tr>' || '<tr><td style="color:#666;padding-right:6px">Arrivage N°</td><td><b>' || replace(replace(replace(COALESCE((sm.stock_move_seq)::text, ''), '&', '&amp;'), '<', '&lt;'), '>', '&gt;') || '</b></td></tr>' || '<tr><td style="color:#666;padding-right:6px">Du</td><td><b>' || replace(replace(replace(COALESCE((to_char(sm.created_on, 'DD/MM/YYYY'))::text, ''), '&', '&amp;'), '<', '&lt;'), '>', '&gt;') || '</b></td></tr>' || '<tr><td style="color:#666;padding-right:6px">Nature</td><td><b>' || replace(replace(replace(COALESCE((CASE sm.nature WHEN 1 THEN 'Flottant - à embarquer' WHEN 2 THEN 'Flottant' WHEN 3 THEN 'Réel' WHEN 4 THEN 'Annulé' ELSE 'Brouillon' END)::text, ''), '&', '&amp;'), '<', '&lt;'), '>', '&gt;') || '</b></td></tr>' || '<tr><td style="color:#666;padding-right:6px">Commande</td><td><b>' || replace(replace(replace(COALESCE((po.purchase_order_seq)::text, ''), '&', '&amp;'), '<', '&lt;'), '>', '&gt;') || '</b></td></tr>' || '<tr><td style="color:#666;padding-right:6px">Date Départ</td><td><b>' || replace(replace(replace(COALESCE((to_char(sm.supplier_shipment_date, 'DD/MM/YYYY'))::text, ''), '&', '&amp;'), '<', '&lt;'), '>', '&gt;') || '</b></td></tr>' || '<tr><td style="color:#666;padding-right:6px">Arrivée</td><td><b>' || replace(replace(replace(COALESCE((to_char(COALESCE(sm.real_date, sm.estimated_date), 'DD/MM/YYYY'))::text, ''), '&', '&amp;'), '<', '&lt;'), '>', '&gt;') || '</b></td></tr>' || '<tr><td style="color:#666;padding-right:6px">Type transport</td><td><b>' || replace(replace(replace(COALESCE((shm.name)::text, ''), '&', '&amp;'), '<', '&lt;'), '>', '&gt;') || '</b></td></tr>' || '<tr><td style="color:#666;padding-right:6px">Bateau</td><td><b>' || replace(replace(replace(COALESCE((bt.name)::text, ''), '&', '&amp;'), '<', '&lt;'), '>', '&gt;') || '</b></td></tr>' || '<tr><td style="color:#666;padding-right:6px">Containers</td><td><b>' || replace(replace(replace(COALESCE(((SELECT string_agg(c.name, ', ') FROM stock_stock_move_container_set cs JOIN stock_container c ON c.id = cs.container_set WHERE cs.stock_stock_move = sm.id))::text, ''), '&', '&amp;'), '<', '&lt;'), '>', '&gt;') || '</b></td></tr>' || '<tr><td style="color:#666;padding-right:6px">Transitaire</td><td><b>' || replace(replace(replace(COALESCE((fw.full_name)::text, ''), '&', '&amp;'), '<', '&lt;'), '>', '&gt;') || '</b></td></tr>' || '<tr><td style="color:#666;padding-right:6px">Frigo</td><td><b>' || replace(replace(replace(COALESCE((fr.name)::text, ''), '&', '&amp;'), '<', '&lt;'), '>', '&gt;') || '</b></td></tr>' || '</table>' AS bloc2,
+  '<div style="font-weight:bold;border-bottom:1px solid #999;margin-bottom:2px">Devise</div><table style="font-size:8pt">' || '<tr><td style="color:#666;padding-right:6px">Devise</td><td><b>' || replace(replace(replace(COALESCE((cur.code)::text, ''), '&', '&amp;'), '<', '&lt;'), '>', '&gt;') || '</b></td></tr>' || '<tr><td style="color:#666;padding-right:6px">Cours</td><td><b>' || replace(replace(replace(COALESCE((replace(replace(to_char(sm.lvme_cours, 'FM999,999,999,990.0000'), ',', ' '), '.', ','))::text, ''), '&', '&amp;'), '<', '&lt;'), '>', '&gt;') || '</b></td></tr>' || '<tr><td style="color:#666;padding-right:6px">Couvert</td><td><b>' || replace(replace(replace(COALESCE((replace(replace(to_char(sm.lvme_couvert, 'FM999,999,999,990.0000'), ',', ' '), '.', ','))::text, ''), '&', '&amp;'), '<', '&lt;'), '>', '&gt;') || '</b></td></tr>' || '<tr><td style="color:#666;padding-right:6px">Flottant</td><td><b>' || replace(replace(replace(COALESCE((replace(replace(to_char(sm.lvme_flottant, 'FM999,999,999,990.0000'), ',', ' '), '.', ','))::text, ''), '&', '&amp;'), '<', '&lt;'), '>', '&gt;') || '</b></td></tr>' || '<tr><td style="color:#666;padding-right:6px">Réel</td><td><b>' || replace(replace(replace(COALESCE((replace(replace(to_char(sm.lvme_reel, 'FM999,999,999,990.0000'), ',', ' '), '.', ','))::text, ''), '&', '&amp;'), '<', '&lt;'), '>', '&gt;') || '</b></td></tr>' || '<tr><td style="color:#666;padding-right:6px">Mt Achat HT</td><td><b>' || replace(replace(replace(COALESCE((replace(replace(to_char(sm.ex_tax_total, 'FM999,999,999,990.00'), ',', ' '), '.', ',') || ' ' || COALESCE(cur.code, ''))::text, ''), '&', '&amp;'), '<', '&lt;'), '>', '&gt;') || '</b></td></tr>' || '<tr><td style="color:#666;padding-right:6px">Équivalent</td><td><b>' || replace(replace(replace(COALESCE((CASE WHEN cur.id IS DISTINCT FROM co.currency THEN replace(replace(to_char((SELECT SUM(CASE WHEN sm.status_select = 3 THEN l.real_qty ELSE l.qty END * COALESCE(l.company_unit_price_untaxed, 0)) FROM stock_stock_move_line l WHERE l.stock_move = sm.id), 'FM999,999,999,990.00'), ',', ' '), '.', ',') || ' ' || COALESCE(ccur.code, '') END)::text, ''), '&', '&amp;'), '<', '&lt;'), '>', '&gt;') || '</b></td></tr>' || '<tr><td style="color:#666;padding-right:6px">Nb Colis</td><td><b>' || replace(replace(replace(COALESCE((replace(replace(to_char(sm.nb_colis_total, 'FM999,999,999,990'), ',', ' '), '.', ','))::text, ''), '&', '&amp;'), '<', '&lt;'), '>', '&gt;') || '</b></td></tr>' || '<tr><td style="color:#666;padding-right:6px">Poids Total</td><td><b>' || replace(replace(replace(COALESCE((replace(replace(to_char(sm.poids_total, 'FM999,999,999,990.000'), ',', ' '), '.', ','))::text, ''), '&', '&amp;'), '<', '&lt;'), '>', '&gt;') || '</b></td></tr>' || '</table>' AS bloc3
+FROM stock_stock_move sm
+LEFT JOIN base_partner p ON p.id = sm.partner
+LEFT JOIN message_email_address em ON em.id = p.email_address
+LEFT JOIN stock_stock_move_purchase_order_set r ON r.stock_stock_move = sm.id
+LEFT JOIN purchase_purchase_order po ON po.id = r.purchase_order_set
+LEFT JOIN base_partner ct ON ct.id = po.contact_partner
+LEFT JOIN base_company co ON co.id = sm.company
+LEFT JOIN base_currency cur ON cur.id = COALESCE(po.currency, co.currency)
+LEFT JOIN base_currency ccur ON ccur.id = co.currency
+LEFT JOIN account_payment_mode pm ON pm.id = po.payment_mode
+LEFT JOIN account_payment_condition pc ON pc.id = po.payment_condition
+LEFT JOIN auth_user bu ON bu.id = po.buyer_user
+LEFT JOIN stock_shipment_mode shm ON shm.id = sm.shipment_mode
+LEFT JOIN stock_bateau bt ON bt.id = sm.bateau
+LEFT JOIN base_partner fw ON fw.id = sm.forwarder_partner
+LEFT JOIN stock_stock_location fr ON fr.id = sm.to_stock_location
+WHERE sm.id = ?
+LIMIT 1
+]]></xml-property>
+        </oda-data-set>
+        <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="Lignes" id="199">
+            <list-property name="parameters">
+                <structure>
+                    <property name="name">param_1</property>
+                    <property name="paramName">StockMoveId</property>
+                    <property name="dataType">decimal</property>
+                    <property name="nativeDataType">2</property>
+                    <property name="position">1</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">param_2</property>
+                    <property name="paramName">StockMoveId</property>
+                    <property name="dataType">decimal</property>
+                    <property name="nativeDataType">2</property>
+                    <property name="position">2</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+            </list-property>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">ordre</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">2</property>
+                        <property name="name">seq</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">3</property>
+                        <property name="name">is_total</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">4</property>
+                        <property name="name">produit</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">5</property>
+                        <property name="name">designation</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">6</property>
+                        <property name="name">frigo</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">7</property>
+                        <property name="name">lot</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">8</property>
+                        <property name="name">origine</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">9</property>
+                        <property name="name">cond</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">10</property>
+                        <property name="name">pa</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">11</property>
+                        <property name="name">pr</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">12</property>
+                        <property name="name">unite</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">13</property>
+                        <property name="name">colis</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">14</property>
+                        <property name="name">parcolis</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">15</property>
+                        <property name="name">qte</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">16</property>
+                        <property name="name">poids</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">17</property>
+                        <property name="name">montant</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">18</property>
+                        <property name="name">dluo</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">19</property>
+                        <property name="name">zone</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <property name="dataSource">Data Source</property>
+            <list-property name="resultSet">
+                <structure>
+                    <property name="position">1</property>
+                    <property name="name">ordre</property>
+                    <property name="nativeName">ordre</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">2</property>
+                    <property name="name">seq</property>
+                    <property name="nativeName">seq</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">3</property>
+                    <property name="name">is_total</property>
+                    <property name="nativeName">is_total</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">4</property>
+                    <property name="name">produit</property>
+                    <property name="nativeName">produit</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">5</property>
+                    <property name="name">designation</property>
+                    <property name="nativeName">designation</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">6</property>
+                    <property name="name">frigo</property>
+                    <property name="nativeName">frigo</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">7</property>
+                    <property name="name">lot</property>
+                    <property name="nativeName">lot</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">8</property>
+                    <property name="name">origine</property>
+                    <property name="nativeName">origine</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">9</property>
+                    <property name="name">cond</property>
+                    <property name="nativeName">cond</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">10</property>
+                    <property name="name">pa</property>
+                    <property name="nativeName">pa</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">11</property>
+                    <property name="name">pr</property>
+                    <property name="nativeName">pr</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">12</property>
+                    <property name="name">unite</property>
+                    <property name="nativeName">unite</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">13</property>
+                    <property name="name">colis</property>
+                    <property name="nativeName">colis</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">14</property>
+                    <property name="name">parcolis</property>
+                    <property name="nativeName">parcolis</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">15</property>
+                    <property name="name">qte</property>
+                    <property name="nativeName">qte</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">16</property>
+                    <property name="name">poids</property>
+                    <property name="nativeName">poids</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">17</property>
+                    <property name="name">montant</property>
+                    <property name="nativeName">montant</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">18</property>
+                    <property name="name">dluo</property>
+                    <property name="nativeName">dluo</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">19</property>
+                    <property name="name">zone</property>
+                    <property name="nativeName">zone</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+            </list-property>
+            <xml-property name="queryText"><![CDATA[SELECT * FROM (
+SELECT 0 AS ordre, l.sequence AS seq, '0' AS is_total,
+  (pr.code)::text AS produit,
+  (l.product_name)::text AS designation,
+  (fr.name)::text AS frigo,
+  (tn.tracking_number_seq)::text AS lot,
+  (l.origine)::text AS origine,
+  (COALESCE(NULLIF(cd.label, ''), cd.code))::text AS cond,
+  (replace(replace(to_char(l.unit_price_untaxed, 'FM999,999,999,990.00'), ',', ' '), '.', ','))::text AS pa,
+  (replace(replace(to_char(l.pr_kg, 'FM999,999,999,990.00'), ',', ' '), '.', ','))::text AS pr,
+  (u.name)::text AS unite,
+  (replace(replace(to_char(l.nb_colis, 'FM999,999,999,990'), ',', ' '), '.', ','))::text AS colis,
+  (replace(replace(to_char(COALESCE(NULLIF(l.nb_unites_par_colis, 0), l.poids_par_colis), 'FM999,999,999,990'), ',', ' '), '.', ','))::text AS parcolis,
+  (replace(replace(to_char(CASE WHEN sm.status_select = 3 THEN l.real_qty ELSE l.qty END, 'FM999,999,999,990'), ',', ' '), '.', ','))::text AS qte,
+  (replace(replace(to_char(l.poids_total_net, 'FM999,999,999,990'), ',', ' '), '.', ','))::text AS poids,
+  (replace(replace(to_char(COALESCE(NULLIF(l.montant_reel, 0), (CASE WHEN sm.status_select = 3 THEN l.real_qty ELSE l.qty END) * l.unit_price_untaxed), 'FM999,999,999,990.00'), ',', ' '), '.', ','))::text AS montant,
+  (to_char(l.dluo, 'DD/MM/YYYY'))::text AS dluo,
+  (l.zone_peche)::text AS zone
+FROM stock_stock_move_line l
+JOIN stock_stock_move sm ON sm.id = l.stock_move
+LEFT JOIN base_product pr ON pr.id = l.product
+LEFT JOIN stock_stock_location fr ON fr.id = COALESCE(l.to_stock_location, sm.to_stock_location)
+LEFT JOIN stock_tracking_number tn ON tn.id = l.tracking_number
+LEFT JOIN purchase_purchase_order_line pol ON pol.id = l.purchase_order_line
+LEFT JOIN purchase_conditionnement cd ON cd.id = pol.conditionnement
+LEFT JOIN base_unit u ON u.id = l.unit
+WHERE l.stock_move = ?
+UNION ALL
+SELECT 1, 0, '1',
+  'Somme' AS produit,
+  NULL::text AS designation,
+  NULL::text AS frigo,
+  NULL::text AS lot,
+  NULL::text AS origine,
+  NULL::text AS cond,
+  NULL::text AS pa,
+  NULL::text AS pr,
+  NULL::text AS unite,
+  (replace(replace(to_char(SUM(l.nb_colis), 'FM999,999,999,990'), ',', ' '), '.', ','))::text AS colis,
+  NULL::text AS parcolis,
+  (replace(replace(to_char(SUM(CASE WHEN sm.status_select = 3 THEN l.real_qty ELSE l.qty END), 'FM999,999,999,990'), ',', ' '), '.', ','))::text AS qte,
+  (replace(replace(to_char(SUM(l.poids_total_net), 'FM999,999,999,990'), ',', ' '), '.', ','))::text AS poids,
+  (replace(replace(to_char(SUM(COALESCE(NULLIF(l.montant_reel, 0), (CASE WHEN sm.status_select = 3 THEN l.real_qty ELSE l.qty END) * l.unit_price_untaxed)), 'FM999,999,999,990.00'), ',', ' '), '.', ','))::text AS montant,
+  NULL::text AS dluo,
+  NULL::text AS zone
+FROM stock_stock_move_line l
+JOIN stock_stock_move sm ON sm.id = l.stock_move
+LEFT JOIN base_product pr ON pr.id = l.product
+LEFT JOIN stock_stock_location fr ON fr.id = COALESCE(l.to_stock_location, sm.to_stock_location)
+LEFT JOIN stock_tracking_number tn ON tn.id = l.tracking_number
+LEFT JOIN purchase_purchase_order_line pol ON pol.id = l.purchase_order_line
+LEFT JOIN purchase_conditionnement cd ON cd.id = pol.conditionnement
+LEFT JOIN base_unit u ON u.id = l.unit
+WHERE l.stock_move = ?
+) x ORDER BY ordre, seq]]></xml-property>
+        </oda-data-set>
+    </data-sets>
+    <styles>
+        <style name="report" id="4">
+            <property name="fontFamily">sans-serif</property>
+            <property name="fontSize">8pt</property>
+        </style>
+    </styles>
+    <page-setup>
+        <simple-master-page name="Simple MasterPage" id="5">
+            <property name="type">a4</property>
+            <property name="orientation">landscape</property>
+            <property name="topMargin">0.3in</property>
+            <property name="leftMargin">0.3in</property>
+            <property name="bottomMargin">0.3in</property>
+            <property name="rightMargin">0.3in</property>
+            <page-footer>
+                <text id="6">
+                    <property name="fontSize">7pt</property>
+                    <property name="textAlign">right</property>
+                    <property name="contentType">html</property>
+                    <text-property name="content"><![CDATA[Page <value-of>pageNumber</value-of> / <value-of>totalPage</value-of>]]></text-property>
+                </text>
+            </page-footer>
+        </simple-master-page>
+    </page-setup>
+    <body>
+        <table id="101">
+            <property name="width">100%</property>
+            <property name="dataSet">Entete</property>
+            <list-property name="boundDataColumns">
+                <structure>
+                    <property name="name">numero</property>
+                    <expression name="expression" type="javascript">dataSetRow["numero"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">bloc1</property>
+                    <expression name="expression" type="javascript">dataSetRow["bloc1"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">bloc2</property>
+                    <expression name="expression" type="javascript">dataSetRow["bloc2"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">bloc3</property>
+                    <expression name="expression" type="javascript">dataSetRow["bloc3"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+            </list-property>
+            <column id="102"><property name="width">36%</property></column>
+            <column id="103"><property name="width">34%</property></column>
+            <column id="104"><property name="width">30%</property></column>
+            <detail>
+                <row id="105">
+                    <cell id="106">
+                        <property name="colSpan">3</property>
+                        <property name="paddingBottom">6pt</property>
+                        <text-data id="107">
+                            <expression name="valueExpr">"&lt;span style='font-size:15pt;font-weight:bold'&gt;ARRIVAGE N° " + row["numero"] + "&lt;/span&gt;"</expression>
+                            <property name="contentType">html</property>
+                        </text-data>
+                    </cell>
+                </row>
+                <row id="108">
+                    <cell id="110">
+                        <text-data id="109">
+                            <expression name="valueExpr">row["bloc1"]</expression>
+                            <property name="contentType">html</property>
+                        </text-data>
+                    </cell>
+                    <cell id="112">
+                        <text-data id="111">
+                            <expression name="valueExpr">row["bloc2"]</expression>
+                            <property name="contentType">html</property>
+                        </text-data>
+                    </cell>
+                    <cell id="114">
+                        <text-data id="113">
+                            <expression name="valueExpr">row["bloc3"]</expression>
+                            <property name="contentType">html</property>
+                        </text-data>
+                    </cell>
+                </row>
+            </detail>
+        </table>
+        <table id="195">
+            <property name="marginTop">8pt</property>
+            <property name="width">100%</property>
+            <property name="fontSize">6.5pt</property>
+            <property name="dataSet">Lignes</property>
+            <list-property name="boundDataColumns">
+                <structure>
+                    <property name="name">is_total</property>
+                    <expression name="expression" type="javascript">dataSetRow["is_total"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">produit</property>
+                    <expression name="expression" type="javascript">dataSetRow["produit"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">designation</property>
+                    <expression name="expression" type="javascript">dataSetRow["designation"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">frigo</property>
+                    <expression name="expression" type="javascript">dataSetRow["frigo"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">lot</property>
+                    <expression name="expression" type="javascript">dataSetRow["lot"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">origine</property>
+                    <expression name="expression" type="javascript">dataSetRow["origine"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">cond</property>
+                    <expression name="expression" type="javascript">dataSetRow["cond"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">pa</property>
+                    <expression name="expression" type="javascript">dataSetRow["pa"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">pr</property>
+                    <expression name="expression" type="javascript">dataSetRow["pr"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">unite</property>
+                    <expression name="expression" type="javascript">dataSetRow["unite"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">colis</property>
+                    <expression name="expression" type="javascript">dataSetRow["colis"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">parcolis</property>
+                    <expression name="expression" type="javascript">dataSetRow["parcolis"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">qte</property>
+                    <expression name="expression" type="javascript">dataSetRow["qte"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">poids</property>
+                    <expression name="expression" type="javascript">dataSetRow["poids"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">montant</property>
+                    <expression name="expression" type="javascript">dataSetRow["montant"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">dluo</property>
+                    <expression name="expression" type="javascript">dataSetRow["dluo"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">zone</property>
+                    <expression name="expression" type="javascript">dataSetRow["zone"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+            </list-property>
+            <column id="115"><property name="width">6.98%</property></column>
+            <column id="116"><property name="width">15.5%</property></column>
+            <column id="117"><property name="width">5.43%</property></column>
+            <column id="118"><property name="width">6.98%</property></column>
+            <column id="119"><property name="width">4.65%</property></column>
+            <column id="120"><property name="width">7.75%</property></column>
+            <column id="121"><property name="width">4.65%</property></column>
+            <column id="122"><property name="width">4.65%</property></column>
+            <column id="123"><property name="width">4.65%</property></column>
+            <column id="124"><property name="width">4.26%</property></column>
+            <column id="125"><property name="width">5.04%</property></column>
+            <column id="126"><property name="width">5.43%</property></column>
+            <column id="127"><property name="width">4.65%</property></column>
+            <column id="128"><property name="width">6.59%</property></column>
+            <column id="129"><property name="width">5.81%</property></column>
+            <column id="130"><property name="width">6.98%</property></column>
+            <header>
+                <row id="196">
+                    <cell id="132">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderBottomColor">#BBBBBB</property>
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingBottom">1pt</property>
+                        <property name="paddingLeft">2pt</property>
+                        <property name="paddingRight">2pt</property>
+                        <property name="backgroundColor">#E8E8E8</property>
+                        <label id="131">
+                            <property name="fontWeight">bold</property>
+                            <text-property name="text">Produit</text-property>
+                        </label>
+                    </cell>
+                    <cell id="134">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderBottomColor">#BBBBBB</property>
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingBottom">1pt</property>
+                        <property name="paddingLeft">2pt</property>
+                        <property name="paddingRight">2pt</property>
+                        <property name="backgroundColor">#E8E8E8</property>
+                        <label id="133">
+                            <property name="fontWeight">bold</property>
+                            <text-property name="text">Désignation</text-property>
+                        </label>
+                    </cell>
+                    <cell id="136">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderBottomColor">#BBBBBB</property>
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingBottom">1pt</property>
+                        <property name="paddingLeft">2pt</property>
+                        <property name="paddingRight">2pt</property>
+                        <property name="backgroundColor">#E8E8E8</property>
+                        <label id="135">
+                            <property name="fontWeight">bold</property>
+                            <text-property name="text">Frigo</text-property>
+                        </label>
+                    </cell>
+                    <cell id="138">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderBottomColor">#BBBBBB</property>
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingBottom">1pt</property>
+                        <property name="paddingLeft">2pt</property>
+                        <property name="paddingRight">2pt</property>
+                        <property name="backgroundColor">#E8E8E8</property>
+                        <label id="137">
+                            <property name="fontWeight">bold</property>
+                            <text-property name="text">N° Lot</text-property>
+                        </label>
+                    </cell>
+                    <cell id="140">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderBottomColor">#BBBBBB</property>
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingBottom">1pt</property>
+                        <property name="paddingLeft">2pt</property>
+                        <property name="paddingRight">2pt</property>
+                        <property name="backgroundColor">#E8E8E8</property>
+                        <label id="139">
+                            <property name="fontWeight">bold</property>
+                            <text-property name="text">Origine</text-property>
+                        </label>
+                    </cell>
+                    <cell id="142">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderBottomColor">#BBBBBB</property>
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingBottom">1pt</property>
+                        <property name="paddingLeft">2pt</property>
+                        <property name="paddingRight">2pt</property>
+                        <property name="backgroundColor">#E8E8E8</property>
+                        <label id="141">
+                            <property name="fontWeight">bold</property>
+                            <text-property name="text">Conditionn.</text-property>
+                        </label>
+                    </cell>
+                    <cell id="144">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderBottomColor">#BBBBBB</property>
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingBottom">1pt</property>
+                        <property name="paddingLeft">2pt</property>
+                        <property name="paddingRight">2pt</property>
+                        <property name="backgroundColor">#E8E8E8</property>
+                        <label id="143">
+                            <property name="fontWeight">bold</property>
+                            <property name="textAlign">right</property>
+                            <text-property name="text">Prix Achat</text-property>
+                        </label>
+                    </cell>
+                    <cell id="146">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderBottomColor">#BBBBBB</property>
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingBottom">1pt</property>
+                        <property name="paddingLeft">2pt</property>
+                        <property name="paddingRight">2pt</property>
+                        <property name="backgroundColor">#E8E8E8</property>
+                        <label id="145">
+                            <property name="fontWeight">bold</property>
+                            <property name="textAlign">right</property>
+                            <text-property name="text">Prix Revient</text-property>
+                        </label>
+                    </cell>
+                    <cell id="148">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderBottomColor">#BBBBBB</property>
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingBottom">1pt</property>
+                        <property name="paddingLeft">2pt</property>
+                        <property name="paddingRight">2pt</property>
+                        <property name="backgroundColor">#E8E8E8</property>
+                        <label id="147">
+                            <property name="fontWeight">bold</property>
+                            <text-property name="text">Unité</text-property>
+                        </label>
+                    </cell>
+                    <cell id="150">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderBottomColor">#BBBBBB</property>
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingBottom">1pt</property>
+                        <property name="paddingLeft">2pt</property>
+                        <property name="paddingRight">2pt</property>
+                        <property name="backgroundColor">#E8E8E8</property>
+                        <label id="149">
+                            <property name="fontWeight">bold</property>
+                            <property name="textAlign">right</property>
+                            <text-property name="text">Nb Colis</text-property>
+                        </label>
+                    </cell>
+                    <cell id="152">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderBottomColor">#BBBBBB</property>
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingBottom">1pt</property>
+                        <property name="paddingLeft">2pt</property>
+                        <property name="paddingRight">2pt</property>
+                        <property name="backgroundColor">#E8E8E8</property>
+                        <label id="151">
+                            <property name="fontWeight">bold</property>
+                            <property name="textAlign">right</property>
+                            <text-property name="text">Nb unt ou Poids /Colis</text-property>
+                        </label>
+                    </cell>
+                    <cell id="154">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderBottomColor">#BBBBBB</property>
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingBottom">1pt</property>
+                        <property name="paddingLeft">2pt</property>
+                        <property name="paddingRight">2pt</property>
+                        <property name="backgroundColor">#E8E8E8</property>
+                        <label id="153">
+                            <property name="fontWeight">bold</property>
+                            <property name="textAlign">right</property>
+                            <text-property name="text">Nb unités ou poids</text-property>
+                        </label>
+                    </cell>
+                    <cell id="156">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderBottomColor">#BBBBBB</property>
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingBottom">1pt</property>
+                        <property name="paddingLeft">2pt</property>
+                        <property name="paddingRight">2pt</property>
+                        <property name="backgroundColor">#E8E8E8</property>
+                        <label id="155">
+                            <property name="fontWeight">bold</property>
+                            <property name="textAlign">right</property>
+                            <text-property name="text">Poids Kg</text-property>
+                        </label>
+                    </cell>
+                    <cell id="158">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderBottomColor">#BBBBBB</property>
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingBottom">1pt</property>
+                        <property name="paddingLeft">2pt</property>
+                        <property name="paddingRight">2pt</property>
+                        <property name="backgroundColor">#E8E8E8</property>
+                        <label id="157">
+                            <property name="fontWeight">bold</property>
+                            <property name="textAlign">right</property>
+                            <text-property name="text">Montant ht</text-property>
+                        </label>
+                    </cell>
+                    <cell id="160">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderBottomColor">#BBBBBB</property>
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingBottom">1pt</property>
+                        <property name="paddingLeft">2pt</property>
+                        <property name="paddingRight">2pt</property>
+                        <property name="backgroundColor">#E8E8E8</property>
+                        <label id="159">
+                            <property name="fontWeight">bold</property>
+                            <text-property name="text">D.L.C. / D.L.U.O</text-property>
+                        </label>
+                    </cell>
+                    <cell id="162">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderBottomColor">#BBBBBB</property>
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingBottom">1pt</property>
+                        <property name="paddingLeft">2pt</property>
+                        <property name="paddingRight">2pt</property>
+                        <property name="backgroundColor">#E8E8E8</property>
+                        <label id="161">
+                            <property name="fontWeight">bold</property>
+                            <text-property name="text">Zone pêche</text-property>
+                        </label>
+                    </cell>
+                </row>
+            </header>
+            <detail>
+                <row id="197">
+                    <list-property name="highlightRules">
+                        <structure>
+                            <property name="operator">eq</property>
+                            <property name="fontWeight">bold</property>
+                            <property name="backgroundColor">#FFF5CC</property>
+                            <expression name="testExpr" type="javascript">row["is_total"]</expression>
+                            <simple-property-list name="value1">
+                                <value type="javascript">"1"</value>
+                            </simple-property-list>
+                        </structure>
+                    </list-property>
+                    <cell id="164">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderBottomColor">#BBBBBB</property>
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingBottom">1pt</property>
+                        <property name="paddingLeft">2pt</property>
+                        <property name="paddingRight">2pt</property>
+                        <data id="163">
+                            <property name="resultSetColumn">produit</property>
+                        </data>
+                    </cell>
+                    <cell id="166">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderBottomColor">#BBBBBB</property>
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingBottom">1pt</property>
+                        <property name="paddingLeft">2pt</property>
+                        <property name="paddingRight">2pt</property>
+                        <data id="165">
+                            <property name="resultSetColumn">designation</property>
+                        </data>
+                    </cell>
+                    <cell id="168">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderBottomColor">#BBBBBB</property>
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingBottom">1pt</property>
+                        <property name="paddingLeft">2pt</property>
+                        <property name="paddingRight">2pt</property>
+                        <data id="167">
+                            <property name="resultSetColumn">frigo</property>
+                        </data>
+                    </cell>
+                    <cell id="170">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderBottomColor">#BBBBBB</property>
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingBottom">1pt</property>
+                        <property name="paddingLeft">2pt</property>
+                        <property name="paddingRight">2pt</property>
+                        <data id="169">
+                            <property name="resultSetColumn">lot</property>
+                        </data>
+                    </cell>
+                    <cell id="172">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderBottomColor">#BBBBBB</property>
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingBottom">1pt</property>
+                        <property name="paddingLeft">2pt</property>
+                        <property name="paddingRight">2pt</property>
+                        <data id="171">
+                            <property name="resultSetColumn">origine</property>
+                        </data>
+                    </cell>
+                    <cell id="174">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderBottomColor">#BBBBBB</property>
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingBottom">1pt</property>
+                        <property name="paddingLeft">2pt</property>
+                        <property name="paddingRight">2pt</property>
+                        <data id="173">
+                            <property name="resultSetColumn">cond</property>
+                        </data>
+                    </cell>
+                    <cell id="176">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderBottomColor">#BBBBBB</property>
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingBottom">1pt</property>
+                        <property name="paddingLeft">2pt</property>
+                        <property name="paddingRight">2pt</property>
+                        <data id="175">
+                            <property name="textAlign">right</property>
+                            <property name="resultSetColumn">pa</property>
+                        </data>
+                    </cell>
+                    <cell id="178">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderBottomColor">#BBBBBB</property>
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingBottom">1pt</property>
+                        <property name="paddingLeft">2pt</property>
+                        <property name="paddingRight">2pt</property>
+                        <data id="177">
+                            <property name="textAlign">right</property>
+                            <property name="resultSetColumn">pr</property>
+                        </data>
+                    </cell>
+                    <cell id="180">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderBottomColor">#BBBBBB</property>
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingBottom">1pt</property>
+                        <property name="paddingLeft">2pt</property>
+                        <property name="paddingRight">2pt</property>
+                        <data id="179">
+                            <property name="resultSetColumn">unite</property>
+                        </data>
+                    </cell>
+                    <cell id="182">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderBottomColor">#BBBBBB</property>
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingBottom">1pt</property>
+                        <property name="paddingLeft">2pt</property>
+                        <property name="paddingRight">2pt</property>
+                        <data id="181">
+                            <property name="textAlign">right</property>
+                            <property name="resultSetColumn">colis</property>
+                        </data>
+                    </cell>
+                    <cell id="184">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderBottomColor">#BBBBBB</property>
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingBottom">1pt</property>
+                        <property name="paddingLeft">2pt</property>
+                        <property name="paddingRight">2pt</property>
+                        <data id="183">
+                            <property name="textAlign">right</property>
+                            <property name="resultSetColumn">parcolis</property>
+                        </data>
+                    </cell>
+                    <cell id="186">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderBottomColor">#BBBBBB</property>
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingBottom">1pt</property>
+                        <property name="paddingLeft">2pt</property>
+                        <property name="paddingRight">2pt</property>
+                        <data id="185">
+                            <property name="textAlign">right</property>
+                            <property name="resultSetColumn">qte</property>
+                        </data>
+                    </cell>
+                    <cell id="188">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderBottomColor">#BBBBBB</property>
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingBottom">1pt</property>
+                        <property name="paddingLeft">2pt</property>
+                        <property name="paddingRight">2pt</property>
+                        <data id="187">
+                            <property name="textAlign">right</property>
+                            <property name="resultSetColumn">poids</property>
+                        </data>
+                    </cell>
+                    <cell id="190">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderBottomColor">#BBBBBB</property>
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingBottom">1pt</property>
+                        <property name="paddingLeft">2pt</property>
+                        <property name="paddingRight">2pt</property>
+                        <data id="189">
+                            <property name="textAlign">right</property>
+                            <property name="resultSetColumn">montant</property>
+                        </data>
+                    </cell>
+                    <cell id="192">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderBottomColor">#BBBBBB</property>
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingBottom">1pt</property>
+                        <property name="paddingLeft">2pt</property>
+                        <property name="paddingRight">2pt</property>
+                        <data id="191">
+                            <property name="resultSetColumn">dluo</property>
+                        </data>
+                    </cell>
+                    <cell id="194">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderBottomColor">#BBBBBB</property>
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingBottom">1pt</property>
+                        <property name="paddingLeft">2pt</property>
+                        <property name="paddingRight">2pt</property>
+                        <data id="193">
+                            <property name="resultSetColumn">zone</property>
+                        </data>
+                    </cell>
+                </row>
+            </detail>
+        </table>
+    </body>
+</report>
