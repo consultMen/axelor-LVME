@@ -61,9 +61,6 @@
 
     <panel name="actionPanel" colSpan="3" itemSpan="12">
       <!-- LVME : bouton « Editer » de GESCOM (impression de l'arrivage), visible aussi quand la fiche s'ouvre en fenêtre -->
-      <field name="archived" hidden="true"/>
-      <button name="lvmeArchiverBtn" title="Archiver" icon="archive" showIf="id &amp;&amp; !archived" prompt="Archiver cet arrivage ? Il n'apparaîtra plus que dans « Arrivages Archivés »." onClick="save,action-lvme-archiver-stockmove"/>
-      <button name="lvmeDesarchiverBtn" title="Désarchiver" icon="archive" showIf="id &amp;&amp; archived" onClick="action-lvme-desarchiver-stockmove"/>
       <button name="lvmeEditerBtn" title="Editer" icon="printer" showIf="id &amp;&amp; statusSelect != 1" onClick="save,action-lvme-arrivage-imprimer"/>
       <button name="planBtn" title="Plan" showIf="statusSelect == 1" icon="fa-calendar" onClick="action-group-stock-stockmove-plan-click"/>
       <button name="lvmeFlottantBtn" title="A Embarquer -> flottant" showIf="statusSelect == 2 &amp;&amp; nature != 'FLOTTANT'" css="btn-info" onClick="action-lvme-arrivage-record-flottant,save"/>

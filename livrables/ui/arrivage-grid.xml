@@ -1,4 +1,8 @@
 <grid name="lvme-arrivage-grid" title="Arrivages" model="com.axelor.apps.stock.db.StockMove" orderBy="-estimatedDate,-id" canNew="false">
+  <toolbar>
+    <button name="lvmeArchiverSelBtn" title="Archiver" icon="archive" prompt="Archiver les lignes cochées ? Elles n'apparaîtront plus dans la liste (case « Archivés » pour les retrouver)." onClick="action-lvme-archiver-selection"/>
+    <button name="lvmeDesarchiverSelBtn" title="Désarchiver" icon="arrow-counterclockwise" onClick="action-lvme-desarchiver-selection"/>
+  </toolbar>
   <!-- LVME : liste des arrivages (réceptions fournisseur), colonnes de l'écran « Arrivages » GESCOM -->
   <hilite color="success" if="nature == 'REEL'"/>
   <hilite color="warning" if="nature == 'FLOTTANT'"/>
@@ -22,4 +26,8 @@
   <field name="toStockLocation" title="Frigo" width="100"/>
   <field name="statusSelect" hidden="true"/>
   <field name="typeSelect" hidden="true"/>
+  <!-- LVME : archiver / désarchiver depuis la liste -->
+  <field name="archived" hidden="true"/>
+  <button name="lvmeArchiverBtn" title="Archiver" icon="archive" hideIf="archived" onClick="action-lvme-basculer-archivage"/>
+  <button name="lvmeDesarchiverBtn" title="Désarchiver" icon="arrow-counterclockwise" showIf="archived" onClick="action-lvme-basculer-archivage"/>
 </grid>

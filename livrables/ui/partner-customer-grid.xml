@@ -1,4 +1,8 @@
 <grid name="partner-customer-grid" title="Clients" model="com.axelor.apps.base.db.Partner" orderBy="name" edit-icon="true">
+  <toolbar>
+    <button name="lvmeArchiverSelBtn" title="Archiver" icon="archive" prompt="Archiver les lignes cochées ? Elles n'apparaîtront plus dans la liste (case « Archivés » pour les retrouver)." onClick="action-lvme-archiver-selection"/>
+    <button name="lvmeDesarchiverSelBtn" title="Désarchiver" icon="arrow-counterclockwise" onClick="action-lvme-desarchiver-selection"/>
+  </toolbar>
   <!-- LVME : colonnes de la liste « Clients » GESCOM -->
   <menubar>
     <menu name="partnerReportsMenu" title="Reports" showTitle="true" icon="fa-files-o">
@@ -23,4 +27,8 @@
   <field if="__config__.app.getApp('base')?.getEnableMultiCompany()" name="companySet" widget="TagSelect"/>
   <button if="__config__.app.isApp('crm')" if-module="axelor-crm" name="scheduleEventBtn" title="Schedule Event" icon="fa-group" onClick="action-partner-view-schedule-event"/>
   <button if="__config__.app.isApp('crm')" if-module="axelor-crm" name="sendByEmailBtn" title="Send Email" icon="fa-envelope" onClick="action-send-by-email-with-template"/>
+  <!-- LVME : archiver / désarchiver depuis la liste -->
+  <field name="archived" hidden="true"/>
+  <button name="lvmeArchiverBtn" title="Archiver" icon="archive" hideIf="archived" onClick="action-lvme-basculer-archivage"/>
+  <button name="lvmeDesarchiverBtn" title="Désarchiver" icon="arrow-counterclockwise" showIf="archived" onClick="action-lvme-basculer-archivage"/>
 </grid>

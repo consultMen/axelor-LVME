@@ -72,7 +72,9 @@ INSERT INTO meta_action (id, version, created_on, name, type, model, xml, home, 
       OR (:_crit = 3 AND EXISTS (SELECT 1 FROM Address a WHERE a = self.mainAddress AND LOWER(a.city.name) LIKE :_val))
       OR (:_crit = 4 AND EXISTS (SELECT 1 FROM Address a WHERE a = self.mainAddress AND a.zip LIKE :_val))
       OR (:_crit = 5 AND (self.fixedPhone LIKE :_val OR self.mobilePhone LIKE :_val))
-      OR (:_crit = 6 AND EXISTS (SELECT 1 FROM User u WHERE u = self.commercial AND LOWER(u.name) LIKE :_val)))</domain>
+      OR (:_crit = 6 AND EXISTS (SELECT 1 FROM User u WHERE u = self.commercial AND LOWER(u.name) LIKE :_val)))
+    AND ((:_archives = true AND self.archived = true) OR (:_archives = false AND (self.archived IS NULL OR self.archived = false)))</domain>
+  <context name="_archives" expr="eval: archives ? true : false"/>
   <context name="_crit" expr="eval: (critere ?: 1) as Integer"/>
   <context name="_val" expr="eval: valeur ? ''%'' + valeur.toString().trim().toLowerCase() + ''%'' : ''%''"/>
   <context name="_isCustomer" expr="true"/>
@@ -101,7 +103,9 @@ INSERT INTO meta_action (id, version, created_on, name, type, model, xml, home, 
     AND (:_val = ''%'' OR (:_crit = 1 AND LOWER(self.name) LIKE :_val) OR (:_crit = 2 AND LOWER(self.partnerSeq) LIKE :_val)
       OR (:_crit = 3 AND EXISTS (SELECT 1 FROM Address a WHERE a = self.mainAddress AND LOWER(a.city.name) LIKE :_val))
       OR (:_crit = 4 AND EXISTS (SELECT 1 FROM Address a WHERE a = self.mainAddress AND a.zip LIKE :_val))
-      OR (:_crit = 5 AND (self.fixedPhone LIKE :_val OR self.mobilePhone LIKE :_val)))</domain>
+      OR (:_crit = 5 AND (self.fixedPhone LIKE :_val OR self.mobilePhone LIKE :_val)))
+    AND ((:_archives = true AND self.archived = true) OR (:_archives = false AND (self.archived IS NULL OR self.archived = false)))</domain>
+  <context name="_archives" expr="eval: archives ? true : false"/>
   <context name="_crit" expr="eval: (critere ?: 1) as Integer"/>
   <context name="_val" expr="eval: valeur ? ''%'' + valeur.toString().trim().toLowerCase() + ''%'' : ''%''"/>
   <context name="_isSupplier" expr="true"/>
@@ -129,7 +133,9 @@ INSERT INTO meta_action (id, version, created_on, name, type, model, xml, home, 
   <domain>self.isModel = false AND self.sellable = true AND self.isShippingCostsProduct = false AND self.dtype = ''Product''
     AND (:_val = ''%'' OR (:_crit = 1 AND LOWER(self.code) LIKE :_val) OR (:_crit = 2 AND LOWER(self.name) LIKE :_val)
       OR (:_crit = 3 AND self.gencode LIKE :_val)
-      OR (:_crit = 4 AND EXISTS (SELECT 1 FROM Partner p WHERE p = self.defaultSupplierPartner AND LOWER(p.name) LIKE :_val)))</domain>
+      OR (:_crit = 4 AND EXISTS (SELECT 1 FROM Partner p WHERE p = self.defaultSupplierPartner AND LOWER(p.name) LIKE :_val)))
+    AND ((:_archives = true AND self.archived = true) OR (:_archives = false AND (self.archived IS NULL OR self.archived = false)))</domain>
+  <context name="_archives" expr="eval: archives ? true : false"/>
   <context name="_crit" expr="eval: (critere ?: 1) as Integer"/>
   <context name="_val" expr="eval: valeur ? ''%'' + valeur.toString().trim().toLowerCase() + ''%'' : ''%''"/>
   <context name="_fromSale" expr="eval: true"/>
@@ -157,7 +163,9 @@ INSERT INTO meta_action (id, version, created_on, name, type, model, xml, home, 
   <domain>self.isModel = false AND self.purchasable = true AND self.dtype = ''Product''
     AND (:_val = ''%'' OR (:_crit = 1 AND LOWER(self.code) LIKE :_val) OR (:_crit = 2 AND LOWER(self.name) LIKE :_val)
       OR (:_crit = 3 AND self.gencode LIKE :_val)
-      OR (:_crit = 4 AND EXISTS (SELECT 1 FROM Partner p WHERE p = self.defaultSupplierPartner AND LOWER(p.name) LIKE :_val)))</domain>
+      OR (:_crit = 4 AND EXISTS (SELECT 1 FROM Partner p WHERE p = self.defaultSupplierPartner AND LOWER(p.name) LIKE :_val)))
+    AND ((:_archives = true AND self.archived = true) OR (:_archives = false AND (self.archived IS NULL OR self.archived = false)))</domain>
+  <context name="_archives" expr="eval: archives ? true : false"/>
   <context name="_crit" expr="eval: (critere ?: 1) as Integer"/>
   <context name="_val" expr="eval: valeur ? ''%'' + valeur.toString().trim().toLowerCase() + ''%'' : ''%''"/>
   <context name="_fromPurchase" expr="eval: true"/>

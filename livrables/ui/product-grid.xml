@@ -3,6 +3,8 @@
   <toolbar>
     <button name="catalogBtn" title="Catalog" icon="fa-book" onClick="action-print-product-catalog"/>
     <button name="checkDuplicateBtn" title="Check Duplicate" onClick="action-general-check-duplicate-records"/>
+    <button name="lvmeArchiverSelBtn" title="Archiver" icon="archive" prompt="Archiver les lignes cochées ? Elles n'apparaîtront plus dans la liste (case « Archivés » pour les retrouver)." onClick="action-lvme-archiver-selection"/>
+    <button name="lvmeDesarchiverSelBtn" title="Désarchiver" icon="arrow-counterclockwise" onClick="action-lvme-desarchiver-selection"/>
   </toolbar>
   <field name="code" title="Référence" width="120" x-bind="{{code|unaccent|uppercase}}"/>
   <field name="name" title="Désignation article" width="300"/>
@@ -18,4 +20,8 @@
   <field name="productTypeSelect" hidden="true"/>
   <button name="sendByEmailBtn" title="Send Email" icon="fa-envelope" onClick="action-send-by-email-with-template"/>
   <button if="__config__.app.getApp('sale')?.getIsCartManagementEnabled()" name="addToCartBtn" title="Add to cart" icon="cart-plus-fill" onClick="action-product-method-add-to-cart"/>
+  <!-- LVME : archiver / désarchiver depuis la liste -->
+  <field name="archived" hidden="true"/>
+  <button name="lvmeArchiverBtn" title="Archiver" icon="archive" hideIf="archived" onClick="action-lvme-basculer-archivage"/>
+  <button name="lvmeDesarchiverBtn" title="Désarchiver" icon="arrow-counterclockwise" showIf="archived" onClick="action-lvme-basculer-archivage"/>
 </grid>

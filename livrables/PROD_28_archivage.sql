@@ -1,77 +1,42 @@
 -- =====================================================================
--- PROD étape 28 : archiver / désarchiver à la main (demande client)
---   - boutons « Archiver » / « Désarchiver » sur les fiches Arrivage, Article, Tiers (client, fournisseur,
---     transporteur : même fiche) et Numéro de suivi (lot). Une fiche archivée sort des listes et des choix,
---     rien n'est supprimé, on peut la désarchiver.
---   - recherche des Arrivages : « Arrivages Archivés » = les arrivages archivés à la main ; les autres options
---     n'affichent pas les archivés (relance de PROD_9 depuis sa source à jour).
--- Fiches Article / Tiers : boutons ajoutés en place dans les vues admin (priorité 30) existantes.
--- Fiche Numéro de suivi : vue admin (priorité 30) créée depuis la vue de module.
+-- PROD étape 28 : archiver / désarchiver depuis les listes (demande client)
+--   - listes Arrivages, Clients, Fournisseurs, Articles (ventes et achats) :
+--       * boutons « Archiver » / « Désarchiver » dans la barre de la liste : agissent sur toutes les lignes cochées
+--       * icône Archiver / Désarchiver sur chaque ligne
+--   - une fiche archivée sort de la liste et des choix ; rien n'est supprimé ; désarchivée, elle revient
+--   - pour retrouver les archivés : Arrivages > « Arrivages Archivés » ; Clients / Fournisseurs / Articles > case « Archivés »
+--   - méthode Java LvmeArchivageController (code à déployer avec ce script)
+-- Relance de PROD_9, PROD_11 et PROD_12 depuis leurs sources à jour (relançables).
 -- À lancer depuis la racine du dépôt, puis redémarrer Axelor. Relançable.
 -- =====================================================================
 BEGIN;
 
--- ---------- Actions (une paire par modèle) ----------
-DELETE FROM meta_action WHERE module IS NULL AND name LIKE 'action-lvme-archiver-%' OR (module IS NULL AND name LIKE 'action-lvme-desarchiver-%');
+-- ---------- Actions ----------
+DELETE FROM meta_action WHERE module IS NULL
+  AND (name LIKE 'action-lvme-archiver-%' OR name LIKE 'action-lvme-desarchiver-%' OR name = 'action-lvme-basculer-archivage');
 INSERT INTO meta_action (id, version, created_on, name, type, model, xml, home, is_custom)
-SELECT nextval('meta_action_seq'), 0, now(), a.name, a.type, a.model, a.xml, false, false
-FROM (
-  SELECT 'action-lvme-' || v.verbe || '-' || m.code || '-record' AS name, 'action-record' AS type, m.model,
-         '<action-record name="action-lvme-' || v.verbe || '-' || m.code || '-record" model="' || m.model || '">
-  <field name="archived" expr="eval: ' || v.valeur || '"/>
-</action-record>' AS xml
-  FROM (VALUES ('stockmove', 'com.axelor.apps.stock.db.StockMove'), ('product', 'com.axelor.apps.base.db.Product'),
-               ('partner', 'com.axelor.apps.base.db.Partner'), ('trackingnumber', 'com.axelor.apps.stock.db.TrackingNumber')) AS m(code, model),
-       (VALUES ('archiver', 'true'), ('desarchiver', 'false')) AS v(verbe, valeur)
-  UNION ALL
-  SELECT 'action-lvme-' || v.verbe || '-' || m.code, 'action-group', NULL,
-         '<action-group name="action-lvme-' || v.verbe || '-' || m.code || '">
-  <action name="action-lvme-' || v.verbe || '-' || m.code || '-record"/>
-  <action name="save"/>
-</action-group>'
-  FROM (VALUES ('stockmove'), ('product'), ('partner'), ('trackingnumber')) AS m(code),
-       (VALUES ('archiver'), ('desarchiver')) AS v(verbe)
-) a;
+SELECT nextval('meta_action_seq'), 0, now(), v.name, 'action-method', NULL,
+       '<action-method name="' || v.name || '">
+  <call class="com.axelor.apps.base.web.LvmeArchivageController" method="' || v.method || '"/>
+</action-method>', false, false
+FROM (VALUES ('action-lvme-archiver-selection', 'archiver'),
+             ('action-lvme-desarchiver-selection', 'desarchiver'),
+             ('action-lvme-basculer-archivage', 'basculerArchivage')) AS v(name, method);
 
--- ---------- Boutons sur les fiches Article, Tiers, Numéro de suivi ----------
-DO $$
-DECLARE r record; v_id bigint; v_xml text; a int; n int; snippet text;
-BEGIN
-  -- fiche Numéro de suivi : vue admin créée depuis la vue de module (une seule fois)
-  IF NOT EXISTS (SELECT 1 FROM meta_view WHERE name = 'tracking-number-form' AND module IS NULL) THEN
-    INSERT INTO meta_view (id, version, created_on, name, title, type, model, priority, xml, extension, computed)
-    SELECT nextval('meta_view_seq'), 0, now(), name, title, type, model, 30, xml, false, false
-    FROM meta_view WHERE name = 'tracking-number-form' AND module IS NOT NULL AND COALESCE(extension, false) = false
-    ORDER BY priority DESC, COALESCE(computed, false) DESC LIMIT 1;
-  END IF;
-
-  FOR r IN SELECT * FROM (VALUES ('product-form', 'product', 'cet article'),
-                                 ('partner-form', 'partner', 'ce tiers'),
-                                 ('tracking-number-form', 'trackingnumber', 'ce lot')) AS t(vue, code, libelle) LOOP
-    SELECT id, xml INTO v_id, v_xml FROM meta_view WHERE name = r.vue AND module IS NULL ORDER BY priority DESC LIMIT 1;
-    IF v_id IS NULL THEN RAISE EXCEPTION 'Vue admin % introuvable : arrêt, rien n''est modifié', r.vue; END IF;
-    IF position('lvmeArchiverBtn' IN v_xml) > 0 THEN
-      RAISE NOTICE '% : boutons déjà présents', r.vue;
-      CONTINUE;
-    END IF;
-    SELECT count(*) INTO n FROM regexp_matches(v_xml, '<panel name="mainPanel"', 'g');
-    IF n < 1 THEN RAISE EXCEPTION '% : panneau mainPanel non trouvé : arrêt', r.vue; END IF;
-    snippet := '<panel name="lvmeArchivePanel" showTitle="false" colSpan="12" showIf="id">
-    <field name="archived" hidden="true"/>
-    <button name="lvmeArchiverBtn" title="Archiver" icon="archive" colSpan="2" showIf="!archived" prompt="Archiver ' || r.libelle || ' ? Il n''apparaîtra plus dans les listes et les choix (rien n''est supprimé)." onClick="save,action-lvme-archiver-' || r.code || '"/>
-    <button name="lvmeDesarchiverBtn" title="Désarchiver" icon="archive" colSpan="2" showIf="archived" onClick="action-lvme-desarchiver-' || r.code || '"/>
-  </panel>
-  ';
-    a := position('<panel name="mainPanel"' IN v_xml);
-    v_xml := substr(v_xml, 1, a - 1) || snippet || substr(v_xml, a);
-    UPDATE meta_view SET xml = v_xml, updated_on = now(), version = COALESCE(version, 0) + 1 WHERE id = v_id;
-    RAISE NOTICE '% : boutons Archiver / Désarchiver ajoutés', r.vue;
-  END LOOP;
-END $$;
+-- ---------- Nettoyage d'une version précédente (boutons sur les fiches, retirés : l'archivage se fait depuis la liste) ----------
+UPDATE meta_view
+   SET xml = regexp_replace(xml, '<panel name="lvmeArchivePanel".*?</panel>\s*', '', 's'),
+       updated_on = now(), version = COALESCE(version, 0) + 1
+ WHERE module IS NULL AND name IN ('partner-form', 'product-form') AND position('lvmeArchivePanel' IN xml) > 0;
+DELETE FROM meta_view WHERE module IS NULL AND name = 'tracking-number-form' AND position('lvmeArchivePanel' IN xml) > 0;
 COMMIT;
 
--- ---------- Arrivages (fiche + recherche) ----------
+-- ---------- Écrans ----------
 \i livrables/PROD_9_arrivages.sql
+\i livrables/PROD_11_listes_tiers_articles.sql
+\i livrables/PROD_12_recherche_tiers_articles.sql
 
-SELECT name, position('lvmeArchiverBtn' IN xml) > 0 AS boutons FROM meta_view
-WHERE module IS NULL AND name IN ('lvme-arrivage-form', 'product-form', 'partner-form', 'tracking-number-form');
+SELECT name, position('lvmeArchiverSelBtn' IN xml) > 0 AS barre, position('lvmeArchiverBtn' IN xml) > 0 AS icone_ligne
+FROM meta_view
+WHERE module IS NULL AND name IN ('lvme-arrivage-grid', 'partner-customer-grid', 'partner-supplier-grid', 'product-grid', 'product-purchase-grid')
+ORDER BY name;
