@@ -7,10 +7,6 @@
   <hilite color="success" if="nature == 'REEL'"/>
   <hilite color="warning" if="nature == 'FLOTTANT'"/>
   <hilite color="warning" if="nature == 'EN_COURS_DE_PRODUCTION'"/>
-  <!-- LVME : archiver / désarchiver depuis la liste -->
-  <field name="archived" hidden="true"/>
-  <button name="lvmeArchiverBtn" title="Archiver" icon="archive" hideIf="archived" onClick="action-lvme-basculer-archivage"/>
-  <button name="lvmeDesarchiverBtn" title="Désarchiver" icon="arrow-counterclockwise" showIf="archived" onClick="action-lvme-basculer-archivage"/>
   <field name="partner" title="Fournisseur" width="200"/>
   <field name="stockMoveSeq" title="N° Arrivage" width="110"/>
   <field name="nature" title="Nature" width="110"/>

@@ -14,10 +14,6 @@
       <item name="mergeDuplicatedItem" title="Merge duplicated" action="action-validate-select-object-message,action-duplicate-object-wizard-open"/>
     </menu>
   </menubar>
-  <!-- LVME : archiver / désarchiver depuis la liste -->
-  <field name="archived" hidden="true"/>
-  <button name="lvmeArchiverBtn" title="Archiver" icon="archive" hideIf="archived" onClick="action-lvme-basculer-archivage"/>
-  <button name="lvmeDesarchiverBtn" title="Désarchiver" icon="arrow-counterclockwise" showIf="archived" onClick="action-lvme-basculer-archivage"/>
   <field name="partnerSeq" title="Référence" width="110"/>
   <field name="name" title="Nom" width="260"/>
   <field name="commercial" title="Commercial" width="130"/>

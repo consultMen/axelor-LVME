@@ -65,6 +65,8 @@ INSERT INTO meta_action (id, version, created_on, name, type, model, xml, home, 
 '<action-view name="action-lvme-arrivage-dashlet" title="Arrivages" model="com.axelor.apps.stock.db.StockMove">
   <view type="grid" name="lvme-arrivage-grid"/>
   <view type="form" name="lvme-arrivage-form"/>
+  <view-param name="showArchived" value="true"/>
+  <view-param name="dashlet.canSearch" value="true"/>
   <view-param name="popup" value="true"/>
   <view-param name="popup-save" value="true"/>
   <view-param name="popup.maximized" value="true"/>
