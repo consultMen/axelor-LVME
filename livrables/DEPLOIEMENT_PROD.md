@@ -1,3 +1,31 @@
+# Déploiement prod LVME — lot « Arrivages + archivage » du 05/10/2026 (PROD_26 à PROD_29)
+
+Déjà en prod : lot « Recette phase 1 » (PROD_17 à PROD_25, code jusqu'à c54de29).
+Code à déployer : tout `main` jusqu'au commit 957a2da.
+
+| Script | Contenu |
+|---|---|
+| PROD_26 | Arrivage / commande d'achat : Nature comme GESCOM (Flottant + À embarquer), champs Cours / Couvert / Flottant / Réel (archivage), équivalent en € ; relance PROD_8, PROD_9, PROD_10 |
+| PROD_27 | Impression de l'arrivage (bouton « Editer », rapport LvmeArrivage) ; filtre « N° Arrivage » ; relance PROD_9 |
+| PROD_28 | Archiver / désarchiver depuis les listes Arrivages, Clients, Fournisseurs, Articles ; relance PROD_9, PROD_11, PROD_12 |
+| PROD_29 | Archiver / désarchiver les lots depuis État des stocks par lots (option « Lots archivés ») — **vue SQL** |
+
+1. **PC** : `git push origin main`
+2. **Serveur — sauvegarde** : `pg_dump -U axelor -Fc axelor > ~/sauvegarde_axelor_$(date +%F_%H%M).dump`
+3. `cd ~/src && rm -rf axelor-LVME axelor-version_app axelor-version_app.war && git clone https://github.com/consultMen/axelor-LVME.git && cd axelor-LVME && git log --oneline -1` (doit afficher 957a2da ou plus récent)
+4. **Scripts, dans cet ordre, AVANT la bascule Tomcat** :
+   ```
+   for f in PROD_26_arrivage_nature_cours PROD_27_impression_arrivage PROD_28_archivage PROD_29_archivage_lots; do echo "== $f"; psql -U axelor axelor -v ON_ERROR_STOP=1 -f livrables/$f.sql || break; done
+   ```
+5. **Build + bascule** : `cd open-suite-webapp && chmod +x gradlew && ./gradlew war -x test`, dézipper dans `~/src/axelor-version_app`,
+   **recopier `~/axelor-config.prod.properties`** dans `WEB-INF/classes/axelor-config.properties`, `sudo systemctl stop axelor-tomcat`,
+   remplacer `ROOT` (garder l'ancien de côté), `sudo systemctl start axelor-tomcat && sudo systemctl restart nginx`.
+6. **Vérifications** : Achats > Arrivages (Nature, À embarquer, N° Arrivage, Arrivages Archivés, Archiver / Désarchiver, fiche : Cours, bouton Editer → PDF) ;
+   commande d'achat (Cours, équivalent € sur une commande USD) ; Ventes > Clients / Articles (case Archivés, Archiver / Désarchiver) ;
+   Stocks > État des stocks par lots (option Lots archivés, Archiver / Désarchiver). Liste aux mauvaises colonnes : engrenage > « Réinitialiser ».
+
+---
+
 # Déploiement prod LVME — lot « Recette phase 1 » du 01/10/2026 (PROD_17 à PROD_25)
 
 Vérifié en prod le 01/10 (lecture seule) : PROD_17 à PROD_25 **pas encore passés**. Ce lot remplace le lot
