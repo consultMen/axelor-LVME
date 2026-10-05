@@ -74,9 +74,10 @@ INSERT INTO meta_action (id, version, created_on, name, type, model, xml, home, 
     AND (:_dateFiltre = false OR self.createdOn BETWEEN :_dateDu AND :_dateAu)
     AND (:_arrFiltre = false OR (self.realDate BETWEEN :_arrDu AND :_arrAu)
          OR (self.realDate IS NULL AND self.estimatedDate BETWEEN :_arrDu AND :_arrAu))
-    AND ((:_nature = 1 AND self.nature IN (0, 1, 2, 3)) OR (:_nature = 2 AND self.nature = 3)
-         OR (:_nature = 3 AND self.nature IN (1, 2))
-         OR (:_nature = 4 AND self.nature = 4))</domain>
+    AND ((:_nature = 4 AND self.archived = true)
+      OR (:_nature != 4 AND (self.archived IS NULL OR self.archived = false)
+        AND ((:_nature = 1 AND self.nature IN (0, 1, 2, 3)) OR (:_nature = 2 AND self.nature = 3)
+          OR (:_nature = 3 AND self.nature IN (1, 2)))))</domain>
   <context name="_num" expr="eval: numeroArrivage ? ''%'' + numeroArrivage.toString().trim().toLowerCase() + ''%'' : ''%''"/>
   <context name="_fou" expr="eval: (fournisseur?.id ?: 0) as Long"/>
   <context name="_dateFiltre" expr="eval: dateDu != null || dateAu != null"/>
