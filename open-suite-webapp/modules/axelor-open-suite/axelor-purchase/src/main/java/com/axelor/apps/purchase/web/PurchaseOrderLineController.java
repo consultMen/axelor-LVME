@@ -305,6 +305,11 @@ public class PurchaseOrderLineController {
       response.setValue("qty", BigDecimal.ZERO);
       response.setValue("unitesTot", BigDecimal.ZERO);
       response.setValue("poidsTotalNet", BigDecimal.ZERO);
+      line.setPoidsParColis(BigDecimal.ZERO);
+      line.setNbUnitesParColis(BigDecimal.ZERO);
+      line.setQty(BigDecimal.ZERO);
+      line.setUnitesTot(BigDecimal.ZERO);
+      computeAmounts(request, response, line);
       return;
     }
     BigDecimal poidsParColis =
@@ -324,6 +329,33 @@ public class PurchaseOrderLineController {
     response.setValue("qty", poidsTotalBrut);
     response.setValue("unitesTot", unitesTot);
     response.setValue("poidsTotalNet", poidsTotalNet);
+
+    // LVME : colis / poids viennent d'être recalculés, le montant HT doit suivre
+    // (sinon il reste à 0 tant qu'on ne retouche pas le prix d'achat)
+    line.setPoidsParColis(poidsParColis);
+    line.setNbUnitesParColis(nbUnitesParColis);
+    line.setCoefPoidsNet(coefPoidsNet);
+    line.setPoidsParColisNet(poidsParColisNet);
+    line.setQty(poidsTotalBrut);
+    line.setUnitesTot(unitesTot);
+    line.setPoidsTotalNet(poidsTotalNet);
+    computeAmounts(request, response, line);
+  }
+
+  protected void computeAmounts(
+      ActionRequest request, ActionResponse response, PurchaseOrderLine line) {
+    try {
+      PurchaseOrder purchaseOrder = this.getPurchaseOrder(request.getContext());
+      if (purchaseOrder == null || line.getPrice() == null) {
+        return;
+      }
+      Map<String, BigDecimal> amounts =
+          Beans.get(PurchaseOrderLineService.class).compute(line, purchaseOrder);
+      // une valeur à la fois : setValues remplacerait les poids déjà renvoyés
+      amounts.forEach(response::setValue);
+    } catch (Exception e) {
+      TraceBackService.trace(response, e);
+    }
   }
 
   public PurchaseOrder getPurchaseOrder(Context context) {
