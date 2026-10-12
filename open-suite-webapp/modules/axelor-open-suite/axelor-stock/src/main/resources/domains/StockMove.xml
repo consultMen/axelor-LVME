@@ -117,10 +117,10 @@
     <decimal name="poidsTotal" title="Poids Total" precision="20" scale="3" readonly="true"
       help="Somme des poids nets des lignes (kg), calculée à l'enregistrement"/>
     <!-- LVME : taux de change de l'écran GESCOM, pour archivage seulement (n'entre dans aucun calcul) -->
-    <decimal name="lvmeCours" title="Cours" precision="20" scale="4"/>
-    <decimal name="lvmeCouvert" title="Couvert" precision="20" scale="4"/>
-    <decimal name="lvmeFlottant" title="Flottant" precision="20" scale="4"/>
-    <decimal name="lvmeReel" title="Réel" precision="20" scale="4"/>
+    <decimal name="lvmeCours" title="Cours" precision="20" scale="4" nullable="true"/>
+    <decimal name="lvmeCouvert" title="Couvert" precision="20" scale="4" nullable="true"/>
+    <decimal name="lvmeFlottant" title="Flottant" precision="20" scale="4" nullable="true"/>
+    <decimal name="lvmeReel" title="Réel" precision="20" scale="4" nullable="true"/>
     <boolean name="lvmeAEmbarquer" title="À embarquer" formula="true">
       <![CDATA[
       nature = 1
