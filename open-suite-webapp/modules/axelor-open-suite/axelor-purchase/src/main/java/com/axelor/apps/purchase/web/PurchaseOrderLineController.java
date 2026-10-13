@@ -52,6 +52,7 @@ import com.google.inject.Singleton;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -562,8 +563,8 @@ public class PurchaseOrderLineController {
 
   /**
    * LVME : ligne saisie mais pas encore enregistrée au moment du clic. Le bouton enregistre d'abord
-   * la commande ; on retrouve alors la ligne dans la commande enregistrée (même n° d'ordre, même
-   * article, même libellé ; la plus récente si plusieurs correspondent).
+   * la commande ; on retrouve alors la ligne dans la commande enregistrée (même article, même
+   * libellé, même n° d'ordre s'il est connu ; la plus récente si plusieurs correspondent).
    */
   protected PurchaseOrderLine findSavedLine(Context context, PurchaseOrderLine line) {
     Context parent = context.getParent();
@@ -577,11 +578,23 @@ public class PurchaseOrderLineController {
       return null;
     }
     Long productId = line.getProduct() != null ? line.getProduct().getId() : null;
-    return purchaseOrder.getPurchaseOrderLineList().stream()
-        .filter(l -> Objects.equals(l.getSequence(), line.getSequence()))
-        .filter(l -> Objects.equals(l.getProduct() != null ? l.getProduct().getId() : null, productId))
-        .filter(l -> Objects.equals(l.getProductName(), line.getProductName()))
-        .max(Comparator.comparing(PurchaseOrderLine::getId))
-        .orElse(null);
+    List<PurchaseOrderLine> candidates =
+        purchaseOrder.getPurchaseOrderLineList().stream()
+            .filter(
+                l -> Objects.equals(l.getProduct() != null ? l.getProduct().getId() : null, productId))
+            .filter(l -> Objects.equals(l.getProductName(), line.getProductName()))
+            .collect(Collectors.toList());
+    // n° d'ordre utilisé seulement s'il est déjà attribué à l'écran (les lignes de vente ne sont
+    // numérotées qu'à l'enregistrement)
+    if (line.getSequence() != null && line.getSequence() > 0) {
+      List<PurchaseOrderLine> sameSequence =
+          candidates.stream()
+              .filter(l -> Objects.equals(l.getSequence(), line.getSequence()))
+              .collect(Collectors.toList());
+      if (!sameSequence.isEmpty()) {
+        candidates = sameSequence;
+      }
+    }
+    return candidates.stream().max(Comparator.comparing(PurchaseOrderLine::getId)).orElse(null);
   }
 }
