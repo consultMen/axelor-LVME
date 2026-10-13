@@ -198,6 +198,17 @@ public class StockMoveLineServiceSupplychainImpl extends StockMoveLineServiceImp
       stockMoveLine.setPurchaseOrderLine(purchaseOrderLine);
       if (purchaseOrderLine != null) {
         copyCustomFieldsFromPurchase(stockMoveLine, purchaseOrderLine);
+
+        // LVME : lot choisi sur la ligne de commande -> même lot sur la ligne d'arrivage
+        // (ni génération ni découpage automatique de la ligne en plusieurs lots)
+        TrackingNumber orderLot = purchaseOrderLine.getTrackingNumber();
+        if (orderLot != null) {
+          stockMoveLine.setTrackingNumber(orderLot);
+          if (orderLot.getOriginStockMoveLine() == null) {
+            fillOriginTrackingNumber(stockMoveLine);
+          }
+          return stockMoveLine;
+        }
       }
 
       TrackingNumberConfiguration trackingNumberConfiguration =

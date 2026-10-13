@@ -36,6 +36,10 @@
     <many-to-one name="stockLocation" ref="com.axelor.apps.stock.db.StockLocation"
       title="Stock location"/>
 
+    <!-- LVME : lot choisi dès la commande, repris tel quel sur la ligne d'arrivage -->
+    <many-to-one name="trackingNumber" ref="com.axelor.apps.stock.db.TrackingNumber"
+      title="N° Lot"/>
+
     <decimal name="qtyAllocatedToSales" readonly="true" precision="20" scale="4"
       title="Qté allouée aux ventes" default="0"/>
     <decimal name="qtyAvailableToPromise" readonly="true" precision="20" scale="4"
