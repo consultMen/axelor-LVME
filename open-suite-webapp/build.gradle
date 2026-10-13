@@ -167,6 +167,28 @@ task checkXmlImportsAttributes(type: CheckXmlImportsAttributes) {
 }
 
 task checkXml(dependsOn: ['checkXmlDomainsAttributes','checkXmlViewsAttributes', 'checkXmlImportsAttributes'])
+
+// LVME : poignée pour réorganiser les lignes (listes de lignes des commandes…) placée en PREMIÈRE
+// colonne au lieu de la dernière (demande client). Axelor 7.4 la place toujours en fin de ligne,
+// sans option : on retouche l'interface d'Axelor juste après sa copie dans build/webapp.
+// Si le code d'Axelor change (mise à jour), rien n'est modifié et un avertissement s'affiche.
+tasks.named('copyWebapp') {
+  doLast {
+    def pattern = '(&&!([\\w$]+)\\.find\\(([\\w$]+)=>\\3\\.name==="__reorder__"\\)&&\\2)\\.push\\('
+    def patched = 0
+    fileTree("$buildDir/webapp/assets") { include 'index-*.js' }.each { f ->
+      def text = f.getText('UTF-8')
+      def updated = text.replaceAll(pattern) { all, head, list, item -> "${head}.unshift(" }
+      if (updated != text) {
+        f.write(updated, 'UTF-8')
+        patched++
+      }
+    }
+    if (patched == 0) {
+      logger.warn('LVME : poignée de réorganisation non déplacée (code Axelor introuvable ou déjà modifié)')
+    }
+  }
+}
 war {
   archiveBaseName.set("axelor-erp")
   archiveVersion.set("8.2.3") // ou autre version
