@@ -6,7 +6,7 @@
   <entity name="SaleOrderLine">
     <many-to-one name="conditionnement"
       ref="com.axelor.apps.purchase.db.Conditionnement" title="Conditionnement"/>
-    <decimal name="nbColis" title="Nb colis" precision="20" scale="3" default="0"/>
+    <decimal name="nbColis" title="Nb colis" precision="20" scale="3" nullable="true"/>
     <decimal name="poidsParColis" title="Poids/colis (Kg)" precision="20" scale="3"
       default="0"/>
     <decimal name="coefPoidsNet" title="Coefficient poids net" precision="10" scale="4"
@@ -16,6 +16,6 @@
     <decimal name="nbUnitesParColis" title="Nb unités/colis" precision="20" scale="3"
       default="0"/>
     <decimal name="qtySachetPreleve" title="Qté sachet prélevé (Kg)" precision="20"
-      scale="3" default="0"/>
+      scale="3" nullable="true"/>
   </entity>
 </domain-models>

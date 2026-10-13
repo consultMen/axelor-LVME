@@ -61,7 +61,7 @@
 
     <many-to-one name="conditionnement"
       ref="com.axelor.apps.purchase.db.Conditionnement" title="Conditionnement"/>
-    <decimal name="nbColis" title="Nb colis" precision="20" scale="3" default="0"/>
+    <decimal name="nbColis" title="Nb colis" precision="20" scale="3" nullable="true"/>
     <decimal name="poidsParColis" title="Poids/colis (Kg)" precision="20" scale="3"
       default="0"/>
     <decimal name="coefPoidsNet" title="Coefficient poids net" precision="10" scale="4"
@@ -74,8 +74,8 @@
     <!-- Frais et prix de revient -->
     <decimal name="fraisApprocheKg" title="Frais d'approche au kg" precision="20" scale="10"
       default="0"/>
-    <decimal name="prKg" title="PR/Kg" precision="20" scale="10" default="0"/>
-    <decimal name="paDevise" title="PA devise" precision="20" scale="10" default="0"/>
+    <decimal name="prKg" title="PR/Kg" precision="20" scale="10" nullable="true"/>
+    <decimal name="paDevise" title="PA devise" precision="20" scale="10" nullable="true"/>
     <decimal name="prixRevientReel" title="PR réel (€/kg)" precision="20" scale="10"
       default="0" help="PR + frais congélation appliqués"/>
     <decimal name="montantReel" title="Montant réel (€)" precision="20" scale="4"
@@ -92,8 +92,8 @@
     <date name="dluo" title="DLUO"/>
     <date name="dateCongelation" title="Date de congélation"/>
     <integer name="durabilite" title="Durabilité (jours)" default="0"/>
-    <integer name="nbColisParCouche" title="Nb colis/couche" default="0"/>
-    <integer name="nbColisParPalette" title="Nb colis/palette" default="0"/>
+    <integer name="nbColisParCouche" title="Nb colis/couche" nullable="true"/>
+    <integer name="nbColisParPalette" title="Nb colis/palette" nullable="true"/>
     <decimal name="discountAmount" title="Discount amount" precision="30" scale="20"/>
     <integer name="discountTypeSelect" title="Discount type"
       selection="base.price.list.line.amount.type.select" default="0"/>
