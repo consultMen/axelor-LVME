@@ -12,6 +12,7 @@ import com.axelor.apps.purchase.db.PurchaseOrder;
 import com.axelor.apps.purchase.db.PurchaseOrderLine;
 import com.axelor.apps.stock.db.TrackingNumber;
 import com.axelor.apps.stock.db.TrackingNumberConfiguration;
+import com.axelor.apps.stock.db.repo.TrackingNumberRepository;
 import com.axelor.apps.stock.service.TrackingNumberCreateService;
 import com.axelor.db.JPA;
 import com.axelor.inject.Beans;
@@ -90,6 +91,40 @@ public class LvmeLotCommandeAchatController {
           Beans.get(TrackingNumberCreateService.class)
               .getTrackingNumber(product, company, date, origin, supplier);
       response.setValue("trackingNumber", newLot);
+    } catch (Exception e) {
+      TraceBackService.trace(response, e);
+    }
+  }
+
+  /**
+   * LVME : lot créé depuis la ligne (saisie d'un nouveau numéro + « Créer ») : la création rapide
+   * ne renseigne que le numéro ; le lot est rattaché ici au produit de la ligne.
+   */
+  public void rattacherLot(ActionRequest request, ActionResponse response) {
+    try {
+      PurchaseOrderLine line = request.getContext().asType(PurchaseOrderLine.class);
+      if (line.getTrackingNumber() == null
+          || line.getTrackingNumber().getId() == null
+          || line.getProduct() == null) {
+        return;
+      }
+      Long lotId = line.getTrackingNumber().getId();
+      Long productId = line.getProduct().getId();
+
+      // contexte de l'écran écarté : seul le rattachement du lot est enregistré
+      JPA.em().clear();
+      TrackingNumberRepository trackingNumberRepository = Beans.get(TrackingNumberRepository.class);
+      TrackingNumber lot = trackingNumberRepository.find(lotId);
+      if (lot == null || lot.getProduct() != null) {
+        return;
+      }
+      Product product = Beans.get(ProductRepository.class).find(productId);
+      JPA.runInTransaction(
+          () -> {
+            lot.setProduct(product);
+            trackingNumberRepository.save(lot);
+          });
+      response.setValue("trackingNumber", lot);
     } catch (Exception e) {
       TraceBackService.trace(response, e);
     }
