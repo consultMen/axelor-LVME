@@ -121,6 +121,9 @@ public class PurchaseOrderServiceSupplychainImpl extends PurchaseOrderServiceImp
       return total;
     }
 
+    // LVME : simple lecture, sans enregistrement automatique (autoFlush). Sinon la requête
+    // enregistrait la commande reconstituée depuis l'écran, incomplète (fournisseur / société /
+    // devise vides) : « Validation failed for classes PurchaseOrder » à la fermeture d'une ligne.
     List<Invoice> advancePaymentInvoiceList =
         Beans.get(InvoiceRepository.class)
             .all()
@@ -129,6 +132,7 @@ public class PurchaseOrderServiceSupplychainImpl extends PurchaseOrderServiceImp
             .bind("purchaseOrderId", purchaseOrder.getId())
             .bind("operationSubTypeSelect", InvoiceRepository.OPERATION_SUB_TYPE_ADVANCE)
             .bind("operationTypeSelect", InvoiceRepository.OPERATION_TYPE_SUPPLIER_PURCHASE)
+            .autoFlush(false)
             .fetch();
     if (advancePaymentInvoiceList == null || advancePaymentInvoiceList.isEmpty()) {
       return total;

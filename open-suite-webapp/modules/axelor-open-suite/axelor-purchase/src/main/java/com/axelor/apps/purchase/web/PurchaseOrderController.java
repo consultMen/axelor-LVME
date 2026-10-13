@@ -47,6 +47,7 @@ import com.axelor.apps.purchase.service.print.PurchaseOrderPrintService;
 import com.axelor.apps.purchase.service.split.PurchaseOrderSplitService;
 import com.axelor.common.ObjectUtils;
 import com.axelor.i18n.I18n;
+import com.axelor.db.JPA;
 import com.axelor.inject.Beans;
 import com.axelor.meta.schema.actions.ActionView;
 import com.axelor.rpc.ActionRequest;
@@ -64,6 +65,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import javax.annotation.Nullable;
+import javax.persistence.EntityTransaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -93,13 +95,30 @@ public class PurchaseOrderController {
     PurchaseOrder purchaseOrder = request.getContext().asType(PurchaseOrder.class);
 
     if (purchaseOrder != null) {
+      // LVME : recalcul pour l'écran uniquement, rien ne doit être enregistré. Les lignes déjà
+      // en base pointent vers la commande reconstituée depuis l'écran (incomplète) : à la fin de
+      // la transaction, Hibernate tentait de l'enregistrer (« Validation failed for classes
+      // PurchaseOrder » / « Error while committing the transaction »). La transaction est donc
+      // toujours annulée ; les montants calculés restent renvoyés à l'écran.
+      EntityTransaction transaction = JPA.em().getTransaction();
+      boolean ownTransaction = !transaction.isActive();
       try {
+        if (ownTransaction) {
+          transaction.begin();
+        }
         purchaseOrder = Beans.get(PurchaseOrderService.class).computePurchaseOrder(purchaseOrder);
         response.setValues(purchaseOrder);
         response.setAttrs(
             Beans.get(PurchaseOrderAttrsService.class).onChangePurchaseOrderLine(purchaseOrder));
       } catch (Exception e) {
+        if (ownTransaction && transaction.isActive()) {
+          transaction.rollback();
+        }
         TraceBackService.trace(response, e);
+      } finally {
+        if (ownTransaction && transaction.isActive()) {
+          transaction.rollback();
+        }
       }
     }
   }
