@@ -1,3 +1,44 @@
+# Déploiement prod LVME — lot « Retours client scénario 1 » du 13/10/2026 (PROD_30 à PROD_36)
+
+Déjà en prod : lot « Arrivages + archivage » (PROD_26 à PROD_29, code e2a217c) et PROD_30 (nom complet des articles).
+Code à déployer : tout `main` jusqu'au commit 54c11d9.
+
+| Script | Contenu |
+|---|---|
+| PROD_30 | (déjà passé le 08/10, relançable) nom complet des articles `[référence] désignation` |
+| PROD_31 | Cours vides (0 -> vide), modes de livraison Bateau / Camion, colonne « Code Produit » |
+| PROD_32 | Dupliquer une ligne de commande fournisseur sans enregistrer à la main |
+| PROD_33 | Dupliquer une ligne de commande client (action au nom corrigé) |
+| PROD_34 | Icône « Dupliquer » en tête de ligne (achats et ventes) |
+| PROD_35 | Statuts / boutons commande fournisseur : Brouillon / A embarquer / Flottant / En Stock |
+| PROD_36 | N° Lot sur la ligne de commande fournisseur — **ajoute une colonne : AVANT de démarrer le nouveau code** |
+
+Code (sans script) : champs à saisir vides (nullable), montant HT recalculé sur Nb Colis / conditionnement,
+plus d'erreur « Validation failed » à la fermeture d'une ligne, poignée de réorganisation en première colonne
+(retouche de l'interface dans `build.gradle`), lot repris sur l'arrivage.
+
+1. **PC** : `git push origin main`
+2. **Serveur — sauvegarde** : `pg_dump -U axelor -Fc axelor > ~/sauvegarde_axelor_$(date +%F_%H%M).dump`
+3. `cd ~/src && rm -rf axelor-LVME axelor-version_app axelor-version_app.war && git clone https://github.com/consultMen/axelor-LVME.git && cd axelor-LVME && git log --oneline -1` (doit afficher 54c11d9 ou plus récent)
+4. **Scripts, dans cet ordre, AVANT la bascule Tomcat** (l'ancienne appli peut tourner ; en cas de blocage le script abandonne après 10 s, relancer hors heures d'utilisation) :
+   ```
+   for f in PROD_31_cours_transport_code_produit PROD_32_dupliquer_ligne_achat PROD_33_dupliquer_ligne_vente PROD_34_bouton_dupliquer_a_gauche PROD_35_statuts_commande_fournisseur PROD_36_lot_commande_fournisseur; do echo "== $f"; PGOPTIONS='-c lock_timeout=10s' psql -U axelor axelor -v ON_ERROR_STOP=1 -f livrables/$f.sql || break; done
+   ```
+5. **Build + bascule** : `cd open-suite-webapp && chmod +x gradlew && ./gradlew war -x test`
+   (le build doit afficher la tâche copyWebapp sans l'avertissement « LVME : poignée de réorganisation non déplacée »),
+   dézipper dans `~/src/axelor-version_app`, **recopier `~/axelor-config.prod.properties`** dans `WEB-INF/classes/axelor-config.properties`,
+   `sudo systemctl stop axelor-tomcat`, remplacer `ROOT` (garder l'ancien de côté), `sudo systemctl start axelor-tomcat && sudo systemctl restart nginx`.
+6. **Utilisateurs** : **Ctrl + F5** dans le navigateur (nouvelle interface : poignée et icône Dupliquer à gauche).
+7. **Vérifications** (commande fournisseur de test, PAS sur un article à très nombreux mouvements) :
+   - nouvelle commande : Cours vides ; Type transport propose Bateau / Camion ; statuts Brouillon / A embarquer / Flottant / En Stock
+   - nouvelle ligne : Nb Colis, PA devise, PR, colis/couche, colis/palette vides ; « Code Produit » ; champ N° Lot
+   - Nb Colis puis prix : montant HT calculé tout de suite ; fermer / rouvrir une ligne : aucun message d'erreur
+   - Dupliquer une ligne sans enregistrer (achat et vente) : la copie apparaît au premier clic
+   - A embarquer -> Flottant : l'arrivage reprend le N° Lot de chaque ligne
+8. **Retour arrière** : `pg_restore` de la sauvegarde de l'étape 2 et redéploiement du `ROOT` gardé de côté.
+
+---
+
 # Déploiement prod LVME — lot « Arrivages + archivage » du 05/10/2026 (PROD_26 à PROD_29)
 
 Déjà en prod : lot « Recette phase 1 » (PROD_17 à PROD_25, code jusqu'à c54de29).
