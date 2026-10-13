@@ -57,6 +57,7 @@
       <field name="forwarderPartner" title="Transitaire" canEdit="false" domain="self.isContact = FALSE AND (self.isCarrier = TRUE OR self.isSupplier = TRUE) AND :company MEMBER OF self.companySet" form-view="partner-form" grid-view="partner-grid"/>
       <field name="carrierPartner" title="Transporteur" canEdit="false" domain="self.isCarrier = TRUE" form-view="partner-form" grid-view="partner-grid"/>
       <field name="toStockLocation" title="Frigo" colSpan="12" canEdit="false" onChange="action-stock-move-group-to-location-onchange" domain="self.company = :company AND self.typeSelect != 3 AND (self.usableOnPurchaseOrder = true AND :isReversion = false OR self.usableOnSaleOrder = true AND :isReversion = true)" form-view="stock-location-form" grid-view="stock-location-grid"/>
+      <button name="lvmeAppliquerFrigoBtn" title="Appliquer à toutes les lignes" colSpan="12" icon="arrow-down-square" showIf="id &amp;&amp; statusSelect != 3" prompt="Mettre le frigo de l'arrivage sur toutes les lignes ?" onClick="save,action-lvme-arrivage-appliquer-frigo"/>
     </panel>
 
     <panel name="actionPanel" colSpan="3" itemSpan="12">
