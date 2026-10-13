@@ -36,6 +36,7 @@ import com.axelor.apps.purchase.db.PurchaseOrder;
 import com.axelor.apps.purchase.db.PurchaseOrderLine;
 import com.axelor.apps.purchase.db.SupplierCatalog;
 import com.axelor.apps.purchase.db.repo.PurchaseOrderLineRepository;
+import com.axelor.apps.purchase.db.repo.PurchaseOrderRepository;
 import com.axelor.apps.purchase.service.PurchaseOrderLineDuplicateService;
 import com.axelor.apps.purchase.service.PurchaseOrderLineService;
 import com.axelor.apps.purchase.service.PurchaseOrderLineWarningService;
@@ -50,7 +51,9 @@ import com.google.common.base.Strings;
 import com.google.inject.Singleton;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Comparator;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.apache.commons.collections.CollectionUtils;
@@ -538,18 +541,47 @@ public class PurchaseOrderLineController {
 
   public void duplicateLine(ActionRequest request, ActionResponse response) {
     try {
-      PurchaseOrderLine purchaseOrderLine = request.getContext().asType(PurchaseOrderLine.class);
-      if (purchaseOrderLine.getId() == null) {
+      Context context = request.getContext();
+      PurchaseOrderLine purchaseOrderLine = context.asType(PurchaseOrderLine.class);
+      PurchaseOrderLine lineToCopy =
+          purchaseOrderLine.getId() != null
+              ? Beans.get(PurchaseOrderLineRepository.class).find(purchaseOrderLine.getId())
+              : findSavedLine(context, purchaseOrderLine);
+      if (lineToCopy == null) {
+        response.setInfo("Enregistrez la commande puis dupliquez la ligne.");
         return;
       }
-      Beans.get(PurchaseOrderLineDuplicateService.class)
-          .duplicateLine(
-              Beans.get(PurchaseOrderLineRepository.class).find(purchaseOrderLine.getId()));
+      Beans.get(PurchaseOrderLineDuplicateService.class).duplicateLine(lineToCopy);
       // LVME : recharge complète de l'onglet (le rechargement partiel depuis la ligne laissait
       // fournisseur / société / devise vides à l'écran, puis l'enregistrement échouait)
       response.setSignal("refresh-tab", true);
     } catch (Exception e) {
       TraceBackService.trace(response, e);
     }
+  }
+
+  /**
+   * LVME : ligne saisie mais pas encore enregistrée au moment du clic. Le bouton enregistre d'abord
+   * la commande ; on retrouve alors la ligne dans la commande enregistrée (même n° d'ordre, même
+   * article, même libellé ; la plus récente si plusieurs correspondent).
+   */
+  protected PurchaseOrderLine findSavedLine(Context context, PurchaseOrderLine line) {
+    Context parent = context.getParent();
+    if (parent == null || parent.get("id") == null) {
+      return null;
+    }
+    PurchaseOrder purchaseOrder =
+        Beans.get(PurchaseOrderRepository.class)
+            .find(Long.valueOf(parent.get("id").toString()));
+    if (purchaseOrder == null || purchaseOrder.getPurchaseOrderLineList() == null) {
+      return null;
+    }
+    Long productId = line.getProduct() != null ? line.getProduct().getId() : null;
+    return purchaseOrder.getPurchaseOrderLineList().stream()
+        .filter(l -> Objects.equals(l.getSequence(), line.getSequence()))
+        .filter(l -> Objects.equals(l.getProduct() != null ? l.getProduct().getId() : null, productId))
+        .filter(l -> Objects.equals(l.getProductName(), line.getProductName()))
+        .max(Comparator.comparing(PurchaseOrderLine::getId))
+        .orElse(null);
   }
 }
