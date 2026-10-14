@@ -5,9 +5,8 @@
 
   <module name="supplychain" package="com.axelor.apps.supplychain.db"/>
 
-  <!-- LVME : écran « Synthèse des Arrivages » de GESCOM (diapo 24), une ligne par ligne d'arrivage
-    réel. Modèle en lecture seule adossé à la vue SQL lvme_synthese_arrivage
-    (sql/lvme_synthese_arrivage.sql). -->
+  <!-- LVME : écran « Synthèse des Arrivages » de GESCOM (diapo 24), une ligne par ligne d'arrivage réel.
+    Modèle en lecture seule adossé à la vue SQL lvme_synthese_arrivage (sql/lvme_synthese_arrivage.sql). -->
   <entity name="SyntheseArrivage" table="lvme_synthese_arrivage" cacheable="false">
     <many-to-one name="stockMove" ref="com.axelor.apps.stock.db.StockMove"
       column="stock_move_id" title="Arrivage"/>
@@ -34,9 +33,12 @@
     <string name="lotNumber" column="lot_number" title="N° Lot"/>
     <date name="dlc" column="dlc" title="D. L. C."/>
     <string name="unite" column="unite" title="Unité"/>
-    <decimal name="nbColis" column="nb_colis" title="Nb Colis Entrées" precision="20" scale="3"/>
-    <decimal name="poidsColis" column="poids_colis" title="Poids Colis" precision="20" scale="3"/>
-    <decimal name="poidsTotal" column="poids_total" title="Poids Total" precision="20" scale="3"/>
+    <decimal name="nbColis" column="nb_colis" title="Nb Colis Entrées" precision="20"
+      scale="3"/>
+    <decimal name="poidsColis" column="poids_colis" title="Poids Colis" precision="20"
+      scale="3"/>
+    <decimal name="poidsTotal" column="poids_total" title="Poids Total" precision="20"
+      scale="3"/>
     <decimal name="pa" column="pa" title="pa" precision="20" scale="4"/>
   </entity>
 

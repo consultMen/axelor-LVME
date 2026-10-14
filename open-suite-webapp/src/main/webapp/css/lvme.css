@@ -1,0 +1,19 @@
+/*
+ * LVME : couleurs de l'écran « Arrivages » GESCOM.
+ * Appliquées aux panneaux qui portent css="lvme-gescom" (fiche Arrivage).
+ * Feuille ajoutée à la page Axelor par build.gradle (tâche copyWebapp).
+ */
+
+/* champs de saisie : fond jaune pâle, texte bleu, comme GESCOM */
+.lvme-gescom input:not([type="checkbox"]):not([type="radio"]),
+.lvme-gescom textarea {
+  background-color: #ffffc4 !important;
+  color: #1a1ad6 !important;
+}
+
+/* bloc Fournisseur encadré en bleu */
+.lvme-gescom-box {
+  border: 1.5px solid #3c3cd8 !important;
+  border-radius: 3px;
+  padding: 4px 8px;
+}

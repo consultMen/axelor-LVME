@@ -710,7 +710,10 @@ public class StockMoveController {
     return gridViewName;
   }
 
-  /** LVME : impression de l'arrivage telle que l'écran GESCOM (modèle d'impression « Arrivage LVME »). */
+  /**
+   * LVME : impression de l'arrivage telle que l'écran GESCOM (modèle d'impression « Arrivage LVME
+   * »).
+   */
   public void printArrivageLvme(ActionRequest request, ActionResponse response) {
     try {
       StockMove stockMove =
@@ -730,7 +733,8 @@ public class StockMoveController {
           PrintingTemplateHelper.getFileLink(
               Beans.get(PrintingTemplatePrintService.class)
                   .getPrintFile(printingTemplate, new PrintingGenFactoryContext(stockMove)));
-      // ouvert par-dessus la fiche (elle-même souvent en fenêtre) : sinon le PDF part dans un onglet caché
+      // ouvert par-dessus la fiche (elle-même souvent en fenêtre) : sinon le PDF part dans un
+      // onglet caché
       response.setView(
           ActionView.define("Arrivage " + stockMove.getStockMoveSeq())
               .add("html", fileLink)

@@ -266,6 +266,7 @@ import com.axelor.apps.supplychain.service.pricing.FreightCarrierApplyPricingSer
 import com.axelor.apps.supplychain.service.pricing.FreightCarrierPricingService;
 import com.axelor.apps.supplychain.service.pricing.FreightCarrierPricingServiceImpl;
 import com.axelor.apps.supplychain.service.pricing.PricingGroupSupplyChainServiceImpl;
+import com.axelor.apps.supplychain.service.saleorder.MarginComputeServiceLVMEImpl;
 import com.axelor.apps.supplychain.service.saleorder.SaleOrderAdvancePaymentFetchService;
 import com.axelor.apps.supplychain.service.saleorder.SaleOrderAdvancePaymentFetchServiceImpl;
 import com.axelor.apps.supplychain.service.saleorder.SaleOrderBlockingSupplychainService;
@@ -281,7 +282,6 @@ import com.axelor.apps.supplychain.service.saleorder.SaleOrderIntercoService;
 import com.axelor.apps.supplychain.service.saleorder.SaleOrderIntercoServiceImpl;
 import com.axelor.apps.supplychain.service.saleorder.SaleOrderInvoiceService;
 import com.axelor.apps.supplychain.service.saleorder.SaleOrderInvoiceServiceImpl;
-import com.axelor.apps.supplychain.service.saleorder.MarginComputeServiceLVMEImpl;
 import com.axelor.apps.supplychain.service.saleorder.SaleOrderMarginServiceLVMEImpl;
 import com.axelor.apps.supplychain.service.saleorder.SaleOrderPurchaseService;
 import com.axelor.apps.supplychain.service.saleorder.SaleOrderPurchaseServiceImpl;

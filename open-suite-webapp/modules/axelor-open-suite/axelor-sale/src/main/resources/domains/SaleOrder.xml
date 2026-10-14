@@ -259,8 +259,10 @@
       <field name="reservationConvertedOn"/>
       <message if="true" on="CREATE">Quotation/sale order created</message>
       <message if="isReservation == true" on="CREATE" tag="info">Commande de réservation créée</message>
-      <message if="reservationValidatedBy != null" fields="reservationValidatedBy" tag="info">Réservation validée par le gestionnaire</message>
-      <message if="reservationConvertedOn != null" fields="reservationConvertedOn" tag="success">Réservation convertie en commande ferme</message>
+      <message if="reservationValidatedBy != null" fields="reservationValidatedBy"
+        tag="info">Réservation validée par le gestionnaire</message>
+      <message if="reservationConvertedOn != null" fields="reservationConvertedOn"
+        tag="success">Réservation convertie en commande ferme</message>
       <message if="statusSelect == 1" tag="important">Draft quotation</message>
       <message if="statusSelect == 2" tag="info">Finalized quotation</message>
       <message if="statusSelect == 3" tag="success">Order confirmed</message>

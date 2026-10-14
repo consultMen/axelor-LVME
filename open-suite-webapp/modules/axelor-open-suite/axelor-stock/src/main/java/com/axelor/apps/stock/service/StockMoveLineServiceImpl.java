@@ -340,7 +340,10 @@ public class StockMoveLineServiceImpl implements StockMoveLineService {
           }
           break;
         case StockMoveLineService.TYPE_PURCHASES:
-          if (trackingNumberConfiguration.getIsPurchaseTrackingManaged()
+          // LVME : ligne qui a déjà son lot (choisi dès la commande) : une ligne = un lot,
+          // ni nouveau lot ni découpage de la ligne
+          if (stockMoveLine.getTrackingNumber() == null
+              && trackingNumberConfiguration.getIsPurchaseTrackingManaged()
               && trackingNumberConfiguration.getGeneratePurchaseAutoTrackingNbr()) {
             // Générer numéro de série si case cochée
             this.generateTrackingNumber(

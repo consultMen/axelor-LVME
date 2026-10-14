@@ -106,6 +106,8 @@ public class TrackingNumberCreateServiceImpl implements TrackingNumberCreateServ
 
     String seq = getSeq(product, company, trackingNumberConfiguration, trackingNumber);
     trackingNumber.setTrackingNumberSeq(seq);
+    // LVME : numéro de base gardé pour les préfixes AE / FL de l'arrivage
+    trackingNumber.setLvmeNumeroBase(seq);
 
     // In case of barcode generation, retrieve the one set on tracking number configuration
     AppStock appStock = appStockService.getAppStock();

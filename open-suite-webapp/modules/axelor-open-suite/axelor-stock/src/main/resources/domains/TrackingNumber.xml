@@ -26,6 +26,9 @@
     <many-to-one name="lotFournisseur" ref="com.axelor.apps.stock.db.LotFournisseur"
       title="Lot Fournisseur"/>
     <date name="dateArrivage" title="Date d'arrivage"/>
+    <!-- LVME : numéro généré par le compteur ; le n° affiché = AE / FL / rien + ce numéro selon l'arrivage
+      (à embarquer / flottant / réel). Vide pour un lot saisi à la main. -->
+    <string name="lvmeNumeroBase" title="N° de lot (compteur)" readonly="true"/>
     <!-- LVME : écran « Lots Vérifiés » de GESCOM -->
     <boolean name="lotVerifie" title="Lot vérifié" default="false"/>
     <decimal name="prixRevientReel" title="Prix de revient réel (€/kg)" precision="20"

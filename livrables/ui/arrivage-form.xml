@@ -17,50 +17,97 @@
     </menu>
   </menubar>
 
-  <panel name="mainPanel" colSpan="12">
-    <field name="statusSelect" showTitle="false" colSpan="8" widget="NavSelect"/>
-    <field name="nature" title="Nature" readonly="true" colSpan="4">
-      <viewer depends="nature"><![CDATA[
-        <>
-          {nature == 'EN_COURS_DE_PRODUCTION' && <Badge bg="warning" style={{ fontSize: 16 }}>Flottant</Badge>}
-          {nature == 'EN_COURS_DE_PRODUCTION' && <Badge bg="info" style={{ fontSize: 16, marginLeft: 6 }}>À embarquer</Badge>}
-          {nature == 'FLOTTANT' && <Badge bg="warning" style={{ fontSize: 16 }}>Flottant</Badge>}
-          {nature == 'REEL' && <Badge bg="success" style={{ fontSize: 16 }}>Réel</Badge>}
-          {nature == 'DRAFT' && <Badge bg="secondary" style={{ fontSize: 16 }}>Brouillon</Badge>}
-          {nature == 'ANNULE' && <Badge bg="danger" style={{ fontSize: 16 }}>Annulé</Badge>}
-        </>
-      ]]></viewer>
-    </field>
+  <!-- LVME : copie de l'écran « Arrivages » GESCOM (même ordre, mêmes blocs) : tout l'arrivage et ses
+       lignes visibles sans défiler. Fournisseur | Arrivage | Devise + tableau Flottant / Réel | Actions -->
+  <panel name="mainPanel" colSpan="12" css="lvme-gescom">
+    <panel name="lvmeFournisseurPanel" colSpan="4" itemSpan="6" css="lvme-gescom lvme-gescom-box">
+      <field name="partner" title="Fournisseur" colSpan="8" readonlyIf="statusSelect != 1" canEdit="false" onChange="action-stock-move-group-partner-onchange" domain="self.isContact = false AND :company member of self.companySet" form-view="partner-form" grid-view="partner-grid" x-image-field="picture"/>
+      <field name="partner.partnerSeq" title="Code" readonly="true" colSpan="4"/>
+      <!-- adresse complète du fournisseur sur une ligne (remplie au choix du fournisseur) -->
+      <field name="fromAddressStr" title="Adresse" readonly="true" colSpan="12">
+        <viewer depends="fromAddressStr"><![CDATA[<>{(fromAddressStr || "").split(/\r?\n/).map(l => l.trim()).filter(l => l).join(", ")}</>]]></viewer>
+      </field>
+      <field name="lvmeContact" title="Contact" readonly="true" colSpan="12"/>
+      <field name="partner.fixedPhone" title="Tél." readonly="true" colSpan="6"/>
+      <field name="partner.emailAddress" colSpan="6" title="Email" readonly="true"/>
+      <field name="lvmeReglement" colSpan="6" title="Règlement" readonly="true"/>
+      <field name="lvmeEcheance" colSpan="6" title="Echéance" readonly="true"/>
+    </panel>
 
-    <panel name="lvmeFournisseurPanel" title="Fournisseur" colSpan="5" itemSpan="6">
-      <field name="partner" title="Fournisseur" colSpan="12" readonlyIf="statusSelect != 1" canEdit="false" onChange="action-stock-move-group-partner-onchange" domain="self.isContact = false AND :company member of self.companySet" form-view="partner-form" grid-view="partner-grid" x-image-field="picture"/>
-      <field name="partner.partnerSeq" title="Code" readonly="true"/>
-      <field name="partner.fixedPhone" title="Tél." readonly="true"/>
-      <field name="partner.emailAddress" title="Email" readonly="true" colSpan="12"/>
-      <field name="fromAddress" title="Adresse" colSpan="12" readonlyIf="statusSelect == 3 || statusSelect == 4" onChange="action-stock-move-method-set-addresses-str" onSelect="action-stock-move-attrs-domain-address" form-view="address-form"/>
-      <field name="fromAddressStr" title="Adresse" colSpan="12" hideIf="statusSelect > 2" height="3">
-        <viewer><![CDATA[<>{fromAddressStr}</>]]></viewer>
+    <panel name="lvmeArrivagePanel" colSpan="3" itemSpan="6" css="lvme-gescom">
+      <field name="createdBy" colSpan="6" title="Opérateur" readonly="true" canView="false"/>
+      <field name="toStockLocation" colSpan="6" title="Frigo" canEdit="false" onChange="action-stock-move-group-to-location-onchange" domain="self.company = :company AND self.typeSelect != 3 AND (self.usableOnPurchaseOrder = true AND :isReversion = false OR self.usableOnSaleOrder = true AND :isReversion = true)" form-view="stock-location-form" grid-view="stock-location-grid"/>
+      <field name="stockMoveSeq" colSpan="6" title="Arrivage N°" readonly="true"/>
+      <field name="createdOn" colSpan="6" title="Du" readonly="true"/>
+      <field name="lvmeAEmbarquer" title="A Embarquer" readonly="true" colSpan="6"/>
+      <field name="nature" showTitle="false" readonly="true" colSpan="6">
+        <viewer depends="nature"><![CDATA[
+          <>
+            {nature == 'EN_COURS_DE_PRODUCTION' && <Badge bg="warning" style={{ fontSize: 16 }}>Flottant</Badge>}
+            {nature == 'EN_COURS_DE_PRODUCTION' && <Badge bg="info" style={{ fontSize: 16, marginLeft: 6 }}>À embarquer</Badge>}
+            {nature == 'FLOTTANT' && <Badge bg="warning" style={{ fontSize: 16 }}>Flottant</Badge>}
+            {nature == 'REEL' && <Badge bg="success" style={{ fontSize: 16 }}>Réel</Badge>}
+            {nature == 'DRAFT' && <Badge bg="secondary" style={{ fontSize: 16 }}>Brouillon</Badge>}
+            {nature == 'ANNULE' && <Badge bg="danger" style={{ fontSize: 16 }}>Annulé</Badge>}
+          </>
+        ]]></viewer>
+      </field>
+      <field name="supplierShipmentDate" colSpan="6" title="Date Départ" showIf="!isReversion"/>
+      <field name="estimatedDate" showIf="statusSelect != 3" colSpan="6" title="Arrivée" readonlyIf="(statusSelect != 1 &amp;&amp; statusSelect != 2) || pickingIsEdited"/>
+      <field name="realDate" title="Arrivée" readonly="true" colSpan="6" showIf="statusSelect == 3"/>
+      <field name="shipmentMode" colSpan="6" title="Type transport" canEdit="false" form-view="shipment-mode-form" grid-view="shipment-mode-grid"/>
+      <field name="bateau" colSpan="6" title="Bateau" canNew="true" form-view="lvme-bateau-form" grid-view="lvme-bateau-grid"/>
+      <field name="containerSet" colSpan="6" title="Containers" widget="TagSelect" canNew="true" form-view="lvme-container-form" grid-view="lvme-container-grid"/>
+      <field name="forwarderPartner" colSpan="6" title="Transitaire" canEdit="false" domain="self.isContact = FALSE AND (self.isCarrier = TRUE OR self.isSupplier = TRUE) AND :company MEMBER OF self.companySet" form-view="partner-form" grid-view="partner-grid"/>
+    </panel>
+
+    <panel name="lvmeDevisePanel" colSpan="3" itemSpan="6" css="lvme-gescom">
+      <field name="$deviseAchat" title="Devise" type="string" readonly="true" colSpan="12"/>
+      <!-- LVME : taux de change GESCOM, archivage seulement (aucun calcul) -->
+      <field name="lvmeCours" title="Cours" colSpan="6"/>
+      <field name="lvmeCouvert" title="Couvert" colSpan="6"/>
+      <field name="lvmeFlottant" title="Flottant" colSpan="6"/>
+      <field name="lvmeReel" title="Réel" colSpan="6"/>
+      <!-- tableau Flottant / Réel de GESCOM : ligne Flottant tant que l'arrivage n'est pas réalisé, Réel ensuite -->
+      <field name="exTaxTotal" showTitle="false" readonly="true" colSpan="12">
+        <viewer depends="exTaxTotal,nbColisTotal,poidsTotal,lvmeFraisApproche,statusSelect"><![CDATA[
+          <>
+            <table style={{ width: "100%", borderCollapse: "separate", borderSpacing: 3, fontSize: 13 }}>
+              <thead>
+                <tr style={{ color: "#8b1a8b" }}>
+                  <th></th><th style={{ textAlign: "center" }}>Mt Achat HT</th><th style={{ textAlign: "center" }}>Nb Colis</th><th style={{ textAlign: "center" }}>Poids Total</th><th style={{ textAlign: "center" }}>Frais Appr</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style={{ color: "#c000c0", whiteSpace: "nowrap" }}>Flottant =&gt;</td>
+                  <td style={{ background: "#ffff99", border: "1px solid #c8c8c8", textAlign: "right", padding: "2px 6px" }}>{statusSelect != 3 ? $fmt("exTaxTotal") : 0}</td>
+                  <td style={{ background: "#ffff99", border: "1px solid #c8c8c8", textAlign: "right", padding: "2px 6px" }}>{statusSelect != 3 ? $fmt("nbColisTotal") : 0}</td>
+                  <td style={{ background: "#ffff99", border: "1px solid #c8c8c8", textAlign: "right", padding: "2px 6px" }}>{statusSelect != 3 ? $fmt("poidsTotal") : 0}</td>
+                  <td></td>
+                </tr>
+                <tr>
+                  <td style={{ color: "#c000c0", whiteSpace: "nowrap" }}>Réel =&gt;</td>
+                  <td style={{ background: "#ffff99", border: "1px solid #c8c8c8", textAlign: "right", padding: "2px 6px" }}>{statusSelect == 3 ? $fmt("exTaxTotal") : 0}</td>
+                  <td style={{ background: "#ffff99", border: "1px solid #c8c8c8", textAlign: "right", padding: "2px 6px" }}>{statusSelect == 3 ? $fmt("nbColisTotal") : 0}</td>
+                  <td style={{ background: "#ffff99", border: "1px solid #c8c8c8", textAlign: "right", padding: "2px 6px" }}>{statusSelect == 3 ? $fmt("poidsTotal") : 0}</td>
+                  <td style={{ background: "#ffff99", border: "1px solid #c8c8c8", textAlign: "right", padding: "2px 6px" }}>{statusSelect == 3 ? $fmt("lvmeFraisApproche") : 0}</td>
+                </tr>
+              </tbody>
+            </table>
+          </>
+        ]]></viewer>
+      </field>
+      <field name="lvmeMontantSociete" title="Équivalent" readonly="true" colSpan="12" showIf="$deviseAchat != $deviseComptable">
+        <viewer depends="lvmeMontantSociete,$deviseComptable"><![CDATA[
+          <>
+            <Box as="span" fontWeight="bold">{$fmt('lvmeMontantSociete')} {$deviseComptable}</Box>
+          </>
+        ]]></viewer>
       </field>
     </panel>
 
-    <panel name="lvmeArrivagePanel" title="Arrivage" colSpan="4" itemSpan="6">
-      <field name="stockMoveSeq" title="Arrivage N°" readonly="true"/>
-      <field name="createdOn" title="Du" readonly="true"/>
-      <field name="purchaseOrderSet" title="Commande d'achat" colSpan="12" readonly="true" widget="TagSelect" form-view="purchase-order-form" grid-view="purchase-order-grid"/>
-      <field name="supplierShipmentDate" title="Date Départ" showIf="!isReversion"/>
-      <field name="estimatedDate" title="Arrivée" readonlyIf="(statusSelect != 1 &amp;&amp; statusSelect != 2) || pickingIsEdited"/>
-      <field name="realDate" title="Arrivée le" readonly="true"/>
-      <field name="supplierShipmentRef" title="Réf. fournisseur" showIf="!isReversion"/>
-      <field name="shipmentMode" title="Type transport" canEdit="false" form-view="shipment-mode-form" grid-view="shipment-mode-grid"/>
-      <field name="bateau" title="Bateau" canNew="true" form-view="lvme-bateau-form" grid-view="lvme-bateau-grid"/>
-      <field name="containerSet" title="Containers" widget="TagSelect" canNew="true" form-view="lvme-container-form" grid-view="lvme-container-grid"/>
-      <field name="forwarderPartner" title="Transitaire" canEdit="false" domain="self.isContact = FALSE AND (self.isCarrier = TRUE OR self.isSupplier = TRUE) AND :company MEMBER OF self.companySet" form-view="partner-form" grid-view="partner-grid"/>
-      <field name="carrierPartner" title="Transporteur" canEdit="false" domain="self.isCarrier = TRUE" form-view="partner-form" grid-view="partner-grid"/>
-      <field name="toStockLocation" title="Frigo" colSpan="12" canEdit="false" onChange="action-stock-move-group-to-location-onchange" domain="self.company = :company AND self.typeSelect != 3 AND (self.usableOnPurchaseOrder = true AND :isReversion = false OR self.usableOnSaleOrder = true AND :isReversion = true)" form-view="stock-location-form" grid-view="stock-location-grid"/>
-      <button name="lvmeAppliquerFrigoBtn" title="Appliquer à toutes les lignes" colSpan="12" icon="arrow-down-square" showIf="id &amp;&amp; statusSelect != 3" prompt="Mettre le frigo de l'arrivage sur toutes les lignes ?" onClick="save,action-lvme-arrivage-appliquer-frigo"/>
-    </panel>
-
-    <panel name="actionPanel" colSpan="3" itemSpan="12">
+    <panel name="actionPanel" colSpan="2" itemSpan="12">
       <!-- LVME : bouton « Editer » de GESCOM (impression de l'arrivage), visible aussi quand la fiche s'ouvre en fenêtre -->
       <button name="lvmeEditerBtn" title="Editer" icon="printer" showIf="id &amp;&amp; statusSelect != 1" onClick="save,action-lvme-arrivage-imprimer"/>
       <button name="planBtn" title="Plan" showIf="statusSelect == 1" icon="fa-calendar" onClick="action-group-stock-stockmove-plan-click"/>
@@ -72,57 +119,39 @@
       <button name="generateReversionBtn" title="Generate reversion" showIf="statusSelect == 3 &amp;&amp; !isReversion" icon="fa-undo" onClick="save,action-stock-move-method-generate-reversion"/>
       <button name="cancelBtn" title="Cancel" showIf="id != null &amp;&amp; statusSelect > 1 &amp;&amp; statusSelect &lt; 4" css="btn-danger" icon="fa-times-circle" onClick="action-group-stock-stockmove-cancel-click"/>
       <button name="draftBtn" title="Draft" showIf="statusSelect == 4" onClick="action-stock-move-method-draft"/>
+      <button name="lvmeAppliquerFrigoBtn" title="Frigo → toutes les lignes" icon="arrow-down-square" showIf="id &amp;&amp; statusSelect != 3" prompt="Mettre le frigo de l'arrivage sur toutes les lignes ?" onClick="save,action-lvme-arrivage-appliquer-frigo"/>
     </panel>
 
-    <panel name="lvmeRecapPanel" title="Récapitulatif" colSpan="12" itemSpan="3">
-      <field name="$deviseAchat" title="Devise" type="string" readonly="true"/>
-      <field name="$deviseComptable" title="Devise comptable" type="string" readonly="true"/>
-      <!-- LVME : taux de change GESCOM, archivage seulement (aucun calcul) -->
-      <field name="lvmeCours" title="Cours"/>
-      <field name="lvmeCouvert" title="Couvert"/>
-      <field name="lvmeFlottant" title="Flottant"/>
-      <field name="lvmeReel" title="Réel"/>
-      <field name="$currencySymbol" type="string" hidden="true"/>
-      <field name="nbColisTotal" title="Nb Colis" readonly="true"/>
-      <field name="poidsTotal" title="Poids Total" readonly="true"/>
-      <field name="exTaxTotal" title="Mt Achat HT" readonly="true" colSpan="6">
-        <viewer depends="exTaxTotal,$currencySymbol"><![CDATA[
-          <>
-            <Box as="span" fontWeight="bold" fontSize={5}>{$fmt('exTaxTotal')} {$currencySymbol}</Box>
-          </>
-        ]]></viewer>
-      </field>
-      <field name="lvmeMontantSociete" title="Équivalent" readonly="true" colSpan="6" showIf="$deviseAchat != $deviseComptable">
-        <viewer depends="lvmeMontantSociete,$deviseComptable"><![CDATA[
-          <>
-            <Box as="span" fontWeight="bold">{$fmt('lvmeMontantSociete')} {$deviseComptable}</Box>
-          </>
-        ]]></viewer>
-      </field>
+    <!-- champs techniques et paramètres (cachés), gardés pour le fonctionnement de la fiche -->
+    <panel name="lvmeTechPanel" hidden="true" colSpan="12">
+      <field name="statusSelect"/>
+      <field name="$deviseComptable" type="string"/>
+      <field name="$currencySymbol" type="string"/>
+      <field name="fromAddress" title="Adresse" colSpan="8" readonlyIf="statusSelect == 3 || statusSelect == 4" onChange="action-stock-move-method-set-addresses-str" onSelect="action-stock-move-attrs-domain-address" form-view="address-form"/>
+      <field name="nbColisTotal"/>
+      <field name="poidsTotal"/>
+      <field name="lvmeFraisApproche"/>
+      <field name="company" readonlyIf="statusSelect != 1" canEdit="false" onChange="action-stock-move-group-onchange-company" form-view="company-form" grid-view="company-grid"/>
+      <field if="__config__.app.getApp('base')?.enableTradingNamesManagement" name="tradingName" readonlyIf="statusSelect >= 2" canEdit="false" onChange="action-stock-move-method-printing-settings-default-value,action-stock-move-record-set-trading-name-stock-locations-default" domain="self.company = :company" form-view="trading-name-form" grid-view="trading-name-grid"/>
+      <field name="fromStockLocation" title="Emplacement départ" canEdit="false" form-view="stock-location-form" grid-view="stock-location-grid"/>
+      <field name="freightCarrierMode" title="Mode transporteur" canEdit="false" onChange="action-stock-move-record-freight-carrier" domain="self.shipmentMode = :shipmentMode" form-view="freight-carrier-mode-form" grid-view="freight-carrier-mode-grid"/>
+      <field name="incoterm" canEdit="false" form-view="incoterm-form" grid-view="incoterm-grid"/>
+      <field name="isWithBackorder"/>
+      <field name="conformitySelect" showIf="statusSelect == 2" onChange="action-stock-move-method-change-conformity"/>
+      <field name="typeSelect" readonly="true"/>
+      <field name="isReversion" hidden="true"/>
+      <field name="pickingIsEdited" hidden="true"/>
+      <field name="invoicingStatusSelect" hidden="true"/>
+      <field name="isNeedingConformityCertificate" hidden="true"/>
+      <field name="toStockLocation.typeSelect" hidden="true"/>
+      <field if="__config__.app.isApp('supplychain')" if-module="axelor-supplychain" name="pfpValidateStatusSelect" hidden="true"/>
     </panel>
   </panel>
 
-  <panel-related name="stockMoveLineListPanel" title="Lignes Arrivages" readonlyIf="company == null || fromStockLocation == null || toStockLocation == null || statusSelect == 3" height="14" field="stockMoveLineList" form-view="stock-move-line-form" grid-view="lvme-arrivage-line-grid" orderBy="sequence" onNew="action-stock-move-line-record-filter-on-available-products, action-stock-move-line-record-fill-stock-location" onChange="action-stock-move-line-change-group" canNew="true" canRemove="!(statusSelect == 2 &amp;&amp; pickingIsEdited)" canMove="true"/>
+  <panel-related name="stockMoveLineListPanel" title="Lignes d'arrivage" readonlyIf="company == null || fromStockLocation == null || toStockLocation == null || statusSelect == 3" height="14" field="stockMoveLineList" form-view="stock-move-line-form" grid-view="lvme-arrivage-line-grid" orderBy="sequence" onNew="action-stock-move-line-record-filter-on-available-products, action-stock-move-line-record-fill-stock-location" onChange="action-stock-move-line-change-group" canNew="true" canRemove="!(statusSelect == 2 &amp;&amp; pickingIsEdited)" canMove="true"/>
 
-  <panel name="lvmeNotePanel" title="Obs" colSpan="12" canCollapse="true">
+  <panel name="lvmeNotePanel" title="Obs" colSpan="12" canCollapse="true" collapseIf="!note">
     <field name="note" showTitle="false" colSpan="12" widget="html" x-lite="true"/>
-  </panel>
-
-  <panel name="lvmeParametresPanel" title="Paramètres" colSpan="12" canCollapse="true" collapseIf="true">
-    <field name="company" readonlyIf="statusSelect != 1" canEdit="false" onChange="action-stock-move-group-onchange-company" form-view="company-form" grid-view="company-grid"/>
-    <field if="__config__.app.getApp('base')?.enableTradingNamesManagement" name="tradingName" readonlyIf="statusSelect >= 2" canEdit="false" onChange="action-stock-move-method-printing-settings-default-value,action-stock-move-record-set-trading-name-stock-locations-default" domain="self.company = :company" form-view="trading-name-form" grid-view="trading-name-grid"/>
-    <field name="fromStockLocation" canEdit="false" form-view="stock-location-form" grid-view="stock-location-grid"/>
-    <field name="freightCarrierMode" canEdit="false" onChange="action-stock-move-record-freight-carrier" domain="self.shipmentMode = :shipmentMode" form-view="freight-carrier-mode-form" grid-view="freight-carrier-mode-grid"/>
-    <field name="incoterm" canEdit="false" form-view="incoterm-form" grid-view="incoterm-grid"/>
-    <field name="isWithBackorder"/>
-    <field name="conformitySelect" showIf="statusSelect == 2" onChange="action-stock-move-method-change-conformity"/>
-    <field name="typeSelect" readonly="true"/>
-    <field name="isReversion" hidden="true"/>
-    <field name="pickingIsEdited" hidden="true"/>
-    <field name="invoicingStatusSelect" hidden="true"/>
-    <field name="isNeedingConformityCertificate" hidden="true"/>
-    <field name="toStockLocation.typeSelect" hidden="true"/>
-    <field if="__config__.app.isApp('supplychain')" if-module="axelor-supplychain" name="pfpValidateStatusSelect" hidden="true"/>
   </panel>
 
   <panel-mail name="mailPanel">

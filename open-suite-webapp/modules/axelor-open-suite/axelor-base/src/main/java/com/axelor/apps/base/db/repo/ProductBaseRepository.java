@@ -46,8 +46,9 @@ public class ProductBaseRepository extends ProductRepository {
   @Inject protected ProductFireService productFireService;
 
   /**
-   * LVME : P.Vente TTC = P.Vente HT x (1 + taux de la TVA de vente de l'article), comme la liste Articles
-   * GESCOM. Taux pris sur la gestion comptable de l'article, sinon sur celle de sa famille comptable.
+   * LVME : P.Vente TTC = P.Vente HT x (1 + taux de la TVA de vente de l'article), comme la liste
+   * Articles GESCOM. Taux pris sur la gestion comptable de l'article, sinon sur celle de sa famille
+   * comptable.
    */
   protected void computeSalePriceTtc(Product product) {
     java.math.BigDecimal ht = product.getSalePrice();
@@ -65,7 +66,8 @@ public class ProductBaseRepository extends ProductRepository {
     product.setSalePriceTtc(
         ht.multiply(
                 java.math.BigDecimal.ONE.add(
-                    rate.divide(new java.math.BigDecimal("100"), 10, java.math.RoundingMode.HALF_UP)))
+                    rate.divide(
+                        new java.math.BigDecimal("100"), 10, java.math.RoundingMode.HALF_UP)))
             .setScale(4, java.math.RoundingMode.HALF_UP));
   }
 

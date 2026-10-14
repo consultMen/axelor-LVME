@@ -5,9 +5,8 @@
 
   <module name="supplychain" package="com.axelor.apps.supplychain.db"/>
 
-  <!-- LVME : écran « Historique Produit » de GESCOM (diapo 11), une ligne par mouvement réalisé et
-    par sens. Modèle en lecture seule adossé à la vue SQL lvme_historique_produit
-    (sql/lvme_historique_produit.sql). -->
+  <!-- LVME : écran « Historique Produit » de GESCOM (diapo 11), une ligne par mouvement réalisé et par
+    sens. Modèle en lecture seule adossé à la vue SQL lvme_historique_produit (sql/lvme_historique_produit.sql). -->
   <entity name="HistoriqueProduit" table="lvme_historique_produit" cacheable="false">
     <many-to-one name="product" ref="com.axelor.apps.base.db.Product"
       column="product_id" title="Produit"/>
@@ -23,7 +22,8 @@
     <string name="libelle" column="libelle" title="Libellé Mvts"/>
     <string name="typeMvt" column="type_mvt" title="Type"/>
     <string name="refTiers" column="ref_tiers" title="Référence Tiers"/>
-    <decimal name="prixVente" column="prix_vente" title="Prix Vente" precision="20" scale="4"/>
+    <decimal name="prixVente" column="prix_vente" title="Prix Vente" precision="20"
+      scale="4"/>
     <decimal name="prixRevient" column="prix_revient" title="Prix Revient" precision="20"
       scale="4"/>
     <decimal name="poidsColis" column="poids_colis" title="Poids du colis" precision="20"

@@ -85,7 +85,8 @@ public class PurchaseOrderManagementRepository extends PurchaseOrderRepository {
         }
       }
     }
-    // les champs totaux ont 3 décimales, les lignes jusqu'à 10 : arrondir sinon l'enregistrement est refusé
+    // les champs totaux ont 3 décimales, les lignes jusqu'à 10 : arrondir sinon l'enregistrement
+    // est refusé
     purchaseOrder.setNbColisTotal(nbColis.setScale(3, java.math.RoundingMode.HALF_UP));
     purchaseOrder.setQtyTotal(qty.setScale(3, java.math.RoundingMode.HALF_UP));
     purchaseOrder.setPoidsTotal(poids.setScale(3, java.math.RoundingMode.HALF_UP));

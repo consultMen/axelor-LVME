@@ -203,8 +203,8 @@
     <string name="gencode" title="Gencode"/>
     <string name="refFournisseur" title="Référence Fournisseur"/>
     <decimal name="poidsColis" title="Poids Colis" precision="20" scale="3"/>
-    <decimal name="salePriceTtc" title="P.Vente TTC" precision="20" scale="4" readonly="true"
-      help="Calculé à l'enregistrement : P.Vente HT x (1 + TVA de vente)"/>
+    <decimal name="salePriceTtc" title="P.Vente TTC" precision="20" scale="4"
+      readonly="true" help="Calculé à l'enregistrement : P.Vente HT x (1 + TVA de vente)"/>
   </entity>
 
 </domain-models>

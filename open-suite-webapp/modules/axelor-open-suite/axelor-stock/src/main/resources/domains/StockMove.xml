@@ -110,8 +110,8 @@
     <!-- LVME : arrivage (réception fournisseur) comme dans GESCOM -->
     <many-to-one name="bateau" ref="com.axelor.apps.stock.db.Bateau" title="Bateau"
       help="Navire (type de transport BATEAU), choisi dans la liste des bateaux"/>
-    <many-to-many name="containerSet" ref="com.axelor.apps.stock.db.Container" title="Containers"
-      help="Containers de l'arrivage, choisis dans la liste des containers"/>
+    <many-to-many name="containerSet" ref="com.axelor.apps.stock.db.Container"
+      title="Containers" help="Containers de l'arrivage, choisis dans la liste des containers"/>
     <decimal name="nbColisTotal" title="Nb Colis" precision="20" scale="3" readonly="true"
       help="Somme des colis des lignes, calculée à l'enregistrement"/>
     <decimal name="poidsTotal" title="Poids Total" precision="20" scale="3" readonly="true"
@@ -127,7 +127,8 @@
       ]]>
     </boolean>
     <!-- contre-valeur en devise de la société (taux officiel Axelor des lignes) -->
-    <decimal name="lvmeMontantSociete" title="Équivalent" precision="20" scale="2" formula="true">
+    <decimal name="lvmeMontantSociete" title="Équivalent" precision="20" scale="2"
+      formula="true">
       <![CDATA[
       (SELECT ROUND(SUM(CASE WHEN status_select = 3 THEN stock_stock_move_line.real_qty ELSE stock_stock_move_line.qty END
                         * COALESCE(stock_stock_move_line.company_unit_price_untaxed, 0)), 2)

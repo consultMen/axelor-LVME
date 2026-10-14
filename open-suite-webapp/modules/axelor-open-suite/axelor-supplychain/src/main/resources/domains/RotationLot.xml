@@ -5,8 +5,8 @@
 
   <module name="supplychain" package="com.axelor.apps.supplychain.db"/>
 
-  <!-- REC-012 : rotation de stock par lot (écran GESCOM « Rotation de Stock »). Modèle en lecture
-    seule adossé à la vue SQL lvme_rotation_lot (sql/lvme_rotation_lot.sql). -->
+  <!-- REC-012 : rotation de stock par lot (écran GESCOM « Rotation de Stock »). Modèle en lecture seule
+    adossé à la vue SQL lvme_rotation_lot (sql/lvme_rotation_lot.sql). -->
   <entity name="RotationLot" table="lvme_rotation_lot" cacheable="false">
     <many-to-one name="product" ref="com.axelor.apps.base.db.Product"
       column="product_id" title="Produit"/>
@@ -38,8 +38,8 @@
       scale="3"/>
     <decimal name="nbColisIn" column="nb_colis_in" title="Nb colis entrées" precision="20"
       scale="3"/>
-    <decimal name="nbColisStock" column="nb_colis_stock" title="Nb colis stock" precision="20"
-      scale="3"/>
+    <decimal name="nbColisStock" column="nb_colis_stock" title="Nb colis stock"
+      precision="20" scale="3"/>
     <decimal name="poidsStock" column="poids_stock" title="Poids stock" precision="20"
       scale="3"/>
     <decimal name="stockQty" column="stock_qty" title="Stock" precision="20" scale="3"/>

@@ -14,8 +14,8 @@ import java.util.List;
 
 /**
  * LVME : bouton « Appliquer à toutes les lignes » de la fiche Arrivage (sauf arrivage réalisé). Met
- * le frigo de l'en-tête sur toutes les lignes ; pour un arrivage planifié, le stock prévisionnel des
- * frigos est recalculé (même mécanisme qu'Axelor à l'enregistrement d'un arrivage planifié).
+ * le frigo de l'en-tête sur toutes les lignes ; pour un arrivage planifié, le stock prévisionnel
+ * des frigos est recalculé (même mécanisme qu'Axelor à l'enregistrement d'un arrivage planifié).
  */
 public class LvmeArrivageFrigoController {
 

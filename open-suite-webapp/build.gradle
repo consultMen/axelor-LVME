@@ -187,6 +187,15 @@ tasks.named('copyWebapp') {
     if (patched == 0) {
       logger.warn('LVME : poignée de réorganisation non déplacée (code Axelor introuvable ou déjà modifié)')
     }
+
+    // LVME : feuille de style des écrans façon GESCOM (src/main/webapp/css/lvme.css)
+    def index = file("$buildDir/webapp/index.html")
+    if (index.exists()) {
+      def html = index.getText('UTF-8')
+      if (!html.contains('css/lvme.css')) {
+        index.write(html.replace('</head>', '    <link rel="stylesheet" href="./css/lvme.css">\n  </head>'), 'UTF-8')
+      }
+    }
   }
 }
 war {

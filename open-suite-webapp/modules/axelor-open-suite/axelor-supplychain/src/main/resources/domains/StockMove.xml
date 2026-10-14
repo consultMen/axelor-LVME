@@ -74,6 +74,43 @@
                                         FROM stock_stock_move_line WHERE stock_stock_move_line.stock_move = id))))
       ]]>
     </boolean>
+    <!-- LVME : en-tête de l'écran Arrivages GESCOM (lecture seule, repris de la commande fournisseur
+      ; à défaut, règlement et échéance du fournisseur) -->
+    <string name="lvmeContact" title="Contact" formula="true">
+      <![CDATA[
+      (SELECT string_agg(DISTINCT base_partner.full_name, ', ') FROM base_partner
+        WHERE base_partner.id IN (SELECT purchase_purchase_order.contact_partner FROM purchase_purchase_order
+          WHERE purchase_purchase_order.id IN (SELECT stock_stock_move_purchase_order_set.purchase_order_set
+            FROM stock_stock_move_purchase_order_set WHERE stock_stock_move_purchase_order_set.stock_stock_move = id)))
+      ]]>
+    </string>
+    <string name="lvmeReglement" title="Règlement" formula="true">
+      <![CDATA[
+      COALESCE((SELECT string_agg(DISTINCT account_payment_mode.name, ', ') FROM account_payment_mode
+        WHERE account_payment_mode.id IN (SELECT purchase_purchase_order.payment_mode FROM purchase_purchase_order
+          WHERE purchase_purchase_order.id IN (SELECT stock_stock_move_purchase_order_set.purchase_order_set
+            FROM stock_stock_move_purchase_order_set WHERE stock_stock_move_purchase_order_set.stock_stock_move = id))),
+        (SELECT account_payment_mode.name FROM account_payment_mode
+          WHERE account_payment_mode.id IN (SELECT base_partner.out_payment_mode FROM base_partner WHERE base_partner.id = partner)))
+      ]]>
+    </string>
+    <string name="lvmeEcheance" title="Echéance" formula="true">
+      <![CDATA[
+      COALESCE((SELECT string_agg(DISTINCT account_payment_condition.name, ', ') FROM account_payment_condition
+        WHERE account_payment_condition.id IN (SELECT purchase_purchase_order.payment_condition FROM purchase_purchase_order
+          WHERE purchase_purchase_order.id IN (SELECT stock_stock_move_purchase_order_set.purchase_order_set
+            FROM stock_stock_move_purchase_order_set WHERE stock_stock_move_purchase_order_set.stock_stock_move = id))),
+        (SELECT account_payment_condition.name FROM account_payment_condition
+          WHERE account_payment_condition.id IN (SELECT base_partner.out_payment_condition FROM base_partner WHERE base_partner.id = partner)))
+      ]]>
+    </string>
+    <decimal name="lvmeFraisApproche" title="Frais Appr." precision="20" scale="2"
+      formula="true">
+      <![CDATA[
+      (SELECT COALESCE(SUM(stock_stock_move_line.frais_approche_kg * stock_stock_move_line.poids_total_net), 0)
+        FROM stock_stock_move_line WHERE stock_stock_move_line.stock_move = id)
+      ]]>
+    </decimal>
     <string name="lvmeRefCdeClient" title="Ref Cde Client" formula="true">
       <![CDATA[
       (SELECT string_agg(DISTINCT sale_sale_order.external_reference, ', ') FROM sale_sale_order

@@ -14,8 +14,8 @@ import java.math.RoundingMode;
 
 /**
  * LVME : la marge d'une ligne de commande client suit toujours la formule LVME, marge = total HT -
- * P.R. Net x qté. La marge commerciale de la commande (totalGrossMargin) est la somme de ces
- * marges (voir SaleOrderMarginServiceLVMEImpl).
+ * P.R. Net x qté. La marge commerciale de la commande (totalGrossMargin) est la somme de ces marges
+ * (voir SaleOrderMarginServiceLVMEImpl).
  */
 public class MarginComputeServiceLVMEImpl extends MarginComputeServiceImpl {
 

@@ -90,6 +90,15 @@ public class LvmeLotCommandeAchatController {
       TrackingNumber newLot =
           Beans.get(TrackingNumberCreateService.class)
               .getTrackingNumber(product, company, date, origin, supplier);
+      // commande pas encore partie : lot « à embarquer » (AE + numéro), renommé ensuite par
+      // l'arrivage (FL au passage en flottant, numéro seul une fois réel)
+      if (newLot.getLvmeNumeroBase() != null) {
+        JPA.runInTransaction(
+            () -> {
+              newLot.setTrackingNumberSeq("AE" + newLot.getLvmeNumeroBase());
+              Beans.get(TrackingNumberRepository.class).save(newLot);
+            });
+      }
       response.setValue("trackingNumber", newLot);
     } catch (Exception e) {
       TraceBackService.trace(response, e);

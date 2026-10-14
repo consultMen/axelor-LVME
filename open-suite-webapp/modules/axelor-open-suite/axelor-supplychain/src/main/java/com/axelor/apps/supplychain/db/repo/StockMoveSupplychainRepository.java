@@ -57,8 +57,9 @@ public class StockMoveSupplychainRepository extends StockMoveManagementRepositor
   }
 
   /**
-   * LVME : la commande fournisseur porte la Nature de son arrivage (En cours de production / Flottant
-   * / Réel), recopiée à chaque enregistrement de la réception. Une réception annulée ne l'écrase pas.
+   * LVME : la commande fournisseur porte la Nature de son arrivage (En cours de production /
+   * Flottant / Réel), recopiée à chaque enregistrement de la réception. Une réception annulée ne
+   * l'écrase pas.
    */
   protected void syncNatureToPurchaseOrders(StockMove stockMove) {
     if (stockMove == null
@@ -70,7 +71,8 @@ public class StockMoveSupplychainRepository extends StockMoveManagementRepositor
         || stockMove.getPurchaseOrderSet() == null) {
       return;
     }
-    for (com.axelor.apps.purchase.db.PurchaseOrder purchaseOrder : stockMove.getPurchaseOrderSet()) {
+    for (com.axelor.apps.purchase.db.PurchaseOrder purchaseOrder :
+        stockMove.getPurchaseOrderSet()) {
       purchaseOrder.setNature(stockMove.getNature());
     }
   }

@@ -56,7 +56,9 @@ public class SaleOrderLineDuplicateLvmeController {
     List<SaleOrderLine> candidates =
         saleOrder.getSaleOrderLineList().stream()
             .filter(
-                l -> Objects.equals(l.getProduct() != null ? l.getProduct().getId() : null, productId))
+                l ->
+                    Objects.equals(
+                        l.getProduct() != null ? l.getProduct().getId() : null, productId))
             .filter(l -> Objects.equals(l.getProductName(), line.getProductName()))
             .collect(Collectors.toList());
     // n° d'ordre utilisé seulement s'il est déjà attribué à l'écran (les lignes de vente ne sont

@@ -22,8 +22,10 @@ import com.axelor.apps.base.db.Product;
 import com.axelor.apps.base.db.repo.ProductRepository;
 import com.axelor.apps.base.service.administration.SequenceService;
 import com.axelor.apps.base.service.exception.TraceBackService;
+import com.axelor.apps.stock.db.Nature;
 import com.axelor.apps.stock.db.StockMove;
 import com.axelor.apps.stock.db.StockMoveLine;
+import com.axelor.apps.stock.db.TrackingNumber;
 import com.axelor.apps.stock.exception.StockExceptionMessage;
 import com.axelor.apps.stock.service.StockMoveLineService;
 import com.axelor.apps.stock.service.StockMoveToolService;
@@ -69,7 +71,8 @@ public class StockMoveManagementRepository extends StockMoveRepository {
         }
       }
     }
-    // les champs totaux ont 3 décimales, les lignes davantage : arrondir sinon l'enregistrement est refusé
+    // les champs totaux ont 3 décimales, les lignes davantage : arrondir sinon l'enregistrement est
+    // refusé
     stockMove.setNbColisTotal(nbColis.setScale(3, java.math.RoundingMode.HALF_UP));
     stockMove.setPoidsTotal(poids.setScale(3, java.math.RoundingMode.HALF_UP));
   }
@@ -90,10 +93,44 @@ public class StockMoveManagementRepository extends StockMoveRepository {
         stockMove.setName(Beans.get(StockMoveToolService.class).computeName(stockMove));
       }
 
+      prefixerLotsArrivage(stockMove);
+
       return stockMove;
     } catch (Exception e) {
       TraceBackService.traceExceptionFromSaveMethod(e);
       throw new PersistenceException(e.getMessage(), e);
+    }
+  }
+
+  /**
+   * LVME : n° des lots générés automatiquement d'un arrivage, selon son état : « AE » + numéro (à
+   * embarquer), « FL » + numéro (flottant), numéro seul (réel). Le lot est renommé (mêmes liens :
+   * commande, stock, ventes). Les lots saisis à la main (sans numéro de base) ne changent pas.
+   */
+  protected void prefixerLotsArrivage(StockMove stockMove) {
+    if (stockMove.getTypeSelect() != TYPE_INCOMING
+        || Boolean.TRUE.equals(stockMove.getIsReversion())
+        || stockMove.getStatusSelect() == STATUS_CANCELED
+        || stockMove.getStockMoveLineList() == null) {
+      return;
+    }
+    String prefixe;
+    if (stockMove.getStatusSelect() == STATUS_REALIZED || stockMove.getNature() == Nature.REEL) {
+      prefixe = "";
+    } else if (stockMove.getNature() == Nature.FLOTTANT) {
+      prefixe = "FL";
+    } else {
+      prefixe = "AE";
+    }
+    for (StockMoveLine line : stockMove.getStockMoveLineList()) {
+      TrackingNumber lot = line.getTrackingNumber();
+      if (lot == null || Strings.isNullOrEmpty(lot.getLvmeNumeroBase())) {
+        continue;
+      }
+      String numero = prefixe + lot.getLvmeNumeroBase();
+      if (!numero.equals(lot.getTrackingNumberSeq())) {
+        lot.setTrackingNumberSeq(numero);
+      }
     }
   }
 

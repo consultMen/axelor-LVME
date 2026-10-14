@@ -29,8 +29,8 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * LVME : archiver / désarchiver les lots (numéros de suivi) cochés dans « État des stocks par
- * lots ». Les lignes de la liste sont lot × frigo : c'est le lot lui-même qui est archivé.
+ * LVME : archiver / désarchiver les lots (numéros de suivi) cochés dans « État des stocks par lots
+ * ». Les lignes de la liste sont lot × frigo : c'est le lot lui-même qui est archivé.
  */
 public class LvmeArchivageLotController {
 
