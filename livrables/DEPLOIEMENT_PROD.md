@@ -1,3 +1,43 @@
+# Déploiement prod LVME — lot « Arrivages GESCOM » du 14/10/2026 (PROD_37 à PROD_41)
+
+Déjà en prod : lot « Retours client scénario 1 » (PROD_31 à PROD_36, code 252154c).
+Code à déployer : tout `main` jusqu'au commit 759cd6d (ou plus récent).
+
+| Script | Contenu |
+|---|---|
+| PROD_37 | N° Lot : créer un lot depuis la ligne de commande fournisseur (rattaché au produit) |
+| PROD_38 | Arrivage : bouton « Frigo → toutes les lignes », titre « Lignes d'arrivage » (relance PROD_9) |
+| PROD_39 | **Colonne `lvme_numero_base` sur les lots** + compteur des lots générés à l'achat au format GESCOM (8 chiffres, repart après le dernier n° GESCOM) |
+| PROD_40 | N° Arrivage sur 6 chiffres : année + mois + compteur remis à zéro chaque mois (ex. 261001) |
+| PROD_41 | Fiche Arrivage copie de l'écran GESCOM (relance PROD_9) |
+
+Code (sans script) : lots AE + n° (à embarquer) / FL + n° (flottant) / n° seul (réel), même lot renommé ;
+ligne d'achat avec lot ni découpée ni regénérée à l'arrivage ; arrivage créé « Flottant » quand la commande
+passe en Flottant ; champs calculés Contact / Règlement / Echéance / Frais Appr. ; couleurs GESCOM (`css/lvme.css`).
+
+1. **PC** : `git push origin main`
+2. **Serveur — sauvegarde** : `pg_dump -U axelor -Fc axelor > ~/sauvegarde_axelor_$(date +%F_%H%M).dump`
+3. `cd ~/src && rm -rf axelor-LVME axelor-version_app axelor-version_app.war && git clone https://github.com/consultMen/axelor-LVME.git && cd axelor-LVME && git log --oneline -1` (759cd6d ou plus récent)
+4. **Build d'abord** (l'ancienne appli tourne pendant ce temps) : `cd open-suite-webapp && chmod +x gradlew && ./gradlew war -x test && cd ..`
+   (pas d'avertissement « LVME : poignée de réorganisation non déplacée »)
+5. **Scripts, juste avant la bascule** (la fiche Arrivage utilise des champs du nouveau code : enchaîner aussitôt avec l'étape 6) :
+   ```
+   for f in PROD_37_lot_cree_depuis_achat PROD_38_appliquer_frigo_arrivage PROD_39_lots_ae_fl PROD_40_numero_arrivage_6_chiffres PROD_41_arrivage_condense; do echo "== $f"; PGOPTIONS='-c lock_timeout=10s' psql -U axelor axelor -v ON_ERROR_STOP=1 -f livrables/$f.sql || break; done
+   ```
+   - PROD_39 affiche à la fin les configurations de lot automatique et le **prochain n° de lot** : vérifier qu'il suit le dernier lot GESCOM (tableau vide = aucun article en lot automatique à l'achat, à configurer sur les articles concernés)
+   - PROD_40 affiche la numérotation des réceptions : préfixe `%YY%FM`, 2 chiffres, version arrêtée à la fin du mois précédent
+6. **Bascule** : dézipper le war dans `~/src/axelor-version_app`, **recopier `~/axelor-config.prod.properties`** dans `WEB-INF/classes/axelor-config.properties`,
+   `sudo systemctl stop axelor-tomcat`, remplacer `ROOT` (garder l'ancien de côté), `sudo systemctl start axelor-tomcat && sudo systemctl restart nginx`.
+7. **Utilisateurs** : **Ctrl + F5** (nouvelle feuille de style GESCOM).
+8. **Vérifications** (article sans des milliers de mouvements) :
+   - commande fournisseur, article en lot automatique : N° Lot = AE + n° ; A embarquer -> Flottant : arrivage « Flottant », n° du type 261001, lot FL + n°
+   - Saisie Réel : lot = n° seul ; même lot dans État des stocks par lots
+   - fiche Arrivage : blocs Fournisseur / Arrivage / Devise + tableau Flottant / Réel, lignes visibles sans défiler, champs jaunes
+   - bouton « Frigo → toutes les lignes » ; « Lignes d'arrivage »
+9. **Retour arrière** : `pg_restore` de la sauvegarde de l'étape 2 et redéploiement du `ROOT` gardé de côté.
+
+---
+
 # Déploiement prod LVME — lot « Retours client scénario 1 » du 13/10/2026 (PROD_30 à PROD_36)
 
 Déjà en prod : lot « Arrivages + archivage » (PROD_26 à PROD_29, code e2a217c) et PROD_30 (nom complet des articles).
