@@ -17,3 +17,44 @@
   border-radius: 3px;
   padding: 4px 8px;
 }
+
+/*
+ * Liste des lignes d'arrivage façon GESCOM (panneau css="lvme-gescom-grid") :
+ * lignes serrées, une ligne sur deux grise, colonnes séparées, en-tête gris dégradé,
+ * ligne sélectionnée bleu nuit / texte blanc, colonnes de saisie jaune pâle.
+ * Mêmes colonnes et même fonctionnement : seule l'apparence change.
+ */
+.lvme-gescom-grid {
+  --bs-table-cell-padding: 0.15rem 0.4rem;
+  --bs-table-striped-bg: #e8e8e8;
+  --bs-table-hover-bg: #dde4ff;
+  --bs-table-border-color: #c4c4c4;
+  font-size: 13px;
+}
+.lvme-gescom-grid [class*="_header_"] [class*="_column_"] {
+  background: linear-gradient(#f4f4f4, #cdcdcd) !important;
+  color: #222 !important;
+  font-size: 12px;
+  font-weight: 600;
+  border-right: 1px solid #b0b0b0;
+}
+.lvme-gescom-grid [class*="_body_"] [class*="_row_"] {
+  min-height: 24px;
+  box-shadow: none;
+}
+.lvme-gescom-grid [class*="_body_"] [class*="_column_"] {
+  border-right: 1px solid #d0d0d0;
+}
+.lvme-gescom-grid [class*="_body_"] [class*="_row_"][class*="_selected_"],
+.lvme-gescom-grid [class*="_body_"] [class*="_row_"][class*="_selected_"] [class*="_column_"] {
+  background: #14234f !important;
+  color: #fff !important;
+}
+.lvme-gescom-grid .bg-yellow {
+  background-color: #ffff99 !important;
+  color: #000;
+}
+.lvme-gescom-grid [class*="_footer_"] {
+  font-weight: 600;
+  background: #f4f4f4;
+}
