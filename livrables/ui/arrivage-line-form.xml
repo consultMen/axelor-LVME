@@ -12,7 +12,7 @@
       <field title="Article" name="product" readonlyIf="($get('stockMove.statusSelect') == 2 &amp;&amp; $get('stockMove.pickingIsEdited')) || $get('stockMove.statusSelect') > 2" canEdit="false" onChange="action-stock-move-line-tracking-number-attrs,action-group-stock-stockmoveline-product-onchange" onSelect="action-stock-move-line-method-product-domain" domain="self.expense = false AND self.dtype = 'Product'" form-view="product-form" grid-view="stock-move-line-product-grid" x-image-field="picture" colSpan="3"/>
       <field title="Désignation" name="productName" colSpan="5"/>
       <field name="product.nomScientifique" title="Nom scientifique" readonly="true" colSpan="2"/>
-      <field name="product.customsCodeNomenclature" title="Réf. douanière" readonly="true" colSpan="2"/>
+      <field name="product.refDouaniere" title="Réf. douanière" readonly="true" colSpan="2"/>
       <field title="N° Lot" name="trackingNumber" readonlyIf="$get('stockMove.statusSelect') > 2" canNew="product != null" onChange="action-stock-move-line-record-product" onSelect="action-stock-move-line-attrs-tracking-number-domain" form-view="tracking-number-stock-move-line-form" grid-view="tracking-number-grid" colSpan="3"/>
       <field name="dateCongelation" title="Date Congélation" colSpan="2" readonly="true"/>
       <field name="purchaseOrderLine.conditionnement" title="Condit." colSpan="3" readonly="true" showIf="purchaseOrderLine != null"/>
