@@ -1,0 +1,156 @@
+<form name="lvme-commande-achat-line-form" title="Ligne de commande d'achat" model="com.axelor.apps.purchase.db.PurchaseOrderLine" width="large"
+onLoad="action-budget-purchase-purchase-orderline-group-onload"  onNew="action-budget-purchase-purchase-orderline-group-onnew">
+  <panel name="namePanel" hideIf="!isTitleLine">
+    <field name="productName" title="Title" colSpan="10"/>
+    <field name="isTitleLine" colSpan="2" widget="boolean-switch" onChange="action-purchase-order-line-method-empty-line"/>
+  </panel>
+  <panel-tabs name="mainPanelTab" hideIf="isTitleLine">
+    <panel name="informationsPanel" title="Ligne">
+
+      <field name="$partnerLanguage" hidden="true"/>
+      <field name="$differentLanguageMessage" showTitle="false" hidden="true" readonly="true" colSpan="12">
+        <viewer depends="$partnerLanguage"><![CDATA[
+        <>{$partnerLanguage && <Badge bg="warning">{_t("The partner's language is different from the current language. Description and product name are in :")} {$partnerLanguage}</Badge>}</>
+      ]]></viewer>
+      </field>
+      <field name="$unitWarningMessage" showTitle="false" hidden="true" readonly="true" colSpan="12">
+        <viewer><![CDATA[
+        <><Badge bg="warning">{_t("The supplier catalog's unit is different from the current unit.")}</Badge></>
+      ]]></viewer>
+      </field>
+      <label name="differentSupplierLabel" hidden="true" colSpan="12"/>
+      <field if="__config__.app.isApp('supplychain')" if-module="axelor-supplychain" name="receiptState" showTitle="false" showIf="receiptState > 0" colSpan="3">
+        <viewer><![CDATA[
+        <>
+          {receiptState == 1 && <Badge bg="danger">{_t('Not received')}</Badge>}
+          {receiptState == 2 && <Badge bg="warning">{_t('Partially received')}</Badge>}
+          {receiptState == 3 && <Badge bg="success">{_t('Received')}</Badge>}
+        </>
+      ]]></viewer>
+      </field>
+      <spacer if="__config__.app.isApp('supplychain')" name="receiptStateSpacer"/>
+      <!-- LVME : copie de la fenêtre « Lignes Arrivages » GESCOM (commande et arrivage partagent la même
+           fenêtre dans GESCOM) ; mêmes champs, actions et calculs qu'avant, disposés sans défiler -->
+      <panel name="lvmeLigneAchatGescomPanel" colSpan="10" css="lvme-gescom">
+        <field title="Article" colSpan="3" name="product" canEdit="false" onChange="action-budget-group-purchase-purchase-orderline-product-onchange" onSelect="action-purchase-order-line-attrs-product-domain" form-view="product-form" grid-view="product-purchase-grid" x-image-field="picture"/>
+        <field title="Désignation" name="productName" colSpan="5" requiredIf="!isTitleLine"/>
+        <field name="product.nomScientifique" title="Nom scientifique" readonly="true" colSpan="2"/>
+        <field name="product.customsCodeNomenclature" title="Réf. douanière" readonly="true" colSpan="2"/>
+        <field name="trackingNumber" title="N° Lot" canNew="true" onChange="action-lvme-ligne-achat-rattacher-lot" colSpan="3" domain="self.product = :product" form-view="tracking-number-form" grid-view="tracking-number-grid"/>
+        <field name="dateCongelation" title="Date Congélation" colSpan="2"/>
+        <field title="Condit." name="conditionnement" colSpan="3" onChange="action-purchase-order-line-method-compute-packaging" form-view="conditionnement-form" grid-view="conditionnement-grid"/>
+        <field title="Coef." name="coefPoidsNet" colSpan="1"/>
+        <field title="Unité" name="unit" colSpan="3" canEdit="false" onChange="action-purchase-order-line-attrs-display-different-unit-message" requiredIf="!isTitleLine" form-view="unit-form" grid-view="unit-grid"/>
+        <field title="Code Produit" name="productCode" colSpan="3"/>
+        <field name="durabilite" title="Durabilité" colSpan="2"/>
+        <field name="dluo" title="D.L.U.O." colSpan="2"/>
+        <field name="origine" title="Origine" colSpan="2" selection="lvme.origine.select"/>
+        <field name="marque" title="Marque" colSpan="3" selection="lvme.marque.select"/>
+        <field name="taxLineSet" title="Taux TVA" readonly="true" colSpan="3" widget="TagSelect"/>
+        <field name="zonePeche" title="Zone Pêche" colSpan="2" selection="lvme.zone.peche.select"/>
+        <field name="modePeche" title="Mode Pêche" colSpan="2" selection="lvme.mode.peche.select"/>
+        <field name="fraisApprocheKg" title="Frais d'approche au kg" colSpan="2"/>
+        <field name="nbColisParCouche" title="Colis/Couche" colSpan="1"/>
+        <field name="nbColisParPalette" title="Colis/Palette" colSpan="2"/>
+        <field name="product.gencode" title="Gencode" readonly="true" colSpan="3"/>
+        <field name="product.refFournisseur" title="Réf. Fourn." readonly="true" colSpan="3"/>
+        <spacer colSpan="6"/>
+        <!-- tableau GESCOM : vrais champs de saisie (Nb Colis, prix…) avec leurs calculs ; ligne Réel = quantité reçue -->
+        <label title="" colSpan="1" css="lvme-gescom-th"/>
+        <label title="Nb Colis" colSpan="1" css="lvme-gescom-th"/>
+        <label title="Nb unité/colis" colSpan="1" css="lvme-gescom-th"/>
+        <label title="Unités Tot" colSpan="1" css="lvme-gescom-th"/>
+        <label title="Poids/Colis-BRUT(Kg)" colSpan="1" css="lvme-gescom-th"/>
+        <label title="Poids/Colis-NET(Kg)" colSpan="1" css="lvme-gescom-th"/>
+        <label title="Poids Total-BRUT(Kg)" colSpan="1" css="lvme-gescom-th"/>
+        <label title="Poids Total- NET(Kg)" colSpan="1" css="lvme-gescom-th"/>
+        <label title="Prix d'achat (PA/Kg)" colSpan="1" css="lvme-gescom-th"/>
+        <label title="Prix d'achat Devise" colSpan="1" css="lvme-gescom-th"/>
+        <label title="Prix de revient U.V(€)" colSpan="1" css="lvme-gescom-th"/>
+        <label title="Montant H.T(€)" colSpan="1" css="lvme-gescom-th"/>
+        <label title="Flottant =&gt;" colSpan="1" css="lvme-gescom-rowt"/>
+        <field showTitle="false" css="lvme-case" name="nbColis" title="Nb Colis" colSpan="1" onChange="action-purchase-order-line-method-compute-packaging"/>
+        <field showTitle="false" css="lvme-case" name="nbUnitesParColis" title="Nb unité/colis" readonly="true" colSpan="1"/>
+        <field showTitle="false" css="lvme-case" name="unitesTot" title="Unités Tot" readonly="true" colSpan="1"/>
+        <field showTitle="false" css="lvme-case" name="poidsParColis" title="Poids/Colis-BRUT(Kg)" readonly="true" colSpan="1"/>
+        <field showTitle="false" css="lvme-case" name="poidsParColisNet" title="Poids/Colis-NET(Kg)" readonly="true" colSpan="1"/>
+        <field showTitle="false" css="lvme-case" name="qty" title="Poids Total-BRUT(Kg)" readonly="true" colSpan="1"/>
+        <field showTitle="false" css="lvme-case" name="poidsTotalNet" title="Poids Total- NET(Kg)" readonly="true" colSpan="1"/>
+        <field showTitle="false" css="lvme-case lvme-case-prix" name="price" title="Prix d'achat (PA/Kg)" colSpan="1" onChange="action-purchase-order-line-method-onchange-price,action-purchase-order-line-method-compute,action-purchase-order-line-method-compute-analytic-distribution"/>
+        <field showTitle="false" css="lvme-case lvme-case-prix" name="paDevise" title="Prix d'achat Devise" colSpan="1"/>
+        <field showTitle="false" css="lvme-case lvme-case-prix" name="prKg" title="Prix de revient U.V(€)" colSpan="1"/>
+        <field showTitle="false" css="lvme-case lvme-case-prix" name="exTaxTotal" title="Montant H.T(€)" readonly="true" colSpan="1" x-scale="$currency.numberOfDecimals"/>
+        <label title="Réel =&gt;" colSpan="1" css="lvme-gescom-rowt"/>
+        <spacer colSpan="5"/>
+        <field name="receivedQty" showTitle="false" readonly="true" colSpan="1" css="lvme-case"/>
+        <spacer colSpan="5"/>
+      </panel>
+
+      <panel name="lvmeLigneAchatActionsPanel" colSpan="2" itemSpan="12">
+        <button name="lvmeHistoriqueProduitBtn" title="Historique produit" icon="clock-history" onClick="action-lvme-ligne-historique-produit"/>
+        <button name="lvmeEtatStockLotBtn" title="État des stocks par lots" icon="box-seam" onClick="action-lvme-ligne-etat-stock-lot"/>
+      </panel>
+
+      <panel name="lvmeLigneAchatObsPanel" title="Obs" colSpan="12" canCollapse="true" collapseIf="!description">
+        <field name="description" showTitle="false" colSpan="12" widget="html" x-lite="true"/>
+      </panel>
+
+      <!-- champs techniques (cachés), gardés pour les actions de la ligne -->
+      <panel name="lvmeLigneAchatTechPanel" hidden="true" colSpan="12">
+        <field name="enableFreezeFields" colSpan="2"/>
+        <field if="__config__.app.getApp('purchase')?.getManageSupplierCatalog()" name="$isFilterOnSupplier" title="Filter on supplier" colSpan="2" type="boolean" widget="boolean-switch"/>
+        <field name="isTitleLine" colSpan="2" widget="boolean-switch" onChange="action-purchase-order-line-method-empty-line"/>
+        <field name="$qtyValid" hidden="true" colSpan="12"/>
+        <field name="$currency" hidden="true" type="many-to-one" target="com.axelor.apps.base.db.Currency"/>
+        <field name="$currency.numberOfDecimals" hidden="true"/>
+        <field name="fixedAssets" widget="boolean-switch" onChange="action-method-budget-purchase-orderline-set-product-account"/>
+        <field name="taxEquiv" hidden="true" form-view="tax-equiv-form" grid-view="tax-equiv-grid"/>
+      </panel>
+    </panel>
+    <panel-dashlet name="orderHistoryPanel" title="Order history" colSpan="12" action="action-purchase-order-line-view-show-order-line-history"/>
+    <panel name="analyticDistributionPanel" title="Analytics" onTabSelect="action-purchase-order-line-attrs-read-only-distribution-lines">
+      <field name="analyticDistributionTemplate" canEdit="false" onChange="action-purchase-order-line-group-analytic-distribution-template-onchange" onSelect="action-purchase-order-line-attrs-set-domain-analytic-distribution-template" form-view="analytic-distribution-template-form" grid-view="analytic-distribution-template-grid"/>
+      <field name="axis1AnalyticAccount" readonlyIf="analyticDistributionTemplate" onChange="action-purchase-order-line-method-axis-create-analytic-line" onSelect="action-purchase-order-line-method-set-axis-domain" form-view="analytic-account-form" grid-view="analytic-account-grid"/>
+      <panel name="axisAnalyticAccountPanel" readonlyIf="analyticDistributionTemplate" colSpan="12">
+        <field name="axis2AnalyticAccount" readonlyIf="analyticDistributionTemplate != null" onChange="action-purchase-order-line-method-axis-create-analytic-line" onSelect="action-purchase-order-line-method-set-axis-domain" form-view="analytic-account-form" grid-view="analytic-account-grid"/>
+        <field name="axis3AnalyticAccount" readonlyIf="analyticDistributionTemplate != null" onChange="action-purchase-order-line-method-axis-create-analytic-line" onSelect="action-purchase-order-line-method-set-axis-domain" form-view="analytic-account-form" grid-view="analytic-account-grid"/>
+        <field name="axis4AnalyticAccount" readonlyIf="analyticDistributionTemplate != null" onChange="action-purchase-order-line-method-axis-create-analytic-line" onSelect="action-purchase-order-line-method-set-axis-domain" form-view="analytic-account-form" grid-view="analytic-account-grid"/>
+        <field name="axis5AnalyticAccount" readonlyIf="analyticDistributionTemplate != null" onChange="action-purchase-order-line-method-axis-create-analytic-line" onSelect="action-purchase-order-line-method-set-axis-domain" form-view="analytic-account-form" grid-view="analytic-account-grid"/>
+      </panel>
+      <panel-related name="analyticMoveLineListPanel" colSpan="12" field="analyticMoveLineList" form-view="analytic-move-line-distribution-form" grid-view="analytic-move-line-distribution-grid" onChange="action-purchase-order-line-group-analytic-move-line-list-onchange"/>
+      <field name="$isValidAnalyticMoveLineList" hidden="true" type="boolean"/>
+    </panel>
+    <panel if="__config__.app.isApp('budget')" if-module="axelor-supplychain" name="budgetDistributionPanel" title="Budget" readonlyIf="purchaseOrder &amp;&amp; purchaseOrder.statusSelect >= 3" colSpan="12">
+      <field if="__config__.app.getApp('budget')?.getManageMultiBudget()" name="companyExTaxTotal" title="Total W.T." hidden="false" readonly="true" colSpan="6" x-currency="$currencySymbol" x-scale="$companyCurrencyScale">
+        <viewer depends="companyExTaxTotal"><![CDATA[
+          <><dd>{$fmt('companyExTaxTotal')}</dd></>
+        ]]></viewer>
+      </field>
+      <field if="__config__.app.getApp('budget')?.getManageMultiBudget()" name="budgetRemainingAmountToAllocate" readonly="true" colSpan="6" x-currency="$currencySymbol" x-scale="$companyCurrencyScale">
+        <viewer depends="budgetRemainingAmountToAllocate"><![CDATA[
+
+
+<dd>{{$fmt('budgetRemainingAmountToAllocate')}}</dd>
+
+
+        ]]></viewer>
+      </field>
+      <field name="account" onChange="action-reset-budget-method" onSelect="action-budget-purchase-order-line-set-account-domain"/>
+      <panel name="datesPanel" colSpan="12">
+        <field name="budgetFromDate" onChange="action-budget-method-manage-budget-date-label" requiredIf="budgetToDate"/>
+        <field name="budgetToDate" onChange="action-budget-method-manage-budget-date-label" requiredIf="budgetFromDate"/>
+        <label name="budgetDatesLabel" hidden="true" colSpan="12" css="label-danger"/>
+      </panel>
+      <field if="!__config__.app.getApp('budget')?.getManageMultiBudget()" name="budget" showIf="product != null" onChange="action-purchase-order-line-group-budget-onchange" onSelect="action-budget-purchase-order-line-method-budget-domain"/>
+      <panel-related if="__config__.app.getApp('budget')?.getManageMultiBudget()" name="budgetDistributionListPanel" showIf="account" colSpan="12" field="budgetDistributionList" form-view="purchase-order-budget-distribution-form" grid-view="reduce-budget-distribution-grid" editable="true" onChange="action-group-budget-purchase-order-line-budget-distribution-onchange"/>
+      <field name="$currencySymbol" hidden="true"/>
+      <field name="$companyCurrencyScale" hidden="true"/>
+      <field name="purchaseOrder.statusSelect" hidden="true"/>
+    </panel>
+  </panel-tabs>
+
+  <panel-mail name="mailPanel">
+    <mail-messages limit="4"/>
+    <mail-followers/>
+  </panel-mail>
+</form>

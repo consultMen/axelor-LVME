@@ -58,3 +58,31 @@
   font-weight: 600;
   background: #f4f4f4;
 }
+
+/*
+ * Tableau Flottant / Réel de la ligne de commande d'achat (vrais champs de saisie) :
+ * en-têtes bleus en italique, libellés de ligne magenta, cases jaunes (quantités) / orange (prix).
+ */
+.lvme-gescom-th {
+  color: #1a1ad6 !important;
+  font-style: italic;
+  font-size: 11px !important;
+  text-align: center;
+  line-height: 1.1;
+}
+.lvme-gescom-rowt {
+  color: #c000c0 !important;
+  font-style: italic;
+  white-space: nowrap;
+}
+.lvme-case {
+  background-color: #ffffc4;
+  border: 1px solid #c8c8c8;
+  color: #1a1ad6;
+  text-align: right;
+  padding: 1px 4px;
+}
+.lvme-case-prix,
+.lvme-gescom .lvme-case-prix input {
+  background-color: #ffd27f !important;
+}
