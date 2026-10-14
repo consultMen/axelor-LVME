@@ -37,7 +37,6 @@ import com.axelor.apps.purchase.db.PurchaseOrder;
 import com.axelor.apps.purchase.db.PurchaseOrderLine;
 import com.axelor.apps.purchase.db.repo.PurchaseOrderLineRepository;
 import com.axelor.apps.purchase.db.repo.PurchaseOrderRepository;
-import com.axelor.apps.stock.db.Nature;
 import com.axelor.apps.stock.db.StockConfig;
 import com.axelor.apps.stock.db.StockLocation;
 import com.axelor.apps.stock.db.StockMove;
@@ -281,10 +280,9 @@ public class PurchaseOrderStockServiceImpl implements PurchaseOrderStockService 
       }
     }
     if (stockMove.getStockMoveLineList() != null && !stockMove.getStockMoveLineList().isEmpty()) {
+      // LVME : arrivage planifié « à embarquer » (lots AE + numéro), comme GESCOM ; il passe en
+      // Flottant par son bouton « A Embarquer -> flottant », puis en Réel à la saisie du réel
       stockMoveService.plan(stockMove);
-      // LVME : commande passée en « Flottant » -> arrivage flottant (lots FL + numéro)
-      stockMove.setNature(Nature.FLOTTANT);
-      Beans.get(StockMoveRepository.class).save(stockMove);
       stockMoveIdList.add(stockMove.getId());
     }
     if (qualityStockMove.getStockMoveLineList() != null

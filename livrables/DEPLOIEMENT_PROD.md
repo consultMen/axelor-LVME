@@ -2,7 +2,11 @@
 
 Déjà en prod : PROD_31 à PROD_36. PROD_37 à PROD_41 (lot ci-dessous) sont repris ici : tous relançables,
 sans effet s'ils sont déjà passés.
-Code à déployer : tout `main` jusqu'au commit 647b051 (ou plus récent).
+Code à déployer : tout `main` (dernier commit affiché par `git log --oneline -1` à l'étape 3).
+
+Code (sans script) : comme avant, l'arrivage créé au passage de la commande en « Flottant » est **à embarquer**
+(lots AE + n°) ; il passe en Flottant (lots FL) par son bouton « A Embarquer -> flottant », puis en Réel à la saisie du réel.
+Fiche Arrivage : barre des statuts remise en haut.
 
 | Script | Contenu |
 |---|---|
@@ -16,7 +20,7 @@ Code à déployer : tout `main` jusqu'au commit 647b051 (ou plus récent).
 
 1. **PC** : `git push origin main`
 2. **Serveur — sauvegarde** : `pg_dump -U axelor -Fc axelor > ~/sauvegarde_axelor_$(date +%F_%H%M).dump`
-3. `cd ~/src && rm -rf axelor-LVME axelor-version_app axelor-version_app.war && git clone https://github.com/consultMen/axelor-LVME.git && cd axelor-LVME && git log --oneline -1` (647b051 ou plus récent)
+3. `cd ~/src && rm -rf axelor-LVME axelor-version_app axelor-version_app.war && git clone https://github.com/consultMen/axelor-LVME.git && cd axelor-LVME && git log --oneline -1` (dernier commit poussé)
 4. **Build d'abord** (l'ancienne appli tourne pendant ce temps) : `cd open-suite-webapp && chmod +x gradlew && ./gradlew war -x test && cd ..`
 5. **Scripts, depuis `~/src/axelor-LVME`, juste avant la bascule** (enchaîner aussitôt avec l'étape 6) :
    ```
