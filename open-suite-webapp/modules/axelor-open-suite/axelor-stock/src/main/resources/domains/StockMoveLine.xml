@@ -53,23 +53,20 @@
 
     <date name="dluo" title="DLUO"/>
     <date name="dateCongelation" title="Date de congélation"/>
-    <integer name="durabilite" title="Durabilité (jours)" default="0"/>
-    <decimal name="nbColis" title="Nb colis" precision="20" scale="3" default="0"/>
-    <decimal name="poidsParColis" title="Poids/colis (Kg)" precision="20" scale="3"
-      default="0"/>
-    <decimal name="poidsParColisNet" title="Poids/colis-NET (Kg)" precision="20" scale="3"/>
+    <integer name="durabilite" title="Durabilité (jours)" nullable="true"/>
+    <decimal name="nbColis" title="Nb colis" precision="20" scale="3" nullable="true"/>
+    <decimal name="poidsParColis" title="Poids/colis (Kg)" precision="20" scale="3" nullable="true"/>
+    <decimal name="poidsParColisNet" title="Poids/colis-NET (Kg)" precision="20" scale="3" nullable="true"/>
     <decimal name="coefPoidsNet" title="Coefficient poids net" precision="10" scale="4"
       default="1"/>
-    <decimal name="poidsTotalNet" title="Poids total net (Kg)" precision="20" scale="3"/>
-    <decimal name="nbUnitesParColis" title="Nb unités/colis" precision="20" scale="3"
-      default="0"/>
-    <decimal name="unitesTot" title="Unités Total" precision="20" scale="3" default="0"/>
+    <decimal name="poidsTotalNet" title="Poids total net (Kg)" precision="20" scale="3" nullable="true"/>
+    <decimal name="nbUnitesParColis" title="Nb unités/colis" precision="20" scale="3" nullable="true"/>
+    <decimal name="unitesTot" title="Unités Total" precision="20" scale="3" nullable="true"/>
 
     <!-- Cost / purchase metrics (optional in receipt UI, but you asked for them) -->
-    <decimal name="fraisApprocheKg" title="Frais d'approche au kg" precision="20" scale="10"
-      default="0"/>
-    <decimal name="prKg" title="PR/Kg" precision="20" scale="10" default="0"/>
-    <decimal name="paDevise" title="PA devise" precision="20" scale="10" default="0"/>
+    <decimal name="fraisApprocheKg" title="Frais d'approche au kg" precision="20" scale="10" nullable="true"/>
+    <decimal name="prKg" title="PR/Kg" precision="20" scale="10" nullable="true"/>
+    <decimal name="paDevise" title="PA devise" precision="20" scale="10" nullable="true"/>
     <decimal name="prixRevientReel" title="PR réel (€/kg)" precision="20" scale="10"
       default="0" help="PR + frais congélation appliqués"/>
     <decimal name="montantReel" title="Montant réel (€)" precision="20" scale="4"

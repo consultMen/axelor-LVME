@@ -39,7 +39,7 @@ onLoad="action-budget-purchase-purchase-orderline-group-onload"  onNew="action-b
         <field name="trackingNumber" title="N° Lot" canNew="true" onChange="action-lvme-ligne-achat-rattacher-lot" colSpan="3" domain="self.product = :product" form-view="tracking-number-form" grid-view="tracking-number-grid"/>
         <field name="dateCongelation" title="Date Congélation" colSpan="2"/>
         <field title="Condit." name="conditionnement" colSpan="3" onChange="action-purchase-order-line-method-compute-packaging" form-view="conditionnement-form" grid-view="conditionnement-grid"/>
-        <field title="Coef." name="coefPoidsNet" colSpan="1"/>
+        <field title="Coef." name="coefPoidsNet" colSpan="1" x-scale="3"/>
         <field title="Unité" name="unit" colSpan="3" canEdit="false" onChange="action-purchase-order-line-attrs-display-different-unit-message" requiredIf="!isTitleLine" form-view="unit-form" grid-view="unit-grid"/>
         <field title="Code Produit" name="productCode" colSpan="3"/>
         <field name="durabilite" title="Durabilité" colSpan="2"/>
@@ -49,7 +49,7 @@ onLoad="action-budget-purchase-purchase-orderline-group-onload"  onNew="action-b
         <field name="taxLineSet" title="Taux TVA" readonly="true" colSpan="3" widget="TagSelect"/>
         <field name="zonePeche" title="Zone Pêche" colSpan="2" selection="lvme.zone.peche.select"/>
         <field name="modePeche" title="Mode Pêche" colSpan="2" selection="lvme.mode.peche.select"/>
-        <field name="fraisApprocheKg" title="Frais d'approche au kg" colSpan="2"/>
+        <field name="fraisApprocheKg" title="Frais d'approche au kg" colSpan="2" x-scale="3"/>
         <field name="nbColisParCouche" title="Colis/Couche" colSpan="1"/>
         <field name="nbColisParPalette" title="Colis/Palette" colSpan="2"/>
         <field name="product.gencode" title="Gencode" readonly="true" colSpan="3"/>
@@ -69,20 +69,20 @@ onLoad="action-budget-purchase-purchase-orderline-group-onload"  onNew="action-b
         <label title="Prix de revient U.V(€)" colSpan="1" css="lvme-gescom-th"/>
         <label title="Montant H.T(€)" colSpan="1" css="lvme-gescom-th"/>
         <label title="Flottant =&gt;" colSpan="1" css="lvme-gescom-rowt"/>
-        <field showTitle="false" css="lvme-case" name="nbColis" title="Nb Colis" colSpan="1" onChange="action-purchase-order-line-method-compute-packaging"/>
-        <field showTitle="false" css="lvme-case" name="nbUnitesParColis" title="Nb unité/colis" readonly="true" colSpan="1"/>
-        <field showTitle="false" css="lvme-case" name="unitesTot" title="Unités Tot" readonly="true" colSpan="1"/>
-        <field showTitle="false" css="lvme-case" name="poidsParColis" title="Poids/Colis-BRUT(Kg)" readonly="true" colSpan="1"/>
-        <field showTitle="false" css="lvme-case" name="poidsParColisNet" title="Poids/Colis-NET(Kg)" readonly="true" colSpan="1"/>
-        <field showTitle="false" css="lvme-case" name="qty" title="Poids Total-BRUT(Kg)" readonly="true" colSpan="1"/>
-        <field showTitle="false" css="lvme-case" name="poidsTotalNet" title="Poids Total- NET(Kg)" readonly="true" colSpan="1"/>
-        <field showTitle="false" css="lvme-case lvme-case-prix" name="price" title="Prix d'achat (PA/Kg)" colSpan="1" onChange="action-purchase-order-line-method-onchange-price,action-purchase-order-line-method-compute,action-purchase-order-line-method-compute-analytic-distribution"/>
-        <field showTitle="false" css="lvme-case lvme-case-prix" name="paDevise" title="Prix d'achat Devise" colSpan="1"/>
-        <field showTitle="false" css="lvme-case lvme-case-prix" name="prKg" title="Prix de revient U.V(€)" colSpan="1"/>
-        <field showTitle="false" css="lvme-case lvme-case-prix" name="exTaxTotal" title="Montant H.T(€)" readonly="true" colSpan="1" x-scale="$currency.numberOfDecimals"/>
+        <field showTitle="false" css="lvme-case" name="nbColis" title="Nb Colis" colSpan="1" onChange="action-purchase-order-line-method-compute-packaging" x-scale="3"/>
+        <field showTitle="false" css="lvme-case" name="nbUnitesParColis" title="Nb unité/colis" readonly="true" colSpan="1" x-scale="3"/>
+        <field showTitle="false" css="lvme-case" name="unitesTot" title="Unités Tot" readonly="true" colSpan="1" x-scale="3"/>
+        <field showTitle="false" css="lvme-case" name="poidsParColis" title="Poids/Colis-BRUT(Kg)" readonly="true" colSpan="1" x-scale="3"/>
+        <field showTitle="false" css="lvme-case" name="poidsParColisNet" title="Poids/Colis-NET(Kg)" readonly="true" colSpan="1" x-scale="3"/>
+        <field showTitle="false" css="lvme-case" name="qty" title="Poids Total-BRUT(Kg)" readonly="true" colSpan="1" x-scale="3"/>
+        <field showTitle="false" css="lvme-case" name="poidsTotalNet" title="Poids Total- NET(Kg)" readonly="true" colSpan="1" x-scale="3"/>
+        <field showTitle="false" css="lvme-case lvme-case-prix" name="price" title="Prix d'achat (PA/Kg)" colSpan="1" onChange="action-purchase-order-line-method-onchange-price,action-purchase-order-line-method-compute,action-purchase-order-line-method-compute-analytic-distribution" x-scale="3"/>
+        <field showTitle="false" css="lvme-case lvme-case-prix" name="paDevise" title="Prix d'achat Devise" colSpan="1" x-scale="3"/>
+        <field showTitle="false" css="lvme-case lvme-case-prix" name="prKg" title="Prix de revient U.V(€)" colSpan="1" x-scale="3"/>
+        <field showTitle="false" css="lvme-case lvme-case-prix" name="exTaxTotal" title="Montant H.T(€)" readonly="true" colSpan="1" x-scale="3"/>
         <label title="Réel =&gt;" colSpan="1" css="lvme-gescom-rowt"/>
         <spacer colSpan="5"/>
-        <field name="receivedQty" showTitle="false" readonly="true" colSpan="1" css="lvme-case"/>
+        <field name="receivedQty" showTitle="false" readonly="true" colSpan="1" css="lvme-case" x-scale="3"/>
         <spacer colSpan="5"/>
       </panel>
 
