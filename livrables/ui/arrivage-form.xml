@@ -19,9 +19,21 @@
 
   <!-- LVME : copie de l'écran « Arrivages » GESCOM (même ordre, mêmes blocs) : tout l'arrivage et ses
        lignes visibles sans défiler. Fournisseur | Arrivage | Devise + tableau Flottant / Réel | Actions -->
-  <!-- barre des statuts (Brouillon, Planifié, Réalisé…) au-dessus de l'écran GESCOM -->
+  <!-- barre des étapes de l'arrivage (d'après sa nature) : Brouillon > A embarquer > Flottant > Réel > Annulé -->
   <panel name="lvmeStatutPanel" colSpan="12">
-    <field name="statusSelect" showTitle="false" readonly="true" colSpan="12" widget="NavSelect"/>
+    <field name="nature" showTitle="false" readonly="true" colSpan="12">
+      <viewer depends="nature"><![CDATA[
+        <>
+          <Box d="flex" style={{ gap: 2 }}>
+            {[["DRAFT", "Brouillon"], ["EN_COURS_DE_PRODUCTION", "A embarquer"], ["FLOTTANT", "Flottant"], ["REEL", "Réel"], ["ANNULE", "Annulé"]].map(e =>
+              <Box as="span" key={e[0]} style={{ padding: "6px 22px 6px 26px", fontSize: 15,
+                clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 50%, calc(100% - 12px) 100%, 0 100%, 12px 50%)",
+                background: nature == e[0] ? "#5b5ce2" : "#ecebfb", color: nature == e[0] ? "#fff" : "#444",
+                fontWeight: nature == e[0] ? 600 : 400 }}>{e[1]}</Box>)}
+          </Box>
+        </>
+      ]]></viewer>
+    </field>
   </panel>
   <panel name="mainPanel" colSpan="12" css="lvme-gescom">
     <panel name="lvmeFournisseurPanel" colSpan="4" itemSpan="6" css="lvme-gescom lvme-gescom-box">
@@ -128,6 +140,7 @@
 
     <!-- champs techniques et paramètres (cachés), gardés pour le fonctionnement de la fiche -->
     <panel name="lvmeTechPanel" hidden="true" colSpan="12">
+      <field name="statusSelect"/>
       <field name="$deviseComptable" type="string"/>
       <field name="$currencySymbol" type="string"/>
       <field name="fromAddress" title="Adresse" colSpan="8" readonlyIf="statusSelect == 3 || statusSelect == 4" onChange="action-stock-move-method-set-addresses-str" onSelect="action-stock-move-attrs-domain-address" form-view="address-form"/>
