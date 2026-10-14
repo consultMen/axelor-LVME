@@ -202,6 +202,8 @@
     <!-- LVME : code-barres article (GENCODE / EAN), repris de GESCOM -->
     <string name="gencode" title="Gencode"/>
     <string name="refFournisseur" title="Référence Fournisseur"/>
+    <!-- LVME : nom scientifique de l'espèce (écran « Lignes Arrivages » GESCOM) -->
+    <string name="nomScientifique" title="Nom scientifique"/>
     <decimal name="poidsColis" title="Poids Colis" precision="20" scale="3"/>
     <decimal name="salePriceTtc" title="P.Vente TTC" precision="20" scale="4"
       readonly="true" help="Calculé à l'enregistrement : P.Vente HT x (1 + TVA de vente)"/>
