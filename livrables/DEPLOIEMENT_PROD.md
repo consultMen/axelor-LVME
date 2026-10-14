@@ -1,3 +1,39 @@
+# Déploiement prod LVME — lot « Fiches GESCOM » du 14/10/2026 (PROD_37 à PROD_47)
+
+Déjà en prod : PROD_31 à PROD_36. PROD_37 à PROD_41 (lot ci-dessous) sont repris ici : tous relançables,
+sans effet s'ils sont déjà passés.
+Code à déployer : tout `main` jusqu'au commit 647b051 (ou plus récent).
+
+| Script | Contenu |
+|---|---|
+| PROD_37 à PROD_41 | voir le lot « Arrivages GESCOM » ci-dessous (lots AE/FL, n° d'arrivage 6 chiffres, fiche Arrivage GESCOM…) |
+| PROD_42 | Fiche « Ligne d'arrivage » copie de « Lignes Arrivages » GESCOM + **colonne `nom_scientifique`** sur l'article |
+| PROD_43 | N° des arrivages repris de GESCOM sans « RO- » (n°, libellé, origine des lots) ; s'arrête sans rien modifier si un n° existe déjà |
+| PROD_44 | Boutons « Historique produit » / « État des stocks par lots » de la ligne, ouverts sur l'article de la ligne |
+| PROD_45 | Fiche « Ligne de commande d'achat » copie de « Lignes Arrivages » GESCOM |
+| PROD_46 | **Colonne `ref_douaniere`** : « Réf. douanière » saisie sur l'article, affichée sur les deux fiches de ligne |
+| PROD_47 | Fiche Commande d'achat condensée comme l'Arrivage (sans barre latérale ni « Paramètres », onglet « Suivi ») |
+
+1. **PC** : `git push origin main`
+2. **Serveur — sauvegarde** : `pg_dump -U axelor -Fc axelor > ~/sauvegarde_axelor_$(date +%F_%H%M).dump`
+3. `cd ~/src && rm -rf axelor-LVME axelor-version_app axelor-version_app.war && git clone https://github.com/consultMen/axelor-LVME.git && cd axelor-LVME && git log --oneline -1` (647b051 ou plus récent)
+4. **Build d'abord** (l'ancienne appli tourne pendant ce temps) : `cd open-suite-webapp && chmod +x gradlew && ./gradlew war -x test && cd ..`
+5. **Scripts, depuis `~/src/axelor-LVME`, juste avant la bascule** (enchaîner aussitôt avec l'étape 6) :
+   ```
+   for f in PROD_37_lot_cree_depuis_achat PROD_38_appliquer_frigo_arrivage PROD_39_lots_ae_fl PROD_40_numero_arrivage_6_chiffres PROD_41_arrivage_condense PROD_42_ligne_arrivage_gescom PROD_43_numero_arrivage_sans_ro PROD_44_boutons_ligne_arrivage PROD_45_ligne_achat_gescom PROD_46_ref_douaniere_article PROD_47_commande_achat_condensee; do echo "== $f"; PGOPTIONS='-c lock_timeout=10s' psql -U axelor axelor -v ON_ERROR_STOP=1 -f livrables/$f.sql > /tmp/$f.log 2>&1 || { echo "ERREUR, voir /tmp/$f.log"; break; }; tail -4 /tmp/$f.log; done
+   ```
+   - chaque script finit par ses contrôles : des `t` partout ; PROD_43 : `restent_avec_ro` = 0
+   - en cas d'arrêt : le message est dans `/tmp/<script>.log`, ne pas basculer, me l'envoyer
+6. **Bascule** : dézipper le war dans `~/src/axelor-version_app`, **recopier `~/axelor-config.prod.properties`** dans `WEB-INF/classes/axelor-config.properties`,
+   `sudo systemctl stop axelor-tomcat`, remplacer `ROOT` (garder l'ancien de côté), `sudo systemctl start axelor-tomcat && sudo systemctl restart nginx`.
+7. **Utilisateurs** : **Ctrl + F5**.
+8. **Vérifications** : fiche Arrivage et sa ligne (tableau Flottant / Réel, boutons historique / stocks) ; commande d'achat
+   condensée (blocs, totaux sous les boutons, onglets du bas) et sa ligne ; article : Nom scientifique + Réf. douanière ;
+   n° d'arrivages repris sans « RO- » ; taux de change EUR → USD présent (Configuration › Devises) pour la contre-valeur en €.
+9. **Retour arrière** : `pg_restore` de la sauvegarde de l'étape 2 et redéploiement du `ROOT` gardé de côté.
+
+---
+
 # Déploiement prod LVME — lot « Arrivages GESCOM » du 14/10/2026 (PROD_37 à PROD_41)
 
 Déjà en prod : lot « Retours client scénario 1 » (PROD_31 à PROD_36, code 252154c).
