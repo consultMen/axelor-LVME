@@ -1,7 +1,7 @@
 <form name="lvme-arrivage-form" title="Arrivage" model="com.axelor.apps.stock.db.StockMove" width="large"
-  onLoad="action-group-stock-stockmove-onload, action-stock-move-attrs-fill-ctx, action-lvme-arrivage-attrs-devise"
+  onLoad="action-group-stock-stockmove-onload, action-stock-move-attrs-fill-ctx, action-lvme-arrivage-attrs-devise, action-lvme-arrivage-attrs-etape"
   onSave="action-stock-move-group-save-and-update-stocks"
-  onNew="action-group-stock-stockmove-onnew, action-stock-move-attrs-fill-ctx">
+  onNew="action-group-stock-stockmove-onnew, action-stock-move-attrs-fill-ctx, action-lvme-arrivage-attrs-etape">
   <!-- LVME : fiche « Arrivages » de GESCOM = réception fournisseur Axelor (mêmes actions que la fiche standard) -->
   <menubar>
     <menu name="stockMoveReportsMenu" title="Editer" icon="fa-files-o">
@@ -19,21 +19,11 @@
 
   <!-- LVME : copie de l'écran « Arrivages » GESCOM (même ordre, mêmes blocs) : tout l'arrivage et ses
        lignes visibles sans défiler. Fournisseur | Arrivage | Devise + tableau Flottant / Réel | Actions -->
-  <!-- barre des étapes de l'arrivage (d'après sa nature) : Brouillon > A embarquer > Flottant > Réel > Annulé -->
+  <!-- barre des étapes de l'arrivage, même présentation que la commande fournisseur :
+       Brouillon > A embarquer > Flottant > Réel > Annulé (d'après la nature, remplie à l'ouverture) -->
   <panel name="lvmeStatutPanel" colSpan="12">
-    <field name="nature" showTitle="false" readonly="true" colSpan="12">
-      <viewer depends="nature"><![CDATA[
-        <>
-          <Box d="flex" style={{ gap: 2 }}>
-            {[["DRAFT", "Brouillon"], ["EN_COURS_DE_PRODUCTION", "A embarquer"], ["FLOTTANT", "Flottant"], ["REEL", "Réel"], ["ANNULE", "Annulé"]].map(e =>
-              <Box as="span" key={e[0]} style={{ padding: "6px 22px 6px 26px", fontSize: 15,
-                clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 50%, calc(100% - 12px) 100%, 0 100%, 12px 50%)",
-                background: nature == e[0] ? "#5b5ce2" : "#ecebfb", color: nature == e[0] ? "#fff" : "#444",
-                fontWeight: nature == e[0] ? 600 : 400 }}>{e[1]}</Box>)}
-          </Box>
-        </>
-      ]]></viewer>
-    </field>
+    <field name="$etapeArrivage" type="integer" showTitle="false" readonly="true" colSpan="12" widget="NavSelect"
+      selection="lvme.arrivage.etape.select"/>
   </panel>
   <panel name="mainPanel" colSpan="12" css="lvme-gescom">
     <panel name="lvmeFournisseurPanel" colSpan="4" itemSpan="6" css="lvme-gescom lvme-gescom-box">
@@ -127,7 +117,7 @@
       <!-- LVME : bouton « Editer » de GESCOM (impression de l'arrivage), visible aussi quand la fiche s'ouvre en fenêtre -->
       <button name="lvmeEditerBtn" title="Editer" icon="printer" showIf="id &amp;&amp; statusSelect != 1" onClick="save,action-lvme-arrivage-imprimer"/>
       <button name="planBtn" title="Plan" showIf="statusSelect == 1" icon="fa-calendar" onClick="action-group-stock-stockmove-plan-click"/>
-      <button name="lvmeFlottantBtn" title="A Embarquer -> flottant" showIf="statusSelect == 2 &amp;&amp; nature != 'FLOTTANT'" css="btn-info" onClick="action-lvme-arrivage-record-flottant,save"/>
+      <button name="lvmeFlottantBtn" title="A Embarquer -> flottant" showIf="statusSelect == 2 &amp;&amp; nature != 'FLOTTANT'" css="btn-info" onClick="action-lvme-arrivage-record-flottant,save,action-lvme-arrivage-attrs-etape"/>
       <button name="realizeBtn" title="Saisie Réel" showIf="statusSelect == 2" css="btn-success" icon="fa-check" prompt="Are you sure you want to realize this stock move?" onClick="action-group-stock-stockmove-realize-click"/>
       <button if="__config__.app.isApp('supplychain') &amp;&amp; __config__.app.getApp('account')?.getActivatePassedForPayment()" if-module="axelor-supplychain" name="passedForPaymentAuthorizedBtn" title="PFP authorized" showIf="pfpValidateStatusSelect != 2" onClick="action-stock-move-group-save-and-update-stocks,action-stock-move-record-pfp-validate,save"/>
       <button if="__config__.app.isApp('supplychain') &amp;&amp; __config__.app.getApp('account')?.getActivatePassedForPayment()" if-module="axelor-supplychain" name="refusalToPayLitigationBtn" title="PFP litigation" showIf="pfpValidateStatusSelect != 3" onClick="action-stock-move-group-save-and-update-stocks,action-stock-move-record-pfp-refusal-to-pay,save"/>

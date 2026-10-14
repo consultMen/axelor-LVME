@@ -107,7 +107,7 @@
     <decimal name="lvmeFraisApproche" title="Frais Appr." precision="20" scale="2"
       formula="true">
       <![CDATA[
-      (SELECT COALESCE(SUM(stock_stock_move_line.frais_approche_kg * stock_stock_move_line.poids_total_net), 0)
+      (SELECT ROUND(COALESCE(SUM(stock_stock_move_line.frais_approche_kg * stock_stock_move_line.poids_total_net), 0), 2)
         FROM stock_stock_move_line WHERE stock_stock_move_line.stock_move = id)
       ]]>
     </decimal>
