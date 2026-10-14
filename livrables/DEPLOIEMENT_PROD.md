@@ -1,3 +1,22 @@
+# Déploiement prod LVME — lot « Lignes vides / lots auto » du 14/10/2026 (PROD_50, PROD_51)
+
+Déjà en prod : PROD_37 à PROD_49. Code à déployer : tout `main` (37c7f7b ou plus récent).
+
+| Script | Contenu |
+|---|---|
+| PROD_50 | Configuration de lot automatique à l'achat sur tous les articles stockables (articles repris) ; s'arrête sans rien modifier s'il n'y a pas exactement 1 configuration auto |
+| PROD_51 | Lignes de commande d'achat / d'arrivage : 3 décimales max à l'affichage (avec le code : champs LVME vides au lieu de 0, poids total brut à 0 par défaut) |
+
+1. **PC** : `git push origin main`
+2. **Serveur — sauvegarde** : `pg_dump -U axelor -Fc axelor > ~/sauvegarde_axelor_$(date +%F_%H%M).dump`
+3. `cd ~/src && rm -rf axelor-LVME axelor-version_app axelor-version_app.war && git clone https://github.com/consultMen/axelor-LVME.git && cd axelor-LVME && git log --oneline -1`
+4. **Build** : `cd ~/src/axelor-LVME/open-suite-webapp && chmod +x gradlew && ./gradlew war -x test`
+5. **Scripts, depuis `~/src/axelor-LVME`** : PROD_50 puis PROD_51 (voir les commandes ci-dessous)
+6. **Bascule** : war de `open-suite-webapp/build/libs/`, dézippé, **`~/axelor-config.prod.properties` recopié**, ancien `ROOT` mis de côté (`mv`), nouveau `ROOT`, redémarrage Tomcat + nginx.
+7. **Ctrl + F5**, vérifier une nouvelle ligne de commande d'achat (champs vides, 3 décimales, lot AE proposé).
+
+---
+
 # Déploiement prod LVME — lot « Fiches GESCOM » du 14/10/2026 (PROD_37 à PROD_49)
 
 Déjà en prod : PROD_31 à PROD_36. PROD_37 à PROD_41 (lot ci-dessous) sont repris ici : tous relançables,
