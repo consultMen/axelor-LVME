@@ -5,7 +5,7 @@ onLoad="action-budget-purchase-purchase-orderline-group-onload"  onNew="action-b
     <field name="isTitleLine" colSpan="2" widget="boolean-switch" onChange="action-purchase-order-line-method-empty-line"/>
   </panel>
   <panel-tabs name="mainPanelTab" hideIf="isTitleLine">
-    <panel name="informationsPanel" title="Ligne">
+    <panel name="informationsPanel" title="Ligne" css="lvme-gescom-fond">
 
       <field name="$partnerLanguage" hidden="true"/>
       <field name="$differentLanguageMessage" showTitle="false" hidden="true" readonly="true" colSpan="12">
@@ -89,6 +89,8 @@ onLoad="action-budget-purchase-purchase-orderline-group-onload"  onNew="action-b
       <panel name="lvmeLigneAchatActionsPanel" colSpan="2" itemSpan="12">
         <button name="lvmeHistoriqueProduitBtn" title="Historique produit" icon="clock-history" onClick="action-lvme-ligne-historique-produit"/>
         <button name="lvmeEtatStockLotBtn" title="État des stocks par lots" icon="box-seam" onClick="action-lvme-ligne-etat-stock-lot"/>
+        <button name="lvmeCdesClientLotBtn" title="Cdes client / Lot" icon="cart" showIf="trackingNumber" onClick="action-lvme-ligne-cdes-client-lot"/>
+        <button name="lvmeCdesClientProduitBtn" title="Cdes client / produit" icon="cart-fill" showIf="product" onClick="action-lvme-ligne-cdes-client-produit"/>
       </panel>
 
       <panel name="lvmeLigneAchatObsPanel" title="Obs" colSpan="12" canCollapse="true" collapseIf="!description">

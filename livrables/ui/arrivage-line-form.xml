@@ -7,7 +7,7 @@
   </panel>
   <!-- LVME : copie de la fenêtre « Lignes Arrivages » GESCOM (mêmes champs et actions que la fiche
        ligne standard, disposés comme GESCOM, sans défiler). Utilisée par la fiche Arrivage. -->
-  <panel name="mainPanel" hideIf="lineTypeSelect == 1" colSpan="12">
+  <panel name="mainPanel" hideIf="lineTypeSelect == 1" colSpan="12" css="lvme-gescom-fond">
     <panel name="lvmeLigneGescomPanel" colSpan="10" css="lvme-gescom">
       <field title="Article" name="product" readonlyIf="($get('stockMove.statusSelect') == 2 &amp;&amp; $get('stockMove.pickingIsEdited')) || $get('stockMove.statusSelect') > 2" canEdit="false" onChange="action-stock-move-line-tracking-number-attrs,action-group-stock-stockmoveline-product-onchange" onSelect="action-stock-move-line-method-product-domain" domain="self.expense = false AND self.dtype = 'Product'" form-view="product-form" grid-view="stock-move-line-product-grid" x-image-field="picture" colSpan="3"/>
       <field title="Désignation" name="productName" colSpan="5"/>
@@ -54,6 +54,8 @@
     <panel name="lvmeLigneActionsPanel" colSpan="2" itemSpan="12">
       <button name="lvmeHistoriqueProduitBtn" title="Historique produit" icon="clock-history" onClick="action-lvme-ligne-historique-produit"/>
       <button name="lvmeEtatStockLotBtn" title="État des stocks par lots" icon="box-seam" onClick="action-lvme-ligne-etat-stock-lot"/>
+      <button name="lvmeCdesClientLotBtn" title="Cdes client / Lot" icon="cart" showIf="trackingNumber" onClick="action-lvme-ligne-cdes-client-lot"/>
+      <button name="lvmeCdesClientProduitBtn" title="Cdes client / produit" icon="cart-fill" showIf="product" onClick="action-lvme-ligne-cdes-client-produit"/>
     </panel>
 
     <!-- champs techniques (cachés) : gardés pour les actions et les calculs de la ligne -->

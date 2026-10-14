@@ -86,3 +86,19 @@
 .lvme-gescom .lvme-case-prix input {
   background-color: #ffd27f !important;
 }
+
+/*
+ * Fenêtres « Ligne d'arrivage » / « Ligne de commande d'achat » : fond bleu clair de GESCOM
+ * (panneau css="lvme-gescom-fond") ; les champs de saisie restent jaunes.
+ */
+.lvme-gescom-fond,
+.lvme-gescom-fond [class*="_panel"],
+.lvme-gescom-fond [class*="_body_"],
+.lvme-gescom-fond [class*="_header_"],
+.lvme-gescom-fond [class*="_content_"] {
+  background-color: #cddff7 !important;
+}
+.lvme-gescom-fond {
+  border-radius: 4px;
+  padding: 6px;
+}

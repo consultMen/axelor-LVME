@@ -1,4 +1,4 @@
-# Déploiement prod LVME — lot « Fiches GESCOM » du 14/10/2026 (PROD_37 à PROD_47)
+# Déploiement prod LVME — lot « Fiches GESCOM » du 14/10/2026 (PROD_37 à PROD_48)
 
 Déjà en prod : PROD_31 à PROD_36. PROD_37 à PROD_41 (lot ci-dessous) sont repris ici : tous relançables,
 sans effet s'ils sont déjà passés.
@@ -6,7 +6,7 @@ Code à déployer : tout `main` (dernier commit affiché par `git log --oneline 
 
 Code (sans script) : comme avant, l'arrivage créé au passage de la commande en « Flottant » est **à embarquer**
 (lots AE + n°) ; il passe en Flottant (lots FL) par son bouton « A Embarquer -> flottant », puis en Réel à la saisie du réel.
-Fiche Arrivage : barre des statuts remise en haut.
+Fiche Arrivage : barre des statuts remise en haut. Lignes de commande client : champs calculés N° Lot / N° Arrivage. Fond bleu des fenêtres de ligne (`css/lvme.css`).
 
 | Script | Contenu |
 |---|---|
@@ -17,6 +17,7 @@ Fiche Arrivage : barre des statuts remise en haut.
 | PROD_45 | Fiche « Ligne de commande d'achat » copie de « Lignes Arrivages » GESCOM |
 | PROD_46 | **Colonne `ref_douaniere`** : « Réf. douanière » saisie sur l'article, affichée sur les deux fiches de ligne |
 | PROD_47 | Fiche Commande d'achat condensée comme l'Arrivage (sans barre latérale ni « Paramètres », onglet « Suivi ») |
+| PROD_48 | Boutons « Cdes client / Lot » et « Cdes client / produit » sur les deux fenêtres de ligne (écran « Commandes Clients » GESCOM) + fond bleu GESCOM |
 
 1. **PC** : `git push origin main`
 2. **Serveur — sauvegarde** : `pg_dump -U axelor -Fc axelor > ~/sauvegarde_axelor_$(date +%F_%H%M).dump`
@@ -24,7 +25,7 @@ Fiche Arrivage : barre des statuts remise en haut.
 4. **Build d'abord** (l'ancienne appli tourne pendant ce temps) : `cd open-suite-webapp && chmod +x gradlew && ./gradlew war -x test && cd ..`
 5. **Scripts, depuis `~/src/axelor-LVME`, juste avant la bascule** (enchaîner aussitôt avec l'étape 6) :
    ```
-   for f in PROD_37_lot_cree_depuis_achat PROD_38_appliquer_frigo_arrivage PROD_39_lots_ae_fl PROD_40_numero_arrivage_6_chiffres PROD_41_arrivage_condense PROD_42_ligne_arrivage_gescom PROD_43_numero_arrivage_sans_ro PROD_44_boutons_ligne_arrivage PROD_45_ligne_achat_gescom PROD_46_ref_douaniere_article PROD_47_commande_achat_condensee; do echo "== $f"; PGOPTIONS='-c lock_timeout=10s' psql -U axelor axelor -v ON_ERROR_STOP=1 -f livrables/$f.sql > /tmp/$f.log 2>&1 || { echo "ERREUR, voir /tmp/$f.log"; break; }; tail -4 /tmp/$f.log; done
+   for f in PROD_37_lot_cree_depuis_achat PROD_38_appliquer_frigo_arrivage PROD_39_lots_ae_fl PROD_40_numero_arrivage_6_chiffres PROD_41_arrivage_condense PROD_42_ligne_arrivage_gescom PROD_43_numero_arrivage_sans_ro PROD_44_boutons_ligne_arrivage PROD_45_ligne_achat_gescom PROD_46_ref_douaniere_article PROD_47_commande_achat_condensee PROD_48_cdes_client_ligne; do echo "== $f"; PGOPTIONS='-c lock_timeout=10s' psql -U axelor axelor -v ON_ERROR_STOP=1 -f livrables/$f.sql > /tmp/$f.log 2>&1 || { echo "ERREUR, voir /tmp/$f.log"; break; }; tail -4 /tmp/$f.log; done
    ```
    - chaque script finit par ses contrôles : des `t` partout ; PROD_43 : `restent_avec_ro` = 0
    - en cas d'arrêt : le message est dans `/tmp/<script>.log`, ne pas basculer, me l'envoyer

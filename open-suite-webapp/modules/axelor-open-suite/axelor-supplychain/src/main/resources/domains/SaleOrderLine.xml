@@ -76,6 +76,23 @@
     <one-to-many name="saleOrderLineLotList"
       ref="com.axelor.apps.supplychain.db.SaleOrderLineLot" mappedBy="saleOrderLine"
       title="Lots sélectionnés"/>
+    <!-- LVME : n° des lots pris et de leurs arrivages, pour l'écran « Commandes Clients » GESCOM -->
+    <string name="lvmeLots" title="N° Lot" formula="true">
+      <![CDATA[
+      (SELECT string_agg(DISTINCT stock_tracking_number.tracking_number_seq, ', ') FROM stock_tracking_number
+        WHERE stock_tracking_number.id IN (SELECT supplychain_sale_order_line_lot.tracking_number
+          FROM supplychain_sale_order_line_lot WHERE supplychain_sale_order_line_lot.sale_order_line = id))
+      ]]>
+    </string>
+    <string name="lvmeArrivages" title="N° Arrivage" formula="true">
+      <![CDATA[
+      (SELECT string_agg(DISTINCT stock_stock_move.stock_move_seq, ', ') FROM stock_stock_move
+        WHERE stock_stock_move.id IN (SELECT stock_stock_move_line.stock_move FROM stock_stock_move_line
+          WHERE stock_stock_move_line.id IN (SELECT stock_tracking_number.origin_stock_move_line FROM stock_tracking_number
+            WHERE stock_tracking_number.id IN (SELECT supplychain_sale_order_line_lot.tracking_number
+              FROM supplychain_sale_order_line_lot WHERE supplychain_sale_order_line_lot.sale_order_line = id))))
+      ]]>
+    </string>
 
     <extra-code>
   		<![CDATA[

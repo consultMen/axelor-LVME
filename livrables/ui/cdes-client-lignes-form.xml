@@ -1,0 +1,31 @@
+<form name="lvme-cdes-client-lignes-form" title="Commandes Clients" model="com.axelor.utils.db.Wizard" width="large"
+  canNew="false" canSave="false" canCopy="false" canDelete="false" onNew="action-lvme-cdes-client-lignes-group-onnew">
+  <!-- LVME : écran « Commandes Clients » GESCOM (boutons Cdes client / Lot et Cdes client / produit de la ligne
+       d'arrivage et de la ligne de commande d'achat) : filtres + lignes de commandes clients -->
+  <panel name="filtresPanel" showTitle="false" colSpan="12">
+    <panel name="filtrePeriodePanel" colSpan="3" itemSpan="12">
+      <field name="$dateDu" title="Période du" type="date"/>
+      <field name="$dateAu" title="au" type="date"/>
+      <field name="$datePeriode" title="Période prédéfinie" type="integer" selection="lvme.etat.stock.periode.select"
+        onChange="action-lvme-cde-client-periode-date"/>
+    </panel>
+    <panel name="filtreClientPanel" colSpan="4" itemSpan="12">
+      <field name="$client" title="Client" type="many-to-one" target="com.axelor.apps.base.db.Partner"
+        domain="self.isCustomer = true" canNew="false" canEdit="false" canView="false"/>
+      <field name="$produit" title="Produit" type="many-to-one" target="com.axelor.apps.base.db.Product"
+        canNew="false" canEdit="false" canView="false"/>
+      <field name="$commercialFiltre" title="Commercial" type="many-to-one" target="com.axelor.auth.db.User"
+        canNew="false" canEdit="false" canView="false"/>
+    </panel>
+    <panel name="filtreLotPanel" colSpan="3" itemSpan="12">
+      <field name="$lot" title="N° Lot" type="many-to-one" target="com.axelor.apps.stock.db.TrackingNumber"
+        canNew="false" canEdit="false" canView="false"/>
+    </panel>
+    <panel name="rechercherPanel" colSpan="2" itemSpan="12">
+      <button name="lancerRechercheBtn" title="Lancer la recherche" icon="search" css="btn-primary"
+        onClick="action-lvme-cdes-client-lignes-refresh"/>
+    </panel>
+  </panel>
+  <panel-dashlet name="lignesDashlet" title="Commandes clients" colSpan="12" height="550"
+    action="action-lvme-cdes-client-lignes-dashlet"/>
+</form>
