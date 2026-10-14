@@ -19,6 +19,10 @@
 
   <!-- LVME : copie de l'écran « Arrivages » GESCOM (même ordre, mêmes blocs) : tout l'arrivage et ses
        lignes visibles sans défiler. Fournisseur | Arrivage | Devise + tableau Flottant / Réel | Actions -->
+  <!-- barre des statuts (Brouillon, Planifié, Réalisé…) au-dessus de l'écran GESCOM -->
+  <panel name="lvmeStatutPanel" colSpan="12">
+    <field name="statusSelect" showTitle="false" readonly="true" colSpan="12" widget="NavSelect"/>
+  </panel>
   <panel name="mainPanel" colSpan="12" css="lvme-gescom">
     <panel name="lvmeFournisseurPanel" colSpan="4" itemSpan="6" css="lvme-gescom lvme-gescom-box">
       <field name="partner" title="Fournisseur" colSpan="8" readonlyIf="statusSelect != 1" canEdit="false" onChange="action-stock-move-group-partner-onchange" domain="self.isContact = false AND :company member of self.companySet" form-view="partner-form" grid-view="partner-grid" x-image-field="picture"/>
@@ -124,7 +128,6 @@
 
     <!-- champs techniques et paramètres (cachés), gardés pour le fonctionnement de la fiche -->
     <panel name="lvmeTechPanel" hidden="true" colSpan="12">
-      <field name="statusSelect"/>
       <field name="$deviseComptable" type="string"/>
       <field name="$currencySymbol" type="string"/>
       <field name="fromAddress" title="Adresse" colSpan="8" readonlyIf="statusSelect == 3 || statusSelect == 4" onChange="action-stock-move-method-set-addresses-str" onSelect="action-stock-move-attrs-domain-address" form-view="address-form"/>
