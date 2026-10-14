@@ -2,6 +2,7 @@ package com.axelor.apps.supplychain.web;
 
 import com.axelor.apps.base.service.exception.TraceBackService;
 import com.axelor.db.JPA;
+import com.axelor.db.Model;
 import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
 import java.math.BigDecimal;
@@ -16,10 +17,13 @@ public class LvmeHistoriqueProduitController {
     try {
       Map<String, Object> context = request.getContext();
       Object produit = context.get("produit");
+      // produit choisi à l'écran (Map) ou passé depuis une ligne d'arrivage (objet)
       Long produitId =
           produit instanceof Map && ((Map<?, ?>) produit).get("id") != null
               ? Long.valueOf(((Map<?, ?>) produit).get("id").toString())
-              : 0L;
+              : produit instanceof Model && ((Model) produit).getId() != null
+                  ? ((Model) produit).getId()
+                  : 0L;
       LocalDate du = toDate(context.get("entreeDu"), LocalDate.of(1900, 1, 1));
       LocalDate au = toDate(context.get("entreeAu"), LocalDate.of(2999, 12, 31));
 

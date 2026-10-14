@@ -52,8 +52,8 @@
     </panel>
 
     <panel name="lvmeLigneActionsPanel" colSpan="2" itemSpan="12">
-      <button name="lvmeHistoriqueProduitBtn" title="Historique produit" icon="clock-history" onClick="action-lvme-historique-produit-open"/>
-      <button name="lvmeEtatStockLotBtn" title="État des stocks par lots" icon="box-seam" onClick="action-lvme-etat-stock-lot-open"/>
+      <button name="lvmeHistoriqueProduitBtn" title="Historique produit" icon="clock-history" onClick="action-lvme-ligne-historique-produit"/>
+      <button name="lvmeEtatStockLotBtn" title="État des stocks par lots" icon="box-seam" onClick="action-lvme-ligne-etat-stock-lot"/>
     </panel>
 
     <!-- champs techniques (cachés) : gardés pour les actions et les calculs de la ligne -->
