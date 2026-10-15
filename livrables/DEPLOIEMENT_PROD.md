@@ -1,9 +1,30 @@
-# Déploiement prod LVME — lot « Lignes vides / lots auto » du 14/10/2026 (PROD_50, PROD_51)
+# Déploiement prod LVME — lot « Détail des lignes GESCOM » du 15/10/2026 (PROD_50, 51, 55 à 59)
 
-Déjà en prod : PROD_37 à PROD_49. Code à déployer : tout `main` (37c7f7b ou plus récent).
+Déjà en prod : PROD_37 à PROD_49. **PROD_52, 53, 54 (fiches Produit / Fournisseur) NE PAS lancer** : en attente des
+écrans GESCOM du client. Code à déployer : tout `main` (dernier commit affiché à l'étape 3).
 
 | Script | Contenu |
 |---|---|
+| PROD_50 | Lot automatique à l'achat sur tous les articles stockables (s'arrête sans rien modifier s'il n'y a pas exactement 1 configuration auto) |
+| PROD_51 | Lignes de commande d'achat / d'arrivage : 3 décimales (code : champs vides au lieu de 0, poids total brut à 0) |
+| PROD_55 | Détail de la commande fournisseur : intitulés GESCOM, totaux sous les lignes (commande et arrivage) |
+| PROD_56 | Colonne Prix Revient = prix de revient saisi ; bouton « Flottant -> A Embarquer » sur l'arrivage |
+| PROD_57 | Totaux sous les lignes calculés par le serveur (toutes les lignes, après duplication aussi) |
+| PROD_58 | Lignes d'arrivage dans l'ordre GESCOM ; tableau des totaux |
+| PROD_59 | Montant ht des lignes d'arrivage = prix d'achat x quantité (code : champ calculé) |
+
+Code (sans script) : impression Arrivage alignée sur la fiche, tableau Flottant / Réel comme GESCOM (Flottant toujours
+affiché), Frais Appr. au kg, montant ht des lignes d'arrivage, feuille de style (intitulés de colonnes en entier).
+
+1. **PC** : `git push origin main`
+2. **Serveur — sauvegarde** : `pg_dump -U axelor -Fc axelor > ~/sauvegarde_axelor_$(date +%F_%H%M).dump`
+3. `cd ~/src && rm -rf axelor-LVME axelor-version_app axelor-version_app.war && git clone https://github.com/consultMen/axelor-LVME.git && cd axelor-LVME && git log --oneline -1`
+4. **Build** : `cd ~/src/axelor-LVME/open-suite-webapp && chmod +x gradlew && ./gradlew war -x test`
+5. **Scripts, depuis `~/src/axelor-LVME`** (`cd ~/src/axelor-LVME`) : PROD_50, 51, 55, 56, 57, 58, 59 dans cet ordre
+6. **Bascule** : war de `open-suite-webapp/build/libs/`, dézippé, **`~/axelor-config.prod.properties` recopié**, ancien `ROOT` mis de côté (`mv`), nouveau `ROOT`, redémarrage Tomcat + nginx.
+7. **Ctrl + F5** ; vérifier une commande fournisseur (détail, totaux, prix revient) et un arrivage (colonnes, montant ht, totaux, Flottant / Réel, Frais Appr., Editer).
+
+---|---|
 | PROD_50 | Configuration de lot automatique à l'achat sur tous les articles stockables (articles repris) ; s'arrête sans rien modifier s'il n'y a pas exactement 1 configuration auto |
 | PROD_51 | Lignes de commande d'achat / d'arrivage : 3 décimales max à l'affichage (avec le code : champs LVME vides au lieu de 0, poids total brut à 0 par défaut) |
 
