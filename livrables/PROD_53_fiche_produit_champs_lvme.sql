@@ -1,5 +1,6 @@
 -- =====================================================================
--- PROD étape 53 : fiche Produit, champs LVME remis en ordre
+-- PROD étape 53 : REMPLACÉ PAR PROD_60 (ne fait plus rien si PROD_60 est passé)
+-- fiche Produit, champs LVME remis en ordre
 --   Gencode, Réf. fournisseur, Poids Colis, P.Vente TTC, Nom scientifique et Réf. douanière avaient été
 --   insérés dans la zone « Code / Nom » d'Axelor (qui cache les libellés) : les champs se mélangeaient
 --   (valeurs sans titre, Nom repoussé dessous). Ils sont sortis de cette zone et regroupés sur une ligne
@@ -13,7 +14,7 @@ DECLARE v_id bigint; v_xml text; f text; n int;
 BEGIN
   SELECT id, xml INTO v_id, v_xml FROM meta_view WHERE name = 'product-form' AND module IS NULL AND priority = 30;
   IF v_id IS NULL THEN RAISE EXCEPTION 'product-form (admin) introuvable : arrêt'; END IF;
-  IF position('name="lvmeInfosArticlePanel"' IN v_xml) > 0 THEN
+  IF position('name="lvmeInfosArticlePanel"' IN v_xml) > 0 OR position('name="lvmeEntetePanel"' IN v_xml) > 0 THEN
     RAISE NOTICE 'déjà passé';
     RETURN;
   END IF;
