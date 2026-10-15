@@ -34,6 +34,33 @@ def bloc(titre, items):
 
 QTE = "CASE WHEN sm.status_select = 3 THEN l.real_qty ELSE l.qty END"
 
+FRAIS = ("(SELECT ROUND(COALESCE(SUM(l.frais_approche_kg * l.poids_total_net), 0), 2) "
+         "FROM stock_stock_move_line l WHERE l.stock_move = sm.id)")
+
+
+def case_fl(expr, reel, dec):
+    """valeur de la ligne Flottant (arrivage non réalisé) ou Réel (réalisé), 0 sinon"""
+    cond = "sm.status_select = 3" if reel else "sm.status_select <> 3"
+    return h(f"CASE WHEN {cond} THEN {num(f'COALESCE({expr}, 0)', dec)} ELSE '0' END")
+
+
+def tableau_fl_re():
+    """tableau GESCOM du bloc Devise : Flottant => / Réel => (Mt Achat HT, Nb Colis, Poids Total, Frais Appr)"""
+    th = '<th style="color:#8b1a8b;padding:0 4px;text-align:right">'
+    td = '<td style="text-align:right;padding:0 4px;border:1px solid #ccc">'
+    out = ("'<table style=\"font-size:8pt;margin-top:4px;border-collapse:collapse\"><tr><th></th>"
+           + th + "Mt Achat HT</th>" + th + "Nb Colis</th>" + th + "Poids Total</th>" + th + "Frais Appr</th></tr>'")
+    for lib, reel in (("Flottant =&gt;", False), ("Réel =&gt;", True)):
+        out += f" || '<tr><td style=\"color:#c000c0;padding-right:4px\">{lib}</td>{td}' || "
+        out += case_fl('sm.ex_tax_total', reel, 2) + f" || '</td>{td}' || "
+        out += case_fl('sm.nb_colis_total', reel, 0) + f" || '</td>{td}' || "
+        out += case_fl('sm.poids_total', reel, 2) + f" || '</td>{td}' || "
+        out += (case_fl(FRAIS, True, 2) if reel else "''") + " || '</td></tr>'"
+    return out + " || '</table>'"
+
+
+TABLEAU_FL_RE = tableau_fl_re()
+
 ENTETE_SQL = f"""
 SELECT
   sm.stock_move_seq AS numero,
@@ -48,29 +75,27 @@ SELECT
      ('Échéance', 'pc.name')])} AS bloc1,
   {bloc('Arrivage', [
      ('Opérateur', 'bu.full_name'),
+     ('Frigo', 'fr.name'),
      ('Arrivage N°', 'sm.stock_move_seq'),
      ('Du', "to_char(sm.created_on, 'DD/MM/YYYY')"),
-     ('Nature', "CASE sm.nature WHEN 1 THEN 'Flottant - à embarquer' WHEN 2 THEN 'Flottant' WHEN 3 THEN 'Réel' WHEN 4 THEN 'Annulé' ELSE 'Brouillon' END"),
-     ('Commande', 'po.purchase_order_seq'),
+     ('A Embarquer', "CASE WHEN sm.nature = 1 THEN 'Oui' ELSE 'Non' END"),
+     ('Nature', "CASE sm.nature WHEN 1 THEN 'A embarquer' WHEN 2 THEN 'Flottant' WHEN 3 THEN 'Réel' WHEN 4 THEN 'Annulé' ELSE 'Brouillon' END"),
      ('Date Départ', "to_char(sm.supplier_shipment_date, 'DD/MM/YYYY')"),
      ('Arrivée', "to_char(COALESCE(sm.real_date, sm.estimated_date), 'DD/MM/YYYY')"),
      ('Type transport', 'shm.name'),
      ('Bateau', 'bt.name'),
      ('Containers', "(SELECT string_agg(c.name, ', ') FROM stock_stock_move_container_set cs JOIN stock_container c ON c.id = cs.container_set WHERE cs.stock_stock_move = sm.id)"),
      ('Transitaire', 'fw.full_name'),
-     ('Frigo', 'fr.name')])} AS bloc2,
+     ('Commande', 'po.purchase_order_seq')])} AS bloc2,
   {bloc('Devise', [
      ('Devise', 'cur.code'),
      ('Cours', num('sm.lvme_cours', 4)),
      ('Couvert', num('sm.lvme_couvert', 4)),
      ('Flottant', num('sm.lvme_flottant', 4)),
      ('Réel', num('sm.lvme_reel', 4)),
-     ('Mt Achat HT', num('sm.ex_tax_total') + " || ' ' || COALESCE(cur.code, '')"),
      ('Équivalent', "CASE WHEN cur.id IS DISTINCT FROM co.currency THEN "
       + num(f"(SELECT SUM(CASE WHEN sm.status_select = 3 THEN l.real_qty ELSE l.qty END * COALESCE(l.company_unit_price_untaxed, 0)) FROM stock_stock_move_line l WHERE l.stock_move = sm.id)")
-      + " || ' ' || COALESCE(ccur.code, '') END"),
-     ('Nb Colis', num('sm.nb_colis_total', 0)),
-     ('Poids Total', num('sm.poids_total', 2))])} AS bloc3
+      + " || ' ' || COALESCE(ccur.code, '') END")])} || {TABLEAU_FL_RE} AS bloc3
 FROM stock_stock_move sm
 LEFT JOIN base_partner p ON p.id = sm.partner
 LEFT JOIN message_email_address em ON em.id = p.email_address
@@ -106,7 +131,7 @@ COLS = [
     ('parcolis', 'Nb unt ou Poids /Colis', num('COALESCE(NULLIF(l.nb_unites_par_colis, 0), l.poids_par_colis)', 0), 0.65, True),
     ('qte', 'Nb unités ou poids', num(QTE, 0), 0.7, True),
     ('poids', 'Poids Kg', num('l.poids_total_net', 2), 0.6, True),
-    ('montant', 'Montant ht', num(f'COALESCE(NULLIF(l.montant_reel, 0), ({QTE}) * l.unit_price_untaxed)', 2), 0.85, True),
+    ('montant', 'Montant ht', num(f'({QTE}) * l.unit_price_untaxed', 2), 0.85, True),
     ('dluo', 'D.L.C. / D.L.U.O', "to_char(l.dluo, 'DD/MM/YYYY')", 0.75, False),
     ('zone', 'Zone pêche', 'l.zone_peche', 0.9, False),
 ]
@@ -114,7 +139,7 @@ TOTAL = {
     'colis': num('SUM(l.nb_colis)', 0),
     'qte': num(f'SUM({QTE})', 0),
     'poids': num('SUM(l.poids_total_net)', 2),
-    'montant': num(f'SUM(COALESCE(NULLIF(l.montant_reel, 0), ({QTE}) * l.unit_price_untaxed))', 2),
+    'montant': num(f'SUM(({QTE}) * l.unit_price_untaxed)', 2),
 }
 JOINS = """FROM stock_stock_move_line l
 JOIN stock_stock_move sm ON sm.id = l.stock_move
