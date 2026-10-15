@@ -55,22 +55,35 @@
     <date name="dateCongelation" title="Date de congélation"/>
     <integer name="durabilite" title="Durabilité (jours)" nullable="true"/>
     <decimal name="nbColis" title="Nb colis" precision="20" scale="3" nullable="true"/>
-    <decimal name="poidsParColis" title="Poids/colis (Kg)" precision="20" scale="3" nullable="true"/>
-    <decimal name="poidsParColisNet" title="Poids/colis-NET (Kg)" precision="20" scale="3" nullable="true"/>
+    <decimal name="poidsParColis" title="Poids/colis (Kg)" precision="20" scale="3"
+      nullable="true"/>
+    <decimal name="poidsParColisNet" title="Poids/colis-NET (Kg)" precision="20" scale="3"
+      nullable="true"/>
     <decimal name="coefPoidsNet" title="Coefficient poids net" precision="10" scale="4"
       default="1"/>
-    <decimal name="poidsTotalNet" title="Poids total net (Kg)" precision="20" scale="3" nullable="true"/>
-    <decimal name="nbUnitesParColis" title="Nb unités/colis" precision="20" scale="3" nullable="true"/>
+    <decimal name="poidsTotalNet" title="Poids total net (Kg)" precision="20" scale="3"
+      nullable="true"/>
+    <decimal name="nbUnitesParColis" title="Nb unités/colis" precision="20" scale="3"
+      nullable="true"/>
     <decimal name="unitesTot" title="Unités Total" precision="20" scale="3" nullable="true"/>
 
     <!-- Cost / purchase metrics (optional in receipt UI, but you asked for them) -->
-    <decimal name="fraisApprocheKg" title="Frais d'approche au kg" precision="20" scale="10" nullable="true"/>
+    <decimal name="fraisApprocheKg" title="Frais d'approche au kg" precision="20" scale="10"
+      nullable="true"/>
     <decimal name="prKg" title="PR/Kg" precision="20" scale="10" nullable="true"/>
     <decimal name="paDevise" title="PA devise" precision="20" scale="10" nullable="true"/>
     <decimal name="prixRevientReel" title="PR réel (€/kg)" precision="20" scale="10"
       default="0" help="PR + frais congélation appliqués"/>
     <decimal name="montantReel" title="Montant réel (€)" precision="20" scale="4"
       default="0" help="Montant HT avec frais congélation = qty × prixRevientReel"/>
+    <!-- LVME : montant HT de la ligne d'arrivage = prix d'achat x quantité (prévue tant que l'arrivage
+      n'est pas réalisé, réelle ensuite), comme la ligne de commande fournisseur -->
+    <decimal name="lvmeMontantHt" title="Montant ht" precision="20" scale="2" formula="true">
+      <![CDATA[
+      ROUND(COALESCE(unit_price_untaxed, 0) * COALESCE(CASE WHEN (SELECT stock_stock_move.status_select
+        FROM stock_stock_move WHERE stock_stock_move.id = stock_move) = 3 THEN real_qty ELSE qty END, 0), 2)
+      ]]>
+    </decimal>
     <!-- LVME : marge reprise de la ligne de commande client (proratisée à la qté livrée) -->
     <decimal name="margeHt" title="Marge HT (€)" precision="20" scale="3" default="0"/>
     <decimal name="tauxMarge" title="% Marge" precision="20" scale="2" default="0"/>

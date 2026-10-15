@@ -21,7 +21,7 @@
     <hilite background="yellow" if="true"/>
   </field>
   <field name="poidsTotalNet" title="Poids Kg" readonly="true" aggregate="sum" width="90px" x-scale="3"/>
-  <field name="montantReel" title="Montant ht" readonly="true" aggregate="sum" width="100px"/>
+  <field name="lvmeMontantHt" title="Montant ht" readonly="true" width="100px"/>
   <field name="dluo" title="D.L.C./ D.L.U.O" readonly="true" width="100px"/>
   <field name="zonePeche" title="Zone Pêche" readonly="true" width="100px"/>
   <field name="qty" title="Flottant" readonlyIf="$get('stockMove.statusSelect') > 1 || lineTypeSelect == 1" width="90px" onChange="action-stock-move-line-group-qty-onchange" aggregate="sum" x-scale="$nbDecimalDigitForQty"/>

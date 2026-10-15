@@ -27,7 +27,7 @@ INSERT INTO meta_action (id, version, created_on, name, type, model, xml, home, 
   <attribute name="value" for="$sommeColis" expr="eval: (stockMoveLineList ?: []).sum(0.0) { it.nbColis ?: 0.0 }"/>
   <attribute name="value" for="$sommeQte" expr="eval: (stockMoveLineList ?: []).sum(0.0) { (statusSelect == 3 ? it.realQty : it.qty) ?: 0.0 }"/>
   <attribute name="value" for="$sommePoids" expr="eval: (stockMoveLineList ?: []).sum(0.0) { it.poidsTotalNet ?: 0.0 }"/>
-  <attribute name="value" for="$sommeMontant" expr="eval: (stockMoveLineList ?: []).sum(0.0) { it.montantReel ?: 0.0 }"/>
+  <attribute name="value" for="$sommeMontant" expr="eval: (stockMoveLineList ?: []).sum(0.0) { (it.unitPriceUntaxed ?: 0.0) * ((statusSelect == 3 ? it.realQty : it.qty) ?: 0.0) }"/>
 </action-attrs>', false, false, 0);
 
 DO $$
