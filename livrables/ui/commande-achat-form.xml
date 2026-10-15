@@ -136,7 +136,18 @@
   </panel>
   <panel-tabs name="mainPanelTab" hideIf="supplierPartner == null || ($enableTradingNamesManagement &amp;&amp; company.tradingNameList != null &amp;&amp; company.tradingNameList.length != 0 &amp;&amp; tradingName == null)">
     <panel name="contentPanel" title="Content" colSpan="12">
-      <panel-related name="purchaseOrderLineListPanel" title="PO lines detail" colSpan="12" height="30" field="purchaseOrderLineList" form-view="lvme-commande-achat-line-form" grid-view="purchase-order-line-purchase-order-grid" orderBy="sequence" onChange="action-purchase-order-method-compute,supplychain-action-create-shipment-cost-line-purchase,action-supplychain-method-purchase-order-check-analytic-axis" canNew="statusSelect &lt; 3" canRemove="statusSelect &lt; 3" canMove="true"/>
+      <panel-related name="purchaseOrderLineListPanel" title="PO lines detail" css="lvme-gescom-grid" colSpan="12" height="30" field="purchaseOrderLineList" form-view="lvme-commande-achat-line-form" grid-view="purchase-order-line-purchase-order-grid" orderBy="sequence" onChange="action-purchase-order-method-compute,supplychain-action-create-shipment-cost-line-purchase,action-supplychain-method-purchase-order-check-analytic-axis" canNew="statusSelect &lt; 3" canRemove="statusSelect &lt; 3" canMove="true"/>
+      <!-- LVME : ligne « Somme » de GESCOM sous le détail (totaux des lignes affichées) -->
+      <field name="$lvmeSommeLignes" type="string" showTitle="false" readonly="true" colSpan="12">
+        <viewer depends="purchaseOrderLineList"><![CDATA[
+          <>
+            <table style={{ borderCollapse: "separate", borderSpacing: 3, fontSize: 13, marginLeft: "auto" }}>
+              <thead><tr><th></th><th style={{ fontWeight: 400, fontStyle: "italic", color: "#1a1ad6", padding: "0 8px", textAlign: "center" }}>Nb Colis</th><th style={{ fontWeight: 400, fontStyle: "italic", color: "#1a1ad6", padding: "0 8px", textAlign: "center" }}>Nb unités ou poids</th><th style={{ fontWeight: 400, fontStyle: "italic", color: "#1a1ad6", padding: "0 8px", textAlign: "center" }}>Poids Kg</th><th style={{ fontWeight: 400, fontStyle: "italic", color: "#1a1ad6", padding: "0 8px", textAlign: "center" }}>Montant ht</th></tr></thead>
+              <tbody><tr><td style={{ fontWeight: 600, paddingRight: 8 }}>Somme</td><td style={{ background: "#ffff99", border: "1px solid #c8c8c8", textAlign: "right", padding: "2px 8px", minWidth: 90 }}>{(v => (v || 0).toLocaleString("fr-FR", { minimumFractionDigits: 3, maximumFractionDigits: 3 }))($sum(purchaseOrderLineList, "nbColis"))}</td><td style={{ background: "#ffff99", border: "1px solid #c8c8c8", textAlign: "right", padding: "2px 8px", minWidth: 90 }}>{(v => (v || 0).toLocaleString("fr-FR", { minimumFractionDigits: 3, maximumFractionDigits: 3 }))($sum(purchaseOrderLineList, "qty"))}</td><td style={{ background: "#ffff99", border: "1px solid #c8c8c8", textAlign: "right", padding: "2px 8px", minWidth: 90 }}>{(v => (v || 0).toLocaleString("fr-FR", { minimumFractionDigits: 3, maximumFractionDigits: 3 }))($sum(purchaseOrderLineList, "poidsTotalNet"))}</td><td style={{ background: "#ffff99", border: "1px solid #c8c8c8", textAlign: "right", padding: "2px 8px", minWidth: 90 }}>{(v => (v || 0).toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }))($sum(purchaseOrderLineList, "exTaxTotal"))}</td></tr></tbody>
+            </table>
+          </>
+        ]]></viewer>
+      </field>
       <field name="notes" colSpan="12" widget="html" x-lite="true"/>
     </panel>
     <panel name="deliveryPanel" title="Delivery" colSpan="12">

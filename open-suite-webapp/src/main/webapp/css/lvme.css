@@ -132,3 +132,12 @@
   padding-top: .15rem;
   padding-bottom: .15rem;
 }
+
+/* intitulés de colonnes GESCOM affichés en entier (sur deux lignes si besoin) au lieu d'être coupés « … » */
+.lvme-gescom-grid [class*="_header_"] [class*="_column_"],
+.lvme-gescom-grid [class*="_header_"] [class*="_column_"] * {
+  white-space: normal !important;
+  text-overflow: clip !important;
+  overflow: visible !important;
+  line-height: 1.15;
+}

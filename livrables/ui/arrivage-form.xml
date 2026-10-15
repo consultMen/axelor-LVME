@@ -155,6 +155,19 @@
   </panel>
 
   <panel-related name="stockMoveLineListPanel" title="Lignes d'arrivage" css="lvme-gescom-grid" readonlyIf="company == null || fromStockLocation == null || toStockLocation == null || statusSelect == 3" height="14" field="stockMoveLineList" form-view="lvme-arrivage-line-form" grid-view="lvme-arrivage-line-grid" orderBy="sequence" onNew="action-stock-move-line-record-filter-on-available-products, action-stock-move-line-record-fill-stock-location" onChange="action-stock-move-line-change-group" canNew="true" canRemove="!(statusSelect == 2 &amp;&amp; pickingIsEdited)" canMove="true"/>
+  <!-- LVME : ligne « Somme » de GESCOM sous les lignes d'arrivage (nb unités ou poids : réel une fois réalisé) -->
+  <panel name="lvmeSommePanel" showTitle="false" colSpan="12">
+    <field name="$lvmeSommeLignes" type="string" showTitle="false" readonly="true" colSpan="12">
+      <viewer depends="stockMoveLineList,statusSelect"><![CDATA[
+        <>
+          <table style={{ borderCollapse: "separate", borderSpacing: 3, fontSize: 13, marginLeft: "auto" }}>
+            <thead><tr><th></th><th style={{ fontWeight: 400, fontStyle: "italic", color: "#1a1ad6", padding: "0 8px", textAlign: "center" }}>Nb Colis</th><th style={{ fontWeight: 400, fontStyle: "italic", color: "#1a1ad6", padding: "0 8px", textAlign: "center" }}>Nb unités ou poids</th><th style={{ fontWeight: 400, fontStyle: "italic", color: "#1a1ad6", padding: "0 8px", textAlign: "center" }}>Poids Kg</th><th style={{ fontWeight: 400, fontStyle: "italic", color: "#1a1ad6", padding: "0 8px", textAlign: "center" }}>Montant ht</th></tr></thead>
+            <tbody><tr><td style={{ fontWeight: 600, paddingRight: 8 }}>Somme</td><td style={{ background: "#ffff99", border: "1px solid #c8c8c8", textAlign: "right", padding: "2px 8px", minWidth: 90 }}>{(v => (v || 0).toLocaleString("fr-FR", { minimumFractionDigits: 3, maximumFractionDigits: 3 }))($sum(stockMoveLineList, "nbColis"))}</td><td style={{ background: "#ffff99", border: "1px solid #c8c8c8", textAlign: "right", padding: "2px 8px", minWidth: 90 }}>{(v => (v || 0).toLocaleString("fr-FR", { minimumFractionDigits: 3, maximumFractionDigits: 3 }))((stockMoveLineList || []).reduce((t, l) => t + (+(statusSelect == 3 ? l.realQty : l.qty) || 0), 0))}</td><td style={{ background: "#ffff99", border: "1px solid #c8c8c8", textAlign: "right", padding: "2px 8px", minWidth: 90 }}>{(v => (v || 0).toLocaleString("fr-FR", { minimumFractionDigits: 3, maximumFractionDigits: 3 }))($sum(stockMoveLineList, "poidsTotalNet"))}</td><td style={{ background: "#ffff99", border: "1px solid #c8c8c8", textAlign: "right", padding: "2px 8px", minWidth: 90 }}>{(v => (v || 0).toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }))($sum(stockMoveLineList, "montantReel"))}</td></tr></tbody>
+          </table>
+        </>
+      ]]></viewer>
+    </field>
+  </panel>
 
   <panel name="lvmeNotePanel" title="Obs" colSpan="12" canCollapse="true" collapseIf="!note">
     <field name="note" showTitle="false" colSpan="12" widget="html" x-lite="true"/>
