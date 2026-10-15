@@ -102,3 +102,33 @@
   border-radius: 4px;
   padding: 6px;
 }
+
+/*
+ * Fiches Produit et Fournisseur / Client resserrées (panneaux css="lvme-compact") : moins d'espace entre
+ * les champs, cases moins hautes, marges réduites ; aucun champ déplacé ni retiré.
+ * Les variables d'Axelor sont redéfinies sur tous les éléments du panneau (elles sont recalculées à
+ * chaque niveau de panneau).
+ */
+.lvme-compact,
+.lvme-compact * {
+  --ax-form-row-gap: .3rem !important;
+  --ax-form-column-gap: .6rem !important;
+  --ax-theme-form-row-gap: .3rem !important;
+  --ax-theme-form-column-gap: .6rem !important;
+  --ax-form-padding: .4rem !important;
+  --ax-panel-body-padding: .4rem !important;
+  --ax-panel-header-padding: .1rem !important;
+  --ax-panel-header-title-padding: .2rem .4rem !important;
+  --ax-input-padding: .15rem .45rem !important;
+}
+.lvme-compact label {
+  font-size: .8rem;
+  margin-bottom: 0;
+  line-height: 1.15;
+}
+.lvme-compact input:not([type="checkbox"]):not([type="radio"]),
+.lvme-compact select {
+  min-height: 0;
+  padding-top: .15rem;
+  padding-bottom: .15rem;
+}
