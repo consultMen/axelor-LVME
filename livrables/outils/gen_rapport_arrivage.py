@@ -39,9 +39,11 @@ FRAIS = ("(SELECT ROUND(COALESCE(SUM(l.frais_approche_kg * l.poids_total_net), 0
 
 
 def case_fl(expr, reel, dec):
-    """valeur de la ligne Flottant (arrivage non réalisé) ou Réel (réalisé), 0 sinon"""
-    cond = "sm.status_select = 3" if reel else "sm.status_select <> 3"
-    return h(f"CASE WHEN {cond} THEN {num(f'COALESCE({expr}, 0)', dec)} ELSE '0' END")
+    """valeur de la ligne Flottant (toujours) ou Réel (arrivage réalisé, 0 sinon)"""
+    # GESCOM : Flottant toujours affiché, Réel une fois l'arrivage réalisé
+    if not reel:
+        return h(num(f'COALESCE({expr}, 0)', dec))
+    return h(f"CASE WHEN sm.status_select = 3 THEN {num(f'COALESCE({expr}, 0)', dec)} ELSE '0' END")
 
 
 def tableau_fl_re():

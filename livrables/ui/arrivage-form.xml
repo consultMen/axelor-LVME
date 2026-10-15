@@ -87,9 +87,9 @@
               <tbody>
                 <tr>
                   <td style={{ color: "#c000c0", whiteSpace: "nowrap" }}>Flottant =&gt;</td>
-                  <td style={{ background: "#ffff99", border: "1px solid #c8c8c8", textAlign: "right", padding: "2px 6px" }}>{statusSelect != 3 ? $fmt("exTaxTotal") : 0}</td>
-                  <td style={{ background: "#ffff99", border: "1px solid #c8c8c8", textAlign: "right", padding: "2px 6px" }}>{statusSelect != 3 ? $fmt("nbColisTotal") : 0}</td>
-                  <td style={{ background: "#ffff99", border: "1px solid #c8c8c8", textAlign: "right", padding: "2px 6px" }}>{statusSelect != 3 ? $fmt("poidsTotal") : 0}</td>
+                  <td style={{ background: "#ffff99", border: "1px solid #c8c8c8", textAlign: "right", padding: "2px 6px" }}>{$fmt("exTaxTotal")}</td>
+                  <td style={{ background: "#ffff99", border: "1px solid #c8c8c8", textAlign: "right", padding: "2px 6px" }}>{$fmt("nbColisTotal")}</td>
+                  <td style={{ background: "#ffff99", border: "1px solid #c8c8c8", textAlign: "right", padding: "2px 6px" }}>{$fmt("poidsTotal")}</td>
                   <td></td>
                 </tr>
                 <tr>
