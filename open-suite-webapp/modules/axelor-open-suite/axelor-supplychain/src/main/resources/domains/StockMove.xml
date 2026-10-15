@@ -104,10 +104,13 @@
           WHERE account_payment_condition.id IN (SELECT base_partner.out_payment_condition FROM base_partner WHERE base_partner.id = partner)))
       ]]>
     </string>
-    <decimal name="lvmeFraisApproche" title="Frais Appr." precision="20" scale="2"
+    <!-- LVME : frais d'approche de l'arrivage AU KG comme GESCOM (moyenne des frais au kg des lignes,
+      pondérée par leur poids net) -->
+    <decimal name="lvmeFraisApproche" title="Frais Appr." precision="20" scale="4"
       formula="true">
       <![CDATA[
-      (SELECT ROUND(COALESCE(SUM(stock_stock_move_line.frais_approche_kg * stock_stock_move_line.poids_total_net), 0), 2)
+      (SELECT ROUND(COALESCE(SUM(stock_stock_move_line.frais_approche_kg * stock_stock_move_line.poids_total_net)
+                / NULLIF(SUM(stock_stock_move_line.poids_total_net), 0), 0), 4)
         FROM stock_stock_move_line WHERE stock_stock_move_line.stock_move = id)
       ]]>
     </decimal>

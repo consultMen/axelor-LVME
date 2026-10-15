@@ -34,7 +34,8 @@ def bloc(titre, items):
 
 QTE = "CASE WHEN sm.status_select = 3 THEN l.real_qty ELSE l.qty END"
 
-FRAIS = ("(SELECT ROUND(COALESCE(SUM(l.frais_approche_kg * l.poids_total_net), 0), 2) "
+# frais d'approche AU KG comme GESCOM (moyenne pondérée par le poids net)
+FRAIS = ("(SELECT ROUND(COALESCE(SUM(l.frais_approche_kg * l.poids_total_net) / NULLIF(SUM(l.poids_total_net), 0), 0), 4) "
          "FROM stock_stock_move_line l WHERE l.stock_move = sm.id)")
 
 
@@ -57,7 +58,7 @@ def tableau_fl_re():
         out += case_fl('sm.ex_tax_total', reel, 2) + f" || '</td>{td}' || "
         out += case_fl('sm.nb_colis_total', reel, 0) + f" || '</td>{td}' || "
         out += case_fl('sm.poids_total', reel, 2) + f" || '</td>{td}' || "
-        out += (case_fl(FRAIS, True, 2) if reel else "''") + " || '</td></tr>'"
+        out += (case_fl(FRAIS, True, 3) if reel else "''") + " || '</td></tr>'"
     return out + " || '</table>'"
 
 

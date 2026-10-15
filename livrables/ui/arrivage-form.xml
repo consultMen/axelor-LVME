@@ -97,7 +97,7 @@
                   <td style={{ background: "#ffff99", border: "1px solid #c8c8c8", textAlign: "right", padding: "2px 6px" }}>{statusSelect == 3 ? $fmt("exTaxTotal") : 0}</td>
                   <td style={{ background: "#ffff99", border: "1px solid #c8c8c8", textAlign: "right", padding: "2px 6px" }}>{statusSelect == 3 ? $fmt("nbColisTotal") : 0}</td>
                   <td style={{ background: "#ffff99", border: "1px solid #c8c8c8", textAlign: "right", padding: "2px 6px" }}>{statusSelect == 3 ? $fmt("poidsTotal") : 0}</td>
-                  <td style={{ background: "#ffff99", border: "1px solid #c8c8c8", textAlign: "right", padding: "2px 6px" }}>{statusSelect == 3 ? $fmt("lvmeFraisApproche") : 0}</td>
+                  <td style={{ background: "#ffff99", border: "1px solid #c8c8c8", textAlign: "right", padding: "2px 6px" }}>{statusSelect == 3 ? (+lvmeFraisApproche || 0).toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 4 }) : 0}</td>
                 </tr>
               </tbody>
             </table>
