@@ -141,3 +141,14 @@
   overflow: visible !important;
   line-height: 1.15;
 }
+
+/* ligne « Somme » de l'arrivage collée sous la liste des lignes (pas de cadre de panneau autour) */
+.lvme-somme,
+.lvme-somme [class*="_panel"],
+.lvme-somme [class*="_body_"] {
+  border: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  padding-top: 0 !important;
+  margin-top: 0 !important;
+}
