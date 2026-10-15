@@ -3,8 +3,8 @@
 --   - colonnes des lignes d'arrivage : Produit, Désignation, Frigo, N° Lot, Origine, Conditionn., Prix Achat,
 --     Prix Revient, Unité, Nb Colis, Nb unt ou Poids /Colis, Nb unités ou poids, Poids Kg, Montant ht,
 --     D.L.C./D.L.U.O, Zone Pêche, puis les colonnes en plus (Flottant, Poids /Colis, N° Lot Fourn., Marque…)
---   - ligne « Somme » (commande fournisseur et arrivage) : une barre grise sous la liste, comme un pied de
---     tableau, libellé à côté de chaque total (plus de rangée de titres au-dessus)
+--   - totaux sous la liste (commande fournisseur et arrivage) : petit tableau à droite, intitulés au-dessus
+--     des valeurs, sans le titre « Somme »
 -- Sources : livrables/ui/arrivage-line-grid.xml, commande-achat-form.xml, arrivage-form.xml (+ css du code).
 -- Après PROD_57. À lancer depuis la racine du dépôt. Relançable.
 -- =====================================================================
@@ -32,5 +32,5 @@ END $$;
 
 COMMIT;
 
-SELECT name, position('Nb unt ou Poids /Colis' IN xml) > 0 OR position('marginRight: "auto"' IN xml) > 0 AS a_jour
+SELECT name, position('Nb unt ou Poids /Colis' IN xml) > 0 OR position('sommeColis' IN xml) > 0 AS a_jour
 FROM meta_view WHERE module IS NULL AND (name IN ('lvme-arrivage-line-grid', 'lvme-arrivage-form') OR (name = 'purchase-order-form' AND priority = 30));
