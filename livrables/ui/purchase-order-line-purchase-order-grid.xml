@@ -18,7 +18,8 @@
   <field name="priceDiscounted" title="Prix Achat" x-scale="$nbDecimalDigitForUnitPrice" width="85">
     <hilite background="yellow" if="true"/>
   </field>
-  <field name="prixRevientReel" title="Prix Revient" width="85"/>
+  <!-- LVME : prix de revient saisi sur la ligne (« Prix de revient U.V(€) ») -->
+  <field name="prKg" title="Prix Revient" x-scale="3" width="85"/>
   <field name="unit" title="Unité" form-view="unit-form" grid-view="unit-grid" width="75"/>
   <field name="nbColis" title="Nb Colis" aggregate="sum" width="75">
     <hilite background="yellow" if="true"/>
