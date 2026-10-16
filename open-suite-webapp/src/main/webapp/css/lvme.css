@@ -188,3 +188,8 @@
   background-color: #ffff00 !important;
   color: #000;
 }
+
+/* fenêtre Ligne de commande client : cases de saisie jaunes de GESCOM (Nb Colis Commandés, Qtés, Prix Vente) */
+.lvme-cde-client .lvme-case input:not([type="checkbox"]):not([type="radio"]) {
+  background-color: #ffff80 !important;
+}

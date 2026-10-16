@@ -1,0 +1,14 @@
+<grid name="lvme-historique-lot-grid" title="Liste des Mouvements de Stock" model="com.axelor.apps.stock.db.StockMoveLine"
+  orderBy="stockMove.realDate,stockMove.estimatedDate,id" canNew="false" canEdit="false" canDelete="false">
+  <!-- LVME : « Liste des Mouvements de Stock » GESCOM d'un lot (bouton Historique lot de la ligne de commande) -->
+  <field name="stockMove.realDate" title="Date" width="90"/>
+  <field name="stockMove.stockMoveSeq" title="Libellé Mvts" width="120"/>
+  <field name="stockMove.typeSelect" title="Type" width="90"/>
+  <field name="stockMove.partner.partnerSeq" title="Réf.Tiers" width="90"/>
+  <field name="trackingNumber" title="N° Lot" width="110"/>
+  <field name="unitPriceUntaxed" title="Prix Vente" x-scale="4" width="85"/>
+  <field name="prKg" title="Prix Revient" x-scale="4" width="85"/>
+  <field name="nbColis" title="Nb Colis" aggregate="sum" x-scale="3" width="80"/>
+  <field name="realQty" title="Quantités" aggregate="sum" x-scale="3" width="90"/>
+  <field name="stockMove.statusSelect" title="Statut" width="90"/>
+</grid>

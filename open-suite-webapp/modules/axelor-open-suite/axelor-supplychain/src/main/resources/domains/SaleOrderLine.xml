@@ -113,6 +113,37 @@
       (SELECT ROUND(COALESCE(sum(lvme_etat_stock_lot.nb_colis_stock - lvme_etat_stock_lot.nb_colis_cdes), 0), 3) FROM lvme_etat_stock_lot WHERE lvme_etat_stock_lot.tracking_number_id IN (SELECT supplychain_sale_order_line_lot.tracking_number FROM supplychain_sale_order_line_lot WHERE supplychain_sale_order_line_lot.sale_order_line = id))
       ]]>
     </decimal>
+    <!-- LVME : autres valeurs du lot pour la fiche « Lignes Commandes » GESCOM -->
+    <string name="lvmeMarque" title="Marque" formula="true">
+      <![CDATA[
+      (SELECT string_agg(DISTINCT stock_stock_move_line.marque, ', ') FROM stock_stock_move_line WHERE stock_stock_move_line.id IN (SELECT stock_tracking_number.origin_stock_move_line FROM stock_tracking_number WHERE stock_tracking_number.id IN (SELECT supplychain_sale_order_line_lot.tracking_number FROM supplychain_sale_order_line_lot WHERE supplychain_sale_order_line_lot.sale_order_line = id)))
+      ]]>
+    </string>
+    <string name="lvmeZonePeche" title="Zone pêche" formula="true">
+      <![CDATA[
+      (SELECT string_agg(DISTINCT stock_stock_move_line.zone_peche, ', ') FROM stock_stock_move_line WHERE stock_stock_move_line.id IN (SELECT stock_tracking_number.origin_stock_move_line FROM stock_tracking_number WHERE stock_tracking_number.id IN (SELECT supplychain_sale_order_line_lot.tracking_number FROM supplychain_sale_order_line_lot WHERE supplychain_sale_order_line_lot.sale_order_line = id)))
+      ]]>
+    </string>
+    <date name="lvmeDateCongelation" title="Congélation" formula="true">
+      <![CDATA[
+      (SELECT min(stock_stock_move_line.date_congelation) FROM stock_stock_move_line WHERE stock_stock_move_line.id IN (SELECT stock_tracking_number.origin_stock_move_line FROM stock_tracking_number WHERE stock_tracking_number.id IN (SELECT supplychain_sale_order_line_lot.tracking_number FROM supplychain_sale_order_line_lot WHERE supplychain_sale_order_line_lot.sale_order_line = id)))
+      ]]>
+    </date>
+    <integer name="lvmeColisPalette" title="Nb Colis / Palette" formula="true">
+      <![CDATA[
+      (SELECT max(purchase_purchase_order_line.nb_colis_par_palette) FROM purchase_purchase_order_line WHERE purchase_purchase_order_line.id IN (SELECT stock_stock_move_line.purchase_order_line FROM stock_stock_move_line WHERE stock_stock_move_line.id IN (SELECT stock_tracking_number.origin_stock_move_line FROM stock_tracking_number WHERE stock_tracking_number.id IN (SELECT supplychain_sale_order_line_lot.tracking_number FROM supplychain_sale_order_line_lot WHERE supplychain_sale_order_line_lot.sale_order_line = id))))
+      ]]>
+    </integer>
+    <integer name="lvmeColisCouche" title="Colis / Couche" formula="true">
+      <![CDATA[
+      (SELECT max(purchase_purchase_order_line.nb_colis_par_couche) FROM purchase_purchase_order_line WHERE purchase_purchase_order_line.id IN (SELECT stock_stock_move_line.purchase_order_line FROM stock_stock_move_line WHERE stock_stock_move_line.id IN (SELECT stock_tracking_number.origin_stock_move_line FROM stock_tracking_number WHERE stock_tracking_number.id IN (SELECT supplychain_sale_order_line_lot.tracking_number FROM supplychain_sale_order_line_lot WHERE supplychain_sale_order_line_lot.sale_order_line = id))))
+      ]]>
+    </integer>
+    <decimal name="lvmeQteDispo" title="Qtés Dispo" precision="20" scale="3" formula="true">
+      <![CDATA[
+      (SELECT ROUND(COALESCE(sum(lvme_etat_stock_lot.dispo_qty), 0), 3) FROM lvme_etat_stock_lot WHERE lvme_etat_stock_lot.tracking_number_id IN (SELECT supplychain_sale_order_line_lot.tracking_number FROM supplychain_sale_order_line_lot WHERE supplychain_sale_order_line_lot.sale_order_line = id))
+      ]]>
+    </decimal>
     <!-- LVME : case « promo » de GESCOM (prix promotionnel) -->
     <boolean name="lvmePromo" title="promo"/>
     <!-- LVME : n° des lots pris et de leurs arrivages, pour l'écran « Commandes Clients » GESCOM -->
