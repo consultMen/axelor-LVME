@@ -1,0 +1,791 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.23" id="1">
+    <property name="createdBy">LVME Sofrimar - Mise A Disposition</property>
+    <list-property name="propertyBindings">
+        <structure>
+            <property name="name">odaURL</property>
+            <property name="id">209</property>
+            <expression name="value" type="javascript">params["DBName"].value</expression>
+        </structure>
+        <structure>
+            <property name="name">odaUser</property>
+            <property name="id">209</property>
+            <expression name="value" type="javascript">params["UserName"].value</expression>
+        </structure>
+        <structure>
+            <property name="name">odaPassword</property>
+            <property name="id">209</property>
+            <expression name="value" type="javascript">params["Password"].value</expression>
+        </structure>
+        <structure>
+            <property name="name">odaDriverClass</property>
+            <property name="id">209</property>
+            <expression name="value" type="javascript">params["DefaultDriver"].value</expression>
+        </structure>
+    </list-property>
+    <property name="units">cm</property>
+    <method name="beforeFactory"><![CDATA[if(params["HeaderHeight"].value != 0 ) {
+reportContext.getDesignHandle().findMasterPage("Simple MasterPage").setProperty("headerHeight",params["HeaderHeight"].value+"cm");
+}
+if(params["FooterHeight"].value != 0) {
+reportContext.getDesignHandle().findMasterPage("Simple MasterPage").setProperty("footerHeight",params["FooterHeight"].value+"cm");
+}]]></method>
+    <property name="layoutPreference">auto layout</property>
+    <property name="bidiLayoutOrientation">ltr</property>
+    <property name="imageDPI">96</property>
+    <parameters>
+        <scalar-parameter name="StockMoveId" id="3265">
+            <property name="hidden">true</property>
+            <property name="valueType">static</property>
+            <property name="isRequired">true</property>
+            <property name="dataType">decimal</property>
+            <property name="distinct">true</property>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="concealValue">false</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="DBName" id="3828">
+            <property name="hidden">true</property>
+            <property name="valueType">static</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant">jdbc:postgresql://localhost:5432/</value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="UserName" id="3829">
+            <property name="hidden">true</property>
+            <property name="valueType">static</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="Password" id="3675">
+            <property name="hidden">true</property>
+            <property name="valueType">static</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="AttachmentPath" id="3838">
+            <property name="hidden">true</property>
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant"></value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="DefaultDriver" id="3819">
+            <property name="hidden">true</property>
+            <property name="valueType">static</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant">org.postgresql.Driver</value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="HeaderHeight" id="5372">
+            <property name="hidden">true</property>
+            <property name="valueType">static</property>
+            <property name="dataType">decimal</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant">0</value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="FooterHeight" id="5373">
+            <property name="hidden">true</property>
+            <property name="valueType">static</property>
+            <property name="dataType">decimal</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant">0</value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+    </parameters>
+    <data-sources>
+        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="Data Source" id="209">
+            <property name="odaDriverClass">org.postgresql.Driver</property>
+            <property name="odaURL">jdbc:postgresql://localhost:5432/</property>
+        </oda-data-source>
+    </data-sources>
+    <data-sets>
+        <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="HeaderDS" id="3000">
+            <property name="nullsOrdering">nulls lowest</property>
+            <list-property name="parameters">
+                <structure>
+                    <property name="name">param_1</property>
+                    <property name="paramName">StockMoveId</property>
+                    <property name="nativeName"></property>
+                    <property name="dataType">decimal</property>
+                    <property name="nativeDataType">-5</property>
+                    <property name="position">1</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+            </list-property>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure><property name="position">1</property><property name="name">stock_move_seq</property><property name="dataType">string</property></structure>
+                    <structure><property name="position">2</property><property name="name">commande_no</property><property name="dataType">string</property></structure>
+                    <structure><property name="position">3</property><property name="name">frigo_name</property><property name="dataType">string</property></structure>
+                    <structure><property name="position">4</property><property name="name">transporteur_name</property><property name="dataType">string</property></structure>
+                    <structure><property name="position">5</property><property name="name">client_livre_name</property><property name="dataType">string</property></structure>
+                    <structure><property name="position">6</property><property name="name">zip</property><property name="dataType">string</property></structure>
+                    <structure><property name="position">7</property><property name="name">ville</property><property name="dataType">string</property></structure>
+                    <structure><property name="position">8</property><property name="name">pdf_header</property><property name="dataType">string</property></structure>
+                </list-property>
+            </structure>
+            <property name="dataSource">Data Source</property>
+            <list-property name="resultSet">
+                <structure><property name="position">1</property><property name="name">stock_move_seq</property><property name="nativeName">stock_move_seq</property><property name="dataType">string</property><property name="nativeDataType">12</property></structure>
+                <structure><property name="position">2</property><property name="name">commande_no</property><property name="nativeName">commande_no</property><property name="dataType">string</property><property name="nativeDataType">12</property></structure>
+                <structure><property name="position">3</property><property name="name">frigo_name</property><property name="nativeName">frigo_name</property><property name="dataType">string</property><property name="nativeDataType">12</property></structure>
+                <structure><property name="position">4</property><property name="name">transporteur_name</property><property name="nativeName">transporteur_name</property><property name="dataType">string</property><property name="nativeDataType">12</property></structure>
+                <structure><property name="position">5</property><property name="name">client_livre_name</property><property name="nativeName">client_livre_name</property><property name="dataType">string</property><property name="nativeDataType">12</property></structure>
+                <structure><property name="position">6</property><property name="name">zip</property><property name="nativeName">zip</property><property name="dataType">string</property><property name="nativeDataType">12</property></structure>
+                <structure><property name="position">7</property><property name="name">ville</property><property name="nativeName">ville</property><property name="dataType">string</property><property name="nativeDataType">12</property></structure>
+                <structure><property name="position">8</property><property name="name">pdf_header</property><property name="nativeName">pdf_header</property><property name="dataType">string</property><property name="nativeDataType">12</property></structure>
+            </list-property>
+            <xml-property name="queryText"><![CDATA[select
+  StockMove.stock_move_seq,
+  StockMove.origin as commande_no,
+  FromLocation.name as frigo_name,
+  Carrier.name as transporteur_name,
+  Partner.name as client_livre_name,
+  ToAddress.zip as zip,
+  City.name as ville,
+  PrintingSetting.pdf_header
+from stock_stock_move as StockMove
+left join base_partner as Partner on (Partner.id = StockMove.partner)
+left join base_address as ToAddress on (ToAddress.id = StockMove.to_address)
+left join base_city as City on (City.id = ToAddress.city)
+left join base_partner as Carrier on (Carrier.id = StockMove.carrier_partner)
+left join stock_stock_location as FromLocation on (FromLocation.id = StockMove.from_stock_location)
+left join base_company as Company on (Company.id = StockMove.company)
+left join base_printing_settings as PrintingSetting on (PrintingSetting.id = Company.printing_settings)
+where StockMove.id = ?]]></xml-property>
+        </oda-data-set>
+        <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="LinesDS" id="4000">
+            <property name="nullsOrdering">nulls lowest</property>
+            <list-property name="parameters">
+                <structure>
+                    <property name="name">param_1</property>
+                    <property name="paramName">StockMoveId</property>
+                    <property name="nativeName"></property>
+                    <property name="dataType">decimal</property>
+                    <property name="nativeDataType">-5</property>
+                    <property name="position">1</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+            </list-property>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure><property name="position">1</property><property name="name">designation</property><property name="dataType">string</property></structure>
+                    <structure><property name="position">2</property><property name="name">nb_colis</property><property name="dataType">decimal</property></structure>
+                    <structure><property name="position">3</property><property name="name">unites_colis</property><property name="dataType">decimal</property></structure>
+                    <structure><property name="position">4</property><property name="name">nb_unites</property><property name="dataType">decimal</property></structure>
+                    <structure><property name="position">5</property><property name="name">poids_total</property><property name="dataType">decimal</property></structure>
+                    <structure><property name="position">6</property><property name="name">num_lot</property><property name="dataType">string</property></structure>
+                </list-property>
+            </structure>
+            <property name="dataSource">Data Source</property>
+            <list-property name="resultSet">
+                <structure><property name="position">1</property><property name="name">designation</property><property name="nativeName">designation</property><property name="dataType">string</property><property name="nativeDataType">12</property></structure>
+                <structure><property name="position">2</property><property name="name">nb_colis</property><property name="nativeName">nb_colis</property><property name="dataType">decimal</property><property name="nativeDataType">2</property></structure>
+                <structure><property name="position">3</property><property name="name">unites_colis</property><property name="nativeName">unites_colis</property><property name="dataType">decimal</property><property name="nativeDataType">2</property></structure>
+                <structure><property name="position">4</property><property name="name">nb_unites</property><property name="nativeName">nb_unites</property><property name="dataType">decimal</property><property name="nativeDataType">2</property></structure>
+                <structure><property name="position">5</property><property name="name">poids_total</property><property name="nativeName">poids_total</property><property name="dataType">decimal</property><property name="nativeDataType">2</property></structure>
+                <structure><property name="position">6</property><property name="name">num_lot</property><property name="nativeName">num_lot</property><property name="dataType">string</property><property name="nativeDataType">12</property></structure>
+            </list-property>
+            <xml-property name="queryText"><![CDATA[select
+  coalesce(StockMoveLine.product_name, Product.name) as designation,
+  StockMoveLine.nb_colis,
+  StockMoveLine.nb_unites_par_colis as unites_colis,
+  StockMoveLine.unites_tot as nb_unites,
+  StockMoveLine.poids_total_net as poids_total,
+  TrackingNumber.tracking_number_seq as num_lot
+from stock_stock_move_line as StockMoveLine
+left join base_product as Product on (Product.id = StockMoveLine.product)
+left join stock_tracking_number as TrackingNumber on (TrackingNumber.id = StockMoveLine.tracking_number)
+where StockMoveLine.stock_move = ?
+order by StockMoveLine.sequence, StockMoveLine.id]]></xml-property>
+        </oda-data-set>
+    </data-sets>
+    <styles>
+        <style name="report" id="4">
+            <property name="fontFamily">sans-serif</property>
+            <property name="fontSize">10pt</property>
+        </style>
+        <style name="cellHead" id="7">
+            <property name="backgroundColor">#C0C0C0</property>
+            <property name="fontSize">9pt</property>
+            <property name="textAlign">center</property>
+            <property name="verticalAlign">middle</property>
+            <property name="borderBottomColor">#000000</property>
+            <property name="borderBottomStyle">solid</property>
+            <property name="borderBottomWidth">thin</property>
+            <property name="borderLeftColor">#000000</property>
+            <property name="borderLeftStyle">solid</property>
+            <property name="borderLeftWidth">thin</property>
+            <property name="borderRightColor">#000000</property>
+            <property name="borderRightStyle">solid</property>
+            <property name="borderRightWidth">thin</property>
+            <property name="borderTopColor">#000000</property>
+            <property name="borderTopStyle">solid</property>
+            <property name="borderTopWidth">thin</property>
+        </style>
+        <style name="cellBody" id="8">
+            <property name="fontSize">9pt</property>
+            <property name="textAlign">center</property>
+            <property name="borderLeftColor">#000000</property>
+            <property name="borderLeftStyle">solid</property>
+            <property name="borderLeftWidth">thin</property>
+            <property name="borderRightColor">#000000</property>
+            <property name="borderRightStyle">solid</property>
+            <property name="borderRightWidth">thin</property>
+        </style>
+        <style name="cellBodyLeft" id="9">
+            <property name="fontSize">9pt</property>
+            <property name="textAlign">left</property>
+            <property name="paddingLeft">3pt</property>
+            <property name="borderLeftColor">#000000</property>
+            <property name="borderLeftStyle">solid</property>
+            <property name="borderLeftWidth">thin</property>
+            <property name="borderRightColor">#000000</property>
+            <property name="borderRightStyle">solid</property>
+            <property name="borderRightWidth">thin</property>
+        </style>
+        <style name="boxFrame" id="10">
+            <property name="borderBottomColor">#808080</property>
+            <property name="borderBottomStyle">solid</property>
+            <property name="borderBottomWidth">thin</property>
+            <property name="borderLeftColor">#808080</property>
+            <property name="borderLeftStyle">solid</property>
+            <property name="borderLeftWidth">thin</property>
+            <property name="borderRightColor">#808080</property>
+            <property name="borderRightStyle">solid</property>
+            <property name="borderRightWidth">thin</property>
+            <property name="borderTopColor">#808080</property>
+            <property name="borderTopStyle">solid</property>
+            <property name="borderTopWidth">thin</property>
+        </style>
+        <style name="totalBox" id="11">
+            <property name="borderBottomColor">#000000</property>
+            <property name="borderBottomStyle">solid</property>
+            <property name="borderBottomWidth">thin</property>
+            <property name="borderLeftColor">#000000</property>
+            <property name="borderLeftStyle">solid</property>
+            <property name="borderLeftWidth">thin</property>
+            <property name="borderRightColor">#000000</property>
+            <property name="borderRightStyle">solid</property>
+            <property name="borderRightWidth">thin</property>
+            <property name="borderTopColor">#000000</property>
+            <property name="borderTopStyle">solid</property>
+            <property name="borderTopWidth">thin</property>
+            <property name="verticalAlign">middle</property>
+        </style>
+    </styles>
+    <page-setup>
+        <simple-master-page name="Simple MasterPage" id="2">
+            <property name="type">a4</property>
+            <property name="orientation">portrait</property>
+            <property name="topMargin">1cm</property>
+            <property name="leftMargin">1cm</property>
+            <property name="rightMargin">1cm</property>
+            <property name="bottomMargin">1cm</property>
+            <property name="headerHeight">7.4cm</property>
+            <property name="footerHeight">0.6cm</property>
+            <property name="showHeaderOnFirst">true</property>
+            <property name="showFooterOnLast">true</property>
+            <page-header>
+                <grid id="500">
+                    <property name="dataSet">HeaderDS</property>
+                    <property name="width">19cm</property>
+                    <list-property name="boundDataColumns">
+                        <structure><property name="name">stock_move_seq</property><expression name="expression" type="javascript">dataSetRow["stock_move_seq"]</expression><property name="dataType">string</property></structure>
+                        <structure><property name="name">commande_no</property><expression name="expression" type="javascript">dataSetRow["commande_no"]</expression><property name="dataType">string</property></structure>
+                        <structure><property name="name">frigo_name</property><expression name="expression" type="javascript">dataSetRow["frigo_name"]</expression><property name="dataType">string</property></structure>
+                        <structure><property name="name">transporteur_name</property><expression name="expression" type="javascript">dataSetRow["transporteur_name"]</expression><property name="dataType">string</property></structure>
+                        <structure><property name="name">client_livre_name</property><expression name="expression" type="javascript">dataSetRow["client_livre_name"]</expression><property name="dataType">string</property></structure>
+                        <structure><property name="name">cp_ville</property><expression name="expression" type="javascript">if(dataSetRow["zip"] != null &amp;&amp; dataSetRow["ville"] != null){dataSetRow["zip"]+" / "+dataSetRow["ville"]}else if(dataSetRow["ville"] != null){dataSetRow["ville"]}else{dataSetRow["zip"]}</expression><property name="dataType">string</property></structure>
+                        <structure><property name="name">pdf_header</property><expression name="expression" type="javascript">dataSetRow["pdf_header"]</expression><property name="dataType">string</property></structure>
+                        <structure><property name="name">TodayDate</property><expression name="expression" type="javascript">new Date()</expression><property name="dataType">date</property></structure>
+                    </list-property>
+                    <column id="501"><property name="width">9.5cm</property></column>
+                    <column id="502"><property name="width">5.5cm</property></column>
+                    <column id="503"><property name="width">4cm</property></column>
+                    <row id="510">
+                        <cell id="511">
+                            <property name="colSpan">2</property>
+                            <property name="rowSpan">1</property>
+                            <property name="textAlign">center</property>
+                            <text id="512">
+                                <property name="fontSize">9pt</property>
+                                <property name="textAlign">center</property>
+                                <list-property name="visibility">
+                                    <structure>
+                                        <property name="format">all</property>
+                                        <expression name="valueExpr" type="javascript">row["pdf_header"] == null</expression>
+                                    </structure>
+                                </list-property>
+                                <property name="contentType">html</property>
+                                <text-property name="content"><![CDATA[<VALUE-OF format="HTML">row["pdf_header"]</VALUE-OF>]]></text-property>
+                            </text>
+                            <text id="513">
+                                <property name="fontSize">9pt</property>
+                                <property name="textAlign">center</property>
+                                <list-property name="visibility">
+                                    <structure>
+                                        <property name="format">all</property>
+                                        <expression name="valueExpr" type="javascript">row["pdf_header"] != null</expression>
+                                    </structure>
+                                </list-property>
+                                <property name="contentType">html</property>
+                                <text-property name="content"><![CDATA[<div style="text-align:center;line-height:1.35em;">
+<span style="font-weight:bold;font-style:italic;font-size:12pt;">L.V.M.E.</span><br/>
+<span style="font-size:9pt;">64, Avenue D'HA&Iuml;FA - Immeuble HERMES PARK - 13008 MARSEILLE</span><br/>
+<span style="font-style:italic;font-size:11pt;">T&eacute;l. 04 91 83 00 00 - Fax 04 91 83 20 40</span><br/>
+<span style="font-size:9pt;">Email : sofrimar@sofrimar.fr</span><br/>
+<span style="font-size:9pt;">S.A.R.L. au capital de 1 000 200 &euro; - SIRET:  522 862 689 00026</span><br/>
+<span style="font-size:9pt;">Tva intra.: FR 12522 862 689   -   APE : 4638 B</span>
+</div>]]></text-property>
+                            </text>
+                        </cell>
+                        <cell id="514">
+                            <property name="verticalAlign">bottom</property>
+                            <property name="textAlign">left</property>
+                            <text id="515">
+                                <property name="fontSize">10pt</property>
+                                <property name="fontStyle">italic</property>
+                                <property name="contentType">html</property>
+                                <text-property name="content"><![CDATA[Page. &nbsp;&nbsp;<VALUE-OF>pageNumber</VALUE-OF>]]></text-property>
+                            </text>
+                        </cell>
+                    </row>
+                    <row id="520">
+                        <property name="height">0.9cm</property>
+                        <cell id="521">
+                            <property name="verticalAlign">middle</property>
+                            <grid id="522">
+                                <property name="width">7.5cm</property>
+                                <column id="523"><property name="width">7.5cm</property></column>
+                                <row id="524">
+                                    <cell id="525">
+                                        <property name="backgroundColor">#C0C0C0</property>
+                                        <property name="textAlign">center</property>
+                                        <property name="borderBottomColor">#000000</property>
+                                        <property name="borderBottomStyle">solid</property>
+                                        <property name="borderBottomWidth">thin</property>
+                                        <property name="borderLeftColor">#000000</property>
+                                        <property name="borderLeftStyle">solid</property>
+                                        <property name="borderLeftWidth">thin</property>
+                                        <property name="borderRightColor">#000000</property>
+                                        <property name="borderRightStyle">solid</property>
+                                        <property name="borderRightWidth">thin</property>
+                                        <property name="borderTopColor">#000000</property>
+                                        <property name="borderTopStyle">solid</property>
+                                        <property name="borderTopWidth">thin</property>
+                                        <label id="526">
+                                            <property name="fontSize">13pt</property>
+                                            <property name="fontWeight">bold</property>
+                                            <property name="textAlign">center</property>
+                                            <text-property name="text">MISE  A  DISPOSITION</text-property>
+                                        </label>
+                                    </cell>
+                                </row>
+                            </grid>
+                        </cell>
+                        <cell id="527">
+                            <property name="colSpan">2</property>
+                            <property name="rowSpan">1</property>
+                            <property name="verticalAlign">middle</property>
+                            <text id="528">
+                                <property name="fontSize">10pt</property>
+                                <property name="contentType">html</property>
+                                <text-property name="content"><![CDATA[Edit&eacute; le &nbsp;&nbsp;<VALUE-OF format="dd/MM/yyyy">row["TodayDate"]</VALUE-OF>]]></text-property>
+                            </text>
+                        </cell>
+                    </row>
+                    <row id="530">
+                        <cell id="531">
+                            <label id="532">
+                                <property name="fontSize">11pt</property>
+                                <property name="fontWeight">bold</property>
+                                <property name="fontStyle">italic</property>
+                                <property name="color">#404040</property>
+                                <property name="marginLeft">1.2cm</property>
+                                <text-property name="text">&lt; FRIGO &gt;</text-property>
+                            </label>
+                        </cell>
+                        <cell id="533">
+                            <property name="colSpan">2</property>
+                            <property name="rowSpan">1</property>
+                            <label id="534">
+                                <property name="fontSize">11pt</property>
+                                <property name="fontStyle">italic</property>
+                                <property name="color">#404040</property>
+                                <property name="marginLeft">1cm</property>
+                                <text-property name="text">&lt; Pour le transporteur &gt;</text-property>
+                            </label>
+                        </cell>
+                    </row>
+                    <row id="540">
+                        <property name="height">1.6cm</property>
+                        <cell id="541">
+                            <property name="verticalAlign">top</property>
+                            <grid id="542">
+                                <property name="style">boxFrame</property>
+                                <property name="width">7.5cm</property>
+                                <column id="543"><property name="width">7.5cm</property></column>
+                                <row id="544">
+                                    <property name="height">1.5cm</property>
+                                    <cell id="545">
+                                        <property name="verticalAlign">top</property>
+                                        <property name="textAlign">center</property>
+                                        <data id="546">
+                                            <property name="fontSize">10pt</property>
+                                            <property name="fontWeight">bold</property>
+                                            <property name="textAlign">center</property>
+                                            <property name="resultSetColumn">frigo_name</property>
+                                        </data>
+                                    </cell>
+                                </row>
+                            </grid>
+                        </cell>
+                        <cell id="547">
+                            <property name="colSpan">2</property>
+                            <property name="rowSpan">1</property>
+                            <property name="verticalAlign">top</property>
+                            <grid id="548">
+                                <property name="style">boxFrame</property>
+                                <property name="width">7.5cm</property>
+                                <column id="549"><property name="width">7.5cm</property></column>
+                                <row id="550">
+                                    <property name="height">1.5cm</property>
+                                    <cell id="551">
+                                        <property name="verticalAlign">top</property>
+                                        <property name="textAlign">center</property>
+                                        <data id="552">
+                                            <property name="fontSize">10pt</property>
+                                            <property name="textAlign">center</property>
+                                            <property name="resultSetColumn">transporteur_name</property>
+                                        </data>
+                                    </cell>
+                                </row>
+                            </grid>
+                        </cell>
+                    </row>
+                    <row id="560">
+                        <cell id="561">
+                            <property name="textAlign">right</property>
+                            <property name="verticalAlign">middle</property>
+                            <label id="562">
+                                <property name="fontSize">11pt</property>
+                                <property name="textAlign">right</property>
+                                <property name="marginRight">0.6cm</property>
+                                <text-property name="text">Client Livré :</text-property>
+                            </label>
+                        </cell>
+                        <cell id="563">
+                            <property name="colSpan">2</property>
+                            <property name="rowSpan">1</property>
+                            <property name="verticalAlign">middle</property>
+                            <data id="564">
+                                <property name="fontSize">11pt</property>
+                                <property name="fontWeight">bold</property>
+                                <property name="textAlign">center</property>
+                                <property name="resultSetColumn">client_livre_name</property>
+                            </data>
+                        </cell>
+                    </row>
+                    <row id="570">
+                        <property name="height">1cm</property>
+                        <cell id="571">
+                            <property name="verticalAlign">middle</property>
+                            <text id="572">
+                                <property name="fontSize">11pt</property>
+                                <property name="contentType">html</property>
+                                <text-property name="content"><![CDATA[Commande N&deg; &nbsp;&nbsp;<VALUE-OF>row["commande_no"]</VALUE-OF>]]></text-property>
+                            </text>
+                        </cell>
+                        <cell id="573">
+                            <property name="colSpan">2</property>
+                            <property name="rowSpan">1</property>
+                            <property name="verticalAlign">middle</property>
+                            <data id="574">
+                                <property name="fontSize">11pt</property>
+                                <property name="fontWeight">bold</property>
+                                <property name="textAlign">center</property>
+                                <property name="resultSetColumn">cp_ville</property>
+                            </data>
+                        </cell>
+                    </row>
+                </grid>
+            </page-header>
+            <page-footer>
+                <text id="580">
+                    <property name="fontSize">9pt</property>
+                    <property name="textAlign">center</property>
+                    <property name="contentType">html</property>
+                    <text-property name="content"><![CDATA[<VALUE-OF>pageNumber</VALUE-OF>]]></text-property>
+                </text>
+            </page-footer>
+        </simple-master-page>
+    </page-setup>
+    <body>
+        <table id="600">
+            <property name="dataSet">LinesDS</property>
+            <property name="width">19cm</property>
+            <property name="repeatHeader">true</property>
+            <list-property name="boundDataColumns">
+                <structure><property name="name">designation</property><expression name="expression" type="javascript">dataSetRow["designation"]</expression><property name="dataType">string</property></structure>
+                <structure><property name="name">nb_colis</property><expression name="expression" type="javascript">dataSetRow["nb_colis"]</expression><property name="dataType">decimal</property></structure>
+                <structure><property name="name">unites_colis</property><expression name="expression" type="javascript">dataSetRow["unites_colis"]</expression><property name="dataType">decimal</property></structure>
+                <structure><property name="name">nb_unites</property><expression name="expression" type="javascript">dataSetRow["nb_unites"]</expression><property name="dataType">decimal</property></structure>
+                <structure><property name="name">poids_total</property><expression name="expression" type="javascript">dataSetRow["poids_total"]</expression><property name="dataType">decimal</property></structure>
+                <structure><property name="name">num_lot</property><expression name="expression" type="javascript">dataSetRow["num_lot"]</expression><property name="dataType">string</property></structure>
+                <structure>
+                    <property name="name">TotalColis</property>
+                    <property name="dataType">decimal</property>
+                    <property name="aggregateFunction">SUM</property>
+                    <list-property name="arguments">
+                        <structure>
+                            <property name="name">Expression</property>
+                            <expression name="value" type="javascript">row["nb_colis"]</expression>
+                        </structure>
+                    </list-property>
+                </structure>
+                <structure>
+                    <property name="name">TotalPoids</property>
+                    <property name="dataType">decimal</property>
+                    <property name="aggregateFunction">SUM</property>
+                    <list-property name="arguments">
+                        <structure>
+                            <property name="name">Expression</property>
+                            <expression name="value" type="javascript">row["poids_total"]</expression>
+                        </structure>
+                    </list-property>
+                </structure>
+            </list-property>
+            <column id="601"><property name="width">8.4cm</property></column>
+            <column id="602"><property name="width">1.9cm</property></column>
+            <column id="603"><property name="width">1.9cm</property></column>
+            <column id="604"><property name="width">1.9cm</property></column>
+            <column id="605"><property name="width">2.1cm</property></column>
+            <column id="606"><property name="width">2.8cm</property></column>
+            <header>
+                <row id="610">
+                    <property name="height">0.85cm</property>
+                    <cell id="611">
+                        <property name="style">cellHead</property>
+                        <label id="621">
+                            <property name="fontSize">9pt</property>
+                            <property name="textAlign">center</property>
+                            <text-property name="text">Désignation</text-property>
+                        </label>
+                    </cell>
+                    <cell id="612">
+                        <property name="style">cellHead</property>
+                        <text id="622">
+                            <property name="fontSize">9pt</property>
+                            <property name="textAlign">center</property>
+                            <property name="contentType">html</property>
+                            <text-property name="content"><![CDATA[Nombre<br/>Colis]]></text-property>
+                        </text>
+                    </cell>
+                    <cell id="613">
+                        <property name="style">cellHead</property>
+                        <text id="623">
+                            <property name="fontSize">9pt</property>
+                            <property name="textAlign">center</property>
+                            <property name="contentType">html</property>
+                            <text-property name="content"><![CDATA[Unit&eacute;s /<br/>colis]]></text-property>
+                        </text>
+                    </cell>
+                    <cell id="614">
+                        <property name="style">cellHead</property>
+                        <text id="624">
+                            <property name="fontSize">9pt</property>
+                            <property name="textAlign">center</property>
+                            <property name="contentType">html</property>
+                            <text-property name="content"><![CDATA[Nb<br/>Unit&eacute;s]]></text-property>
+                        </text>
+                    </cell>
+                    <cell id="615">
+                        <property name="style">cellHead</property>
+                        <text id="625">
+                            <property name="fontSize">9pt</property>
+                            <property name="textAlign">center</property>
+                            <property name="contentType">html</property>
+                            <text-property name="content"><![CDATA[Poids<br/>Total]]></text-property>
+                        </text>
+                    </cell>
+                    <cell id="616">
+                        <property name="style">cellHead</property>
+                        <label id="626">
+                            <property name="fontSize">9pt</property>
+                            <property name="textAlign">center</property>
+                            <text-property name="text">N° Lot</text-property>
+                        </label>
+                    </cell>
+                </row>
+            </header>
+            <detail>
+                <row id="630">
+                    <property name="height">0.5cm</property>
+                    <cell id="631">
+                        <property name="style">cellBodyLeft</property>
+                        <data id="641">
+                            <property name="fontSize">9pt</property>
+                            <property name="textAlign">left</property>
+                            <property name="resultSetColumn">designation</property>
+                        </data>
+                    </cell>
+                    <cell id="632">
+                        <property name="style">cellBody</property>
+                        <text id="642"><property name="fontSize">9pt</property><property name="textAlign">center</property><property name="contentType">html</property><text-property name="content"><![CDATA[<VALUE-OF>row["nb_colis"]==null?"":String(parseFloat(row["nb_colis"].toString())).replace(".",",")</VALUE-OF>]]></text-property></text>
+                    </cell>
+                    <cell id="633">
+                        <property name="style">cellBody</property>
+                        <text id="643"><property name="fontSize">9pt</property><property name="textAlign">center</property><property name="contentType">html</property><text-property name="content"><![CDATA[<VALUE-OF>row["unites_colis"]==null?"":String(parseFloat(row["unites_colis"].toString())).replace(".",",")</VALUE-OF>]]></text-property></text>
+                    </cell>
+                    <cell id="634">
+                        <property name="style">cellBody</property>
+                        <text id="644"><property name="fontSize">9pt</property><property name="textAlign">center</property><property name="contentType">html</property><text-property name="content"><![CDATA[<VALUE-OF>row["nb_unites"]==null?"":String(parseFloat(row["nb_unites"].toString())).replace(".",",")</VALUE-OF>]]></text-property></text>
+                    </cell>
+                    <cell id="635">
+                        <property name="style">cellBody</property>
+                        <text id="645"><property name="fontSize">9pt</property><property name="textAlign">center</property><property name="contentType">html</property><text-property name="content"><![CDATA[<VALUE-OF>row["poids_total"]==null?"":String(parseFloat(row["poids_total"].toString())).replace(".",",")</VALUE-OF>]]></text-property></text>
+                    </cell>
+                    <cell id="636">
+                        <property name="style">cellBody</property>
+                        <data id="646">
+                            <property name="fontSize">9pt</property>
+                            <property name="textAlign">center</property>
+                            <property name="resultSetColumn">num_lot</property>
+                        </data>
+                    </cell>
+                </row>
+            </detail>
+            <footer>
+                <row id="650">
+                    <property name="height">0.1cm</property>
+                    <cell id="651">
+                        <property name="colSpan">6</property>
+                        <property name="rowSpan">1</property>
+                        <property name="borderTopColor">#000000</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <label id="661"><property name="fontSize">1pt</property></label>
+                    </cell>
+                </row>
+                <row id="670">
+                    <property name="height">1.2cm</property>
+                    <cell id="671">
+                        <property name="colSpan">6</property>
+                        <property name="rowSpan">1</property>
+                        <label id="681"><property name="fontSize">1pt</property></label>
+                    </cell>
+                </row>
+                <row id="690">
+                    <property name="height">0.7cm</property>
+                    <cell id="691"><property name="colSpan">3</property><property name="rowSpan">1</property></cell>
+                    <cell id="694">
+                        <property name="colSpan">2</property>
+                        <property name="rowSpan">1</property>
+                        <property name="style">cellHead</property>
+                        <text id="794">
+                            <property name="fontSize">9pt</property>
+                            <property name="textAlign">center</property>
+                            <property name="contentType">html</property>
+                            <text-property name="content"><![CDATA[Total Colis]]></text-property>
+                        </text>
+                    </cell>
+                    <cell id="696">
+                        <property name="style">cellHead</property>
+                        <text id="796">
+                            <property name="fontSize">9pt</property>
+                            <property name="textAlign">center</property>
+                            <property name="contentType">html</property>
+                            <text-property name="content"><![CDATA[Poids Total &nbsp;(kg)]]></text-property>
+                        </text>
+                    </cell>
+                </row>
+                <row id="700">
+                    <property name="height">0.7cm</property>
+                    <cell id="701"><property name="colSpan">3</property><property name="rowSpan">1</property></cell>
+                    <cell id="704">
+                        <property name="colSpan">2</property>
+                        <property name="rowSpan">1</property>
+                        <property name="style">totalBox</property>
+                        <text id="804">
+                            <property name="fontSize">11pt</property>
+                            <property name="fontWeight">bold</property>
+                            <property name="textAlign">center</property>
+                            <property name="contentType">html</property>
+                            <text-property name="content"><![CDATA[<VALUE-OF>row["TotalColis"]==null?"":String(parseFloat(row["TotalColis"].toString())).replace(".",",")</VALUE-OF>]]></text-property>
+                        </text>
+                    </cell>
+                    <cell id="706">
+                        <property name="style">totalBox</property>
+                        <text id="806">
+                            <property name="fontSize">11pt</property>
+                            <property name="fontWeight">bold</property>
+                            <property name="textAlign">center</property>
+                            <property name="contentType">html</property>
+                            <text-property name="content"><![CDATA[<VALUE-OF>row["TotalPoids"]==null?"":String(parseFloat(row["TotalPoids"].toString())).replace(".",",")</VALUE-OF>]]></text-property>
+                        </text>
+                    </cell>
+                </row>
+            </footer>
+        </table>
+    </body>
+</report>
