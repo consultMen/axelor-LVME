@@ -9,12 +9,20 @@
 --     Réservation, Livraison et Paramètres repliés sous l'en-tête. Aucun champ retiré.
 --   - Nb Colis / Poids calculés par le serveur sur toutes les lignes, à l'ouverture et à chaque changement
 -- Source : livrables/ui/commande-client-form.xml (fiche admin sale-order-form, priorité 30).
--- À lancer depuis la racine du dépôt. Relançable. Pas de redémarrage nécessaire.
+--   - champs Préparateur et % Frais Cong. (code de ce lot), Port HT / Port TVA (poids x coût port/kg si le port
+--     n'est pas payé, TVA 20 %), couleurs GESCOM (css du code de ce lot)
+-- À lancer depuis la racine du dépôt, avant le redémarrage. Relançable.
 -- =====================================================================
 \set fiche `cat livrables/ui/commande-client-form.xml`
 SELECT set_config('lvme.fiche_client', :'fiche', false) IS NOT NULL AS fiche_lue;
+\set grille `cat livrables/ui/sale-order-line-grid.xml`
+SELECT set_config('lvme.grille_lignes', :'grille', false) IS NOT NULL AS grille_lue;
 
 BEGIN;
+
+-- champs GESCOM de la commande (code de ce lot)
+ALTER TABLE sale_sale_order ADD COLUMN IF NOT EXISTS lvme_preparateur bigint;
+ALTER TABLE sale_sale_order ADD COLUMN IF NOT EXISTS lvme_frais_congelation numeric(5,2);
 
 DELETE FROM meta_action WHERE module IS NULL AND name = 'action-lvme-commande-client-attrs-somme';
 INSERT INTO meta_action (id, version, created_on, name, type, model, xml, home, is_custom, priority) VALUES
@@ -22,6 +30,8 @@ INSERT INTO meta_action (id, version, created_on, name, type, model, xml, home, 
 '<action-attrs name="action-lvme-commande-client-attrs-somme" model="com.axelor.apps.sale.db.SaleOrder">
   <attribute name="value" for="$sommeColis" expr="eval: (saleOrderLineList ?: []).sum(0.0) { it.nbColis ?: 0.0 }"/>
   <attribute name="value" for="$sommePoids" expr="eval: (saleOrderLineList ?: []).sum(0.0) { it.poidsTotalNet ?: 0.0 }"/>
+  <attribute name="value" for="$portHt" expr="eval: portPaye ? 0 : (saleOrderLineList ?: []).sum(0.0) { it.poidsTotalNet ?: 0.0 } * (coutPortKg ?: 0.0)"/>
+  <attribute name="value" for="$portTva" expr="eval: portPaye ? 0 : (saleOrderLineList ?: []).sum(0.0) { it.poidsTotalNet ?: 0.0 } * (coutPortKg ?: 0.0) * 0.20"/>
 </action-attrs>', false, false, 0);
 
 DO $$
@@ -34,6 +44,10 @@ BEGIN
   END IF;
   UPDATE meta_view SET xml = current_setting('lvme.fiche_client'), updated_on = now(), version = COALESCE(version, 0) + 1
    WHERE id = v_id AND xml IS DISTINCT FROM current_setting('lvme.fiche_client');
+  -- tableau des lignes : couleurs GESCOM (colonnes jaune pâle / jaune vif)
+  UPDATE meta_view SET xml = current_setting('lvme.grille_lignes'), updated_on = now(), version = COALESCE(version, 0) + 1
+   WHERE name = 'sale-order-line-grid' AND module IS NULL AND priority = 30
+     AND xml IS DISTINCT FROM current_setting('lvme.grille_lignes');
 END $$;
 
 COMMIT;

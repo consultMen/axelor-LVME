@@ -152,3 +152,39 @@
   padding-top: 0 !important;
   margin-top: 0 !important;
 }
+
+/*
+ * Fiche Commande client copiée sur GESCOM (panneaux css="lvme-cde-client") : cases de saisie blanches,
+ * texte foncé (pas le jaune de l'arrivage), libellés violets du bloc Commande, statut en bleu ;
+ * tableau des lignes (css="lvme-cde-grid") : lignes blanc / cyan en alternance, colonnes Colis Cdes et
+ * Nb unités ou Poids cdés jaune pâle, Prix Vente jaune vif.
+ */
+.lvme-cde-fond {
+  background-color: #dfe3ec !important;
+  border-radius: 4px;
+}
+.lvme-cde-client input:not([type="checkbox"]):not([type="radio"]),
+.lvme-cde-client textarea {
+  background-color: #ffffff !important;
+  color: #101040 !important;
+}
+.lvme-cde-violet label {
+  color: #8b1a8b !important;
+}
+.lvme-cde-statut,
+.lvme-cde-statut * {
+  color: #1a1ad6 !important;
+  font-size: 15px;
+  text-align: center;
+}
+.lvme-cde-grid [class*="_body_"] [class*="_row_"]:nth-child(even) [class*="_column_"] {
+  background-color: #ccffff;
+}
+.lvme-cde-grid .bg-warning {
+  background-color: #ffffc0 !important;
+  color: #000;
+}
+.lvme-cde-grid .bg-yellow {
+  background-color: #ffff00 !important;
+  color: #000;
+}

@@ -5,6 +5,7 @@
   <hilite color="warning" if="deliveryState == 2"/>
   <hilite color="success" if="deliveryState == 3"/>
   <field name="$hasWarning" hidden="true"/>
+  <button name="lvmeDuplicateLineBtn" title="Dupliquer la ligne" icon="fa-copy" readonlyIf="$get('saleOrder.statusSelect') &gt; 2" onClick="save,action-lvme-sale-order-line-method-duplicate"/>
   <button name="errorIconButton" showIf="$hasWarning" onClick="refresh" readonlyIf="true" icon="fa-exclamation-triangle"/>
   <field name="sequence" if="__config__.app.getApp('sale')?.isDisplaySaleOrderLineNumber" width="51"/>
   <field name="product" hidden="true"/>
@@ -17,13 +18,13 @@
   <field name="nbUnitesParColis" title="Unt/colis" width="75"/>
   <field name="poidsParColis" title="Pds du colis" width="80"/>
   <field name="nbColis" title="Colis Cdes" aggregate="sum" width="80">
-    <hilite background="yellow" if="true"/>
+    <hilite background="warning" if="true"/>
   </field>
   <field name="unit" title="Unité Vente" form-view="unit-form" grid-view="unit-grid" width="80"/>
   <field name="poidsTotalNet" title="Poids en KG" aggregate="sum" width="85"/>
   <field name="$currencyNumberOfDecimals" hidden="true"/>
   <field name="qty" title="Nb unités ou Poids cdés" aggregate="sum" x-scale="$nbDecimalDigitForQty" width="100">
-    <hilite background="yellow" if="true"/>
+    <hilite background="warning" if="true"/>
   </field>
   <field name="orderedQty" aggregate="sum" x-scale="$nbDecimalDigitForQty" if="__config__.app.getApp('sale')?.isQuotationAndOrderSplitEnabled" readonly="true"/>
   <field name="prixRevient" title="Prix Revient" width="85"/>
@@ -49,5 +50,4 @@
   <field name="saleOrder" hidden="true"/>
   <field name="saleOrder.id" hidden="true"/>
   <field name="availableStatusSelect" hidden="true"/>
-  <button name="lvmeDuplicateLineBtn" title="Dupliquer la ligne" icon="fa-copy" readonlyIf="id == null || $get('saleOrder.statusSelect') &gt; 2" onClick="save,action-lvme-sale-order-line-method-duplicate"/>
 </grid>

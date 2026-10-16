@@ -104,7 +104,7 @@ d1 = lambda n: els(n, cde)[0]
 # ---------- bloc Client (encadré bleu), deux colonnes comme GESCOM ----------
 adr = els('mainInvoicingAddress', client)[0]
 client_new = '\n'.join([
-    '    <panel name="lvmeClientPanel" colSpan="6" css="lvme-gescom lvme-gescom-box">',
+    '    <panel name="lvmeClientPanel" colSpan="6" css="lvme-cde-client lvme-gescom-box">',
     '      <panel name="lvmeClientGauche" colSpan="6" itemSpan="12" showTitle="false">',
     F(c1('clientPartner'), 12, 'Client'),
     F(adr, 12, 'Adresse'),
@@ -123,20 +123,22 @@ client_new = '\n'.join([
     F(c1('paymentCondition'), 12, 'Echéance'),
     F(c1('remiseFacture'), 6, '% Rem/Fact.'),
     F(c1('tauxRFA'), 6, '% RFA'),
-    F(c1('tauxCommission'), 12, '% Frais Commission'),
+    '        <field name="lvmeFraisCongelation" title="% Frais Cong." colSpan="6"/>',
+    F(c1('tauxCommission'), 6, '% Frais Commission'),
     '      </panel>',
     '    </panel>'])
 
 # ---------- bloc Commande ----------
 resa_case = dela(els('isReservation', resa)[0], 'widget')
 cde_new = '\n'.join([
-    '    <panel name="lvmeCommandePanel" colSpan="4" itemSpan="6" css="lvme-gescom">',
+    '    <panel name="lvmeCommandePanel" colSpan="4" itemSpan="6" css="lvme-cde-client lvme-cde-violet">',
     '        <field name="saleOrderSeq" title="Commande N°" readonly="true" colSpan="6"/>',
-    F(d1('salespersonUser'), 6, 'Opérateur'),
-    F(d1('creationDate'), 6, 'Date Commande'),
-    F(d1('estimatedDeliveryDate'), 6, 'Date Livraison'),
-    F(resa_case, 6, 'Réservation'),
-    F(d1('externalReference'), 6, 'Ref Cde'),
+    '        <field name="lvmePreparateur" title="Préparateur" colSpan="6" canNew="false" canEdit="false" canView="false"/>',
+    F(d1('salespersonUser'), 4, 'Opérateur'),
+    F(d1('creationDate'), 4, 'Date Commande'),
+    F(d1('estimatedDeliveryDate'), 4, 'Date Livraison'),
+    F(resa_case, 4, 'Réservation'),
+    F(d1('externalReference'), 8, 'Ref Cde'),
     F(d1('carrierPartner'), 8, 'Transporteur'),
     F(d1('portPaye'), 4, 'Port Payé'),
     F(d1('coutPortKg'), 4, 'Coût port/kg'),
@@ -148,9 +150,11 @@ act_buttons = re.findall(r'<button\b' + A + r'*?/>', actions, re.S)
 act_fields = re.findall(r'<field\b' + A + r'*?/>', actions, re.S)
 boutons = '\n'.join(
     ['    <panel name="actionsPanel" colSpan="2" itemSpan="12">',
+     '      <button name="lvmeValiderBtn" title="Valider" icon="check-circle" css="btn-success" onClick="save"/>',
+     '      <button name="lvmeFermerBtn" title="Fermer" icon="x-circle" css="btn-danger" onClick="close"/>',
      '      <button name="lvmeImprimerCommandeBtn" title="Imprimer commande" icon="printer" '
      'showIf="id" onClick="save,action-sale-order-view-reports-wizard"/>']
-    + ['      ' + b for b in act_buttons] + ['      ' + f for f in act_fields] + ['    </panel>'])
+    + ['      ' + (seta(b, 'title', 'Confirmation Commande') if 'name="confirmOrderBtn"' in b else b) for b in act_buttons] + ['      ' + f for f in act_fields] + ['    </panel>'])
 
 # ---------- cadre des totaux, gris comme GESCOM ----------
 NUM = '(+%s || 0).toLocaleString("fr-FR", { minimumFractionDigits: %d, maximumFractionDigits: %d })'
@@ -164,14 +168,16 @@ def paire(lib, var, dec):
 
 
 totaux = '''    <panel name="lvmeTotauxPanel" colSpan="12">
-      <spacer colSpan="5"/>
-      <field name="$lvmeTotaux" type="string" showTitle="false" readonly="true" colSpan="7">
-        <viewer depends="$sommeColis,$sommePoids,exTaxTotal,inTaxTotal,marginRate,totalGrossMargin"><![CDATA[
+      <field name="statusSelect" showTitle="false" readonly="true" colSpan="4" css="lvme-cde-statut">
+        <viewer depends="statusSelect"><![CDATA[<>{$fmt("statusSelect")}</>]]></viewer>
+      </field>
+      <field name="$lvmeTotaux" type="string" showTitle="false" readonly="true" colSpan="8">
+        <viewer depends="$sommeColis,$sommePoids,$portHt,$portTva,exTaxTotal,inTaxTotal,marginRate,totalGrossMargin"><![CDATA[
           <>
             <table style={{ borderCollapse: "separate", borderSpacing: 3, fontSize: 13, border: "1px solid #b8b8b8", background: "#f4f4f4", marginLeft: "auto" }}>
               <tbody>
-                <tr>%s%s%s</tr>
-                <tr>%s%s%s</tr>
+                <tr>%s%s%s%s</tr>
+                <tr>%s%s%s%s</tr>
               </tbody>
             </table>
           </>
@@ -179,8 +185,12 @@ totaux = '''    <panel name="lvmeTotauxPanel" colSpan="12">
       </field>
       <field name="$sommeColis" type="decimal" hidden="true"/>
       <field name="$sommePoids" type="decimal" hidden="true"/>
-    </panel>''' % (paire('Nb Colis', '$sommeColis', 0), paire('% Marge Totale', 'marginRate', 2), paire('Total TTC', 'inTaxTotal', 2),
-                   paire('Poids', '$sommePoids', 1), paire('Total marge', 'totalGrossMargin', 2), paire('Total HT', 'exTaxTotal', 2))
+      <field name="$portHt" type="decimal" hidden="true"/>
+      <field name="$portTva" type="decimal" hidden="true"/>
+    </panel>''' % (paire('Nb Colis', '$sommeColis', 0), paire('Port HT', '$portHt', 2), paire('Total TTC', 'inTaxTotal', 2),
+                   paire('% Marge Totale', 'marginRate', 2),
+                   paire('Poids', '$sommePoids', 1), paire('Port TVA', '$portTva', 2), paire('Total HT', 'exTaxTotal', 2),
+                   paire('Total marge', 'totalGrossMargin', 2))
 
 # ---------- lignes : remontées de l'onglet Contenu, juste sous l'en-tête ----------
 lignes = [blk(n, tag) for n, tag in [('displayMultiLinesButtonPanel', 'panel'), ('detailLinesPanel', 'panel-related'),
@@ -198,7 +208,7 @@ def onchange(t):
         new = head.replace('<panel-related ', '<panel-related onChange="%s" ' % SOMME, 1)
     new = seta(new, 'title', 'Commande') if 'name="detailLinesPanel"' in new else new
     if 'css="' not in new:
-        new = new.replace('<panel-related ', '<panel-related css="lvme-gescom-grid" ', 1)
+        new = new.replace('<panel-related ', '<panel-related css="lvme-gescom-grid lvme-cde-grid" ', 1)
     return t.replace(head, new, 1)
 
 
@@ -235,7 +245,7 @@ tech = ('  <panel name="lvmeTechPanel" hidden="true" colSpan="12">\n'
 new_main = ('  <!-- LVME : copie de la « Fiche Commande client » GESCOM : Client | Commande | boutons, totaux, puis le\n'
             '       tableau des lignes ; statuts conservés ; réservation, livraison, paramètres en onglets -->\n'
             '  <panel name="mainPanel" colSpan="12">\n' + top.rstrip() + '\n    ' + details + '\n  </panel>\n'
-            '  <panel name="lvmeGescomPanel" colSpan="12" css="lvme-gescom">\n'
+            '  <panel name="lvmeGescomPanel" colSpan="12" css="lvme-cde-client lvme-cde-fond">\n'
             + client_new + '\n' + cde_new + '\n' + boutons + '\n' + totaux + '\n'
             '    ' + info_client + '\n'
             '  </panel>\n' + lignes_xml + '\n')
