@@ -98,7 +98,8 @@ SELECT
      ('Réel', num('sm.lvme_reel', 4)),
      ('Équivalent', "CASE WHEN cur.id IS DISTINCT FROM co.currency THEN "
       + num(f"(SELECT SUM(CASE WHEN sm.status_select = 3 THEN l.real_qty ELSE l.qty END * COALESCE(l.company_unit_price_untaxed, 0)) FROM stock_stock_move_line l WHERE l.stock_move = sm.id)")
-      + " || ' ' || COALESCE(ccur.code, '') END")])} || {TABLEAU_FL_RE} AS bloc3
+      + " || ' ' || COALESCE(ccur.code, '') END")])} || {TABLEAU_FL_RE} AS bloc3,
+  lf.file_path AS logo_path
 FROM stock_stock_move sm
 LEFT JOIN base_partner p ON p.id = sm.partner
 LEFT JOIN message_email_address em ON em.id = p.email_address
@@ -115,6 +116,7 @@ LEFT JOIN stock_shipment_mode shm ON shm.id = sm.shipment_mode
 LEFT JOIN stock_bateau bt ON bt.id = sm.bateau
 LEFT JOIN base_partner fw ON fw.id = sm.forwarder_partner
 LEFT JOIN stock_stock_location fr ON fr.id = sm.to_stock_location
+LEFT JOIN meta_file lf ON lf.id = co.logo
 WHERE sm.id = ?
 LIMIT 1
 """
@@ -240,7 +242,7 @@ BORDER = """
                         <property name="paddingLeft">2pt</property>
                         <property name="paddingRight">2pt</property>"""
 
-ENT_NAMES = ['numero', 'bloc1', 'bloc2', 'bloc3']
+ENT_NAMES = ['numero', 'bloc1', 'bloc2', 'bloc3', 'logo_path']
 LIG_NAMES = ['is_total'] + [c[0] for c in COLS]
 
 
@@ -279,12 +281,30 @@ def build():
             <detail>
                 <row id="{nid()}">
                     <cell id="{nid()}">
-                        <property name="colSpan">3</property>
+                        <property name="colSpan">2</property>
                         <property name="paddingBottom">6pt</property>
+                        <property name="verticalAlign">bottom</property>
                         <text-data id="{nid()}">
                             <expression name="valueExpr">"&lt;span style='font-size:15pt;font-weight:bold'&gt;ARRIVAGE N° " + row["numero"] + "&lt;/span&gt;"</expression>
                             <property name="contentType">html</property>
                         </text-data>
+                    </cell>
+                    <!-- logo de la société en haut à droite : hauteur fixe, proportions gardées -->
+                    <cell id="{nid()}">
+                        <property name="textAlign">right</property>
+                        <property name="paddingBottom">6pt</property>
+                        <image id="{nid()}">
+                            <property name="height">1.6cm</property>
+                            <property name="proportionalScale">true</property>
+                            <list-property name="visibility">
+                                <structure>
+                                    <property name="format">all</property>
+                                    <expression name="valueExpr" type="javascript">row["logo_path"] == null</expression>
+                                </structure>
+                            </list-property>
+                            <property name="source">file</property>
+                            <expression name="uri" type="javascript">params["AttachmentPath"].value + row["logo_path"]</expression>
+                        </image>
                     </cell>
                 </row>
                 <row id="{nid()}">
@@ -342,6 +362,21 @@ def build():
             <property name="valueType">static</property>
             <property name="isRequired">true</property>
             <property name="dataType">decimal</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <!-- dossier des fichiers d'Axelor (passé par Axelor à chaque impression) : chemin du logo -->
+        <scalar-parameter name="AttachmentPath" id="3">
+            <property name="hidden">true</property>
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant"></value>
+            </simple-property-list>
             <property name="paramType">simple</property>
             <property name="controlType">text-box</property>
             <structure name="format">
