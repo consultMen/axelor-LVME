@@ -41,6 +41,7 @@ import com.axelor.apps.base.service.PartnerLinkServiceImpl;
 import com.axelor.apps.base.service.wizard.BaseConvertLeadWizardService;
 import com.axelor.apps.purchase.db.repo.PurchaseOrderManagementRepository;
 import com.axelor.apps.purchase.service.PurchaseOrderCreateServiceImpl;
+import com.axelor.apps.purchase.service.PurchaseOrderLineDuplicateServiceImpl;
 import com.axelor.apps.purchase.service.PurchaseOrderLineServiceImpl;
 import com.axelor.apps.purchase.service.PurchaseOrderLineTaxComputeServiceImpl;
 import com.axelor.apps.purchase.service.PurchaseOrderMergingServiceImpl;
@@ -172,6 +173,7 @@ import com.axelor.apps.supplychain.service.PurchaseOrderFromSaleOrderLinesServic
 import com.axelor.apps.supplychain.service.PurchaseOrderFromSaleOrderLinesServiceImpl;
 import com.axelor.apps.supplychain.service.PurchaseOrderInvoiceService;
 import com.axelor.apps.supplychain.service.PurchaseOrderInvoiceServiceImpl;
+import com.axelor.apps.supplychain.service.PurchaseOrderLineDuplicateServiceSupplychainImpl;
 import com.axelor.apps.supplychain.service.PurchaseOrderLineServiceSupplyChain;
 import com.axelor.apps.supplychain.service.PurchaseOrderLineServiceSupplyChainImpl;
 import com.axelor.apps.supplychain.service.PurchaseOrderLineTaxComputeSupplychainServiceImp;
@@ -402,6 +404,9 @@ public class SupplychainModule extends AxelorModule {
         .to(StockLocationUtilsServiceSupplychainImpl.class);
     bind(ReservedQtyService.class).to(ReservedQtyServiceImpl.class);
     bind(PurchaseOrderLineServiceImpl.class).to(PurchaseOrderLineServiceSupplyChainImpl.class);
+    // LVME : ligne d'achat dupliquée avec un nouveau lot
+    bind(PurchaseOrderLineDuplicateServiceImpl.class)
+        .to(PurchaseOrderLineDuplicateServiceSupplychainImpl.class);
     bind(PurchaseOrderStockService.class).to(PurchaseOrderStockServiceImpl.class);
     bind(AccountingCutOffServiceImpl.class).to(AccountingCutOffSupplyChainServiceImpl.class);
     bind(AccountingCutOffSupplyChainService.class).to(AccountingCutOffSupplyChainServiceImpl.class);
