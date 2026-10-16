@@ -15,8 +15,8 @@
       <item if="__config__.app.isApp('intervention')" name="generateEquipmentsBtn" title="Generate equipments" action="action-park-model-show-confirmation-from-sale-order"/>
     </menu>
   </menubar>
-    <!-- LVME : fiche Commande client copiée sur la « Fiche Commande client » GESCOM : Client | Commande |
-       Totaux | boutons, sans barre latérale ; statuts, réservation, livraison et onglets conservés -->
+    <!-- LVME : copie de la « Fiche Commande client » GESCOM : Client | Commande | boutons, totaux, puis le
+       tableau des lignes ; statuts conservés ; réservation, livraison, paramètres en onglets -->
   <panel name="mainPanel" colSpan="12">
 
     <panel name="blockedCustCreditExceedPanel" colSpan="12">
@@ -99,54 +99,44 @@
       ]]></viewer>
       </field>
     </panel>
+  </panel>
   <panel name="lvmeGescomPanel" colSpan="12" css="lvme-gescom">
-    <panel name="lvmeClientPanel" colSpan="5" itemSpan="6" css="lvme-gescom lvme-gescom-box">
-      <field colSpan="6" name="clientPartner" title="Client" hideIf="company == null" readonlyIf="statusSelect > 1" onChange="action-sale-order-method-client-partner-onchange,action-sale-order-record-set-remise-rfa" onSelect="action-sale-order-method-set-client-partner-domain" required="true" form-view="partner-form" grid-view="partner-grid" x-image-field="picture"/>
-      <field colSpan="6" name="commercial" title="Commercial" canEdit="false" hideIf="clientPartner == null" form-view="user-form" grid-view="user-grid"/>
-      <field colSpan="6" name="mainInvoicingAddress" title="Adresse" hideIf="$readonly() || (statusSelect > 1 &amp;&amp; !orderBeingEdited)" canNew="true" canEdit="false" onChange="action-sale-order-method-address-str" onSelect="action-sale-order-attrs-domain-main-invoicing-address" form-view="address-form" grid-view="address-grid"/>
-      <field colSpan="6" name="mainInvoicingAddressStr" title="Adresse" readonlyIf="statusSelect > 1 &amp;&amp; !orderBeingEdited" height="3">
-            <viewer><![CDATA[<>{mainInvoicingAddressStr}</>]]></viewer>
-          </field>
-      <field colSpan="6" name="contactPartner" title="contact" canEdit="false" onChange="action-record-so-contact-partner-change" onSelect="action-sale-order-domain-on-contact-partner" domain="self.isContact = true" form-view="partner-contact-form" grid-view="partner-contact-grid" x-image-field="picture"/>
-      <field colSpan="6" name="clientPartner.fixedPhone" title="Téléphone" readonly="true"/>
-      <field colSpan="6" name="clientPartner.groupement" title="Groupement" readonly="true" showIf="clientPartner != null &amp;&amp; clientPartner.groupement != null"/>
-      <field colSpan="6" name="paymentMode" title="Règlement" readonlyIf="statusSelect > 2" canEdit="false" onChange="action-sale-order-method-fill-company-bank-details" domain="self.inOutSelect = 1" form-view="payment-mode-form" grid-view="payment-mode-grid"/>
-      <field colSpan="6" name="paymentCondition" title="Echéance" readonlyIf="statusSelect > 2" canEdit="false" onChange="action-sale-order-method-set-advance-payment" onSelect="action-sale-order-attrs-payment-condition-set-domain" form-view="payment-condition-form" grid-view="payment-condition-grid"/>
-      <field name="remiseFacture" title="% Rem/Fact." hideIf="clientPartner == null" readonlyIf="statusSelect > 1" colSpan="4"/>
-      <field name="tauxRFA" title="% RFA" hideIf="clientPartner == null" readonlyIf="statusSelect > 1" colSpan="4"/>
-      <field name="tauxCommission" title="% Frais Commission" colSpan="4" widget="Decimal" x-scale="2" readonlyIf="statusSelect > 1"/>
+    <panel name="lvmeClientPanel" colSpan="6" css="lvme-gescom lvme-gescom-box">
+      <panel name="lvmeClientGauche" colSpan="6" itemSpan="12" showTitle="false">
+        <field colSpan="12" name="clientPartner" title="Client" hideIf="company == null" readonlyIf="statusSelect > 1" onChange="action-sale-order-method-client-partner-onchange,action-sale-order-record-set-remise-rfa" onSelect="action-sale-order-method-set-client-partner-domain" required="true" form-view="partner-form" grid-view="partner-grid" x-image-field="picture"/>
+        <field colSpan="12" name="mainInvoicingAddress" title="Adresse" hideIf="$readonly() || (statusSelect > 1 &amp;&amp; !orderBeingEdited)" canNew="true" canEdit="false" onChange="action-sale-order-method-address-str" onSelect="action-sale-order-attrs-domain-main-invoicing-address" form-view="address-form" grid-view="address-grid"/>
+        <field name="mainInvoicingAddress.addressL4" title="Adresse" readonly="true" colSpan="12" showIf="mainInvoicingAddress"/>
+        <field name="mainInvoicingAddress.addressL5" title="" readonly="true" colSpan="12" showIf="mainInvoicingAddress.addressL5"/>
+        <field name="mainInvoicingAddress.zip" title="Code postal" readonly="true" colSpan="4"/>
+        <field name="mainInvoicingAddress.city.name" title="Ville" readonly="true" colSpan="8"/>
+        <field name="mainInvoicingAddress.country" title="Code pays" readonly="true" colSpan="12"/>
+        <field colSpan="12" name="clientPartner.groupement" title="Groupement" readonly="true" showIf="clientPartner != null &amp;&amp; clientPartner.groupement != null"/>
+      </panel>
+      <panel name="lvmeClientDroite" colSpan="6" itemSpan="12" showTitle="false">
+        <field colSpan="12" name="commercial" title="Commercial" canEdit="false" hideIf="clientPartner == null" form-view="user-form" grid-view="user-grid"/>
+        <field colSpan="12" name="contactPartner" title="contact" canEdit="false" onChange="action-record-so-contact-partner-change" onSelect="action-sale-order-domain-on-contact-partner" domain="self.isContact = true" form-view="partner-contact-form" grid-view="partner-contact-grid" x-image-field="picture"/>
+        <field colSpan="12" name="clientPartner.fixedPhone" title="Téléphone" readonly="true"/>
+        <field colSpan="12" name="paymentMode" title="Règlement" readonlyIf="statusSelect > 2" canEdit="false" onChange="action-sale-order-method-fill-company-bank-details" domain="self.inOutSelect = 1" form-view="payment-mode-form" grid-view="payment-mode-grid"/>
+        <field colSpan="12" name="paymentCondition" title="Echéance" readonlyIf="statusSelect > 2" canEdit="false" onChange="action-sale-order-method-set-advance-payment" onSelect="action-sale-order-attrs-payment-condition-set-domain" form-view="payment-condition-form" grid-view="payment-condition-grid"/>
+        <field name="remiseFacture" title="% Rem/Fact." hideIf="clientPartner == null" readonlyIf="statusSelect > 1" colSpan="6"/>
+        <field name="tauxRFA" title="% RFA" hideIf="clientPartner == null" readonlyIf="statusSelect > 1" colSpan="6"/>
+        <field name="tauxCommission" title="% Frais Commission" colSpan="12" widget="Decimal" x-scale="2" readonlyIf="statusSelect > 1"/>
+      </panel>
     </panel>
     <panel name="lvmeCommandePanel" colSpan="4" itemSpan="6" css="lvme-gescom">
-      <field name="saleOrderSeq" title="Commande N°" readonly="true" colSpan="6"/>
-      <field name="salespersonUser" title="Opérateur" colSpan="6" canNew="false" canView="false" canEdit="false" form-view="user-form" grid-view="user-grid"/>
-      <field name="creationDate" title="Date Commande" readonlyIf="statusSelect != 1" colSpan="6" onChange="action-sale-order-record-compute-end-of-validity-date"/>
-      <field name="estimatedDeliveryDate" title="Date Livraison" colSpan="6" onChange="action-supplychain-sale-order-group-estimated-delivery-date-change"/>
-      <field colSpan="6" name="isReservation" title="Réservation" readonlyIf="statusSelect > 3 || reservationConvertedOn != null"/>
-      <field name="externalReference" title="Ref Cde" colSpan="6" hideIf="company == null" onChange="action-sale-sale-order-attrs-external-reference"/>
-      <field name="carrierPartner" title="Transporteur" colSpan="8" canEdit="false" domain="self.isCarrier = TRUE AND (self.companySet IS EMPTY OR :company MEMBER OF self.companySet)" form-view="partner-form" grid-view="partner-grid" x-image-field="picture"/>
-      <field name="portPaye" title="Port Payé" colSpan="4"/>
-      <field name="coutPortKg" title="Coût port/kg" colSpan="4"/>
-      <field height="2" name="internalNote" title="&lt; Commentaire &gt;" colSpan="8" widget="Html" x-lite="true"/>
+        <field name="saleOrderSeq" title="Commande N°" readonly="true" colSpan="6"/>
+        <field name="salespersonUser" title="Opérateur" colSpan="6" canNew="false" canView="false" canEdit="false" form-view="user-form" grid-view="user-grid"/>
+        <field name="creationDate" title="Date Commande" readonlyIf="statusSelect != 1" colSpan="6" onChange="action-sale-order-record-compute-end-of-validity-date"/>
+        <field name="estimatedDeliveryDate" title="Date Livraison" colSpan="6" onChange="action-supplychain-sale-order-group-estimated-delivery-date-change"/>
+        <field colSpan="6" name="isReservation" title="Réservation" readonlyIf="statusSelect > 3 || reservationConvertedOn != null"/>
+        <field name="externalReference" title="Ref Cde" colSpan="6" hideIf="company == null" onChange="action-sale-sale-order-attrs-external-reference"/>
+        <field name="carrierPartner" title="Transporteur" colSpan="8" canEdit="false" domain="self.isCarrier = TRUE AND (self.companySet IS EMPTY OR :company MEMBER OF self.companySet)" form-view="partner-form" grid-view="partner-grid" x-image-field="picture"/>
+        <field name="portPaye" title="Port Payé" colSpan="4"/>
+        <field name="coutPortKg" title="Coût port/kg" colSpan="4"/>
+        <field height="2" name="internalNote" title="&lt; Commentaire &gt;" colSpan="8" widget="Html" x-lite="true"/>
     </panel>
-    <panel name="lvmeTotauxPanel" colSpan="4" css="lvme-gescom lvme-gescom-box">
-      <field name="$lvmeTotaux" type="string" showTitle="false" readonly="true" colSpan="12">
-        <viewer depends="$sommeColis,$sommePoids,exTaxTotal,inTaxTotal,marginRate,totalGrossMargin"><![CDATA[
-          <>
-            <table style={{ borderCollapse: "separate", borderSpacing: 3, fontSize: 13 }}>
-              <tbody>
-                <tr><td style={{ color: "#333", paddingRight: 6, whiteSpace: "nowrap", textAlign: "right" }}>Nb Colis</td><td style={{ background: "#ffffc4", color: "#1a1ad6", border: "1px solid #c8c8c8", textAlign: "right", padding: "1px 6px", minWidth: 70 }}>{(+$sommeColis || 0).toLocaleString("fr-FR", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</td><td style={{ color: "#333", paddingRight: 6, whiteSpace: "nowrap", textAlign: "right" }}>Total HT</td><td style={{ background: "#ffffc4", color: "#1a1ad6", border: "1px solid #c8c8c8", textAlign: "right", padding: "1px 6px", minWidth: 70 }}>{(+exTaxTotal || 0).toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td></tr>
-                <tr><td style={{ color: "#333", paddingRight: 6, whiteSpace: "nowrap", textAlign: "right" }}>Poids</td><td style={{ background: "#ffffc4", color: "#1a1ad6", border: "1px solid #c8c8c8", textAlign: "right", padding: "1px 6px", minWidth: 70 }}>{(+$sommePoids || 0).toLocaleString("fr-FR", { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</td><td style={{ color: "#333", paddingRight: 6, whiteSpace: "nowrap", textAlign: "right" }}>Total TTC</td><td style={{ background: "#ffffc4", color: "#1a1ad6", border: "1px solid #c8c8c8", textAlign: "right", padding: "1px 6px", minWidth: 70 }}>{(+inTaxTotal || 0).toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td></tr>
-                <tr><td style={{ color: "#333", paddingRight: 6, whiteSpace: "nowrap", textAlign: "right" }}>% Marge Totale</td><td style={{ background: "#ffffc4", color: "#1a1ad6", border: "1px solid #c8c8c8", textAlign: "right", padding: "1px 6px", minWidth: 70 }}>{(+marginRate || 0).toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td><td style={{ color: "#333", paddingRight: 6, whiteSpace: "nowrap", textAlign: "right" }}>Total marge</td><td style={{ background: "#ffffc4", color: "#1a1ad6", border: "1px solid #c8c8c8", textAlign: "right", padding: "1px 6px", minWidth: 70 }}>{(+totalGrossMargin || 0).toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td></tr>
-              </tbody>
-            </table>
-          </>
-        ]]></viewer>
-      </field>
-      <field name="$sommeColis" type="decimal" hidden="true"/>
-      <field name="$sommePoids" type="decimal" hidden="true"/>
-    </panel>
-    <panel name="actionsPanel" hideIf="clientPartner == null" colSpan="3" itemSpan="12">
-      <button name="lvmeImprimerCommandeBtn" title="Imprimer commande" icon="printer" onClick="save,action-sale-order-view-reports-wizard"/>
+    <panel name="actionsPanel" colSpan="2" itemSpan="12">
+      <button name="lvmeImprimerCommandeBtn" title="Imprimer commande" icon="printer" showIf="id" onClick="save,action-sale-order-view-reports-wizard"/>
       <button name="finalizeBtn" title="Finalize" showIf="statusSelect == 1" readonlyIf="!saleOrderLineList || saleOrderLineList.length == 0" colSpan="12" css="btn-success" icon="check" onClick="action-group-sale-order-finalize-quotation"/>
       <button if="!__config__.app.getApp('sale')?.isQuotationAndOrderSplitEnabled" name="confirmOrderBtn" title="Confirm order" showIf="statusSelect == 2" readonlyIf="(advancePaymentNeeded &amp;&amp; $number(advanceTotal) &lt; $number(advancePaymentAmountNeeded)) || !saleOrderLineList || saleOrderLineList.length == 0" colSpan="12" css="btn-success" icon="check-all" onClick="action-sale-group-confirmed"/>
       <button if="__config__.app.getApp('sale')?.isQuotationAndOrderSplitEnabled" name="confirmOrderBtn" title="Confirm order" showIf="statusSelect == 2" readonlyIf="(advancePaymentNeeded &amp;&amp; $number(advanceTotal) &lt; $number(advancePaymentAmountNeeded)) || !saleOrderLineList || saleOrderLineList.length == 0" colSpan="12" css="btn-success" icon="check-all" onClick="action-sale-order-group-split-confirm"/>
@@ -169,8 +159,60 @@
       <field name="message" hidden="true" type="string"/>
       <field name="amountInvoiced" hidden="true" x-scale="currency.numberOfDecimals"/>
     </panel>
+    <panel name="lvmeTotauxPanel" colSpan="12">
+      <spacer colSpan="5"/>
+      <field name="$lvmeTotaux" type="string" showTitle="false" readonly="true" colSpan="7">
+        <viewer depends="$sommeColis,$sommePoids,exTaxTotal,inTaxTotal,marginRate,totalGrossMargin"><![CDATA[
+          <>
+            <table style={{ borderCollapse: "separate", borderSpacing: 3, fontSize: 13, border: "1px solid #b8b8b8", background: "#f4f4f4", marginLeft: "auto" }}>
+              <tbody>
+                <tr><td style={{ paddingLeft: 12, paddingRight: 6, whiteSpace: "nowrap", textAlign: "right" }}>Nb Colis</td><td style={{ background: "#e6e6e6", border: "1px solid #b8b8b8", textAlign: "right", padding: "1px 6px", minWidth: 80 }}>{(+$sommeColis || 0).toLocaleString("fr-FR", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</td><td style={{ paddingLeft: 12, paddingRight: 6, whiteSpace: "nowrap", textAlign: "right" }}>% Marge Totale</td><td style={{ background: "#e6e6e6", border: "1px solid #b8b8b8", textAlign: "right", padding: "1px 6px", minWidth: 80 }}>{(+marginRate || 0).toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td><td style={{ paddingLeft: 12, paddingRight: 6, whiteSpace: "nowrap", textAlign: "right" }}>Total TTC</td><td style={{ background: "#e6e6e6", border: "1px solid #b8b8b8", textAlign: "right", padding: "1px 6px", minWidth: 80 }}>{(+inTaxTotal || 0).toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td></tr>
+                <tr><td style={{ paddingLeft: 12, paddingRight: 6, whiteSpace: "nowrap", textAlign: "right" }}>Poids</td><td style={{ background: "#e6e6e6", border: "1px solid #b8b8b8", textAlign: "right", padding: "1px 6px", minWidth: 80 }}>{(+$sommePoids || 0).toLocaleString("fr-FR", { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</td><td style={{ paddingLeft: 12, paddingRight: 6, whiteSpace: "nowrap", textAlign: "right" }}>Total marge</td><td style={{ background: "#e6e6e6", border: "1px solid #b8b8b8", textAlign: "right", padding: "1px 6px", minWidth: 80 }}>{(+totalGrossMargin || 0).toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td><td style={{ paddingLeft: 12, paddingRight: 6, whiteSpace: "nowrap", textAlign: "right" }}>Total HT</td><td style={{ background: "#e6e6e6", border: "1px solid #b8b8b8", textAlign: "right", padding: "1px 6px", minWidth: 80 }}>{(+exTaxTotal || 0).toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td></tr>
+              </tbody>
+            </table>
+          </>
+        ]]></viewer>
+      </field>
+      <field name="$sommeColis" type="decimal" hidden="true"/>
+      <field name="$sommePoids" type="decimal" hidden="true"/>
+    </panel>
+    <field name="clientPartner.saleOrderInformation" showTitle="false" hideIf="clientPartner == null || clientPartner.saleOrderInformation == null" colSpan="12" css="bold red"/>
   </panel>
-    <panel name="lvmeReservationPanel" title="Réservation" colSpan="12" itemSpan="6" canCollapse="true" collapseIf="true">
+  <panel if="__config__.app.getApp('sale')?.getListDisplayTypeSelect() == __repo__(AppSale).APP_SALE_LINE_DISPLAY_TYPE_MULTI" name="displayMultiLinesButtonPanel" colSpan="12">
+        <spacer colSpan="8"/>
+        <button name="displayLinesBtn" title="Display lines" readonlyIf="id == null" colSpan="4" onClick="action-sale-order-view-display-multi-lines"/>
+      </panel>
+  <panel-related css="lvme-gescom-grid" if="__config__.app.getApp('sale')?.getListDisplayTypeSelect() == __repo__(AppSale).APP_SALE_LINE_DISPLAY_TYPE_CLASSIC" name="detailLinesPanel" title="Commande" readonlyIf="clientPartner == null" colSpan="12" height="30" field="saleOrderLineList" form-view="sale-order-line-form" grid-view="sale-order-line-grid" orderBy="sequence" onChange="action-sale-order-method-on-line-change,action-lvme-commande-client-attrs-somme" canNew="!(clientPartner == null || statusSelect == 2 || (statusSelect == 3 &amp;&amp; !orderBeingEdited) || statusSelect == 4)" canRemove="!(clientPartner == null || statusSelect == 2 || (statusSelect == 3 &amp;&amp; !orderBeingEdited) || statusSelect == 4)" canMove="true"/>
+  <panel-related css="lvme-gescom-grid" if="__config__.app.getApp('sale')?.getListDisplayTypeSelect() == __repo__(AppSale).APP_SALE_LINE_DISPLAY_TYPE_MULTI" name="saleOrderLineEditableTreePanel" title="Order Lines" readonlyIf="clientPartner == null || statusSelect == 2 || (statusSelect == 3 &amp;&amp; !orderBeingEdited) || statusSelect == 4" colSpan="12" field="saleOrderLineList" form-view="sale-order-line-form" grid-view="sale-order-line-editable-grid" summary-view="sale-order-line-summary-form" editable="true" orderBy="sequence" onNew="action-sale-order-line-method-onnew-editable" onChange="action-sale-order-method-on-line-change,action-lvme-commande-client-attrs-somme" canNew="!(clientPartner == null || statusSelect == 2 || (statusSelect == 3 &amp;&amp; !orderBeingEdited) || statusSelect == 4)" canRemove="!(clientPartner == null || statusSelect == 2 || (statusSelect == 3 &amp;&amp; !orderBeingEdited) || statusSelect == 4)" canMove="true" widget="tree-grid" x-expand-all="subSaleOrderLineList,saleOrderLineDetailsList" x-tree-field-title="Add a new sale order line" x-tree-field="subSaleOrderLineList"/>
+  <panel-related css="lvme-gescom-grid" if="__config__.app.getApp('sale')?.getListDisplayTypeSelect() == __repo__(AppSale).APP_SALE_LINE_DISPLAY_TYPE_EDITABLE" name="editableDetailLinesPanel" title="Details Lines" readonlyIf="clientPartner == null || statusSelect == 2 || (statusSelect == 3 &amp;&amp; !orderBeingEdited) || statusSelect == 4" colSpan="12" height="30" field="saleOrderLineList" form-view="sale-order-line-form" grid-view="sale-order-line-editable-grid" orderBy="sequence" onNew="action-sale-order-line-method-onnew-editable" onChange="action-sale-order-method-on-line-change,action-lvme-commande-client-attrs-somme" canNew="!(clientPartner == null || statusSelect == 2 || (statusSelect == 3 &amp;&amp; !orderBeingEdited) || statusSelect == 4)" canRemove="!(clientPartner == null || statusSelect == 2 || (statusSelect == 3 &amp;&amp; !orderBeingEdited) || statusSelect == 4)" canMove="true"/>
+  <panel name="lvmeTechPanel" hidden="true" colSpan="12">
+    <field name="currency.symbol"/>
+    <field name="currency.numberOfDecimals"/>
+    <field name="exTaxTotal" x-currency="currency.symbol" x-scale="currency.numberOfDecimals"/>
+    <field name="taxTotal" x-currency="currency.symbol" x-scale="currency.numberOfDecimals"/>
+    <field name="amountInvoiced" x-currency="currency.symbol" x-scale="currency.numberOfDecimals"/>
+    <field name="advanceTotal" x-currency="currency.symbol" x-scale="currency.numberOfDecimals"/>
+    <field name="exTaxTotalOrdered" x-currency="currency.symbol" x-scale="currency.numberOfDecimals"/>
+    <field name="inTaxTotalOrdered" x-currency="currency.symbol" x-scale="currency.numberOfDecimals"/>
+    <field name="inTaxTotal"/>
+    <field name="mainInvoicingAddressStr" title="Adresse" readonlyIf="statusSelect > 1 &amp;&amp; !orderBeingEdited" height="3">
+            <viewer><![CDATA[<>{mainInvoicingAddressStr}</>]]></viewer>
+          </field>
+  </panel>
+  <panel-tabs name="mainPanelTab" hideIf="clientPartner == null || ($enableTradingNamesManagement &amp;&amp; company.tradingNameList != null &amp;&amp; company.tradingNameList.length != 0 &amp;&amp; tradingName == null)">
+    <panel name="contentPanel" title="Content">
+      
+      
+      
+      
+      <panel name="descriptionPanel" title="Comment to display" colSpan="12">
+        <field name="description" showTitle="false" colSpan="12" widget="Html" x-lite="true"/>
+      </panel>
+      <panel if="__config__.app.getApp('sale')?.getListDisplayTypeSelect() == __repo__(AppSale).APP_SALE_LINE_DISPLAY_TYPE_MULTI" name="subLinePanel" colSpan="12">
+        <field name="isDisplaySubLinesOnReport" widget="boolean-switch"/>
+      </panel>
+    </panel>
+    <panel name="lvmeReservationPanel" title="Réservation" colSpan="12" itemSpan="6">
           <field name="$statutReservation" showTitle="false" readonly="true" type="string">
             <viewer depends="isReservation,statusSelect,reservationConvertedOn"><![CDATA[
               <>
@@ -193,7 +235,7 @@
             showIf="isReservation &amp;&amp; id &amp;&amp; (clientPartner.sousContrat || reservationValidatedBy)"
             onClick="save,action-lvme-reservation-group-convertir"/>
         </panel>
-    <panel name="lvmeLivraisonPanel" title="Livraison" colSpan="12" canCollapse="true" collapseIf="true">
+    <panel name="lvmeLivraisonPanel" title="Livraison" colSpan="12">
       <field if="__config__.app.getApp('base')?.activatePartnerRelations" name="deliveredPartner" title="Tiers livré" hideIf="company == null || clientPartner == null" readonlyIf="statusSelect > 1" colSpan="3" onChange="action-group-sale-order-supplychain-set-delivery-address" onSelect="action-sale-order-supplychain-method-set-delivered-partner-domain" form-view="partner-form" grid-view="partner-grid" x-image-field="picture"/>
       <field name="deliveryAddress" title="Adresse de livraison" colSpan="3" hideIf="$readonly() || (statusSelect > 1 &amp;&amp; !orderBeingEdited)" canNew="true" canEdit="false" onChange="action-sale-order-group-delivery-address-change" onSelect="action-sale-order-attrs-domain-delivery-address" form-view="address-form" grid-view="address-grid"/>
       <field name="deliveryAddressStr" title="Adresse de livraison" colSpan="3" readonlyIf="statusSelect > 1 &amp;&amp; !orderBeingEdited" height="2">
@@ -205,7 +247,7 @@
       <field name="shipmentMode" title="Mode d'expédition" colSpan="3" canEdit="false" onChange="supplychain-action-create-shipment-cost-line" form-view="shipment-mode-form" grid-view="shipment-mode-grid" readOnlyIf="statusSelect > 1"/>
       <field name="deliveryCondition" title="Conditions de livraison" colSpan="3"/>
     </panel>
-    <panel name="lvmeParametresPanel" title="Paramètres" colSpan="12" canCollapse="true" collapseIf="true">
+    <panel name="lvmeParametresPanel" title="Paramètres">
       <field name="oneoffSale" colSpan="2"/>
       <field name="company.tradingNameList" hidden="true"/>
       <panel name="lvmeDevisePanel" showTitle="false" colSpan="12">
@@ -227,35 +269,6 @@
         <field name="currency.numberOfDecimals" hidden="true"/>
       </panel>
     </panel>
-    </panel>
-    <field name="clientPartner.saleOrderInformation" showTitle="false" hideIf="clientPartner == null || clientPartner.saleOrderInformation == null" colSpan="12" css="bold red"/>
-  </panel>
-  <panel name="lvmeTotauxTechPanel" hidden="true" colSpan="12">
-    <field name="currency.symbol"/>
-    <field name="currency.numberOfDecimals"/>
-    <field name="exTaxTotal" x-currency="currency.symbol" x-scale="currency.numberOfDecimals"/>
-    <field name="taxTotal" x-currency="currency.symbol" x-scale="currency.numberOfDecimals"/>
-    <field name="amountInvoiced" x-currency="currency.symbol" x-scale="currency.numberOfDecimals"/>
-    <field name="advanceTotal" x-currency="currency.symbol" x-scale="currency.numberOfDecimals"/>
-    <field name="exTaxTotalOrdered" x-currency="currency.symbol" x-scale="currency.numberOfDecimals"/>
-    <field name="inTaxTotalOrdered" x-currency="currency.symbol" x-scale="currency.numberOfDecimals"/>
-    <field name="inTaxTotal"/>
-  </panel>
-  <panel-tabs name="mainPanelTab" hideIf="clientPartner == null || ($enableTradingNamesManagement &amp;&amp; company.tradingNameList != null &amp;&amp; company.tradingNameList.length != 0 &amp;&amp; tradingName == null)">
-    <panel name="contentPanel" title="Content">
-      <panel if="__config__.app.getApp('sale')?.getListDisplayTypeSelect() == __repo__(AppSale).APP_SALE_LINE_DISPLAY_TYPE_MULTI" name="displayMultiLinesButtonPanel" colSpan="12">
-        <spacer colSpan="8"/>
-        <button name="displayLinesBtn" title="Display lines" readonlyIf="id == null" colSpan="4" onClick="action-sale-order-view-display-multi-lines"/>
-      </panel>
-      <panel-related if="__config__.app.getApp('sale')?.getListDisplayTypeSelect() == __repo__(AppSale).APP_SALE_LINE_DISPLAY_TYPE_CLASSIC" name="detailLinesPanel" title="Details Lines" readonlyIf="clientPartner == null" colSpan="12" height="30" field="saleOrderLineList" form-view="sale-order-line-form" grid-view="sale-order-line-grid" orderBy="sequence" onChange="action-sale-order-method-on-line-change,action-lvme-commande-client-attrs-somme" canNew="!(clientPartner == null || statusSelect == 2 || (statusSelect == 3 &amp;&amp; !orderBeingEdited) || statusSelect == 4)" canRemove="!(clientPartner == null || statusSelect == 2 || (statusSelect == 3 &amp;&amp; !orderBeingEdited) || statusSelect == 4)" canMove="true"/>
-      <panel-related if="__config__.app.getApp('sale')?.getListDisplayTypeSelect() == __repo__(AppSale).APP_SALE_LINE_DISPLAY_TYPE_MULTI" name="saleOrderLineEditableTreePanel" title="Order Lines" readonlyIf="clientPartner == null || statusSelect == 2 || (statusSelect == 3 &amp;&amp; !orderBeingEdited) || statusSelect == 4" colSpan="12" field="saleOrderLineList" form-view="sale-order-line-form" grid-view="sale-order-line-editable-grid" summary-view="sale-order-line-summary-form" editable="true" orderBy="sequence" onNew="action-sale-order-line-method-onnew-editable" onChange="action-sale-order-method-on-line-change,action-lvme-commande-client-attrs-somme" canNew="!(clientPartner == null || statusSelect == 2 || (statusSelect == 3 &amp;&amp; !orderBeingEdited) || statusSelect == 4)" canRemove="!(clientPartner == null || statusSelect == 2 || (statusSelect == 3 &amp;&amp; !orderBeingEdited) || statusSelect == 4)" canMove="true" widget="tree-grid" x-expand-all="subSaleOrderLineList,saleOrderLineDetailsList" x-tree-field-title="Add a new sale order line" x-tree-field="subSaleOrderLineList"/>
-      <panel-related if="__config__.app.getApp('sale')?.getListDisplayTypeSelect() == __repo__(AppSale).APP_SALE_LINE_DISPLAY_TYPE_EDITABLE" name="editableDetailLinesPanel" title="Details Lines" readonlyIf="clientPartner == null || statusSelect == 2 || (statusSelect == 3 &amp;&amp; !orderBeingEdited) || statusSelect == 4" colSpan="12" height="30" field="saleOrderLineList" form-view="sale-order-line-form" grid-view="sale-order-line-editable-grid" orderBy="sequence" onNew="action-sale-order-line-method-onnew-editable" onChange="action-sale-order-method-on-line-change,action-lvme-commande-client-attrs-somme" canNew="!(clientPartner == null || statusSelect == 2 || (statusSelect == 3 &amp;&amp; !orderBeingEdited) || statusSelect == 4)" canRemove="!(clientPartner == null || statusSelect == 2 || (statusSelect == 3 &amp;&amp; !orderBeingEdited) || statusSelect == 4)" canMove="true"/>
-      <panel name="descriptionPanel" title="Comment to display" colSpan="12">
-        <field name="description" showTitle="false" colSpan="12" widget="Html" x-lite="true"/>
-      </panel>
-      <panel if="__config__.app.getApp('sale')?.getListDisplayTypeSelect() == __repo__(AppSale).APP_SALE_LINE_DISPLAY_TYPE_MULTI" name="subLinePanel" colSpan="12">
-        <field name="isDisplaySubLinesOnReport" widget="boolean-switch"/>
-      </panel>
     </panel>
     <panel name="taxPanel" title="Tax" readonlyIf="statusSelect != 1">
       <panel-related name="saleOrderLineTaxListPanel" colSpan="12" field="saleOrderLineTaxList" form-view="sale-order-line-tax-form" grid-view="sale-order-line-tax-grid" onChange="action-sale-order-method-compute" canNew="false" canRemove="false"/>

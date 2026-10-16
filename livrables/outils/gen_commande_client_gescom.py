@@ -1,59 +1,81 @@
-"""Construit livrables/ui/commande-client-form.xml : fiche Commande client condensée comme la « Fiche Commande
-client » GESCOM (Client | Commande | Totaux | boutons, sans barre latérale), à partir de la fiche admin
-sale-order-form (priorité 30). Barre de statuts et onglets du bas conservés ; rien n'est retiré."""
-import re, sys
+"""Construit livrables/ui/commande-client-form.xml : fiche Commande client copiée sur la « Fiche Commande
+client » GESCOM, à partir de la fiche admin sale-order-form (priorité 30) d'origine
+(livrables/ui/origine/sale-order-form-p30-avant-PROD63.xml).
 
-src, dst = sys.argv[1], sys.argv[2]
-x = open(src, encoding='utf-8').read().replace('\r\n', '\n').replace('\r', '')
+  en haut   : Client (encadré bleu) | Commande | boutons
+  dessous   : cadre des totaux (Nb Colis, Poids, Total HT, Total TTC, % Marge Totale, Total marge)
+  puis      : le tableau des lignes de commande (remonté de l'onglet « Contenu »)
+  en bas    : les onglets (Contenu, Réservation, Livraison, Paramètres, Taxes, Facturation… Suivi)
+Barre de statuts conservée ; plus de barre latérale ; aucun champ retiré.
+Usage : python livrables/outils/gen_commande_client_gescom.py   (depuis la racine du dépôt)
+"""
+import os
+import re
+
+RACINE = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+SRC = os.path.join(RACINE, 'livrables', 'ui', 'origine', 'sale-order-form-p30-avant-PROD63.xml')
+DST = os.path.join(RACINE, 'livrables', 'ui', 'commande-client-form.xml')
+SOMME = 'action-lvme-commande-client-attrs-somme'
+
+x = open(SRC, encoding='utf-8').read().replace('\r\n', '\n').replace('\r', '')
 x = re.sub(r'\n[ \t]*\n', '\n', x)
 A = r'(?:[^>"]|"[^"]*")'
 
 
-def blk(name, tag='panel', extra=''):
-    m = re.search(r'<' + tag + r'\b(?=' + A + r'*?\sname="' + re.escape(name) + r'"' + extra + r')', x)
+def blk(name, tag='panel', extra='', within=None):
+    s = x if within is None else within
+    m = re.search(r'<' + tag + r'\b(?=' + A + r'*?\sname="' + re.escape(name) + r'"' + extra + r')', s)
     assert m, name
     i = m.start()
+    if re.match(r'<' + tag + r'\b' + A + r'*?/>', s[i:]):
+        return re.match(r'<' + tag + r'\b' + A + r'*?/>', s[i:]).group(0)
     depth = 0
-    for t in re.finditer(r'<(/?)' + tag + r'\b' + A + r'*?(/?)>', x[i:]):
+    for t in re.finditer(r'<(/?)' + tag + r'\b' + A + r'*?(/?)>', s[i:]):
         if t.group(1):
             depth -= 1
         elif not t.group(2):
             depth += 1
         if depth == 0:
-            return x[i:i + t.end()]
+            return s[i:i + t.end()]
     raise AssertionError(name)
 
 
-def el(name, within, extra=None):
+def els(name, within):
     pat = re.compile(r'<(field|button)\b(?=' + A + r'*?\sname="' + re.escape(name) + r'")' + A + r'*?(/>|>.*?</\1>)', re.S)
-    found = [m.group(0) for m in pat.finditer(within) if extra is None or extra in m.group(0)]
+    found = [m.group(0) for m in pat.finditer(within)]
     assert found, name
     return found
 
 
 def seta(e, attr, val):
-    head = re.match(r'<\w+\b' + A + r'*', e).group(0)
+    head = re.match(r'<[\w-]+\b' + A + r'*', e).group(0)
     if re.search(r'\s%s="[^"]*"' % attr, head):
-        return e.replace(head, re.sub(r'(\s)%s="[^"]*"' % attr, r'\1%s="%s"' % (attr, val), head, count=1), 1)
-    return re.sub(r'^<(\w+)', r'<\1 %s="%s"' % (attr, val), e, count=1)
+        new = re.sub(r'(\s)%s="[^"]*"' % attr, lambda m: m.group(1) + '%s="%s"' % (attr, val), head, count=1)
+    else:
+        new = re.sub(r'^<([\w-]+)', lambda m: '<%s %s="%s"' % (m.group(1), attr, val), head, count=1)
+    return e.replace(head, new, 1)
 
 
 def dela(e, attr):
-    head = re.match(r'<\w+\b' + A + r'*', e).group(0)
+    head = re.match(r'<[\w-]+\b' + A + r'*', e).group(0)
     return e.replace(head, re.sub(r'\s%s="[^"]*"' % attr, '', head), 1)
 
 
-def F(e, cs, title=None, ind='      '):
+def F(e, cs, title=None, ind='        '):
     e = seta(e, 'colSpan', cs)
-    if title:
+    if title is not None:
         e = seta(e, 'title', title)
     return ind + e
+
+
+def ro(name, title, cs, extra=''):
+    return '        <field name="%s" title="%s" readonly="true" colSpan="%s"%s/>' % (name, title, cs, extra)
 
 
 main = blk('mainPanel')
 tabs = blk('mainPanelTab', 'panel-tabs')
 head_form = x[:x.index('<panel name="mainPanel"')]
-mail = x[x.index('<panel-mail name="mailPanel">'):x.index('</panel-mail>') + len('</panel-mail>')]
+mail = blk('mailPanel', 'panel-mail')
 client = blk('lvmeClientPanel')
 cde = blk('lvmeCommandePanel')
 resa = blk('lvmeReservationPanel')
@@ -68,56 +90,88 @@ side_names = ['globalDiscountPanel', 'salesFollowUpPanel', 'characteristicsPanel
 sides = {n: (blk(n, extra=' title="Dates"') if n == 'datesPanel' else blk(n)) for n in side_names}
 other_infos = blk('otherInfosPanel')
 attrs_panel = blk('attrsPanel')
+content = blk('contentPanel')
 
-# haut de la fiche Axelor (blocage encours, statuts, n°) : tout ce qui précède detailsPanel, gardé tel quel
+# haut Axelor (blocage encours, statuts, n°) gardé tel quel, puis badges de livraison / facturation
 top = main[main.index('>') + 1:main.index(details)]
-# champs entre detailsPanel et lvmeDevisePanel (vente ponctuelle, noms commerciaux) : gardés dans Paramètres
 entre = main[main.index(details) + len(details):main.index(devise)]
 entre_fields = re.findall(r'<field\b' + A + r'*?(?:/>|>.*?</field>)', entre, re.S)
+info_client = els('clientPartner.saleOrderInformation', main)[0]
 
-# --- bloc Client (encadré bleu), libellés GESCOM
-c = lambda n, extra=None: el(n, client, extra)[0]
-client_new = ['    <panel name="lvmeClientPanel" colSpan="5" itemSpan="6" css="lvme-gescom lvme-gescom-box">',
-              F(c('clientPartner'), 6, 'Client'), F(c('commercial'), 6, 'Commercial')]
-client_new += [F(e, 6, 'Adresse') for e in el('mainInvoicingAddress', client)]
-client_new += [F(e, 6, 'Adresse') for e in el('mainInvoicingAddressStr', client)]
-client_new += [F(c('contactPartner'), 6, 'contact'), F(c('clientPartner.fixedPhone'), 6, 'Téléphone'),
-               F(c('clientPartner.groupement'), 6, 'Groupement'),
-               F(c('paymentMode'), 6, 'Règlement'), F(c('paymentCondition'), 6, 'Echéance'),
-               F(c('remiseFacture'), 4, '% Rem/Fact.'), F(c('tauxRFA'), 4, '% RFA'),
-               F(c('tauxCommission'), 4, '% Frais Commission'),
-               '    </panel>']
+c1 = lambda n: els(n, client)[0]
+d1 = lambda n: els(n, cde)[0]
 
-# --- bloc Commande
-d = lambda n: el(n, cde)[0]
-seq = el('saleOrderSeq', top)[0]
-cde_new = ['    <panel name="lvmeCommandePanel" colSpan="4" itemSpan="6" css="lvme-gescom">',
-           '      <field name="saleOrderSeq" title="Commande N°" readonly="true" colSpan="6"/>',
-           F(d('salespersonUser'), 6, 'Opérateur'),
-           F(d('creationDate'), 6, 'Date Commande'), F(d('estimatedDeliveryDate'), 6, 'Date Livraison'),
-           F(el('isReservation', resa)[0].replace(' widget="boolean-switch"', ''), 6, 'Réservation'),
-           F(d('externalReference'), 6, 'Ref Cde'),
-           F(d('carrierPartner'), 8, 'Transporteur'), F(d('portPaye'), 4, 'Port Payé'),
-           F(d('coutPortKg'), 4, 'Coût port/kg'),
-           F(seta(d('internalNote'), 'height', '2'), 8, '&lt; Commentaire &gt;'),
-           '    </panel>']
+# ---------- bloc Client (encadré bleu), deux colonnes comme GESCOM ----------
+adr = els('mainInvoicingAddress', client)[0]
+client_new = '\n'.join([
+    '    <panel name="lvmeClientPanel" colSpan="6" css="lvme-gescom lvme-gescom-box">',
+    '      <panel name="lvmeClientGauche" colSpan="6" itemSpan="12" showTitle="false">',
+    F(c1('clientPartner'), 12, 'Client'),
+    F(adr, 12, 'Adresse'),
+    ro('mainInvoicingAddress.addressL4', 'Adresse', 12, ' showIf="mainInvoicingAddress"'),
+    ro('mainInvoicingAddress.addressL5', '', 12, ' showIf="mainInvoicingAddress.addressL5"'),
+    ro('mainInvoicingAddress.zip', 'Code postal', 4),
+    ro('mainInvoicingAddress.city.name', 'Ville', 8),
+    ro('mainInvoicingAddress.country', 'Code pays', 12),
+    F(c1('clientPartner.groupement'), 12, 'Groupement'),
+    '      </panel>',
+    '      <panel name="lvmeClientDroite" colSpan="6" itemSpan="12" showTitle="false">',
+    F(c1('commercial'), 12, 'Commercial'),
+    F(c1('contactPartner'), 12, 'contact'),
+    F(c1('clientPartner.fixedPhone'), 12, 'Téléphone'),
+    F(c1('paymentMode'), 12, 'Règlement'),
+    F(c1('paymentCondition'), 12, 'Echéance'),
+    F(c1('remiseFacture'), 6, '% Rem/Fact.'),
+    F(c1('tauxRFA'), 6, '% RFA'),
+    F(c1('tauxCommission'), 12, '% Frais Commission'),
+    '      </panel>',
+    '    </panel>'])
 
-# --- bloc Totaux (Nb Colis / Poids calculés par le serveur sur toutes les lignes ; totaux de la commande)
+# ---------- bloc Commande ----------
+resa_case = dela(els('isReservation', resa)[0], 'widget')
+cde_new = '\n'.join([
+    '    <panel name="lvmeCommandePanel" colSpan="4" itemSpan="6" css="lvme-gescom">',
+    '        <field name="saleOrderSeq" title="Commande N°" readonly="true" colSpan="6"/>',
+    F(d1('salespersonUser'), 6, 'Opérateur'),
+    F(d1('creationDate'), 6, 'Date Commande'),
+    F(d1('estimatedDeliveryDate'), 6, 'Date Livraison'),
+    F(resa_case, 6, 'Réservation'),
+    F(d1('externalReference'), 6, 'Ref Cde'),
+    F(d1('carrierPartner'), 8, 'Transporteur'),
+    F(d1('portPaye'), 4, 'Port Payé'),
+    F(d1('coutPortKg'), 4, 'Coût port/kg'),
+    F(seta(d1('internalNote'), 'height', '2'), 8, '&lt; Commentaire &gt;'),
+    '    </panel>'])
+
+# ---------- boutons (ancienne barre latérale) à droite, en premier Imprimer commande ----------
+act_buttons = re.findall(r'<button\b' + A + r'*?/>', actions, re.S)
+act_fields = re.findall(r'<field\b' + A + r'*?/>', actions, re.S)
+boutons = '\n'.join(
+    ['    <panel name="actionsPanel" colSpan="2" itemSpan="12">',
+     '      <button name="lvmeImprimerCommandeBtn" title="Imprimer commande" icon="printer" '
+     'showIf="id" onClick="save,action-sale-order-view-reports-wizard"/>']
+    + ['      ' + b for b in act_buttons] + ['      ' + f for f in act_fields] + ['    </panel>'])
+
+# ---------- cadre des totaux, gris comme GESCOM ----------
 NUM = '(+%s || 0).toLocaleString("fr-FR", { minimumFractionDigits: %d, maximumFractionDigits: %d })'
-CASE = 'style={{ background: "#ffffc4", color: "#1a1ad6", border: "1px solid #c8c8c8", textAlign: "right", padding: "1px 6px", minWidth: 70 }}'
-LIB = 'style={{ color: "#333", paddingRight: 6, whiteSpace: "nowrap", textAlign: "right" }}'
-def ligne_tot(l1, v1, d1, l2, v2, d2):
-    return ('<tr><td %s>%s</td><td %s>{%s}</td><td %s>%s</td><td %s>{%s}</td></tr>'
-            % (LIB, l1, CASE, NUM % (v1, d1, d1), LIB, l2, CASE, NUM % (v2, d2, d2)))
-totaux = '''    <panel name="lvmeTotauxPanel" colSpan="4" css="lvme-gescom lvme-gescom-box">
-      <field name="$lvmeTotaux" type="string" showTitle="false" readonly="true" colSpan="12">
+CASE = ('style={{ background: "#e6e6e6", border: "1px solid #b8b8b8", textAlign: "right", padding: "1px 6px", '
+        'minWidth: 80 }}')
+LIB = 'style={{ paddingLeft: 12, paddingRight: 6, whiteSpace: "nowrap", textAlign: "right" }}'
+
+
+def paire(lib, var, dec):
+    return '<td %s>%s</td><td %s>{%s}</td>' % (LIB, lib, CASE, NUM % (var, dec, dec))
+
+
+totaux = '''    <panel name="lvmeTotauxPanel" colSpan="12">
+      <spacer colSpan="5"/>
+      <field name="$lvmeTotaux" type="string" showTitle="false" readonly="true" colSpan="7">
         <viewer depends="$sommeColis,$sommePoids,exTaxTotal,inTaxTotal,marginRate,totalGrossMargin"><![CDATA[
           <>
-            <table style={{ borderCollapse: "separate", borderSpacing: 3, fontSize: 13 }}>
+            <table style={{ borderCollapse: "separate", borderSpacing: 3, fontSize: 13, border: "1px solid #b8b8b8", background: "#f4f4f4", marginLeft: "auto" }}>
               <tbody>
-                %s
-                %s
-                %s
+                <tr>%s%s%s</tr>
+                <tr>%s%s%s</tr>
               </tbody>
             </table>
           </>
@@ -125,44 +179,41 @@ totaux = '''    <panel name="lvmeTotauxPanel" colSpan="4" css="lvme-gescom lvme-
       </field>
       <field name="$sommeColis" type="decimal" hidden="true"/>
       <field name="$sommePoids" type="decimal" hidden="true"/>
-    </panel>''' % (ligne_tot('Nb Colis', '$sommeColis', 0, 'Total HT', 'exTaxTotal', 2),
-                   ligne_tot('Poids', '$sommePoids', 1, 'Total TTC', 'inTaxTotal', 2),
-                   ligne_tot('% Marge Totale', 'marginRate', 2, 'Total marge', 'totalGrossMargin', 2))
+    </panel>''' % (paire('Nb Colis', '$sommeColis', 0), paire('% Marge Totale', 'marginRate', 2), paire('Total TTC', 'inTaxTotal', 2),
+                   paire('Poids', '$sommePoids', 1), paire('Total marge', 'totalGrossMargin', 2), paire('Total HT', 'exTaxTotal', 2))
 
-# --- boutons (barre latérale) à droite, avec Imprimer commande
-act_buttons = re.findall(r'<button\b' + A + r'*?/>', actions, re.S)
-act_fields = re.findall(r'<field\b' + A + r'*?/>', actions, re.S)
-boutons = (['    <panel name="actionsPanel" hideIf="clientPartner == null" colSpan="3" itemSpan="12">',
-            '      <button name="lvmeImprimerCommandeBtn" title="Imprimer commande" icon="printer" '
-            'onClick="save,action-sale-order-view-reports-wizard"/>']
-           + ['      ' + b for b in act_buttons] + ['      ' + f for f in act_fields] + ['    </panel>'])
+# ---------- lignes : remontées de l'onglet Contenu, juste sous l'en-tête ----------
+lignes = [blk(n, tag) for n, tag in [('displayMultiLinesButtonPanel', 'panel'), ('detailLinesPanel', 'panel-related'),
+                                      ('saleOrderLineEditableTreePanel', 'panel-related'),
+                                      ('editableDetailLinesPanel', 'panel-related')]]
 
-# --- en-tête : statuts Axelor + 4 blocs ; réservation, livraison, paramètres repliés dessous
-def replie(p, titre=None):
-    p = re.sub(r'^(<panel\b' + A + r'*?)>', lambda m: m.group(1) + ' canCollapse="true" collapseIf="true">', p, count=1) \
-        if 'canCollapse' not in p[:p.index('>')] else p
-    return p
-new_main = ('  <!-- LVME : fiche Commande client copiée sur la « Fiche Commande client » GESCOM : Client | Commande |\n'
-            '       Totaux | boutons, sans barre latérale ; statuts, réservation, livraison et onglets conservés -->\n'
-            '  <panel name="mainPanel" colSpan="12">\n' + top.rstrip() + '\n    ' + details + '\n'
-            '  <panel name="lvmeGescomPanel" colSpan="12" css="lvme-gescom">\n'
-            + '\n'.join(client_new) + '\n' + '\n'.join(cde_new) + '\n' + totaux + '\n' + '\n'.join(boutons) + '\n'
-            '  </panel>\n'
-            '    ' + re.sub(r'\s*<field name="isReservation"' + A + r'*?/>', '', replie(resa), count=1) + '\n'
-            '    ' + replie(livr) + '\n'
-            '    <panel name="lvmeParametresPanel" title="Paramètres" colSpan="12" canCollapse="true" collapseIf="true">\n'
-            + ''.join('      ' + f + '\n' for f in entre_fields)
-            + '      ' + devise + '\n      ' + general + '\n    </panel>\n'
-            + '    ' + el('clientPartner.saleOrderInformation', main)[0] + '\n'
-            '  </panel>\n')
 
-# champs techniques de la barre latérale des totaux (cachés), gardés pour les conditions et calculs
-intax_fields = re.findall(r'<field\b' + A + r'*?/>', intax, re.S)
-tech = ('  <panel name="lvmeTotauxTechPanel" hidden="true" colSpan="12">\n'
-        + '\n'.join('    ' + dela(f, 'hidden') for f in intax_fields if 'name="inTaxTotal"' not in f)
-        + '\n    <field name="inTaxTotal"/>\n  </panel>\n')
+def onchange(t):
+    if not t.startswith('<panel-related'):
+        return t
+    head = re.match(r'<panel-related\b' + A + r'*?/?>', t).group(0)
+    if 'onChange="' in head:
+        new = re.sub(r'onChange="([^"]*)"', lambda q: 'onChange="%s,%s"' % (q.group(1), SOMME), head, count=1)
+    else:
+        new = head.replace('<panel-related ', '<panel-related onChange="%s" ' % SOMME, 1)
+    new = seta(new, 'title', 'Commande') if 'name="detailLinesPanel"' in new else new
+    if 'css="' not in new:
+        new = new.replace('<panel-related ', '<panel-related css="lvme-gescom-grid" ', 1)
+    return t.replace(head, new, 1)
 
-# barre latérale restante (remise globale, suivi, caractéristiques, références, marge, dates) : onglet « Suivi »
+
+lignes_xml = '\n'.join('  ' + onchange(t) for t in lignes)
+content_reste = content
+for t in lignes:
+    content_reste = content_reste.replace(t, '')
+
+# ---------- onglets : Contenu (sans les lignes), puis Réservation / Livraison / Paramètres, puis le reste ----------
+resa_tab = re.sub(r'\s*<field\b(?=' + A + r'*?\sname="isReservation")' + A + r'*?/>', '', resa, count=1)
+resa_tab = dela(dela(seta(resa_tab, 'colSpan', '12'), 'canCollapse'), 'collapseIf')
+livr_tab = dela(dela(seta(livr, 'colSpan', '12'), 'canCollapse'), 'collapseIf')
+param_tab = ('    <panel name="lvmeParametresPanel" title="Paramètres">\n'
+             + ''.join('      ' + f + '\n' for f in entre_fields)
+             + '      ' + devise + '\n      ' + general + '\n    </panel>')
 suivi = ['    <!-- LVME : ancienne barre latérale -->', '    <panel name="lvmeSuiviPanel" title="Suivi">']
 for n in side_names + ['marginPanel']:
     p = sides.get(n) or margin
@@ -170,18 +221,27 @@ for n in side_names + ['marginPanel']:
         p = dela(p, a)
     suivi.append('      ' + seta(p, 'colSpan', '6'))
 suivi.append('    </panel>')
+tabs = tabs.replace(content, content_reste + '\n    ' + resa_tab + '\n    ' + livr_tab + '\n' + param_tab, 1)
 tabs = tabs[:tabs.rindex('</panel-tabs>')] + '\n'.join(suivi) + '\n  </panel-tabs>'
 
-out = (head_form + new_main + tech + '  ' + tabs + '\n  ' + attrs_panel + '\n  ' + other_infos + '\n  ' + mail + '\n</form>\n')
+# ---------- champs techniques ----------
+intax_fields = re.findall(r'<field\b' + A + r'*?/>', intax, re.S)
+tech = ('  <panel name="lvmeTechPanel" hidden="true" colSpan="12">\n'
+        + ''.join('    ' + dela(f, 'hidden') + '\n' for f in intax_fields if 'name="inTaxTotal"' not in f)
+        + '    <field name="inTaxTotal"/>\n'
+        + ''.join('    ' + dela(dela(e, 'hideIf'), 'showIf') + '\n' for e in els('mainInvoicingAddressStr', client))
+        + '  </panel>\n')
+
+new_main = ('  <!-- LVME : copie de la « Fiche Commande client » GESCOM : Client | Commande | boutons, totaux, puis le\n'
+            '       tableau des lignes ; statuts conservés ; réservation, livraison, paramètres en onglets -->\n'
+            '  <panel name="mainPanel" colSpan="12">\n' + top.rstrip() + '\n    ' + details + '\n  </panel>\n'
+            '  <panel name="lvmeGescomPanel" colSpan="12" css="lvme-gescom">\n'
+            + client_new + '\n' + cde_new + '\n' + boutons + '\n' + totaux + '\n'
+            '    ' + info_client + '\n'
+            '  </panel>\n' + lignes_xml + '\n')
+
+out = head_form + new_main + tech + '  ' + tabs + '\n  ' + attrs_panel + '\n  ' + other_infos + '\n  ' + mail + '\n</form>\n'
 m = re.search(r'\sonLoad="([^"]*)"', out[:out.index('>')])
-out = out.replace('onLoad="%s"' % m.group(1), 'onLoad="%s,action-lvme-commande-client-attrs-somme"' % m.group(1), 1)
-# totaux recalculés à chaque changement des lignes
-SOMME = 'action-lvme-commande-client-attrs-somme'
-def onchange(mm):
-    t = mm.group(0)
-    if 'onChange="' in t:
-        return re.sub(r'onChange="([^"]*)"', lambda q: 'onChange="' + q.group(1) + ',' + SOMME + '"', t, count=1)
-    return t.replace('<panel-related ', '<panel-related onChange="' + SOMME + '" ', 1)
-out = re.sub(r'<panel-related\s(?=' + A + r'*?field="saleOrderLineList")' + A + r'*?>', onchange, out)
-open(dst, 'w', encoding='utf-8', newline='\r\n').write(out)
-print('ok', len(out))
+out = out.replace('onLoad="%s"' % m.group(1), 'onLoad="%s,%s"' % (m.group(1), SOMME), 1)
+open(DST, 'w', encoding='utf-8', newline='\r\n').write(out)
+print('ok', DST, len(out))
