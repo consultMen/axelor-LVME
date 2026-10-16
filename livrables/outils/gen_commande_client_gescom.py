@@ -150,7 +150,6 @@ act_buttons = re.findall(r'<button\b' + A + r'*?/>', actions, re.S)
 act_fields = re.findall(r'<field\b' + A + r'*?/>', actions, re.S)
 boutons = '\n'.join(
     ['    <panel name="actionsPanel" colSpan="2" itemSpan="12">',
-     '      <button name="lvmeValiderBtn" title="Valider" icon="check-circle" css="btn-success" onClick="save"/>',
      '      <button name="lvmeFermerBtn" title="Fermer" icon="x-circle" css="btn-danger" onClick="close"/>',
      '      <button name="lvmeImprimerCommandeBtn" title="Imprimer commande" icon="printer" '
      'showIf="id" onClick="save,action-sale-order-view-reports-wizard"/>']
@@ -159,8 +158,8 @@ boutons = '\n'.join(
 # ---------- cadre des totaux, gris comme GESCOM ----------
 NUM = '(+%s || 0).toLocaleString("fr-FR", { minimumFractionDigits: %d, maximumFractionDigits: %d })'
 CASE = ('style={{ background: "#e6e6e6", border: "1px solid #b8b8b8", textAlign: "right", padding: "1px 6px", '
-        'minWidth: 80 }}')
-LIB = 'style={{ paddingLeft: 12, paddingRight: 6, whiteSpace: "nowrap", textAlign: "right" }}'
+        'minWidth: 62 }}')
+LIB = 'style={{ paddingLeft: 8, paddingRight: 4, whiteSpace: "nowrap", textAlign: "right", fontSize: 12 }}'
 
 
 def paire(lib, var, dec):
@@ -168,10 +167,10 @@ def paire(lib, var, dec):
 
 
 totaux = '''    <panel name="lvmeTotauxPanel" colSpan="12">
-      <field name="statusSelect" showTitle="false" readonly="true" colSpan="4" css="lvme-cde-statut">
+      <field name="statusSelect" showTitle="false" readonly="true" colSpan="3" css="lvme-cde-statut">
         <viewer depends="statusSelect"><![CDATA[<>{$fmt("statusSelect")}</>]]></viewer>
       </field>
-      <field name="$lvmeTotaux" type="string" showTitle="false" readonly="true" colSpan="8">
+      <field name="$lvmeTotaux" type="string" showTitle="false" readonly="true" colSpan="9">
         <viewer depends="$sommeColis,$sommePoids,$portHt,$portTva,exTaxTotal,inTaxTotal,marginRate,totalGrossMargin"><![CDATA[
           <>
             <table style={{ borderCollapse: "separate", borderSpacing: 3, fontSize: 13, border: "1px solid #b8b8b8", background: "#f4f4f4", marginLeft: "auto" }}>
@@ -206,7 +205,7 @@ def onchange(t):
         new = re.sub(r'onChange="([^"]*)"', lambda q: 'onChange="%s,%s"' % (q.group(1), SOMME), head, count=1)
     else:
         new = head.replace('<panel-related ', '<panel-related onChange="%s" ' % SOMME, 1)
-    new = seta(new, 'title', 'Commande') if 'name="detailLinesPanel"' in new else new
+    new = seta(new, 'title', 'Lignes commande') if 'title="' in new else new
     if 'css="' not in new:
         new = new.replace('<panel-related ', '<panel-related css="lvme-gescom-grid lvme-cde-grid" ', 1)
     return t.replace(head, new, 1)
@@ -231,7 +230,14 @@ for n in side_names + ['marginPanel']:
         p = dela(p, a)
     suivi.append('      ' + seta(p, 'colSpan', '6'))
 suivi.append('    </panel>')
-tabs = tabs.replace(content, content_reste + '\n    ' + resa_tab + '\n    ' + livr_tab + '\n' + param_tab, 1)
+content_reste = seta(content_reste, 'title', 'Commentaire')
+resa_tab = seta(resa_tab, 'showIf', 'isReservation')
+tabs = tabs.replace(content, content_reste + '\n    ' + resa_tab + '\n' + param_tab, 1)
+# livraison LVME (tiers livré, adresse, frigo, dates…) en tête de l'onglet Livraison d'Axelor
+delivery = blk('deliveryInformationPanel', within=tabs)
+d_head = re.match(r'<panel\b' + A + r'*?>', delivery).group(0)
+livr_in = dela(seta(livr_tab, 'showTitle', 'false'), 'title')
+tabs = tabs.replace(delivery, delivery.replace(d_head, d_head + '\n      ' + livr_in, 1), 1)
 tabs = tabs[:tabs.rindex('</panel-tabs>')] + '\n'.join(suivi) + '\n  </panel-tabs>'
 
 # ---------- champs techniques ----------
