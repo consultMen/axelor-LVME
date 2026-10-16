@@ -11,6 +11,10 @@
 -- Source : livrables/ui/commande-client-form.xml (fiche admin sale-order-form, priorité 30).
 --   - champs Préparateur et % Frais Cong. (code de ce lot), Port HT / Port TVA (poids x coût port/kg si le port
 --     n'est pas payé, TVA 20 %), couleurs GESCOM (css du code de ce lot)
+--   - tableau des lignes dans l'ordre GESCOM : Référence, Désignation, Taux TVA, Numéro Arrivage, Fourn., Ori.,
+--     Frigo, Date Livraison, N° Lot, D.D.M., Unit/Pds du Colis, Prix Achat, Colis Rsv, Colis Dispo, Colis Cdes,
+--     Unité Vente, Poids en KG, Nb unités ou Poids cdés, Prix Revient, Prix Vente, promo, Montant, % Marge
+--     (colonnes du lot calculées par le code de ce lot ; case promo = nouvelle colonne)
 -- À lancer depuis la racine du dépôt, avant le redémarrage. Relançable.
 -- =====================================================================
 \set fiche `cat livrables/ui/commande-client-form.xml`
@@ -23,6 +27,7 @@ BEGIN;
 -- champs GESCOM de la commande (code de ce lot)
 ALTER TABLE sale_sale_order ADD COLUMN IF NOT EXISTS lvme_preparateur bigint;
 ALTER TABLE sale_sale_order ADD COLUMN IF NOT EXISTS lvme_frais_congelation numeric(5,2);
+ALTER TABLE sale_sale_order_line ADD COLUMN IF NOT EXISTS lvme_promo boolean;
 
 DELETE FROM meta_action WHERE module IS NULL AND name = 'action-lvme-commande-client-attrs-somme';
 INSERT INTO meta_action (id, version, created_on, name, type, model, xml, home, is_custom, priority) VALUES
