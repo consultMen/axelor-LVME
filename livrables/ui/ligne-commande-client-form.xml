@@ -1,4 +1,4 @@
-<form name="sale-order-line-form" title="Ligne de commande" model="com.axelor.apps.sale.db.SaleOrderLine" width="large" onLoad="action-method-sale-order-line-reload-from-db,action-sale-order-line-method-onload" onSave="action-method-sale-order-line-set-pr-from-lot,action-method-sale-order-line-compute-pr-net,action-method-sale-order-line-recompute-marge-with-pr-net" onNew="action-sale-order-line-method-onnew">
+<form css="lvme-ligne-cde" name="sale-order-line-form" title="Lignes Commandes" model="com.axelor.apps.sale.db.SaleOrderLine" width="large" onLoad="action-method-sale-order-line-reload-from-db,action-sale-order-line-method-onload" onSave="action-method-sale-order-line-set-pr-from-lot,action-method-sale-order-line-compute-pr-net,action-method-sale-order-line-recompute-marge-with-pr-net" onNew="action-sale-order-line-method-onnew">
   <panel name="productPanel" showIf="typeSelect > 0">
     <field name="productName" title="Title" colSpan="9"/>
     <field name="typeSelect" colSpan="3" onChange="action-sale-order-line-method-type-select-onchange" requiredIf="typeSelect != 0"/>
@@ -71,8 +71,8 @@
         </panel>
         <field title="Article" colSpan="3" if="!__config__.app.isApp('supplychain')" name="product" canEdit="false" onChange="action-sale-order-line-method-get-product-information" onSelect="action-sale-order-line-method-domain-product" form-view="product-form" grid-view="product-grid" x-image-field="picture"/>
         <field title="Article" colSpan="3" if="__config__.app.isApp('supplychain')" name="product" canEdit="false" onChange="action-sale-order-line-method-get-product-information,action-method-sale-order-line-copy-taux-from-sale-order,action-method-sale-order-line-set-frais-congelation-from-lot,action-method-sale-order-line-compute-pr-net" onSelect="action-sale-order-line-method-domain-product" form-view="product-form" grid-view="stock-move-line-product-grid" x-image-field="picture"/>
-        <field name="enableFreezeFields" colSpan="2"/>
-        <field name="typeSelect" colSpan="2" onChange="action-sale-order-line-method-type-select-onchange"/>
+        
+        
         <field title="" name="productName" colSpan="5"/>
         <field name="oldQty"/>
         <field name="product.gencode" title="Gencode" readonly="true" colSpan="2"/>
@@ -93,31 +93,36 @@
         <field name="lvmeZonePeche" title="Zone pêche" readonly="true" colSpan="3"/>
         <field name="lvmeColisCouche" title="Colis / Couche" readonly="true" colSpan="2"/>
         <field name="lvmePromo" title="Prix Promo" colSpan="2"/>
-        <!-- ligne du bas GESCOM, même ordre : Taux TVA, quantités puis prix (2 lignes de 12 colonnes) -->
-        <field title="Taux TVA" name="taxLineSet" readonlyIf="$isReadOnly !== false || deliveryState == 2 || deliveryState == 3 || amountInvoiced > 0" colSpan="2" widget="TagSelect" canNew="false" canEdit="false" onChange="action-sale-order-line-method-tax-line-onchange" domain="(self.endDate = null or self.endDate > :__date__) AND self.tax.isNonDeductibleTax = false" form-view="tax-line-form" grid-view="tax-line-grid"/>
-        <field title="Nb unités ou Poids du Colis" name="nbUnitesParColis" colSpan="2"/>
+        <!-- ligne du bas GESCOM sur une seule ligne, même ordre, chaque case encadrée (css lvme-ligne-bas :
+             grille de 14 colonnes au lieu de 12) -->
+        <panel name="lvmeLigneBasPanel" colSpan="12" css="lvme-ligne-bas">
+        <field title="Taux TVA" name="taxLineSet" readonlyIf="$isReadOnly !== false || deliveryState == 2 || deliveryState == 3 || amountInvoiced > 0" colSpan="1" widget="TagSelect" canNew="false" canEdit="false" onChange="action-sale-order-line-method-tax-line-onchange" domain="(self.endDate = null or self.endDate > :__date__) AND self.tax.isNonDeductibleTax = false" form-view="tax-line-form" grid-view="tax-line-grid"/>
+        <field title="Nb unités ou Poids du Colis" name="nbUnitesParColis" colSpan="1"/>
         <field name="lvmeColisRsv" title="Nb Colis Réservé" readonly="true" colSpan="1"/>
         <field name="lvmeColisDispo" title="Nb Colis Dispo" readonly="true" colSpan="1"/>
-        <field css="lvme-case lvme-cde-violet" title="Nb Colis Commandés" name="nbColis" colSpan="2" onChange="action-sale-order-line-method-compute-packaging" validIf="nbColis == null || nbColis % 1 == 0"/>
+        <field css="lvme-case lvme-cde-violet" title="Nb Colis Commandés" name="nbColis" colSpan="1" onChange="action-sale-order-line-method-compute-packaging" validIf="nbColis == null || nbColis % 1 == 0"/>
         <field name="lvmeQteDispo" title="Qtes Dispo" readonly="true" colSpan="1"/>
-        <field css="lvme-case lvme-cde-violet" title="Qtes Commandées" name="qty" readonlyIf="$availabiltyRequest || ($isReadOnly !== false &amp;&amp; !$get('saleOrder.orderBeingEdited'))" colSpan="2" onChange="action-group-sale-saleorderline-qty-onchange,action-method-sale-order-line-compute-pr-net,action-method-sale-order-line-recompute-marge-with-pr-net" validIf="$qtyValid != false"/>
+        <field css="lvme-case lvme-cde-violet" title="Qtes Commandées" name="qty" readonlyIf="$availabiltyRequest || ($isReadOnly !== false &amp;&amp; !$get('saleOrder.orderBeingEdited'))" colSpan="1" onChange="action-group-sale-saleorderline-qty-onchange,action-method-sale-order-line-compute-pr-net,action-method-sale-order-line-recompute-marge-with-pr-net" validIf="$qtyValid != false"/>
         <field css="lvme-case" title=" " name="unit" readonlyIf="$isReadOnly !== false || deliveryState == 3 || $nonNegotiable" colSpan="1" canEdit="false" onChange="action-sale-order-line-method-unit-onchange" requiredIf="typeSelect == 0" form-view="unit-form" grid-view="unit-grid"/>
-        <field title="Poids en Kg" name="poidsTotalNet" colSpan="2"/>
-        <field name="prixRevient" title="Prix Revient" readonly="true" hideIf="product == null" colSpan="2" widget="Decimal" onChange="action-method-sale-order-line-compute-pr-net" x-scale="4"/>
-        <field css="lvme-case lvme-cde-violet" title="Prix Vente" name="price" hidden="true" readonlyIf="$isReadOnly !== false || deliveryState == 3 || $nonNegotiable || ((subSaleOrderLineList.length > 0 || saleOrderLineDetailsList.length > 0) &amp;&amp; $computeWithSOL)" colSpan="2" onChange="action-sale-order-line-method-onchange-price,action-method-sale-order-line-recompute-marge-with-pr-net"/>
-        <field css="lvme-case lvme-cde-violet" title="Prix Vente" name="inTaxPrice" hidden="true" readonlyIf="$isReadOnly !== false || deliveryState == 3" colSpan="2" onChange="action-sale-order-line-method-onchange-intaxprice"/>
-        <field title="Montant HT" name="exTaxTotal" readonly="true" colSpan="2" x-scale="$currency.numberOfDecimals"/>
+        <field title="Poids en Kg" name="poidsTotalNet" colSpan="1"/>
+        <field name="prixRevient" title="Prix Revient" readonly="true" hideIf="product == null" colSpan="1" widget="Decimal" onChange="action-method-sale-order-line-compute-pr-net" x-scale="4"/>
+        <field css="lvme-case lvme-cde-violet" title="Prix Vente" name="price" hidden="true" readonlyIf="$isReadOnly !== false || deliveryState == 3 || $nonNegotiable || ((subSaleOrderLineList.length > 0 || saleOrderLineDetailsList.length > 0) &amp;&amp; $computeWithSOL)" colSpan="1" onChange="action-sale-order-line-method-onchange-price,action-method-sale-order-line-recompute-marge-with-pr-net"/>
+        <field css="lvme-case lvme-cde-violet" title="Prix Vente" name="inTaxPrice" hidden="true" readonlyIf="$isReadOnly !== false || deliveryState == 3" colSpan="1" onChange="action-sale-order-line-method-onchange-intaxprice"/>
+        <field title="Montant HT" name="exTaxTotal" readonly="true" colSpan="1" x-scale="$currency.numberOfDecimals"/>
         <field title="P.V - Rem." name="priceDiscounted" readonly="true" colSpan="1"/>
         <field name="prixRevientNet" title="P.R. net" readonly="true" hideIf="product == null" colSpan="1" widget="Decimal" x-scale="4"/>
-        <field name="subMarginRate" title="% Marge" readonly="true" hideIf="product == null" colSpan="2" widget="Decimal" x-scale="2"/>
+        <field name="subMarginRate" title="% Marge" readonly="true" hideIf="product == null" colSpan="1" widget="Decimal" x-scale="2"/>
+        </panel>
+        <field name="enableFreezeFields" colSpan="2"/>
+        <field name="typeSelect" colSpan="2" onChange="action-sale-order-line-method-type-select-onchange"/>
       </panel>
 
       <panel name="lvmeLigneCdeBoutonsPanel" colSpan="2" itemSpan="12">
-        <button name="lvmeHistoriqueLotBtn" title="Historique lot" icon="clock-history" showIf="saleOrderLineLotList &amp;&amp; saleOrderLineLotList.length" onClick="action-lvme-ligne-cde-historique-lot"/>
-        <button name="lvmeCdesClientLotBtn" title="Commandes/Lot" icon="cart" showIf="saleOrderLineLotList &amp;&amp; saleOrderLineLotList.length" onClick="action-lvme-ligne-cde-cdes-client-lot"/>
-        <button name="lvmeCdesClientProduitBtn" title="Commandes/Art." icon="cart-fill" showIf="product" onClick="action-lvme-ligne-cdes-client-produit"/>
-        <button name="lvmeSelectArrivageBtn" title="Sélect Arrivage" icon="truck" showIf="product" onClick="action-view-sale-order-line-add-arrivage"/>
-        <button name="lvmeHistoriquePrixBtn" title="F1 : Historique Prix" icon="clock" css="btn-warning" showIf="product" onClick="action-lvme-ligne-cde-historique-prix"/>
+        <button name="lvmeHistoriqueLotBtn" title="Historique Lot" css="lvme-btn-gris" showIf="saleOrderLineLotList &amp;&amp; saleOrderLineLotList.length" onClick="action-lvme-ligne-cde-historique-lot"/>
+        <button name="lvmeCdesClientLotBtn" title="Commandes/Lot" css="lvme-btn-gris" showIf="saleOrderLineLotList &amp;&amp; saleOrderLineLotList.length" onClick="action-lvme-ligne-cde-cdes-client-lot"/>
+        <button name="lvmeCdesClientProduitBtn" title="Commandes/Art." css="lvme-btn-gris" showIf="product" onClick="action-lvme-ligne-cdes-client-produit"/>
+        <button name="lvmeSelectArrivageBtn" title="Sélect Arrivage" css="lvme-btn-lilas" showIf="product" onClick="action-view-sale-order-line-add-arrivage"/>
+        <button name="lvmeHistoriquePrixBtn" title="F1 : Historique Prix" css="lvme-btn-orange" showIf="product" onClick="action-lvme-ligne-cde-historique-prix"/>
       </panel>
 
       

@@ -1,4 +1,4 @@
-<form name="lvme-cdes-client-lignes-form" title="Commandes Clients" model="com.axelor.utils.db.Wizard" width="large"
+<form name="lvme-cdes-client-lignes-form" css="lvme-gescom-liste" title="Commandes Clients" model="com.axelor.utils.db.Wizard" width="large"
   canNew="false" canSave="false" canCopy="false" canDelete="false" onNew="action-lvme-cdes-client-lignes-group-onnew">
   <!-- LVME : écran « Commandes Clients » GESCOM (boutons Cdes client / Lot et Cdes client / produit de la ligne
        d'arrivage et de la ligne de commande d'achat) : filtres + lignes de commandes clients -->

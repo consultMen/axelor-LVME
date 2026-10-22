@@ -193,3 +193,81 @@
 .lvme-cde-client .lvme-case input:not([type="checkbox"]):not([type="radio"]) {
   background-color: #ffff80 !important;
 }
+
+/*
+ * Fenêtre « Lignes Commandes » (fiche ligne de commande client, css="lvme-ligne-cde") copiée sur GESCOM :
+ * pleine largeur, fond bleu partout, libellés bleu marine, champs non modifiables en cases grises encadrées,
+ * ligne du bas (css="lvme-ligne-bas") sur une seule ligne de 14 cases encadrées, boutons aux couleurs GESCOM.
+ * Fenêtres ouvertes par ses boutons (css="lvme-gescom-liste") : même fond bleu, lignes cyan en alternance.
+ */
+[class*="_modal-dialog"]:has(.lvme-ligne-cde) {
+  max-width: 98vw !important;
+  width: 98vw !important;
+}
+[class*="_modal-content"]:has(.lvme-ligne-cde),
+[class*="_modal-content"]:has(.lvme-ligne-cde) [class*="_modal-header"],
+[class*="_modal-content"]:has(.lvme-ligne-cde) [class*="_modal-body"],
+[class*="_modal-content"]:has(.lvme-ligne-cde) [class*="_modal-footer"],
+[class*="_modal-content"]:has(.lvme-gescom-liste),
+[class*="_modal-content"]:has(.lvme-gescom-liste) [class*="_modal-header"],
+[class*="_modal-content"]:has(.lvme-gescom-liste) [class*="_modal-body"],
+[class*="_modal-content"]:has(.lvme-gescom-liste) [class*="_modal-footer"],
+.lvme-ligne-cde,
+.lvme-ligne-cde [class*="_panel"],
+.lvme-ligne-cde [class*="_header_"],
+.lvme-ligne-cde [class*="_content_"],
+.lvme-gescom-liste,
+.lvme-gescom-liste [class*="_panel"],
+.lvme-gescom-liste [class*="_header_"],
+.lvme-gescom-liste [class*="_content_"] {
+  background-color: #c3d9f5 !important;
+}
+.lvme-ligne-cde,
+.lvme-gescom-liste {
+  --label-color: #1a2a6c;
+}
+.lvme-ligne-cde .lvme-cde-client [class*="_viewer_"] {
+  border: 1px solid #8aa6cc !important;
+  background-color: #e6ecf5 !important;
+  color: #1a1ad6 !important;
+  border-radius: 2px;
+  padding-left: 4px;
+  min-height: 1.8em;
+}
+.lvme-ligne-bas [class*="_grid_"] {
+  grid-template-columns: repeat(14, minmax(0, 1fr)) !important;
+}
+.lvme-ligne-bas [class*="_gridItem_"] {
+  border: 1px solid #8aa6cc;
+  border-radius: 3px;
+  padding: 2px 4px;
+}
+.lvme-ligne-bas label {
+  font-size: 11px;
+  white-space: normal;
+  line-height: 1.1;
+}
+.lvme-btn-gris,
+.lvme-btn-gris button {
+  background-color: #eef0f3 !important;
+  border: 1px solid #8c8c8c !important;
+  color: #000 !important;
+}
+.lvme-btn-lilas,
+.lvme-btn-lilas button {
+  background-color: #dcd0f5 !important;
+  border: 1px solid #8c7cb8 !important;
+  color: #000 !important;
+}
+.lvme-btn-orange,
+.lvme-btn-orange button {
+  background-color: #ffb066 !important;
+  border: 1px solid #c87830 !important;
+  color: #000 !important;
+}
+.lvme-gescom-liste [class*="_body_"] [class*="_row_"] [class*="_column_"] {
+  background-color: #b8f4fa;
+}
+.lvme-gescom-liste [class*="_body_"] [class*="_row_"]:nth-child(even) [class*="_column_"] {
+  background-color: #6cdcee;
+}

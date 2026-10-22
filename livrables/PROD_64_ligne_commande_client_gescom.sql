@@ -7,6 +7,9 @@
 --     TVA, Poids en Kg, Prix Revient, Prix Vente, Montant HT, P.V - Rem., P.R. net, % Marge)
 --   - boutons : Historique lot (mouvements de stock du lot), Commandes/Lot, Commandes/Art., Sélect Arrivage,
 --     F1 : Historique Prix (prix déjà vendus à ce client pour cet article ; touche F1 = code de ce lot)
+--   - fenêtre en pleine largeur, fond bleu, ligne du bas sur une seule ligne (cases encadrées), boutons aux
+--     couleurs GESCOM ; Historique Lot avec Colis Entrés / Sortis et Qtes Entrées / Sorties ; fenêtres des
+--     boutons (Commandes Clients, Historique Prix, Historique Lot) aux couleurs GESCOM
 --   - dessous, inchangés : lots disponibles, lots sélectionnés, arrivages, réservations stocks, stock
 --     physique… ; onglets inchangés. Aucun champ retiré. Valeurs du lot calculées par le code de ce lot.
 -- Source : livrables/ui/ligne-commande-client-form.xml (fiche admin sale-order-line-form, priorité 30).
@@ -68,6 +71,12 @@ INSERT INTO meta_action (id, version, created_on, name, type, model, xml, home, 
   <attribute name="value" for="$client" expr="eval: _clientId ? __repo__(com.axelor.apps.base.db.Partner).find(_clientId as Long) : null"/>
 </action-attrs>', false, false, 0);
 
+-- fenêtres Commandes Clients / Historique Prix ouvertes par les boutons : mêmes couleurs GESCOM (fond bleu, lignes cyan)
+UPDATE meta_view SET xml = replace(xml, '<form name="lvme-cdes-client-lignes-form" ',
+  '<form name="lvme-cdes-client-lignes-form" css="lvme-gescom-liste" ')
+WHERE name = 'lvme-cdes-client-lignes-form' AND module IS NULL AND xml NOT LIKE '%lvme-gescom-liste%';
+
 COMMIT;
 
-SELECT name, priority FROM meta_view WHERE module IS NULL AND name IN ('sale-order-line-form', 'lvme-historique-lot-grid');
+SELECT name, priority, xml LIKE '%lvme-gescom-liste%' AS couleurs FROM meta_view WHERE module IS NULL
+  AND name IN ('sale-order-line-form', 'lvme-historique-lot-grid', 'lvme-cdes-client-lignes-form');

@@ -97,6 +97,12 @@ for e in re.findall(r'<field\b(?=' + A + r'*?\sname="product")' + A + r'*?/>', p
     prod_new = prod_new.replace(e, seta(seta(e, 'colSpan', '3'), 'title', 'Article'), 1)
 pn = el('productName', prod)
 prod_new = prod_new.replace(pn, seta(seta(pn, 'colSpan', '5'), 'title', ''), 1)
+# « Figer les champs » et « Type » n'existent pas dans GESCOM : sortis de la ligne 1, remis à la fin du bloc
+deplaces = []
+for nom in ('enableFreezeFields', 'typeSelect'):
+    e = el(nom, prod_new)
+    prod_new = prod_new.replace(e, '', 1)
+    deplaces.append('        ' + seta(e, 'colSpan', '2'))
 fin = prod_new.rindex('</panel>')
 prod_new = (prod_new[:fin]
             + '  <field name="product.gencode" title="Gencode" readonly="true" colSpan="2"/>\n'
@@ -125,31 +131,35 @@ bloc = '\n'.join([
     ro('lvmeZonePeche', 'Zone pêche', 3),
     ro('lvmeColisCouche', 'Colis / Couche', 2),
     '        <field name="lvmePromo" title="Prix Promo" colSpan="2"/>',
-    '        <!-- ligne du bas GESCOM, même ordre : Taux TVA, quantités puis prix (2 lignes de 12 colonnes) -->',
-    prendre('taxLineSet', 2, 'Taux TVA'),
-    prendre('nbUnitesParColis', 2, 'Nb unités ou Poids du Colis'),
+    '        <!-- ligne du bas GESCOM sur une seule ligne, même ordre, chaque case encadrée (css lvme-ligne-bas :',
+    '             grille de 14 colonnes au lieu de 12) -->',
+    '        <panel name="lvmeLigneBasPanel" colSpan="12" css="lvme-ligne-bas">',
+    prendre('taxLineSet', 1, 'Taux TVA'),
+    prendre('nbUnitesParColis', 1, 'Nb unités ou Poids du Colis'),
     ro('lvmeColisRsv', 'Nb Colis Réservé', 1),
     ro('lvmeColisDispo', 'Nb Colis Dispo', 1),
-    prendre('nbColis', 2, 'Nb Colis Commandés', QV),
+    prendre('nbColis', 1, 'Nb Colis Commandés', QV),
     ro('lvmeQteDispo', 'Qtes Dispo', 1),
-    prendre('qty', 2, 'Qtes Commandées', QV),
+    prendre('qty', 1, 'Qtes Commandées', QV),
     prendre('unit', 1, ' ', Q),
-    prendre('poidsTotalNet', 2, 'Poids en Kg'),
-    prendre('prixRevient', 2, 'Prix Revient'),
-    prendre('price', 2, 'Prix Vente', QV),
-    prendre('inTaxPrice', 2, 'Prix Vente', QV),  # à la place de Prix Vente quand la commande est en TTC
-    prendre('exTaxTotal', 2, 'Montant HT'),
+    prendre('poidsTotalNet', 1, 'Poids en Kg'),
+    prendre('prixRevient', 1, 'Prix Revient'),
+    prendre('price', 1, 'Prix Vente', QV),
+    prendre('inTaxPrice', 1, 'Prix Vente', QV),  # à la place de Prix Vente quand la commande est en TTC
+    prendre('exTaxTotal', 1, 'Montant HT'),
     prendre('priceDiscounted', 1, 'P.V - Rem.'),
     prendre('prixRevientNet', 1, 'P.R. net'),
-    prendre('subMarginRate', 2, '% Marge'),
+    prendre('subMarginRate', 1, '% Marge'),
+    '        </panel>',
+] + deplaces + [
     '      </panel>',
     '',
     '      <panel name="lvmeLigneCdeBoutonsPanel" colSpan="2" itemSpan="12">',
-    '        <button name="lvmeHistoriqueLotBtn" title="Historique lot" icon="clock-history" showIf="saleOrderLineLotList &amp;&amp; saleOrderLineLotList.length" onClick="action-lvme-ligne-cde-historique-lot"/>',
-    '        <button name="lvmeCdesClientLotBtn" title="Commandes/Lot" icon="cart" showIf="saleOrderLineLotList &amp;&amp; saleOrderLineLotList.length" onClick="action-lvme-ligne-cde-cdes-client-lot"/>',
-    '        <button name="lvmeCdesClientProduitBtn" title="Commandes/Art." icon="cart-fill" showIf="product" onClick="action-lvme-ligne-cdes-client-produit"/>',
-    '        <button name="lvmeSelectArrivageBtn" title="Sélect Arrivage" icon="truck" showIf="product" onClick="action-view-sale-order-line-add-arrivage"/>',
-    '        <button name="lvmeHistoriquePrixBtn" title="F1 : Historique Prix" icon="clock" css="btn-warning" showIf="product" onClick="action-lvme-ligne-cde-historique-prix"/>',
+    '        <button name="lvmeHistoriqueLotBtn" title="Historique Lot" css="lvme-btn-gris" showIf="saleOrderLineLotList &amp;&amp; saleOrderLineLotList.length" onClick="action-lvme-ligne-cde-historique-lot"/>',
+    '        <button name="lvmeCdesClientLotBtn" title="Commandes/Lot" css="lvme-btn-gris" showIf="saleOrderLineLotList &amp;&amp; saleOrderLineLotList.length" onClick="action-lvme-ligne-cde-cdes-client-lot"/>',
+    '        <button name="lvmeCdesClientProduitBtn" title="Commandes/Art." css="lvme-btn-gris" showIf="product" onClick="action-lvme-ligne-cdes-client-produit"/>',
+    '        <button name="lvmeSelectArrivageBtn" title="Sélect Arrivage" css="lvme-btn-lilas" showIf="product" onClick="action-view-sale-order-line-add-arrivage"/>',
+    '        <button name="lvmeHistoriquePrixBtn" title="F1 : Historique Prix" css="lvme-btn-orange" showIf="product" onClick="action-lvme-ligne-cde-historique-prix"/>',
     '      </panel>',
 ])
 
@@ -158,6 +168,8 @@ reste_head = re.match(r'<panel\b' + A + r'*?>', reste).group(0)
 reste_corps = reste[len(reste_head):reste.rindex('</panel>')]
 info_new = (seta(seta(reste_head, 'title', 'Ligne'), 'css', 'lvme-gescom-fond') + '\n' + bloc + '\n' + reste_corps + '</panel>')
 out = x.replace(info, info_new, 1)
-out = out.replace('title="SO line"', 'title="Ligne de commande"', 1)
+out = out.replace('title="SO line"', 'title="Lignes Commandes"', 1)
+# css lvme-ligne-cde : fenêtre en pleine largeur, fond bleu GESCOM (lvme.css)
+out = re.sub(r'^<form\b', '<form css="lvme-ligne-cde"', out, count=1)
 open(DST, 'w', encoding='utf-8', newline='\r\n').write(out)
 print('ok', DST, len(out), 'champs repris :', len(pris))
