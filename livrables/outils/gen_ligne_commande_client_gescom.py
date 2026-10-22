@@ -175,9 +175,11 @@ bloc = '\n'.join([
     '        <button name="lvmeHistoriqueLotBtn" title="Historique Lot" css="lvme-btn-gris" onClick="action-lvme-ligne-cde-historique-lot"/>',
     '        <button name="lvmeCdesClientLotBtn" title="Commandes/Lot" css="lvme-btn-gris" onClick="action-lvme-ligne-cde-cdes-client-lot"/>',
     '        <button name="lvmeCdesClientProduitBtn" title="Commandes/Art." css="lvme-btn-gris" showIf="product" onClick="action-lvme-ligne-cdes-client-produit"/>',
-    # Sélect Arrivage : ouvre la « Sélection Arrivage » GESCOM (arrivages / lots de l'article) ; le lot choisi est
-    # ajouté aux lots sélectionnés de la ligne (action-lvme-ligne-cde-group-sel-arrivage, PROD_66)
-    '        <field name="$selArrivage" title="Sélect Arrivage" type="many-to-one" target="com.axelor.apps.supplychain.db.EtatStockLot" target-name="lotNumber" css="lvme-btn-lilas lvme-sel-arrivage" showIf="product" canNew="false" canEdit="false" canView="false" grid-view="lvme-selection-arrivage-grid" domain="self.product = :product AND self.lotArchive IS NOT TRUE" onChange="action-lvme-ligne-cde-group-sel-arrivage"/>',
+    # Sélect Arrivage : bouton comme GESCOM ; il ouvre la « Sélection Arrivage » (arrivages / lots de l'article) par le
+    # sélecteur du champ caché $selArrivage (js/lvme.js) ; le lot choisi est ajouté aux lots sélectionnés de la ligne
+    # (action-lvme-ligne-cde-group-sel-arrivage, PROD_66)
+    '        <button name="lvmeSelectArrivageBtn" title="Sélect Arrivage" css="lvme-btn-lilas" showIf="product" onClick="action-lvme-ligne-cde-sel-arrivage-vider"/>',
+    '        <field name="$selArrivage" title="Sélection Arrivage" type="many-to-one" target="com.axelor.apps.supplychain.db.EtatStockLot" target-name="lotNumber" css="lvme-sel-arrivage-cache" canNew="false" canEdit="false" canView="false" grid-view="lvme-selection-arrivage-grid" domain="self.product = :product AND self.lotArchive IS NOT TRUE" onChange="action-lvme-ligne-cde-group-sel-arrivage"/>',
     '        <button name="lvmeHistoriquePrixBtn" title="F1 : Historique Prix" css="lvme-btn-orange" showIf="product" onClick="action-lvme-ligne-cde-historique-prix"/>',
     '      </panel>',
 ])

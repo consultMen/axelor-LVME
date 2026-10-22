@@ -30,6 +30,33 @@
     }
   }, true);
 
+  // Sélect Arrivage (fenêtre Lignes Commandes) : le bouton ouvre la liste « Sélection Arrivage » comme GESCOM,
+  // c'est-à-dire la recherche (loupe) du champ caché « Sélection Arrivage » (css lvme-sel-arrivage-cache) ;
+  // la ligne choisie dans la liste est ajoutée aux lots sélectionnés de la ligne de commande.
+  document.addEventListener('click', function (e) {
+    var b = e.target && e.target.closest ? e.target.closest('button') : null;
+    if (!b || (b.textContent || '').indexOf('Sélect Arrivage') < 0) {
+      return;
+    }
+    var fenetre = b.closest('[class*="_modal-content"]') || document;
+    var champ = fenetre.querySelector('.lvme-sel-arrivage-cache');
+    if (!champ) {
+      return;
+    }
+    var icones = champ.querySelectorAll('*');
+    for (var i = 0; i < icones.length; i++) {
+      if (icones[i].children.length === 0 && (icones[i].textContent || '').trim() === 'search') {
+        icones[i].click();
+        return;
+      }
+    }
+    // sinon : l'élément « Sélectionner » (titre) de la recherche
+    var sel = champ.querySelector('[title="Sélectionner"], [title="Select"]');
+    if (sel) {
+      (sel.firstElementChild || sel).click();
+    }
+  }, true);
+
   // certains navigateurs ouvrent l'aide sur l'évènement « help » : bloqué aussi
   window.addEventListener('help', function (e) {
     e.preventDefault();

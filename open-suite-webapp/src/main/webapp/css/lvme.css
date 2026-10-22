@@ -296,3 +296,9 @@
   overflow: visible !important;
   text-overflow: clip !important;
 }
+/* champ « Sélection Arrivage » ouvert par le bouton Sélect Arrivage (js/lvme.js) : présent mais hors de l'écran */
+.lvme-sel-arrivage-cache {
+  position: absolute !important;
+  left: -10000px !important;
+  width: 300px !important;
+}
