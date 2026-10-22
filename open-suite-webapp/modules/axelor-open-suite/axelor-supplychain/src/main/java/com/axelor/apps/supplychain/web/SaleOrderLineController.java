@@ -376,7 +376,7 @@ public class SaleOrderLineController {
   // Règles :
   // - Sans lot sélectionné -> affiche le taux société brut
   // - Avec lot et âge >= 3 mois -> (mois - 3) x taux société
-  // - Avec lot et âge < 3 mois -> taux société brut (pas encore pénalisation)
+  // - Avec lot et âge < 3 mois -> 0 (les 3 premiers mois sont gratuits)
   // ==================================================================
 
   public void setFraisCongelationFromLot(ActionRequest request, ActionResponse response) {
@@ -422,7 +422,7 @@ public class SaleOrderLineController {
 
       java.math.BigDecimal frais;
       if (moisAge < 3) {
-        frais = tauxFraisCong;
+        frais = java.math.BigDecimal.ZERO.setScale(4);
       } else {
         frais =
             new java.math.BigDecimal(moisAge - 3)
