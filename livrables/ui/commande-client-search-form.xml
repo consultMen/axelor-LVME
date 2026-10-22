@@ -1,6 +1,45 @@
 <form name="lvme-commande-client-search-form" title="Listes Commandes Clients" model="com.axelor.utils.db.Wizard" width="large"
-  canNew="false" canSave="false" canCopy="false" canDelete="false" onNew="action-lvme-cde-client-defaults">
+  canNew="false" canSave="false" canCopy="false" canDelete="false" onNew="action-lvme-cde-client-defaults,action-lvme-cde-client-kpi">
   <!-- LVME : écran « Listes Commandes Clients » de GESCOM : filtres + liste des commandes clients -->
+  <!-- LVME : 4 KPI des commandes clients (calculés à l'ouverture, action-lvme-cde-client-kpi) -->
+  <panel name="kpiCdeClientPanel" showTitle="false" colSpan="12">
+    <field name="$kpiEnCours" type="string" hidden="true"/>
+    <field name="$kpiEnCoursDetail" type="string" hidden="true"/>
+    <field name="$kpiCaMois" type="string" hidden="true"/>
+    <field name="$kpiCaMoisDetail" type="string" hidden="true"/>
+    <field name="$kpiMarge" type="string" hidden="true"/>
+    <field name="$kpiMargeDetail" type="string" hidden="true"/>
+    <field name="$kpiALivrer" type="string" hidden="true"/>
+    <field name="$kpiRetard" type="string" hidden="true"/>
+    <field name="$kpiCdeTuiles" showTitle="false" readonly="true" colSpan="12" type="string">
+      <viewer depends="$kpiEnCours,$kpiEnCoursDetail,$kpiCaMois,$kpiCaMoisDetail,$kpiMarge,$kpiMargeDetail,$kpiALivrer,$kpiRetard"><![CDATA[
+        <>
+          <Box d="grid" style={{ gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
+            <Box style={{ border: '1px solid #0d6efd', borderLeft: '6px solid #0d6efd', borderRadius: 8, padding: 12 }}>
+              <Box style={{ fontSize: 13, color: '#666' }}>Commandes en cours</Box>
+              <Box style={{ fontSize: 26, fontWeight: 'bold' }}>{$kpiEnCours}</Box>
+              <Box style={{ fontSize: 12, color: '#666' }}>{$kpiEnCoursDetail}</Box>
+            </Box>
+            <Box style={{ border: '1px solid #198754', borderLeft: '6px solid #198754', borderRadius: 8, padding: 12 }}>
+              <Box style={{ fontSize: 13, color: '#666' }}>CA HT du mois</Box>
+              <Box style={{ fontSize: 26, fontWeight: 'bold' }}>{$kpiCaMois}</Box>
+              <Box style={{ fontSize: 12, color: '#666' }}>{$kpiCaMoisDetail}</Box>
+            </Box>
+            <Box style={{ border: '1px solid #6f42c1', borderLeft: '6px solid #6f42c1', borderRadius: 8, padding: 12 }}>
+              <Box style={{ fontSize: 13, color: '#666' }}>% Marge du mois</Box>
+              <Box style={{ fontSize: 26, fontWeight: 'bold' }}>{$kpiMarge}</Box>
+              <Box style={{ fontSize: 12, color: '#666' }}>{$kpiMargeDetail}</Box>
+            </Box>
+            <Box style={{ border: '1px solid #fd7e14', borderLeft: '6px solid #fd7e14', borderRadius: 8, padding: 12 }}>
+              <Box style={{ fontSize: 13, color: '#666' }}>À livrer aujourd'hui</Box>
+              <Box style={{ fontSize: 26, fontWeight: 'bold' }}>{$kpiALivrer}</Box>
+              <Box style={{ fontSize: 12, color: '#dc3545' }}>{$kpiRetard}</Box>
+            </Box>
+          </Box>
+        </>
+      ]]></viewer>
+    </field>
+  </panel>
   <panel name="rechercheCdePanel" title="Recherche" colSpan="12">
     <panel name="filtreEtatPanel" colSpan="3" itemSpan="12">
       <field name="$etatCommande" showTitle="false" type="integer" widget="RadioSelect" selection="lvme.commande.client.etat.select"/>
