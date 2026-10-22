@@ -94,9 +94,9 @@ prod = blk('productInfoPanel', within=info)
 reste = reste.replace(prod, '', 1)
 prod_new = prod
 for e in re.findall(r'<field\b(?=' + A + r'*?\sname="product")' + A + r'*?/>', prod):
-    prod_new = prod_new.replace(e, seta(seta(e, 'colSpan', '3'), 'title', 'Article'), 1)
+    prod_new = prod_new.replace(e, seta(seta(seta(e, 'colSpan', '2'), 'title', 'Article'), 'target-name', 'code'), 1)
 pn = el('productName', prod)
-prod_new = prod_new.replace(pn, seta(seta(pn, 'colSpan', '5'), 'title', ''), 1)
+prod_new = prod_new.replace(pn, seta(seta(pn, 'colSpan', '6'), 'title', ''), 1)
 # « Figer les champs » et « Type » n'existent pas dans GESCOM : sortis de la ligne 1, remis à la fin du bloc
 deplaces = []
 for nom in ('enableFreezeFields', 'typeSelect'):
@@ -114,7 +114,7 @@ Q = 'lvme-case'  # cases de saisie jaunes de GESCOM
 QV = 'lvme-case lvme-cde-violet'  # case jaune à libellé violet (Nb Colis Commandés, Qtes Commandées, Prix Vente)
 bloc = '\n'.join([
     '      <!-- LVME : copie de la fenêtre « Lignes Commandes » GESCOM -->',
-    '      <panel name="lvmeLigneCdeGescomPanel" colSpan="10" css="lvme-cde-client lvme-ligne-cde">',
+    '      <panel name="lvmeLigneCdeGescomPanel" colSpan="10" css="lvme-cde-client lvme-ligne-cde lvme-compact">',
     '        ' + prod_new,
     ro('lvmeArrivages', 'N° Arrivage', 2),
     ro('lvmeFrigo', 'Frigo', 3),
@@ -154,7 +154,7 @@ bloc = '\n'.join([
 ] + deplaces + [
     '      </panel>',
     '',
-    '      <panel name="lvmeLigneCdeBoutonsPanel" colSpan="2" itemSpan="12" css="lvme-ligne-cde">',
+    '      <panel name="lvmeLigneCdeBoutonsPanel" colSpan="2" itemSpan="12" css="lvme-ligne-cde lvme-compact">',
     '        <button name="lvmeHistoriqueLotBtn" title="Historique Lot" css="lvme-btn-gris" showIf="saleOrderLineLotList &amp;&amp; saleOrderLineLotList.length" onClick="action-lvme-ligne-cde-historique-lot"/>',
     '        <button name="lvmeCdesClientLotBtn" title="Commandes/Lot" css="lvme-btn-gris" showIf="saleOrderLineLotList &amp;&amp; saleOrderLineLotList.length" onClick="action-lvme-ligne-cde-cdes-client-lot"/>',
     '        <button name="lvmeCdesClientProduitBtn" title="Commandes/Art." css="lvme-btn-gris" showIf="product" onClick="action-lvme-ligne-cdes-client-produit"/>',
