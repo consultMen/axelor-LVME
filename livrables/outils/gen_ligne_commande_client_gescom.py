@@ -96,7 +96,11 @@ prod_new = prod
 for e in re.findall(r'<field\b(?=' + A + r'*?\sname="product")' + A + r'*?/>', prod):
     prod_new = prod_new.replace(e, seta(seta(seta(e, 'colSpan', '2'), 'title', 'Article'), 'target-name', 'code'), 1)
 pn = el('productName', prod)
-prod_new = prod_new.replace(pn, seta(seta(pn, 'colSpan', '6'), 'title', ''), 1)
+prod_new = prod_new.replace(pn, seta(seta(pn, 'colSpan', '4'), 'title', ''), 1)
+# oldQty (champ technique caché) prenait 6 colonnes et renvoyait Gencode / Nom Scientifique à la ligne :
+# repoussé à la fin du panneau ; Article, désignation, Gencode et Nom Scientifique sur une seule ligne
+oq = el('oldQty', prod_new)
+prod_new = prod_new.replace(oq, '', 1)
 # « Figer les champs » et « Type » n'existent pas dans GESCOM : sortis de la ligne 1, remis à la fin du bloc
 deplaces = []
 for nom in ('enableFreezeFields', 'typeSelect'):
@@ -105,8 +109,9 @@ for nom in ('enableFreezeFields', 'typeSelect'):
     deplaces.append('        ' + seta(e, 'colSpan', '2'))
 fin = prod_new.rindex('</panel>')
 prod_new = (prod_new[:fin]
-            + '  <field name="product.gencode" title="Gencode" readonly="true" colSpan="2"/>\n'
-            + '        <field name="product.nomScientifique" title="Nom Scientifique" readonly="true" colSpan="2"/>\n      '
+            + '  <field name="product.gencode" title="Gencode" readonly="true" colSpan="3"/>\n'
+            + '        <field name="product.nomScientifique" title="Nom Scientifique" readonly="true" colSpan="3"/>\n'
+            + '        ' + oq + '\n      '
             + prod_new[fin:])
 prod_new = seta(prod_new, 'colSpan', '12')
 
@@ -155,8 +160,8 @@ bloc = '\n'.join([
     '      </panel>',
     '',
     '      <panel name="lvmeLigneCdeBoutonsPanel" colSpan="2" itemSpan="12" css="lvme-ligne-cde lvme-compact">',
-    '        <button name="lvmeHistoriqueLotBtn" title="Historique Lot" css="lvme-btn-gris" showIf="saleOrderLineLotList &amp;&amp; saleOrderLineLotList.length" onClick="action-lvme-ligne-cde-historique-lot"/>',
-    '        <button name="lvmeCdesClientLotBtn" title="Commandes/Lot" css="lvme-btn-gris" showIf="saleOrderLineLotList &amp;&amp; saleOrderLineLotList.length" onClick="action-lvme-ligne-cde-cdes-client-lot"/>',
+    '        <button name="lvmeHistoriqueLotBtn" title="Historique Lot" css="lvme-btn-gris" onClick="action-lvme-ligne-cde-historique-lot"/>',
+    '        <button name="lvmeCdesClientLotBtn" title="Commandes/Lot" css="lvme-btn-gris" onClick="action-lvme-ligne-cde-cdes-client-lot"/>',
     '        <button name="lvmeCdesClientProduitBtn" title="Commandes/Art." css="lvme-btn-gris" showIf="product" onClick="action-lvme-ligne-cdes-client-produit"/>',
     '        <button name="lvmeSelectArrivageBtn" title="Sélect Arrivage" css="lvme-btn-lilas" showIf="product" onClick="action-view-sale-order-line-add-arrivage"/>',
     '        <button name="lvmeHistoriquePrixBtn" title="F1 : Historique Prix" css="lvme-btn-orange" showIf="product" onClick="action-lvme-ligne-cde-historique-prix"/>',

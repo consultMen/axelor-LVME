@@ -73,10 +73,11 @@
         <field target-name="code" title="Article" colSpan="2" if="__config__.app.isApp('supplychain')" name="product" canEdit="false" onChange="action-sale-order-line-method-get-product-information,action-method-sale-order-line-copy-taux-from-sale-order,action-method-sale-order-line-set-frais-congelation-from-lot,action-method-sale-order-line-compute-pr-net" onSelect="action-sale-order-line-method-domain-product" form-view="product-form" grid-view="stock-move-line-product-grid" x-image-field="picture"/>
         
         
-        <field title="" name="productName" colSpan="6"/>
+        <field title="" name="productName" colSpan="4"/>
+        
+        <field name="product.gencode" title="Gencode" readonly="true" colSpan="3"/>
+        <field name="product.nomScientifique" title="Nom Scientifique" readonly="true" colSpan="3"/>
         <field name="oldQty"/>
-        <field name="product.gencode" title="Gencode" readonly="true" colSpan="2"/>
-        <field name="product.nomScientifique" title="Nom Scientifique" readonly="true" colSpan="2"/>
       </panel>
         <field name="lvmeArrivages" title="N° Arrivage" readonly="true" colSpan="2"/>
         <field name="lvmeFrigo" title="Frigo" readonly="true" colSpan="3"/>
@@ -118,8 +119,8 @@
       </panel>
 
       <panel name="lvmeLigneCdeBoutonsPanel" colSpan="2" itemSpan="12" css="lvme-ligne-cde lvme-compact">
-        <button name="lvmeHistoriqueLotBtn" title="Historique Lot" css="lvme-btn-gris" showIf="saleOrderLineLotList &amp;&amp; saleOrderLineLotList.length" onClick="action-lvme-ligne-cde-historique-lot"/>
-        <button name="lvmeCdesClientLotBtn" title="Commandes/Lot" css="lvme-btn-gris" showIf="saleOrderLineLotList &amp;&amp; saleOrderLineLotList.length" onClick="action-lvme-ligne-cde-cdes-client-lot"/>
+        <button name="lvmeHistoriqueLotBtn" title="Historique Lot" css="lvme-btn-gris" onClick="action-lvme-ligne-cde-historique-lot"/>
+        <button name="lvmeCdesClientLotBtn" title="Commandes/Lot" css="lvme-btn-gris" onClick="action-lvme-ligne-cde-cdes-client-lot"/>
         <button name="lvmeCdesClientProduitBtn" title="Commandes/Art." css="lvme-btn-gris" showIf="product" onClick="action-lvme-ligne-cdes-client-produit"/>
         <button name="lvmeSelectArrivageBtn" title="Sélect Arrivage" css="lvme-btn-lilas" showIf="product" onClick="action-view-sale-order-line-add-arrivage"/>
         <button name="lvmeHistoriquePrixBtn" title="F1 : Historique Prix" css="lvme-btn-orange" showIf="product" onClick="action-lvme-ligne-cde-historique-prix"/>
