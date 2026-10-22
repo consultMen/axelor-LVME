@@ -329,3 +329,11 @@
   background-color: #ffff80 !important;
   color: #000 !important;
 }
+/* fenêtres Ligne d'arrivage / Ligne de commande d'achat (panneau css="lvme-gescom-fond") : le même bleu sur toute la
+   fenêtre (en-tête, onglets, bas avec les boutons), sans rien changer à la fiche elle-même */
+[class*="_modal-content"]:has(.lvme-gescom-fond),
+[class*="_modal-content"]:has(.lvme-gescom-fond) [class*="_modal-header"],
+[class*="_modal-content"]:has(.lvme-gescom-fond) [class*="_modal-body"],
+[class*="_modal-content"]:has(.lvme-gescom-fond) [class*="_modal-footer"] {
+  background-color: #cddff7 !important;
+}
