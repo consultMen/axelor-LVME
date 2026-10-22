@@ -195,10 +195,12 @@
 }
 
 /*
- * Fenêtre « Lignes Commandes » (fiche ligne de commande client, css="lvme-ligne-cde") copiée sur GESCOM :
- * pleine largeur, fond bleu partout, libellés bleu marine, champs non modifiables en cases grises encadrées,
- * ligne du bas (css="lvme-ligne-bas") sur une seule ligne de 14 cases encadrées, boutons aux couleurs GESCOM.
- * Fenêtres ouvertes par ses boutons (css="lvme-gescom-liste") : même fond bleu, lignes cyan en alternance.
+ * Fenêtre « Lignes Commandes » (fiche ligne de commande client) copiée sur GESCOM. Les panneaux du bloc GESCOM
+ * portent css="lvme-ligne-cde" (le css d'une fiche entière n'est pas repris par Axelor) : la fenêtre qui les
+ * contient passe en pleine largeur et en fond bleu ; libellés à gauche des champs (sur une ligne, comme
+ * GESCOM) ; ligne du bas (css="lvme-ligne-bas") : 14 cases encadrées sur une seule ligne, libellé au-dessus ;
+ * boutons aux couleurs GESCOM. Fenêtres ouvertes par ses boutons (css="lvme-gescom-liste") : même fond bleu,
+ * lignes cyan en alternance.
  */
 [class*="_modal-dialog"]:has(.lvme-ligne-cde) {
   max-width: 98vw !important;
@@ -208,25 +210,39 @@
 [class*="_modal-content"]:has(.lvme-ligne-cde) [class*="_modal-header"],
 [class*="_modal-content"]:has(.lvme-ligne-cde) [class*="_modal-body"],
 [class*="_modal-content"]:has(.lvme-ligne-cde) [class*="_modal-footer"],
+[class*="_modal-content"]:has(.lvme-ligne-cde) [class*="_panel"],
+[class*="_modal-content"]:has(.lvme-ligne-cde) [class*="_header_"],
+[class*="_modal-content"]:has(.lvme-ligne-cde) [class*="_content_"],
+[class*="_modal-content"]:has(.lvme-ligne-cde) [class*="_tabs"],
 [class*="_modal-content"]:has(.lvme-gescom-liste),
 [class*="_modal-content"]:has(.lvme-gescom-liste) [class*="_modal-header"],
 [class*="_modal-content"]:has(.lvme-gescom-liste) [class*="_modal-body"],
 [class*="_modal-content"]:has(.lvme-gescom-liste) [class*="_modal-footer"],
-.lvme-ligne-cde,
-.lvme-ligne-cde [class*="_panel"],
-.lvme-ligne-cde [class*="_header_"],
-.lvme-ligne-cde [class*="_content_"],
-.lvme-gescom-liste,
-.lvme-gescom-liste [class*="_panel"],
-.lvme-gescom-liste [class*="_header_"],
-.lvme-gescom-liste [class*="_content_"] {
+[class*="_modal-content"]:has(.lvme-gescom-liste) [class*="_panel"],
+[class*="_modal-content"]:has(.lvme-gescom-liste) [class*="_header_"],
+[class*="_modal-content"]:has(.lvme-gescom-liste) [class*="_content_"] {
   background-color: #c3d9f5 !important;
 }
-.lvme-ligne-cde,
-.lvme-gescom-liste {
+[class*="_modal-content"]:has(.lvme-ligne-cde),
+[class*="_modal-content"]:has(.lvme-gescom-liste) {
   --label-color: #1a2a6c;
 }
-.lvme-ligne-cde .lvme-cde-client [class*="_viewer_"] {
+/* libellé à gauche du champ, sur une seule ligne */
+.lvme-ligne-cde [class*="_container_"]:has(> [class*="_label_"]) {
+  flex-direction: row !important;
+  align-items: center;
+  gap: 6px;
+}
+.lvme-ligne-cde [class*="_container_"]:has(> [class*="_label_"]) > [class*="_label_"] {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+.lvme-ligne-cde [class*="_container_"]:has(> [class*="_label_"]) > :not([class*="_label_"]) {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+/* champs non modifiables : cases grises encadrées */
+.lvme-ligne-cde [class*="_viewer_"] {
   border: 1px solid #8aa6cc !important;
   background-color: #e6ecf5 !important;
   color: #1a1ad6 !important;
@@ -234,17 +250,25 @@
   padding-left: 4px;
   min-height: 1.8em;
 }
+/* ligne du bas : 14 cases sur une seule ligne, libellé au-dessus dans la case */
 .lvme-ligne-bas [class*="_grid_"] {
   grid-template-columns: repeat(14, minmax(0, 1fr)) !important;
 }
 .lvme-ligne-bas [class*="_gridItem_"] {
+  grid-column: auto / span 1 !important;
+  grid-row: auto !important;
   border: 1px solid #8aa6cc;
   border-radius: 3px;
   padding: 2px 4px;
 }
+.lvme-ligne-cde .lvme-ligne-bas [class*="_container_"]:has(> [class*="_label_"]) {
+  flex-direction: column !important;
+  align-items: stretch;
+  gap: 0;
+}
 .lvme-ligne-bas label {
   font-size: 11px;
-  white-space: normal;
+  white-space: normal !important;
   line-height: 1.1;
 }
 .lvme-btn-gris,
@@ -265,9 +289,9 @@
   border: 1px solid #c87830 !important;
   color: #000 !important;
 }
-.lvme-gescom-liste [class*="_body_"] [class*="_row_"] [class*="_column_"] {
+[class*="_modal-content"]:has(.lvme-gescom-liste) [class*="_body_"] [class*="_row_"] [class*="_column_"] {
   background-color: #b8f4fa;
 }
-.lvme-gescom-liste [class*="_body_"] [class*="_row_"]:nth-child(even) [class*="_column_"] {
+[class*="_modal-content"]:has(.lvme-gescom-liste) [class*="_body_"] [class*="_row_"]:nth-child(even) [class*="_column_"] {
   background-color: #6cdcee;
 }

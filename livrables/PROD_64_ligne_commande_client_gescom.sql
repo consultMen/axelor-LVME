@@ -75,8 +75,11 @@ INSERT INTO meta_action (id, version, created_on, name, type, model, xml, home, 
 UPDATE meta_view SET xml = replace(xml, '<form name="lvme-cdes-client-lignes-form" ',
   '<form name="lvme-cdes-client-lignes-form" css="lvme-gescom-liste" ')
 WHERE name = 'lvme-cdes-client-lignes-form' AND module IS NULL AND xml NOT LIKE '%lvme-gescom-liste%';
+UPDATE meta_view SET xml = replace(xml, '<panel name="filtresPanel" showTitle="false" colSpan="12">',
+  '<panel name="filtresPanel" showTitle="false" colSpan="12" css="lvme-gescom-liste">')
+WHERE name = 'lvme-cdes-client-lignes-form' AND module IS NULL AND xml NOT LIKE '%filtresPanel" showTitle="false" colSpan="12" css=%';
 
 COMMIT;
 
-SELECT name, priority, xml LIKE '%lvme-gescom-liste%' AS couleurs FROM meta_view WHERE module IS NULL
+SELECT name, priority, xml LIKE '%lvme-gescom-liste%' OR xml LIKE '%lvme-ligne-cde%' AS couleurs FROM meta_view WHERE module IS NULL
   AND name IN ('sale-order-line-form', 'lvme-historique-lot-grid', 'lvme-cdes-client-lignes-form');

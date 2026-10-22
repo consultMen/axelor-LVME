@@ -114,7 +114,7 @@ Q = 'lvme-case'  # cases de saisie jaunes de GESCOM
 QV = 'lvme-case lvme-cde-violet'  # case jaune à libellé violet (Nb Colis Commandés, Qtes Commandées, Prix Vente)
 bloc = '\n'.join([
     '      <!-- LVME : copie de la fenêtre « Lignes Commandes » GESCOM -->',
-    '      <panel name="lvmeLigneCdeGescomPanel" colSpan="10" css="lvme-cde-client">',
+    '      <panel name="lvmeLigneCdeGescomPanel" colSpan="10" css="lvme-cde-client lvme-ligne-cde">',
     '        ' + prod_new,
     ro('lvmeArrivages', 'N° Arrivage', 2),
     ro('lvmeFrigo', 'Frigo', 3),
@@ -154,7 +154,7 @@ bloc = '\n'.join([
 ] + deplaces + [
     '      </panel>',
     '',
-    '      <panel name="lvmeLigneCdeBoutonsPanel" colSpan="2" itemSpan="12">',
+    '      <panel name="lvmeLigneCdeBoutonsPanel" colSpan="2" itemSpan="12" css="lvme-ligne-cde">',
     '        <button name="lvmeHistoriqueLotBtn" title="Historique Lot" css="lvme-btn-gris" showIf="saleOrderLineLotList &amp;&amp; saleOrderLineLotList.length" onClick="action-lvme-ligne-cde-historique-lot"/>',
     '        <button name="lvmeCdesClientLotBtn" title="Commandes/Lot" css="lvme-btn-gris" showIf="saleOrderLineLotList &amp;&amp; saleOrderLineLotList.length" onClick="action-lvme-ligne-cde-cdes-client-lot"/>',
     '        <button name="lvmeCdesClientProduitBtn" title="Commandes/Art." css="lvme-btn-gris" showIf="product" onClick="action-lvme-ligne-cdes-client-produit"/>',

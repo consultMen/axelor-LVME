@@ -11,7 +11,7 @@
   <panel-tabs name="mainPanelTab" hideIf="typeSelect > 0">
     <panel css="lvme-gescom-fond" name="informationsPanel" title="Ligne">
       <!-- LVME : copie de la fenêtre « Lignes Commandes » GESCOM -->
-      <panel name="lvmeLigneCdeGescomPanel" colSpan="10" css="lvme-cde-client">
+      <panel name="lvmeLigneCdeGescomPanel" colSpan="10" css="lvme-cde-client lvme-ligne-cde">
         <panel name="productInfoPanel" readonlyIf="$isReadOnly !== false || deliveryState == 2 || deliveryState == 3 || amountInvoiced > 0" colSpan="12">
         <panel name="tagPanel" colSpan="12">
           <field name="$partnerLanguage" hidden="true"/>
@@ -117,7 +117,7 @@
         <field name="typeSelect" colSpan="2" onChange="action-sale-order-line-method-type-select-onchange"/>
       </panel>
 
-      <panel name="lvmeLigneCdeBoutonsPanel" colSpan="2" itemSpan="12">
+      <panel name="lvmeLigneCdeBoutonsPanel" colSpan="2" itemSpan="12" css="lvme-ligne-cde">
         <button name="lvmeHistoriqueLotBtn" title="Historique Lot" css="lvme-btn-gris" showIf="saleOrderLineLotList &amp;&amp; saleOrderLineLotList.length" onClick="action-lvme-ligne-cde-historique-lot"/>
         <button name="lvmeCdesClientLotBtn" title="Commandes/Lot" css="lvme-btn-gris" showIf="saleOrderLineLotList &amp;&amp; saleOrderLineLotList.length" onClick="action-lvme-ligne-cde-cdes-client-lot"/>
         <button name="lvmeCdesClientProduitBtn" title="Commandes/Art." css="lvme-btn-gris" showIf="product" onClick="action-lvme-ligne-cdes-client-produit"/>
