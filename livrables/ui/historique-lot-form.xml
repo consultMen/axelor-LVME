@@ -1,0 +1,32 @@
+<form name="lvme-historique-lot-form" title="Liste des Mouvements de Stock" model="com.axelor.utils.db.Wizard" width="large"
+  canNew="false" canSave="false" canCopy="false" canDelete="false" onNew="action-lvme-historique-lot-group-onnew">
+  <!-- LVME : copie de la « Liste des Mouvements de Stock » GESCOM (bouton Historique Lot de la ligne de commande
+       client) : produit, lot, poids du colis et période en haut, mouvements du lot, totaux et Stock Période en bas -->
+  <panel name="lvmeHistLotFiltresPanel" showTitle="false" colSpan="12" css="lvme-gescom-liste lvme-ligne-cde lvme-compact">
+    <field name="$produit" title="Produit" type="many-to-one" target="com.axelor.apps.base.db.Product" target-name="code"
+      colSpan="3" canNew="false" canEdit="false" canView="false" onChange="action-lvme-historique-lot-produit-nom"/>
+    <field name="$produitNom" title=" " type="string" readonly="true" colSpan="3"/>
+    <field name="$dateDu" title="Entrée du" type="date" colSpan="2"/>
+    <field name="$datePeriode" title="Période prédéfinie" type="integer" selection="lvme.etat.stock.periode.select"
+      colSpan="2" onChange="action-lvme-cde-client-periode-date"/>
+    <button name="lvmeHistLotValiderBtn" title="Valider" css="lvme-btn-gris" colSpan="2"
+      onClick="action-lvme-historique-lot-group-refresh"/>
+    <field name="$lot" title="N° Lot" type="many-to-one" target="com.axelor.apps.stock.db.TrackingNumber"
+      colSpan="3" canNew="false" canEdit="false" canView="false"/>
+    <field name="$poidsColis" title="Poids du Colis" type="decimal" readonly="true" x-scale="3" colSpan="3"/>
+    <field name="$dateAu" title="au" type="date" colSpan="2"/>
+    <spacer colSpan="2"/>
+    <button name="lvmeHistLotFermerBtn" title="Fermer" css="lvme-btn-gris" colSpan="2" onClick="close"/>
+  </panel>
+  <panel-dashlet name="mouvementsDashlet" showTitle="false" colSpan="12" height="450"
+    action="action-lvme-historique-lot-dashlet"/>
+  <panel name="lvmeHistLotTotauxPanel" showTitle="false" colSpan="12" css="lvme-gescom-liste lvme-ligne-cde lvme-compact">
+    <spacer colSpan="2"/>
+    <field name="$stockPeriode" title="Stock Période" type="decimal" readonly="true" x-scale="3" colSpan="2"/>
+    <spacer colSpan="2"/>
+    <field name="$colisEntres" title="Colis Entrés" type="decimal" readonly="true" x-scale="0" colSpan="1"/>
+    <field name="$colisSortis" title="Colis Sortis" type="decimal" readonly="true" x-scale="0" colSpan="1"/>
+    <field name="$qteEntrees" title="Qtes Entrées" type="decimal" readonly="true" x-scale="3" colSpan="2"/>
+    <field name="$qteSorties" title="Qtes Sorties" type="decimal" readonly="true" x-scale="3" colSpan="2"/>
+  </panel>
+</form>
