@@ -115,6 +115,18 @@ prod_new = (prod_new[:fin]
             + prod_new[fin:])
 prod_new = seta(prod_new, 'colSpan', '12')
 
+# Taux TVA affiché en chiffre comme GESCOM (5,50) dans la ligne du bas ($tauxTva, calculé par
+# action-lvme-ligne-cde-taux-tva) ; le champ TVA d'Axelor reste modifiable plus bas, avec Figer les champs et Type
+TVA = 'action-lvme-ligne-cde-taux-tva'
+
+
+def ajout_onchange(e, action):
+    if re.search(r'\sonChange="', e):
+        return re.sub(r'(\sonChange=")([^"]*)"', lambda m: m.group(1) + m.group(2) + ',' + action + '"', e, count=1)
+    return seta(e, 'onChange', action)
+
+
+deplaces.append(ajout_onchange(prendre('taxLineSet', 2, 'Taux TVA'), TVA))
 Q = 'lvme-case'  # cases de saisie jaunes de GESCOM
 QV = 'lvme-case lvme-cde-violet'  # case jaune à libellé violet (Nb Colis Commandés, Qtes Commandées, Prix Vente)
 bloc = '\n'.join([
@@ -139,7 +151,7 @@ bloc = '\n'.join([
     '        <!-- ligne du bas GESCOM sur une seule ligne, même ordre, chaque case encadrée (css lvme-ligne-bas :',
     '             grille de 14 colonnes au lieu de 12) -->',
     '        <panel name="lvmeLigneBasPanel" colSpan="12" css="lvme-ligne-bas">',
-    prendre('taxLineSet', 1, 'Taux TVA'),
+    '        <field name="$tauxTva" title="Taux TVA" type="decimal" readonly="true" x-scale="2" colSpan="1"/>',
     prendre('nbUnitesParColis', 1, 'Nb unités ou Poids du Colis'),
     ro('lvmeColisRsv', 'Nb Colis Réservé', 1),
     ro('lvmeColisDispo', 'Nb Colis Dispo', 1),
@@ -173,6 +185,14 @@ bloc = '\n'.join([
 # (pas supprimé : poids par colis, poids net et qté sachet restent dans la ligne pour les calculs)
 colis = blk('colisPanel', within=reste)
 reste = reste.replace(colis, seta(dela(colis, 'showIf'), 'hidden', 'true'), 1)
+# description et commentaire de production : après les panneaux personnalisés (lots, arrivages, stocks…)
+fin_panneaux = []
+for nom in ('descriptionPanel', 'lineProductionCommentPanel'):
+    b = blk(nom, within=reste)
+    reste = reste.replace(b, '', 1)
+    fin_panneaux.append('      ' + b)
+k = reste.rindex('</panel>')
+reste = reste[:k] + '\n'.join(fin_panneaux) + '\n    ' + reste[k:]
 reste_head = re.match(r'<panel\b' + A + r'*?>', reste).group(0)
 reste_corps = reste[len(reste_head):reste.rindex('</panel>')]
 info_new = (seta(seta(reste_head, 'title', 'Ligne'), 'css', 'lvme-gescom-fond') + '\n' + bloc + '\n' + reste_corps + '</panel>')
@@ -180,5 +200,9 @@ out = x.replace(info, info_new, 1)
 out = out.replace('title="SO line"', 'title="Lignes Commandes"', 1)
 # css lvme-ligne-cde : fenêtre en pleine largeur, fond bleu GESCOM (lvme.css)
 out = re.sub(r'^<form\b', '<form css="lvme-ligne-cde"', out, count=1)
+# Taux TVA (chiffre) recalculé à l'ouverture et au choix de l'article
+out = re.sub(r'^(<form\b[^>]*?\sonLoad=")([^"]*)"', lambda m: m.group(1) + m.group(2) + ',' + TVA + '"', out, count=1)
+for e in re.findall(r'<field\b(?=' + A + r'*?\sname="product")' + A + r'*?/>', out):
+    out = out.replace(e, ajout_onchange(e, TVA), 1)
 open(DST, 'w', encoding='utf-8', newline='\r\n').write(out)
 print('ok', DST, len(out), 'champs repris :', len(pris))

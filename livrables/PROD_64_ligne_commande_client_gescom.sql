@@ -31,7 +31,8 @@ INSERT INTO meta_view (id, version, created_on, name, title, type, model, priori
  'com.axelor.apps.stock.db.StockMoveLine', 20, current_setting('lvme.historique_lot'), false, false);
 
 DELETE FROM meta_action WHERE module IS NULL AND name IN ('action-lvme-ligne-cde-historique-lot',
-  'action-lvme-ligne-cde-cdes-client-lot', 'action-lvme-ligne-cde-historique-prix', 'action-lvme-cdes-client-lignes-defaults');
+  'action-lvme-ligne-cde-cdes-client-lot', 'action-lvme-ligne-cde-historique-prix', 'action-lvme-cdes-client-lignes-defaults',
+  'action-lvme-ligne-cde-taux-tva');
 INSERT INTO meta_action (id, version, created_on, name, type, model, xml, home, is_custom, priority) VALUES
 (nextval('meta_action_seq'), 0, now(), 'action-lvme-ligne-cde-historique-lot', 'action-view', 'com.axelor.apps.stock.db.StockMoveLine',
 '<action-view name="action-lvme-ligne-cde-historique-lot" title="Liste des Mouvements de Stock" model="com.axelor.apps.stock.db.StockMoveLine">
@@ -69,6 +70,10 @@ INSERT INTO meta_action (id, version, created_on, name, type, model, xml, home, 
   <attribute name="value" for="$produit" expr="eval: _produitId ? __repo__(com.axelor.apps.base.db.Product).find(_produitId as Long) : null"/>
   <attribute name="value" for="$lot" expr="eval: _lotId ? __repo__(com.axelor.apps.stock.db.TrackingNumber).find(_lotId as Long) : null"/>
   <attribute name="value" for="$client" expr="eval: _clientId ? __repo__(com.axelor.apps.base.db.Partner).find(_clientId as Long) : null"/>
+</action-attrs>', false, false, 0),
+(nextval('meta_action_seq'), 0, now(), 'action-lvme-ligne-cde-taux-tva', 'action-attrs', NULL,
+'<action-attrs name="action-lvme-ligne-cde-taux-tva">
+  <attribute name="value" for="$tauxTva" expr="eval: taxLineSet?.find()?.value"/>
 </action-attrs>', false, false, 0);
 
 -- fenêtres Commandes Clients / Historique Prix ouvertes par les boutons : mêmes couleurs GESCOM (fond bleu, lignes cyan)

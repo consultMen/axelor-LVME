@@ -289,3 +289,10 @@
 [class*="_modal-content"]:has(.lvme-gescom-liste) [class*="_body_"] [class*="_row_"]:nth-child(even) [class*="_column_"] {
   background-color: #6cdcee;
 }
+/* ligne du bas : libellés GESCOM affichés en entier (sur deux lignes si besoin) au lieu d'être coupés « … » */
+.lvme-ligne-bas [class*="_label_"],
+.lvme-ligne-bas [class*="_labelText_"] {
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+}
