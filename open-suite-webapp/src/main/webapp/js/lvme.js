@@ -57,9 +57,10 @@
     }
   }, true);
 
-  // fenêtres GESCOM ouvertes depuis la ligne de commande : Axelor ne reprend pas le css d'une liste ouverte en
+  // fenêtres GESCOM (ligne de commande client, ligne d'arrivage, ligne de commande d'achat) : Axelor ne reprend pas le css d'une liste ouverte en
   // recherche, la fenêtre est donc marquée par son titre (classe lvme-fenetre-gescom, couleurs dans lvme.css)
-  var TITRES_GESCOM = ['Sélection Arrivage', 'Liste des Mouvements de Stock', 'Commandes Clients', 'Historique Prix'];
+  var TITRES_GESCOM = ['Sélection Arrivage', 'Liste des Mouvements de Stock', 'Commandes Clients', 'Historique Prix',
+    "Ligne d'arrivage", "Ligne de commande d'achat"];
   function marquerFenetres() {
     var fenetres = document.querySelectorAll('[class*="_modal-content"]:not(.lvme-fenetre-gescom)');
     for (var i = 0; i < fenetres.length; i++) {
