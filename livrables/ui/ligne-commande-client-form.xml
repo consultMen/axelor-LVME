@@ -123,7 +123,7 @@
         <button name="lvmeHistoriqueLotBtn" title="Historique Lot" css="lvme-btn-gris" onClick="action-lvme-ligne-cde-historique-lot"/>
         <button name="lvmeCdesClientLotBtn" title="Commandes/Lot" css="lvme-btn-gris" onClick="action-lvme-ligne-cde-cdes-client-lot"/>
         <button name="lvmeCdesClientProduitBtn" title="Commandes/Art." css="lvme-btn-gris" showIf="product" onClick="action-lvme-ligne-cdes-client-produit"/>
-        <button name="lvmeSelectArrivageBtn" title="Sélect Arrivage" css="lvme-btn-lilas" showIf="product" onClick="action-view-sale-order-line-add-arrivage"/>
+        <field name="$selArrivage" title="Sélect Arrivage" type="many-to-one" target="com.axelor.apps.supplychain.db.EtatStockLot" target-name="lotNumber" css="lvme-btn-lilas lvme-sel-arrivage" showIf="product" canNew="false" canEdit="false" canView="false" grid-view="lvme-selection-arrivage-grid" domain="self.product = :product AND self.lotArchive IS NOT TRUE" onChange="action-lvme-ligne-cde-group-sel-arrivage"/>
         <button name="lvmeHistoriquePrixBtn" title="F1 : Historique Prix" css="lvme-btn-orange" showIf="product" onClick="action-lvme-ligne-cde-historique-prix"/>
       </panel>
 
