@@ -129,7 +129,7 @@
       
       
       <field name="tauxCommission" title="% Commission" readonly="true" hideIf="product == null" colSpan="3" widget="Decimal" x-scale="2"/>
-      <panel name="colisPanel" title="Conditionnement / Colis" showIf="product != null" colSpan="12">
+      <panel hidden="true" name="colisPanel" title="Conditionnement / Colis" colSpan="12">
         
         
         

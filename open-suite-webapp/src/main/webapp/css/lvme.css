@@ -227,28 +227,22 @@
 [class*="_modal-content"]:has(.lvme-gescom-liste) {
   --label-color: #1a2a6c;
 }
-/* libellé à gauche du champ, sur une seule ligne */
-.lvme-ligne-cde [class*="_container_"]:has(> [class*="_label_"]) {
+/* libellé à gauche du champ, sur une seule ligne (champ Axelor = conteneur > titre + contenu) */
+.lvme-ligne-cde [class*="_container_"]:has(> [class*="_title_"]) {
   flex-direction: row !important;
   align-items: center;
   gap: 6px;
 }
-.lvme-ligne-cde [class*="_container_"]:has(> [class*="_label_"]) > [class*="_label_"] {
+.lvme-ligne-cde [class*="_container_"]:has(> [class*="_title_"]) > [class*="_title_"] {
   flex: 0 0 auto;
-  white-space: nowrap;
 }
-.lvme-ligne-cde [class*="_container_"]:has(> [class*="_label_"]) > :not([class*="_label_"]) {
+.lvme-ligne-cde [class*="_container_"]:has(> [class*="_title_"]) > :not([class*="_title_"]) {
   flex: 1 1 auto;
   min-width: 0;
 }
-/* champs non modifiables : cases grises encadrées */
-.lvme-ligne-cde [class*="_viewer_"] {
-  border: 1px solid #8aa6cc !important;
-  background-color: #e6ecf5 !important;
-  color: #1a1ad6 !important;
-  border-radius: 2px;
-  padding-left: 4px;
-  min-height: 1.8em;
+.lvme-ligne-cde [class*="_title_"] label,
+.lvme-ligne-cde [class*="_label_"] {
+  color: #1a2a6c !important;
 }
 /* ligne du bas : 14 cases sur une seule ligne, libellé au-dessus dans la case */
 .lvme-ligne-bas [class*="_grid_"] {
@@ -261,7 +255,7 @@
   border-radius: 3px;
   padding: 2px 4px;
 }
-.lvme-ligne-cde .lvme-ligne-bas [class*="_container_"]:has(> [class*="_label_"]) {
+.lvme-ligne-cde .lvme-ligne-bas [class*="_container_"]:has(> [class*="_title_"]) {
   flex-direction: column !important;
   align-items: stretch;
   gap: 0;

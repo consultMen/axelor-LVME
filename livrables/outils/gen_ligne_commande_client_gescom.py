@@ -164,6 +164,10 @@ bloc = '\n'.join([
 ])
 
 # le reste du panneau (colis, réservation, stocks, lots, arrivages…) reste dessous, dans l'ordre d'origine
+# panneau « Conditionnement / Colis » : absent de GESCOM, ses champs utiles sont dans le bloc GESCOM ; masqué
+# (pas supprimé : poids par colis, poids net et qté sachet restent dans la ligne pour les calculs)
+colis = blk('colisPanel', within=reste)
+reste = reste.replace(colis, seta(dela(colis, 'showIf'), 'hidden', 'true'), 1)
 reste_head = re.match(r'<panel\b' + A + r'*?>', reste).group(0)
 reste_corps = reste[len(reste_head):reste.rindex('</panel>')]
 info_new = (seta(seta(reste_head, 'title', 'Ligne'), 'css', 'lvme-gescom-fond') + '\n' + bloc + '\n' + reste_corps + '</panel>')
