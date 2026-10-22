@@ -206,8 +206,12 @@ out = out.replace('title="SO line"', 'title="Lignes Commandes"', 1)
 out = re.sub(r'^<form\b', '<form css="lvme-ligne-cde"', out, count=1)
 # Taux TVA (chiffre) recalculé à l'ouverture et au choix de l'article
 out = re.sub(r'^(<form\b[^>]*?\sonLoad=")([^"]*)"', lambda m: m.group(1) + m.group(2) + ',' + TVA + '"', out, count=1)
+# changement d'article : lots sélectionnés, valeurs du lot et prix revient remis à zéro AVANT les calculs de
+# l'article (comme GESCOM) ; puis Taux TVA en chiffre
+REINIT = 'action-lvme-ligne-cde-reinit-article,action-method-sale-order-line-persist-lot-selection'
 for e in re.findall(r'<field\b(?=' + A + r'*?\sname="product")' + A + r'*?/>', out):
-    out = out.replace(e, ajout_onchange(e, TVA), 1)
+    e2 = re.sub(r'(\sonChange=")', lambda m: m.group(1) + REINIT + ',', e, count=1)
+    out = out.replace(e, ajout_onchange(e2, TVA), 1)
 # valeurs du lot (N° Lot, Arrivage, Frigo, Congélation, Origine, D.L.U.O., Marque, Zone pêche, colis…) remplies dès
 # le choix du lot, comme GESCOM, sans attendre l'enregistrement de la ligne
 for e in re.findall(r'<panel-related\b(?=' + A + r'*?\sfield="saleOrderLineLotList")' + A + r'*?/?>', out):

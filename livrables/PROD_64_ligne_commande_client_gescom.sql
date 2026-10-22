@@ -10,6 +10,7 @@
 --   - fenêtre en pleine largeur, fond bleu, ligne du bas sur une seule ligne (cases encadrées), boutons aux
 --     couleurs GESCOM ; Historique Lot avec Colis Entrés / Sortis et Qtes Entrées / Sorties ; fenêtres des
 --     boutons (Commandes Clients, Historique Prix, Historique Lot) aux couleurs GESCOM
+--   - changement d'article : lots sélectionnés, valeurs du lot et prix revient remis à zéro
 --   - dessous, inchangés : lots disponibles, lots sélectionnés, arrivages, réservations stocks, stock
 --     physique… ; onglets inchangés. Aucun champ retiré. Valeurs du lot calculées par le code de ce lot.
 -- Source : livrables/ui/ligne-commande-client-form.xml (fiche admin sale-order-line-form, priorité 30).
@@ -32,7 +33,7 @@ INSERT INTO meta_view (id, version, created_on, name, title, type, model, priori
 
 DELETE FROM meta_action WHERE module IS NULL AND name IN ('action-lvme-ligne-cde-historique-lot',
   'action-lvme-ligne-cde-cdes-client-lot', 'action-lvme-ligne-cde-historique-prix', 'action-lvme-cdes-client-lignes-defaults',
-  'action-lvme-ligne-cde-taux-tva', 'action-lvme-ligne-cde-valeurs-lot');
+  'action-lvme-ligne-cde-taux-tva', 'action-lvme-ligne-cde-valeurs-lot', 'action-lvme-ligne-cde-reinit-article');
 INSERT INTO meta_action (id, version, created_on, name, type, model, xml, home, is_custom, priority) VALUES
 (nextval('meta_action_seq'), 0, now(), 'action-lvme-ligne-cde-historique-lot', 'action-view', 'com.axelor.apps.stock.db.StockMoveLine',
 '<action-view name="action-lvme-ligne-cde-historique-lot" title="Liste des Mouvements de Stock" model="com.axelor.apps.stock.db.StockMoveLine">
@@ -74,6 +75,26 @@ INSERT INTO meta_action (id, version, created_on, name, type, model, xml, home, 
 (nextval('meta_action_seq'), 0, now(), 'action-lvme-ligne-cde-taux-tva', 'action-attrs', NULL,
 '<action-attrs name="action-lvme-ligne-cde-taux-tva">
   <attribute name="value" for="$tauxTva" expr="eval: taxLineSet?.find()?.value"/>
+</action-attrs>', false, false, 0),
+(nextval('meta_action_seq'), 0, now(), 'action-lvme-ligne-cde-reinit-article', 'action-attrs', NULL,
+'<action-attrs name="action-lvme-ligne-cde-reinit-article">
+  <!-- changement d''article : lots sélectionnés, valeurs du lot et prix revient remis à zéro (comme GESCOM) -->
+  <attribute name="value" for="saleOrderLineLotList" expr="eval: []"/>
+  <attribute name="value" for="lvmeLots" expr="eval: null"/>
+  <attribute name="value" for="lvmeArrivages" expr="eval: null"/>
+  <attribute name="value" for="lvmeFrigo" expr="eval: null"/>
+  <attribute name="value" for="lvmeOrigine" expr="eval: null"/>
+  <attribute name="value" for="lvmeMarque" expr="eval: null"/>
+  <attribute name="value" for="lvmeZonePeche" expr="eval: null"/>
+  <attribute name="value" for="lvmeDdm" expr="eval: null"/>
+  <attribute name="value" for="lvmeDateCongelation" expr="eval: null"/>
+  <attribute name="value" for="lvmeColisPalette" expr="eval: null"/>
+  <attribute name="value" for="lvmeColisCouche" expr="eval: null"/>
+  <attribute name="value" for="lvmeColisRsv" expr="eval: null"/>
+  <attribute name="value" for="lvmeColisDispo" expr="eval: null"/>
+  <attribute name="value" for="lvmeQteDispo" expr="eval: null"/>
+  <attribute name="value" for="prixRevient" expr="eval: null"/>
+  <attribute name="value" for="$selArrivage" expr="eval: null"/>
 </action-attrs>', false, false, 0),
 (nextval('meta_action_seq'), 0, now(), 'action-lvme-ligne-cde-valeurs-lot', 'action-attrs', NULL,
 '<action-attrs name="action-lvme-ligne-cde-valeurs-lot">

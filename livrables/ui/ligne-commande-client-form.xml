@@ -69,8 +69,8 @@
           ]]></viewer>
           </field>
         </panel>
-        <field target-name="code" title="Article" colSpan="2" if="!__config__.app.isApp('supplychain')" name="product" canEdit="false" onChange="action-sale-order-line-method-get-product-information,action-lvme-ligne-cde-taux-tva" onSelect="action-sale-order-line-method-domain-product" form-view="product-form" grid-view="product-grid" x-image-field="picture"/>
-        <field target-name="code" title="Article" colSpan="2" if="__config__.app.isApp('supplychain')" name="product" canEdit="false" onChange="action-sale-order-line-method-get-product-information,action-method-sale-order-line-copy-taux-from-sale-order,action-method-sale-order-line-set-frais-congelation-from-lot,action-method-sale-order-line-compute-pr-net,action-lvme-ligne-cde-taux-tva" onSelect="action-sale-order-line-method-domain-product" form-view="product-form" grid-view="stock-move-line-product-grid" x-image-field="picture"/>
+        <field target-name="code" title="Article" colSpan="2" if="!__config__.app.isApp('supplychain')" name="product" canEdit="false" onChange="action-lvme-ligne-cde-reinit-article,action-method-sale-order-line-persist-lot-selection,action-sale-order-line-method-get-product-information,action-lvme-ligne-cde-taux-tva" onSelect="action-sale-order-line-method-domain-product" form-view="product-form" grid-view="product-grid" x-image-field="picture"/>
+        <field target-name="code" title="Article" colSpan="2" if="__config__.app.isApp('supplychain')" name="product" canEdit="false" onChange="action-lvme-ligne-cde-reinit-article,action-method-sale-order-line-persist-lot-selection,action-sale-order-line-method-get-product-information,action-method-sale-order-line-copy-taux-from-sale-order,action-method-sale-order-line-set-frais-congelation-from-lot,action-method-sale-order-line-compute-pr-net,action-lvme-ligne-cde-taux-tva" onSelect="action-sale-order-line-method-domain-product" form-view="product-form" grid-view="stock-move-line-product-grid" x-image-field="picture"/>
         
         
         <field title="" name="productName" colSpan="4"/>
