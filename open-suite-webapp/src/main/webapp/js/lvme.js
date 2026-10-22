@@ -57,6 +57,24 @@
     }
   }, true);
 
+  // fenêtres GESCOM ouvertes depuis la ligne de commande : Axelor ne reprend pas le css d'une liste ouverte en
+  // recherche, la fenêtre est donc marquée par son titre (classe lvme-fenetre-gescom, couleurs dans lvme.css)
+  var TITRES_GESCOM = ['Sélection Arrivage', 'Liste des Mouvements de Stock', 'Commandes Clients', 'Historique Prix'];
+  function marquerFenetres() {
+    var fenetres = document.querySelectorAll('[class*="_modal-content"]:not(.lvme-fenetre-gescom)');
+    for (var i = 0; i < fenetres.length; i++) {
+      var entete = fenetres[i].querySelector('[class*="_modal-header"]') || fenetres[i];
+      var titre = (entete.textContent || '').trim();
+      for (var j = 0; j < TITRES_GESCOM.length; j++) {
+        if (titre.indexOf(TITRES_GESCOM[j]) === 0) {
+          fenetres[i].classList.add('lvme-fenetre-gescom');
+          break;
+        }
+      }
+    }
+  }
+  new MutationObserver(marquerFenetres).observe(document.documentElement, { childList: true, subtree: true });
+
   // certains navigateurs ouvrent l'aide sur l'évènement « help » : bloqué aussi
   window.addEventListener('help', function (e) {
     e.preventDefault();

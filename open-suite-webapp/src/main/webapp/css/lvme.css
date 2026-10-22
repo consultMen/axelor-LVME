@@ -302,3 +302,30 @@
   left: -10000px !important;
   width: 300px !important;
 }
+/* fenêtres GESCOM marquées par js/lvme.js (Sélection Arrivage, Liste des Mouvements de Stock, Commandes Clients,
+   Historique Prix) : fond bleu, en-têtes de colonnes bleus, lignes bleu clair / cyan, Colis Dispo jaune */
+.lvme-fenetre-gescom,
+.lvme-fenetre-gescom [class*="_modal-header"],
+.lvme-fenetre-gescom [class*="_modal-body"],
+.lvme-fenetre-gescom [class*="_modal-footer"],
+.lvme-fenetre-gescom [class*="_panel"],
+.lvme-fenetre-gescom [class*="_content_"] {
+  background-color: #c3d9f5 !important;
+}
+.lvme-fenetre-gescom [class*="_header_"] [class*="_column_"] {
+  background-color: #a9c4ec !important;
+  color: #10204a !important;
+  white-space: normal !important;
+}
+.lvme-fenetre-gescom [class*="_body_"] [class*="_row_"] [class*="_column_"] {
+  background-color: #9fc3f2;
+  color: #000;
+}
+.lvme-fenetre-gescom [class*="_body_"] [class*="_row_"]:nth-child(even) [class*="_column_"] {
+  background-color: #ccffff;
+}
+.lvme-fenetre-gescom .bg-warning,
+.lvme-fenetre-gescom [class*="_body_"] [class*="_row_"] [class*="_column_"].bg-warning {
+  background-color: #ffff80 !important;
+  color: #000 !important;
+}
