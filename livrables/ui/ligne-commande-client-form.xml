@@ -210,7 +210,7 @@
         <panel-dashlet name="lotsAvailableDashlet" colSpan="12" height="200" action="action-view-tracking-numbers-available-for-product" canSearch="true"/>
       </panel>
       <panel name="lotSelectionPanel" title="Lots sélectionnés" showIf="product != null" colSpan="12">
-        <panel-related name="saleOrderLineLotListPanel" colSpan="12" field="saleOrderLineLotList" form-view="sale-order-line-lot-form" grid-view="sale-order-line-lot-grid" onChange="action-method-sale-order-line-persist-lot-selection,action-method-sale-order-line-set-frais-congelation-from-lot,action-method-sale-order-line-set-pr-from-lot,action-method-sale-order-line-compute-pr-net,action-method-sale-order-line-recompute-marge-with-pr-net,action-method-sale-order-line-persist-calculs-lvme" canNew="true" canEdit="true" canRemove="true"/>
+        <panel-related name="saleOrderLineLotListPanel" colSpan="12" field="saleOrderLineLotList" form-view="sale-order-line-lot-form" grid-view="sale-order-line-lot-grid" onChange="action-method-sale-order-line-persist-lot-selection,action-method-sale-order-line-set-frais-congelation-from-lot,action-method-sale-order-line-set-pr-from-lot,action-method-sale-order-line-compute-pr-net,action-method-sale-order-line-recompute-marge-with-pr-net,action-method-sale-order-line-persist-calculs-lvme,action-lvme-ligne-cde-valeurs-lot" canNew="true" canEdit="true" canRemove="true"/>
       </panel>
       <panel name="arrivagesPanel" title="Arrivages (Commandes Achat)" showIf="product != null " colSpan="12">
         <field name="qtyFromArrivage" readonly="true" colSpan="5"/>

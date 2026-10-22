@@ -204,5 +204,9 @@ out = re.sub(r'^<form\b', '<form css="lvme-ligne-cde"', out, count=1)
 out = re.sub(r'^(<form\b[^>]*?\sonLoad=")([^"]*)"', lambda m: m.group(1) + m.group(2) + ',' + TVA + '"', out, count=1)
 for e in re.findall(r'<field\b(?=' + A + r'*?\sname="product")' + A + r'*?/>', out):
     out = out.replace(e, ajout_onchange(e, TVA), 1)
+# valeurs du lot (N° Lot, Arrivage, Frigo, Congélation, Origine, D.L.U.O., Marque, Zone pêche, colis…) remplies dès
+# le choix du lot, comme GESCOM, sans attendre l'enregistrement de la ligne
+for e in re.findall(r'<panel-related\b(?=' + A + r'*?\sfield="saleOrderLineLotList")' + A + r'*?/?>', out):
+    out = out.replace(e, ajout_onchange(e, 'action-lvme-ligne-cde-valeurs-lot'), 1)
 open(DST, 'w', encoding='utf-8', newline='\r\n').write(out)
 print('ok', DST, len(out), 'champs repris :', len(pris))
