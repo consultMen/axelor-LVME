@@ -38,10 +38,19 @@
       nature = 1
       ]]>
     </boolean>
+    <!-- LVME : « Numéro Arrivage » de la liste des achats GESCOM : n° des arrivages (réceptions) de la commande -->
+    <string name="lvmeNumeroArrivage" title="Numéro Arrivage" formula="true">
+      <![CDATA[
+      (SELECT string_agg(stock_stock_move.stock_move_seq, ', ') FROM stock_stock_move
+        WHERE stock_stock_move.type_select = 3 AND stock_stock_move.id IN (
+          SELECT stock_stock_move_purchase_order_set.stock_stock_move FROM stock_stock_move_purchase_order_set
+          WHERE stock_stock_move_purchase_order_set.purchase_order_set = id))
+      ]]>
+    </string>
     <!-- LVME : ordre des cartes dans le Kanban (déplacement des cartes) -->
     <integer name="lvmeKanbanSeq" title="Ordre Kanban"/>
-    <!-- LVME : étape de la commande d'achat (Kanban et barre de la fiche) : 1 Brouillon / demandée, 2 À embarquer,
-      3 Flottant, 4 En stock, 5 Annulée -->
+    <!-- LVME : étape de la commande d'achat (Kanban et barre de la fiche) : 1 Brouillon / demandée,
+      2 À embarquer, 3 Flottant, 4 En stock, 5 Annulée -->
     <integer name="lvmeEtapeAchat" title="Étape" selection="lvme.achat.etape.select"
       formula="true">
       <![CDATA[
