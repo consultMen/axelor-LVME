@@ -385,3 +385,7 @@
   font-weight: 600 !important;
   box-shadow: 0 3px 8px rgba(13, 107, 61, .35);
 }
+/* icône Supprimer (corbeille) des listes Commandes clients / Achats / Arrivages : en rouge */
+.lvme-btn-supprimer, .lvme-btn-supprimer button, .lvme-btn-supprimer * {
+  color: #dc3545 !important;
+}

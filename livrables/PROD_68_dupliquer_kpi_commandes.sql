@@ -1,5 +1,6 @@
 -- =====================================================================
 -- PROD étape 68 : bouton « Dupliquer » et KPI des commandes clients
+--   - Supprimer (corbeille, avec confirmation) à côté de Dupliquer dans les 3 listes : brouillon ou annulé seulement
 --   - Dupliquer (icône copie) : barre d'outils des fiches Commande client, Commande fournisseur et Arrivage,
 --     et au bout de chaque ligne des listes Commandes clients, Achats fournisseurs et Arrivages. Copie comme
 --     Axelor (nouvelle pièce en brouillon, nouveau numéro, mêmes lignes), enregistrée et ouverte. Commande
@@ -8,7 +9,7 @@
 --   - Listes Commandes Clients : 4 KPI en haut (Commandes en cours, CA HT du mois, % Marge du mois,
 --     À livrer aujourd'hui + en retard)
 -- Sources : livrables/ui/commande-client-search-form.xml ; écrit par livrables/outils/gen_prod68_dupliquer_kpi.py
--- Prérequis : code avec LvmeDuplicationController (recompiler) ; PROD_63 (fiche commande client p30).
+-- Prérequis : code avec LvmeDuplicationController et LvmeSuppressionController (recompiler) ; PROD_63.
 -- À lancer depuis la racine du dépôt. Relançable.
 -- =====================================================================
 \set recherche `cat livrables/ui/commande-client-search-form.xml`
@@ -48,20 +49,20 @@ UPDATE meta_view SET xml = CASE WHEN position('<toolbar>' IN xml) > 0
   updated_on = now(), version = COALESCE(version, 0) + 1
 WHERE name = 'lvme-arrivage-form' AND module IS NULL AND priority = 20 AND xml NOT LIKE '%lvmeDupliquerBtn%';
 
-UPDATE meta_view SET xml = regexp_replace(regexp_replace(xml, '\n\s*<button name="lvmeDupliquerBtn"[^>]*/>', '', 'g'),
-    '(\n\s*<field )', E'\n  ' || '<button name="lvmeDupliquerBtn" title="Dupliquer" icon="content_copy" onClick="action-lvme-dupliquer-cde-client"/>' || '\1', ''),
+UPDATE meta_view SET xml = regexp_replace(regexp_replace(xml, '\n\s*<button name="lvme(Dupliquer|Supprimer)Btn"[^>]*/>', '', 'g'),
+    '(\n\s*<field )', E'\n  ' || '<button name="lvmeDupliquerBtn" title="Dupliquer" icon="content_copy" onClick="action-lvme-dupliquer-cde-client"/>' || E'\n  ' || '<button name="lvmeSupprimerBtn" title="Supprimer" icon="delete" css="lvme-btn-supprimer" prompt="Supprimer définitivement cette commande client ?" onClick="action-lvme-supprimer-cde-client"/>' || '\1', ''),
   updated_on = now(), version = COALESCE(version, 0) + 1
 WHERE name = 'lvme-commande-client-grid' AND module IS NULL;
-UPDATE meta_view SET xml = regexp_replace(regexp_replace(xml, '\n\s*<button name="lvmeDupliquerBtn"[^>]*/>', '', 'g'),
-    '(\n\s*<field )', E'\n  ' || '<button name="lvmeDupliquerBtn" title="Dupliquer" icon="content_copy" onClick="action-lvme-dupliquer-cde-achat"/>' || '\1', ''),
+UPDATE meta_view SET xml = regexp_replace(regexp_replace(xml, '\n\s*<button name="lvme(Dupliquer|Supprimer)Btn"[^>]*/>', '', 'g'),
+    '(\n\s*<field )', E'\n  ' || '<button name="lvmeDupliquerBtn" title="Dupliquer" icon="content_copy" onClick="action-lvme-dupliquer-cde-achat"/>' || E'\n  ' || '<button name="lvmeSupprimerBtn" title="Supprimer" icon="delete" css="lvme-btn-supprimer" prompt="Supprimer définitivement cette commande d''achat ?" onClick="action-lvme-supprimer-cde-achat"/>' || '\1', ''),
   updated_on = now(), version = COALESCE(version, 0) + 1
 WHERE name = 'lvme-achat-grid' AND module IS NULL;
-UPDATE meta_view SET xml = regexp_replace(regexp_replace(xml, '\n\s*<button name="lvmeDupliquerBtn"[^>]*/>', '', 'g'),
-    '(\n\s*<field )', E'\n  ' || '<button name="lvmeDupliquerBtn" title="Dupliquer" icon="content_copy" onClick="action-lvme-dupliquer-arrivage"/>' || '\1', ''),
+UPDATE meta_view SET xml = regexp_replace(regexp_replace(xml, '\n\s*<button name="lvme(Dupliquer|Supprimer)Btn"[^>]*/>', '', 'g'),
+    '(\n\s*<field )', E'\n  ' || '<button name="lvmeDupliquerBtn" title="Dupliquer" icon="content_copy" onClick="action-lvme-dupliquer-arrivage"/>' || E'\n  ' || '<button name="lvmeSupprimerBtn" title="Supprimer" icon="delete" css="lvme-btn-supprimer" prompt="Supprimer définitivement cet arrivage ?" onClick="action-lvme-supprimer-arrivage"/>' || '\1', ''),
   updated_on = now(), version = COALESCE(version, 0) + 1
 WHERE name = 'lvme-arrivage-grid' AND module IS NULL;
 
-DELETE FROM meta_action WHERE module IS NULL AND name IN ('action-lvme-dupliquer-cde-client', 'action-lvme-dupliquer-cde-achat', 'action-lvme-dupliquer-arrivage', 'action-lvme-cde-client-kpi', 'action-lvme-cde-client-alerte-retard', 'action-lvme-cde-client-alerte-marge-negative', 'action-lvme-cde-client-alerte-marge-faible', 'action-lvme-cde-client-alerte-devis', 'action-lvme-cde-client-alerte-aucune', 'action-lvme-cde-client-refresh', 'action-lvme-cde-client-dashlet');
+DELETE FROM meta_action WHERE module IS NULL AND name IN ('action-lvme-dupliquer-cde-client', 'action-lvme-dupliquer-cde-achat', 'action-lvme-dupliquer-arrivage', 'action-lvme-supprimer-cde-client', 'action-lvme-supprimer-cde-achat', 'action-lvme-supprimer-arrivage', 'action-lvme-cde-client-kpi', 'action-lvme-cde-client-alerte-retard', 'action-lvme-cde-client-alerte-marge-negative', 'action-lvme-cde-client-alerte-marge-faible', 'action-lvme-cde-client-alerte-devis', 'action-lvme-cde-client-alerte-aucune', 'action-lvme-cde-client-refresh', 'action-lvme-cde-client-dashlet');
 INSERT INTO meta_action (id, version, created_on, name, type, model, xml, home, is_custom, priority) VALUES
 (nextval('meta_action_seq'), 0, now(), 'action-lvme-dupliquer-cde-client', 'action-method', NULL,
 '<action-method name="action-lvme-dupliquer-cde-client">
@@ -74,6 +75,18 @@ INSERT INTO meta_action (id, version, created_on, name, type, model, xml, home, 
 (nextval('meta_action_seq'), 0, now(), 'action-lvme-dupliquer-arrivage', 'action-method', NULL,
 '<action-method name="action-lvme-dupliquer-arrivage">
   <call class="com.axelor.apps.supplychain.web.LvmeDuplicationController" method="dupliquerArrivage"/>
+</action-method>', false, false, 0),
+(nextval('meta_action_seq'), 0, now(), 'action-lvme-supprimer-cde-client', 'action-method', NULL,
+'<action-method name="action-lvme-supprimer-cde-client">
+  <call class="com.axelor.apps.supplychain.web.LvmeSuppressionController" method="supprimerCommandeClient"/>
+</action-method>', false, false, 0),
+(nextval('meta_action_seq'), 0, now(), 'action-lvme-supprimer-cde-achat', 'action-method', NULL,
+'<action-method name="action-lvme-supprimer-cde-achat">
+  <call class="com.axelor.apps.supplychain.web.LvmeSuppressionController" method="supprimerCommandeAchat"/>
+</action-method>', false, false, 0),
+(nextval('meta_action_seq'), 0, now(), 'action-lvme-supprimer-arrivage', 'action-method', NULL,
+'<action-method name="action-lvme-supprimer-arrivage">
+  <call class="com.axelor.apps.supplychain.web.LvmeSuppressionController" method="supprimerArrivage"/>
 </action-method>', false, false, 0),
 (nextval('meta_action_seq'), 0, now(), 'action-lvme-cde-client-kpi', 'action-attrs', NULL,
 '<action-attrs name="action-lvme-cde-client-kpi">

@@ -154,12 +154,20 @@ BTN_LISTE = '<button name="lvmeDupliquerBtn" title="Dupliquer" icon="content_cop
 fiches = [('sale-order-form', 30, 'action-lvme-dupliquer-cde-client'),
           ('purchase-order-form', 30, 'action-lvme-dupliquer-cde-achat'),
           ('lvme-arrivage-form', 20, 'action-lvme-dupliquer-arrivage')]
-listes = [('lvme-commande-client-grid', 'action-lvme-dupliquer-cde-client'),
-          ('lvme-achat-grid', 'action-lvme-dupliquer-cde-achat'),
-          ('lvme-arrivage-grid', 'action-lvme-dupliquer-arrivage')]
+# icône Supprimer (corbeille) à côté de Dupliquer, avec confirmation ; brouillon ou annulé seulement (Java)
+BTN_SUPPR = ('<button name="lvmeSupprimerBtn" title="Supprimer" icon="delete" css="lvme-btn-supprimer" '
+             'prompt="Supprimer définitivement %s ?" onClick="%s"/>')
+listes = [('lvme-commande-client-grid', 'action-lvme-dupliquer-cde-client', 'cette commande client',
+           'action-lvme-supprimer-cde-client'),
+          ('lvme-achat-grid', 'action-lvme-dupliquer-cde-achat', "cette commande d'achat",
+           'action-lvme-supprimer-cde-achat'),
+          ('lvme-arrivage-grid', 'action-lvme-dupliquer-arrivage', 'cet arrivage', 'action-lvme-supprimer-arrivage')]
 methodes = [('action-lvme-dupliquer-cde-client', 'dupliquerCommandeClient'),
             ('action-lvme-dupliquer-cde-achat', 'dupliquerCommandeAchat'),
             ('action-lvme-dupliquer-arrivage', 'dupliquerArrivage')]
+suppressions = [('action-lvme-supprimer-cde-client', 'supprimerCommandeClient'),
+                ('action-lvme-supprimer-cde-achat', 'supprimerCommandeAchat'),
+                ('action-lvme-supprimer-arrivage', 'supprimerArrivage')]
 
 maj_fiches = ''.join(
     "UPDATE meta_view SET xml = CASE WHEN position('<toolbar>' IN xml) > 0\n"
@@ -168,14 +176,14 @@ maj_fiches = ''.join(
     "  updated_on = now(), version = COALESCE(version, 0) + 1\n"
     "WHERE name = '%s' AND module IS NULL AND priority = %d AND xml NOT LIKE '%%lvmeDupliquerBtn%%';\n"
     % (q(BTN_FICHE % a), q(BTN_FICHE % a), n, p_) for n, p_, a in fiches)
-# icône Dupliquer en PREMIÈRE colonne de la liste (à côté du crayon) : retirée d'où elle était, remise avant le
-# premier champ (relançable : toujours une seule icône)
+# icônes Dupliquer et Supprimer en PREMIÈRES colonnes de la liste (à côté du crayon) : retirées d'où elles étaient,
+# remises avant le premier champ (relançable : toujours une seule de chaque)
 maj_listes = ''.join(
-    "UPDATE meta_view SET xml = regexp_replace(regexp_replace(xml, '\\n\\s*<button name=\"lvmeDupliquerBtn\"[^>]*/>', '', 'g'),\n"
-    "    '(\\n\\s*<field )', E'\\n  ' || '%s' || '\\1', ''),\n"
+    "UPDATE meta_view SET xml = regexp_replace(regexp_replace(xml, '\\n\\s*<button name=\"lvme(Dupliquer|Supprimer)Btn\"[^>]*/>', '', 'g'),\n"
+    "    '(\\n\\s*<field )', E'\\n  ' || '%s' || E'\\n  ' || '%s' || '\\1', ''),\n"
     "  updated_on = now(), version = COALESCE(version, 0) + 1\n"
     "WHERE name = '%s' AND module IS NULL;\n"
-    % (q(BTN_LISTE % a), n) for n, a in listes)
+    % (q(BTN_LISTE % a), q(BTN_SUPPR % (quoi, sup)), n) for n, a, quoi, sup in listes)
 DASHLET = """<action-view name="action-lvme-cde-client-dashlet" title="Commandes clients" model="com.axelor.apps.sale.db.SaleOrder">
   <view type="grid" name="lvme-commande-client-grid"/>
   <view type="form" name="sale-order-form"/>
@@ -230,11 +238,13 @@ ACT_ALERTES.append(('action-lvme-cde-client-refresh',
                     '  <attribute name="refresh" for="commandesDashlet" expr="eval: true"/>\n'
                     '</action-attrs>'))
 ACT_ALERTES.append(('action-lvme-cde-client-dashlet', DASHLET))
-noms = [m for m, _ in methodes] + ['action-lvme-cde-client-kpi'] + [n for n, _ in ACT_ALERTES]
+noms = [m for m, _ in methodes + suppressions] + ['action-lvme-cde-client-kpi'] + [n for n, _ in ACT_ALERTES]
 actions = ',\n'.join(
     "(nextval('meta_action_seq'), 0, now(), '%s', 'action-method', NULL,\n"
-    "'<action-method name=\"%s\">\n  <call class=\"com.axelor.apps.supplychain.web.LvmeDuplicationController\" method=\"%s\"/>\n"
-    "</action-method>', false, false, 0)" % (m, m, j) for m, j in methodes)
+    "'<action-method name=\"%s\">\n  <call class=\"com.axelor.apps.supplychain.web.%s\" method=\"%s\"/>\n"
+    "</action-method>', false, false, 0)" % (m, m, c, j)
+    for (m, j), c in [(x, 'LvmeDuplicationController') for x in methodes]
+    + [(x, 'LvmeSuppressionController') for x in suppressions])
 actions += (",\n(nextval('meta_action_seq'), 0, now(), 'action-lvme-cde-client-kpi', 'action-attrs', NULL,\n'%s', false, false, 0)"
             % q(kpi_xml))
 for n, x in ACT_ALERTES:
@@ -244,6 +254,7 @@ for n, x in ACT_ALERTES:
 
 sql = '''-- =====================================================================
 -- PROD étape 68 : bouton « Dupliquer » et KPI des commandes clients
+--   - Supprimer (corbeille, avec confirmation) à côté de Dupliquer dans les 3 listes : brouillon ou annulé seulement
 --   - Dupliquer (icône copie) : barre d'outils des fiches Commande client, Commande fournisseur et Arrivage,
 --     et au bout de chaque ligne des listes Commandes clients, Achats fournisseurs et Arrivages. Copie comme
 --     Axelor (nouvelle pièce en brouillon, nouveau numéro, mêmes lignes), enregistrée et ouverte. Commande
@@ -252,7 +263,7 @@ sql = '''-- ====================================================================
 --   - Listes Commandes Clients : 4 KPI en haut (Commandes en cours, CA HT du mois, %% Marge du mois,
 --     À livrer aujourd'hui + en retard)
 -- Sources : livrables/ui/commande-client-search-form.xml ; écrit par livrables/outils/gen_prod68_dupliquer_kpi.py
--- Prérequis : code avec LvmeDuplicationController (recompiler) ; PROD_63 (fiche commande client p30).
+-- Prérequis : code avec LvmeDuplicationController et LvmeSuppressionController (recompiler) ; PROD_63.
 -- À lancer depuis la racine du dépôt. Relançable.
 -- =====================================================================
 \\set recherche `cat livrables/ui/commande-client-search-form.xml`
