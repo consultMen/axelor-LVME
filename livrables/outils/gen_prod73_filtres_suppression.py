@@ -2,10 +2,8 @@
   1. filtres tout prêts (menu ▾ de la recherche) des 3 Kanban de suivi (livrables/ui/*-kanban-filtres.xml) ;
   2. les boutons « Suivi des … » ouvrent le Kanban avec les filtres saisis au-dessus de la liste (fournisseur /
      client, n°, périodes, transport…) ;
-  3. suppression de plusieurs pièces : bouton « Supprimer la sélection » dans la barre des listes Commandes clients,
-     Achats fournisseurs et Arrivages (lignes cochées ; brouillon ou annulé seulement, LvmeSuppressionController) ;
-     dans les écrans de recherche, bouton « Archiver / Supprimer » (arrivages) et « Supprimer une sélection »
-     (commandes clients, achats) qui ouvrent la liste avec sa barre.
+  3. corbeille native dans l'en-tête des listes intégrées (panel-dashlet canDelete) de tous les écrans de recherche ;
+     contrôle avant suppression des commandes et arrivages (onDelete, LvmeSuppressionController).
 Usage : python livrables/outils/gen_prod73_filtres_suppression.py   (depuis la racine du dépôt)
 """
 import os
@@ -84,19 +82,39 @@ for nom, (titre, modele, kanban, grille, fiche, filtres, corps) in KANBANS.items
            % (nom, titre, modele, kanban, grille, fiche, filtres, corps))
     actions.append((nom, 'action-view', "'%s'" % modele, xml))
 
-SUPPR = [('lvme-commande-client-grid', 'action-lvme-supprimer-cde-client', 'les commandes clients cochées'),
-         ('lvme-achat-grid', 'action-lvme-supprimer-cde-achat', "les commandes d'achat cochées"),
-         ('lvme-arrivage-grid', 'action-lvme-supprimer-arrivage', 'les arrivages cochés')]
-BTN = ('<button name="lvmeSupprimerSelBtn" title="Supprimer la sélection" icon="delete" css="lvme-btn-supprimer" '
-       'prompt="Supprimer définitivement %s ? (brouillons et annulés seulement)" onClick="%s"/>')
+# corbeille native dans l'en-tête de la liste intégrée (panel-dashlet canDelete) de tous les écrans de recherche ;
+# pour les 3 listes de pièces, contrôle avant suppression (onDelete : brouillon / annulé seulement, lots détachés)
+ON_DELETE = [('lvme-commande-client-grid', 'action-lvme-verifier-suppression-cde-client', 'verifierSuppressionCommandeClient'),
+             ('lvme-achat-grid', 'action-lvme-verifier-suppression-cde-achat', 'verifierSuppressionCommandeAchat'),
+             ('lvme-arrivage-grid', 'action-lvme-verifier-suppression-arrivage', 'verifierSuppressionArrivage')]
+for grille, act, meth in ON_DELETE:
+    actions.append((act, 'action-method', 'NULL',
+                    '<action-method name="%s">\n  <call class="com.axelor.apps.supplychain.web.LvmeSuppressionController" method="%s"/>\n</action-method>'
+                    % (act, meth)))
+NOMS_GRILLES = ', '.join("'%s'" % g for g, a, m in ON_DELETE)
 maj_grilles = ''.join(
-    "UPDATE meta_view SET xml = CASE WHEN position('<toolbar>' IN xml) > 0\n"
-    "    THEN regexp_replace(regexp_replace(xml, '\\n\\s*<button name=\"lvmeSupprimerSelBtn\"[^>]*/>', '', 'g'),\n"
-    "      '<toolbar>', '<toolbar>' || E'\\n    ' || '%s', '')\n"
-    "    ELSE regexp_replace(xml, '(<grid\\s[^>]*>)', '\\1' || E'\\n  <toolbar>\\n    ' || '%s' || E'\\n  </toolbar>', '') END,\n"
-    "  updated_on = now(), version = COALESCE(version, 0) + 1\n"
-    "WHERE name = '%s' AND module IS NULL;\n"
-    % (q(BTN % (quoi, act)), q(BTN % (quoi, act)), grille) for grille, act, quoi in SUPPR)
+    r"""UPDATE meta_view SET xml = regexp_replace(regexp_replace(regexp_replace(xml,
+    '\n\s*<button name="lvmeSupprimerSelBtn"[^>]*/>', '', 'g'),
+    '\s+onDelete="[^"]*"', '', 'g'),
+    '^(<grid\s)', '\1onDelete="%s" ', ''),
+  updated_on = now(), version = COALESCE(version, 0) + 1
+WHERE name = '%s' AND module IS NULL;
+""" % (act, grille) for grille, act, meth in ON_DELETE)
+# barre d'outils restée vide après le retrait du bouton : retirée
+maj_grilles += r"""UPDATE meta_view SET xml = regexp_replace(xml, '\n\s*<toolbar>\s*</toolbar>', '', 'g'), updated_on = now()
+WHERE module IS NULL AND name IN (%s) AND xml ~ '<toolbar>\s*</toolbar>';
+""" % NOMS_GRILLES
+FORMS = ['lvme-commande-client-search-form', 'lvme-achat-search-form', 'lvme-arrivage-search-form', 'lvme-client-search-form',
+         'lvme-fournisseur-search-form', 'lvme-article-search-form', 'lvme-article-achat-search-form']
+NOMS_FORMS = ', '.join("'%s'" % f for f in FORMS)
+maj_formulaires = r"""UPDATE meta_view SET xml = regexp_replace(xml, '\n\s*<button name="lvmeSelectionBtn"[^>]*/>', '', 'g'), updated_on = now()
+WHERE module IS NULL AND name IN (%s) AND xml LIKE '%%lvmeSelectionBtn%%';
+UPDATE meta_view SET xml = replace(xml, '<panel-dashlet ', '<panel-dashlet canDelete="true" '),
+  updated_on = now(), version = COALESCE(version, 0) + 1
+WHERE module IS NULL AND name IN (%s) AND xml NOT LIKE '%%panel-dashlet canDelete=%%';
+UPDATE meta_view SET xml = replace(xml, 'title="Archiver / Supprimer"', 'title="Archiver / Désarchiver"'), updated_on = now()
+WHERE module IS NULL AND name = 'lvme-arrivage-search-form' AND xml LIKE '%%title="Archiver / Supprimer"%%';
+""" % (NOMS_FORMS, NOMS_FORMS)
 
 FILTRES = ['arrivage-kanban-filtres', 'achat-kanban-filtres', 'commande-client-kanban-filtres']
 NOMS_FILTRES = ['lvme-arrivage-kanban-filters', 'lvme-achat-kanban-filters', 'lvme-commande-client-kanban-filters']
@@ -107,9 +125,9 @@ sql = ['''-- ===================================================================
 --   - menu ▾ de la recherche des 3 Kanban : filtres tout prêts (en retard, bateau / camion, du mois, livraison
 --     aujourd'hui, marge négative)
 --   - les boutons « Suivi des … » ouvrent le Kanban avec les filtres saisis au-dessus de la liste
---   - « Supprimer la sélection » dans la barre des listes Commandes clients / Achats / Arrivages (lignes cochées,
---     brouillons et annulés seulement) ; ouverte par « Archiver / Supprimer » (arrivages) et « Supprimer une
---     sélection » (commandes clients, achats) dans les écrans de recherche
+--   - corbeille native dans l'en-tête de la liste de chaque écran de recherche (commandes clients, achats,
+--     arrivages, clients, fournisseurs, articles) : supprime les lignes cochées ; pour les
+--     commandes et arrivages, contrôle avant (brouillons et annulés seulement, sinon rien n'est supprimé)
 -- Sources : livrables/ui/*-kanban-filtres.xml ; écrit par livrables/outils/gen_prod73_filtres_suppression.py
 -- Prérequis : PROD_68 à PROD_71 ; code avec LvmeSuppressionController (suppression de plusieurs lignes, recompiler).
 -- Depuis la racine du dépôt. Relançable.
@@ -126,26 +144,18 @@ sql.append("DELETE FROM meta_action WHERE module IS NULL AND name IN (%s);" % ',
 sql.append("INSERT INTO meta_action (id, version, created_on, name, type, model, xml, home, is_custom, priority) VALUES\n"
            + ',\n'.join("(nextval('meta_action_seq'), 0, now(), '%s', '%s', %s,\n'%s', false, false, 0)" % (n, t, m, q(x))
                         for n, t, m, x in actions) + ';\n')
-sql.append('-- bouton « Supprimer la sélection » dans la barre des 3 listes (ouvertes en grand)')
+sql.append('-- contrôle avant la corbeille native (3 listes de pièces) ; ancien bouton « Supprimer la sélection » retiré')
 sql.append(maj_grilles)
-sql.append("""-- écrans de recherche : bouton qui ouvre la liste en grand (barre : Supprimer la sélection, Archiver…)
-UPDATE meta_view SET xml = replace(xml, 'name="lvmeArchivageBtn" title="Archiver / Désarchiver"', 'name="lvmeArchivageBtn" title="Archiver / Supprimer"'),
-  updated_on = now(), version = COALESCE(version, 0) + 1
-WHERE name = 'lvme-arrivage-search-form' AND module IS NULL AND xml LIKE '%title="Archiver / Désarchiver"%';
-UPDATE meta_view SET xml = regexp_replace(xml, '(<button name="lvmeKanbanBtn"[^>]*/>)',
-  '\\1' || E'\\n      ' || '<button name="lvmeSelectionBtn" title="Supprimer une sélection" icon="delete" onClick="action-lvme-cde-client-dashlet"/>', ''),
-  updated_on = now(), version = COALESCE(version, 0) + 1
-WHERE name = 'lvme-commande-client-search-form' AND module IS NULL AND xml NOT LIKE '%lvmeSelectionBtn%';
-UPDATE meta_view SET xml = regexp_replace(xml, '(<button name="lvmeKanbanBtn"[^>]*/>)',
-  '\\1' || E'\\n      ' || '<button name="lvmeSelectionBtn" title="Supprimer une sélection" icon="delete" onClick="action-lvme-achat-dashlet"/>', ''),
-  updated_on = now(), version = COALESCE(version, 0) + 1
-WHERE name = 'lvme-achat-search-form' AND module IS NULL AND xml NOT LIKE '%lvmeSelectionBtn%';
-
+sql.append("-- corbeille native dans l'en-tête des listes intégrées des écrans de recherche")
+sql.append(maj_formulaires)
+sql.append("""
 COMMIT;
 
 SELECT name, type FROM meta_view WHERE module IS NULL AND name LIKE '%kanban-filters';
-SELECT name, position('lvmeSupprimerSelBtn' IN xml) > 0 AS supprimer_selection FROM meta_view
+SELECT name, substring(xml from 'onDelete="([^"]*)"') AS controle FROM meta_view
 WHERE module IS NULL AND name IN ('lvme-commande-client-grid', 'lvme-achat-grid', 'lvme-arrivage-grid');
+SELECT name, position('panel-dashlet canDelete="true"' IN xml) > 0 AS corbeille FROM meta_view
+WHERE module IS NULL AND name LIKE 'lvme-%search-form' ORDER BY name;
 """)
 open(DST, 'w', encoding='utf-8', newline='\n').write('\n'.join(sql))
 print('ok', DST)

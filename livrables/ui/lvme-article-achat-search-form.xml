@@ -10,5 +10,5 @@
     <field name="$archives" title="Archivés" type="boolean" colSpan="8" onChange="action-lvme-recherche-refresh"/>
     <button colSpan="4" name="lvmeArchivageBtn" title="Archiver / Désarchiver" icon="archive" onClick="action-lvme-article-achat-dashlet"/>
   </panel>
-  <panel-dashlet name="listeDashlet" title="Articles" colSpan="12" height="650" action="action-lvme-article-achat-dashlet"/>
+  <panel-dashlet canDelete="true" name="listeDashlet" title="Articles" colSpan="12" height="650" action="action-lvme-article-achat-dashlet"/>
 </form>

@@ -100,9 +100,8 @@
       <field name="$natureAchat" showTitle="false" type="integer" widget="RadioSelect" selection="lvme.achat.nature.select"/>
       <button name="lancerRechercheBtn" title="Lancer la recherche" icon="search" css="btn-primary" onClick="action-lvme-achat-refresh"/>
       <button name="lvmeKanbanBtn" title="Suivi des commandes d'achat" icon="view_kanban" css="lvme-btn-kanban" onClick="action-lvme-achat-kanban"/>
-      <button name="lvmeSelectionBtn" title="Supprimer une sélection" icon="delete" onClick="action-lvme-achat-dashlet"/>
       <button name="nouvelleCommandeBtn" title="Nouvelle commande" icon="plus" css="lvme-btn-nouveau" onClick="action-lvme-achat-new"/>
     </panel>
   </panel>
-  <panel-dashlet name="achatsDashlet" title="Achats fournisseurs" colSpan="12" height="600" action="action-lvme-achat-dashlet"/>
+  <panel-dashlet canDelete="true" name="achatsDashlet" title="Achats fournisseurs" colSpan="12" height="600" action="action-lvme-achat-dashlet"/>
 </form>

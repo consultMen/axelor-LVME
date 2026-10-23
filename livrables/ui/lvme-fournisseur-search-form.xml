@@ -9,5 +9,5 @@
     <field name="$archives" title="Archivés" type="boolean" colSpan="8" onChange="action-lvme-recherche-refresh"/>
     <button colSpan="4" name="lvmeArchivageBtn" title="Archiver / Désarchiver" icon="archive" onClick="action-lvme-fournisseur-dashlet"/>
   </panel>
-  <panel-dashlet name="listeDashlet" title="Fournisseurs" colSpan="12" height="650" action="action-lvme-fournisseur-dashlet"/>
+  <panel-dashlet canDelete="true" name="listeDashlet" title="Fournisseurs" colSpan="12" height="650" action="action-lvme-fournisseur-dashlet"/>
 </form>

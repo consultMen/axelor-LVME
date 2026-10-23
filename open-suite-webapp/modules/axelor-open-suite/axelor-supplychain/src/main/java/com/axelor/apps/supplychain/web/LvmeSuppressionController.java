@@ -21,10 +21,11 @@ import java.util.function.Function;
 
 /**
  * LVME : suppression dans les listes Commandes clients, Achats fournisseurs et Arrivages, comme la
- * suppression native d'Axelor : l'icône corbeille d'une ligne supprime cette ligne ; le bouton
- * « Supprimer la sélection » de la barre de la liste supprime les lignes cochées. Seulement une pièce
- * en brouillon ou annulée (une commande confirmée, une commande validée ou un arrivage planifié / réel
- * s'annule d'abord dans sa fiche) : les autres lignes cochées sont laissées et listées dans le message.
+ * suppression native d'Axelor : l'icône corbeille d'une ligne supprime cette ligne ; le bouton «
+ * Supprimer la sélection » de la barre de la liste supprime les lignes cochées. Seulement une pièce
+ * en brouillon ou annulée (une commande confirmée, une commande validée ou un arrivage planifié /
+ * réel s'annule d'abord dans sa fiche) : les autres lignes cochées sont laissées et listées dans le
+ * message.
  */
 public class LvmeSuppressionController {
 
@@ -40,9 +41,129 @@ public class LvmeSuppressionController {
     supprimer(request, response, "arrivage(s)", this::supprimerArrivage);
   }
 
+  // ---------- corbeille native (en-tête de la liste) : contrôle avant la suppression par Axelor ----------
+
+  public void verifierSuppressionCommandeClient(ActionRequest request, ActionResponse response) {
+    verifier(request, response, this::refusCommandeClient, false);
+  }
+
+  public void verifierSuppressionCommandeAchat(ActionRequest request, ActionResponse response) {
+    verifier(request, response, this::refusCommandeAchat, false);
+  }
+
+  public void verifierSuppressionArrivage(ActionRequest request, ActionResponse response) {
+    verifier(request, response, this::refusArrivage, true);
+  }
+
   /**
-   * Lignes cochées (_ids, bouton de la barre) ou ligne cliquée (id, icône de la ligne) ; chaque pièce
-   * est supprimée dans sa propre transaction, les refus sont listés.
+   * Action onDelete de la liste, lancée par Axelor avant sa suppression native : si une ligne cochée
+   * n'est ni brouillon ni annulée, erreur (rien n'est supprimé) avec la liste des pièces à annuler
+   * d'abord. Arrivages : les lots créés pour leurs lignes en sont détachés (sinon la base refuse).
+   */
+  protected void verifier(
+      ActionRequest request,
+      ActionResponse response,
+      Function<Long, String> refus,
+      boolean detacherLots) {
+    try {
+      List<Long> ids = new ArrayList<>();
+      Object selection = request.getContext().get("_ids");
+      if (selection instanceof List) {
+        for (Object id : (List<?>) selection) {
+          ids.add(Long.valueOf(id.toString()));
+        }
+      }
+      List<String> refusees = new ArrayList<>();
+      for (Long id : ids) {
+        String raison = refus.apply(id);
+        if (raison != null) {
+          refusees.add(raison);
+        }
+      }
+      if (!refusees.isEmpty()) {
+        response.setError(
+            "Rien n'a été supprimé : seules les pièces en brouillon ou annulées se suppriment.<br/>- "
+                + String.join("<br/>- ", refusees));
+        return;
+      }
+      if (detacherLots) {
+        JPA.runInTransaction(
+            () -> {
+              for (Long id : ids) {
+                detacherLots(Beans.get(StockMoveRepository.class).find(id));
+              }
+            });
+      }
+    } catch (Exception e) {
+      TraceBackService.trace(response, e);
+    }
+  }
+
+  protected String refusCommandeClient(Long id) {
+    SaleOrder commande = Beans.get(SaleOrderRepository.class).find(id);
+    if (commande == null) {
+      return null;
+    }
+    int status = commande.getStatusSelect();
+    return status == SaleOrderRepository.STATUS_DRAFT_QUOTATION
+            || status == SaleOrderRepository.STATUS_FINALIZED_QUOTATION
+            || status == SaleOrderRepository.STATUS_CANCELED
+        ? null
+        : "Commande " + commande.getSaleOrderSeq() + " confirmée : l'annuler d'abord dans sa fiche";
+  }
+
+  protected String refusCommandeAchat(Long id) {
+    PurchaseOrder commande = Beans.get(PurchaseOrderRepository.class).find(id);
+    if (commande == null) {
+      return null;
+    }
+    int status = commande.getStatusSelect();
+    return status == PurchaseOrderRepository.STATUS_DRAFT
+            || status == PurchaseOrderRepository.STATUS_REQUESTED
+            || status == PurchaseOrderRepository.STATUS_CANCELED
+        ? null
+        : "Commande " + commande.getPurchaseOrderSeq() + " validée : l'annuler d'abord dans sa fiche";
+  }
+
+  protected String refusArrivage(Long id) {
+    StockMove arrivage = Beans.get(StockMoveRepository.class).find(id);
+    if (arrivage == null) {
+      return null;
+    }
+    int status = arrivage.getStatusSelect();
+    if (status == StockMoveRepository.STATUS_DRAFT || status == StockMoveRepository.STATUS_CANCELED) {
+      return null;
+    }
+    return "Arrivage "
+        + arrivage.getStockMoveSeq()
+        + (status == StockMoveRepository.STATUS_REALIZED
+            ? " réel : entré en stock, ne peut plus être supprimé"
+            : " en cours : l'annuler d'abord dans sa fiche");
+  }
+
+  /** Lots dont la ligne d'origine est une ligne de l'arrivage : lien retiré ; renvoie ces lots. */
+  protected List<TrackingNumber> detacherLots(StockMove arrivage) {
+    List<TrackingNumber> lots = new ArrayList<>();
+    if (arrivage == null || arrivage.getStockMoveLineList() == null) {
+      return lots;
+    }
+    TrackingNumberRepository lotRepo = Beans.get(TrackingNumberRepository.class);
+    for (StockMoveLine line : arrivage.getStockMoveLineList()) {
+      if (line.getId() == null) {
+        continue;
+      }
+      for (TrackingNumber lot :
+          lotRepo.all().filter("self.originStockMoveLine.id = ?1", line.getId()).fetch()) {
+        lot.setOriginStockMoveLine(null);
+        lots.add(lot);
+      }
+    }
+    return lots;
+  }
+
+  /**
+   * Lignes cochées (_ids, bouton de la barre) ou ligne cliquée (id, icône de la ligne) ; chaque
+   * pièce est supprimée dans sa propre transaction, les refus sont listés.
    */
   protected void supprimer(
       ActionRequest request,
@@ -105,7 +226,9 @@ public class LvmeSuppressionController {
     if (status != SaleOrderRepository.STATUS_DRAFT_QUOTATION
         && status != SaleOrderRepository.STATUS_FINALIZED_QUOTATION
         && status != SaleOrderRepository.STATUS_CANCELED) {
-      return "Commande " + commande.getSaleOrderSeq() + " confirmée : l'annuler d'abord dans sa fiche";
+      return "Commande "
+          + commande.getSaleOrderSeq()
+          + " confirmée : l'annuler d'abord dans sa fiche";
     }
     repo.remove(commande);
     return null;
@@ -121,7 +244,9 @@ public class LvmeSuppressionController {
     if (status != PurchaseOrderRepository.STATUS_DRAFT
         && status != PurchaseOrderRepository.STATUS_REQUESTED
         && status != PurchaseOrderRepository.STATUS_CANCELED) {
-      return "Commande " + commande.getPurchaseOrderSeq() + " validée : l'annuler d'abord dans sa fiche";
+      return "Commande "
+          + commande.getPurchaseOrderSeq()
+          + " validée : l'annuler d'abord dans sa fiche";
     }
     repo.remove(commande);
     return null;
@@ -142,8 +267,10 @@ public class LvmeSuppressionController {
               ? " réel : entré en stock, ne peut plus être supprimé"
               : " en cours : l'annuler d'abord dans sa fiche");
     }
-    // les lots créés pour ses lignes (lot « d'origine » = ligne de l'arrivage) en sont détachés, sinon
-    // la base refuse de supprimer les lignes ; un lot qui ne sert plus nulle part est supprimé aussi
+    // les lots créés pour ses lignes (lot « d'origine » = ligne de l'arrivage) en sont détachés,
+    // sinon
+    // la base refuse de supprimer les lignes ; un lot qui ne sert plus nulle part est supprimé
+    // aussi
     TrackingNumberRepository lotRepo = Beans.get(TrackingNumberRepository.class);
     List<TrackingNumber> lots = new ArrayList<>();
     if (arrivage.getStockMoveLineList() != null) {
