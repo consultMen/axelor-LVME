@@ -48,21 +48,18 @@ UPDATE meta_view SET xml = CASE WHEN position('<toolbar>' IN xml) > 0
   updated_on = now(), version = COALESCE(version, 0) + 1
 WHERE name = 'lvme-arrivage-form' AND module IS NULL AND priority = 20 AND xml NOT LIKE '%lvmeDupliquerBtn%';
 
-UPDATE meta_view SET xml = regexp_replace(xml, '</grid>\s*$', '  ' || '<button name="lvmeDupliquerBtn" title="Dupliquer" icon="content_copy" onClick="action-lvme-dupliquer-cde-client"/>' || '
-</grid>
-', ''),
+UPDATE meta_view SET xml = regexp_replace(regexp_replace(xml, '\n\s*<button name="lvmeDupliquerBtn"[^>]*/>', '', 'g'),
+    '(\n\s*<field )', E'\n  ' || '<button name="lvmeDupliquerBtn" title="Dupliquer" icon="content_copy" onClick="action-lvme-dupliquer-cde-client"/>' || '\1', ''),
   updated_on = now(), version = COALESCE(version, 0) + 1
-WHERE name = 'lvme-commande-client-grid' AND module IS NULL AND xml NOT LIKE '%lvmeDupliquerBtn%';
-UPDATE meta_view SET xml = regexp_replace(xml, '</grid>\s*$', '  ' || '<button name="lvmeDupliquerBtn" title="Dupliquer" icon="content_copy" onClick="action-lvme-dupliquer-cde-achat"/>' || '
-</grid>
-', ''),
+WHERE name = 'lvme-commande-client-grid' AND module IS NULL;
+UPDATE meta_view SET xml = regexp_replace(regexp_replace(xml, '\n\s*<button name="lvmeDupliquerBtn"[^>]*/>', '', 'g'),
+    '(\n\s*<field )', E'\n  ' || '<button name="lvmeDupliquerBtn" title="Dupliquer" icon="content_copy" onClick="action-lvme-dupliquer-cde-achat"/>' || '\1', ''),
   updated_on = now(), version = COALESCE(version, 0) + 1
-WHERE name = 'lvme-achat-grid' AND module IS NULL AND xml NOT LIKE '%lvmeDupliquerBtn%';
-UPDATE meta_view SET xml = regexp_replace(xml, '</grid>\s*$', '  ' || '<button name="lvmeDupliquerBtn" title="Dupliquer" icon="content_copy" onClick="action-lvme-dupliquer-arrivage"/>' || '
-</grid>
-', ''),
+WHERE name = 'lvme-achat-grid' AND module IS NULL;
+UPDATE meta_view SET xml = regexp_replace(regexp_replace(xml, '\n\s*<button name="lvmeDupliquerBtn"[^>]*/>', '', 'g'),
+    '(\n\s*<field )', E'\n  ' || '<button name="lvmeDupliquerBtn" title="Dupliquer" icon="content_copy" onClick="action-lvme-dupliquer-arrivage"/>' || '\1', ''),
   updated_on = now(), version = COALESCE(version, 0) + 1
-WHERE name = 'lvme-arrivage-grid' AND module IS NULL AND xml NOT LIKE '%lvmeDupliquerBtn%';
+WHERE name = 'lvme-arrivage-grid' AND module IS NULL;
 
 DELETE FROM meta_action WHERE module IS NULL AND name IN ('action-lvme-dupliquer-cde-client', 'action-lvme-dupliquer-cde-achat', 'action-lvme-dupliquer-arrivage', 'action-lvme-cde-client-kpi', 'action-lvme-cde-client-alerte-retard', 'action-lvme-cde-client-alerte-marge-negative', 'action-lvme-cde-client-alerte-marge-faible', 'action-lvme-cde-client-alerte-devis', 'action-lvme-cde-client-alerte-aucune', 'action-lvme-cde-client-refresh', 'action-lvme-cde-client-dashlet');
 INSERT INTO meta_action (id, version, created_on, name, type, model, xml, home, is_custom, priority) VALUES

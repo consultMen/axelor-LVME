@@ -168,10 +168,13 @@ maj_fiches = ''.join(
     "  updated_on = now(), version = COALESCE(version, 0) + 1\n"
     "WHERE name = '%s' AND module IS NULL AND priority = %d AND xml NOT LIKE '%%lvmeDupliquerBtn%%';\n"
     % (q(BTN_FICHE % a), q(BTN_FICHE % a), n, p_) for n, p_, a in fiches)
+# icône Dupliquer en PREMIÈRE colonne de la liste (à côté du crayon) : retirée d'où elle était, remise avant le
+# premier champ (relançable : toujours une seule icône)
 maj_listes = ''.join(
-    "UPDATE meta_view SET xml = regexp_replace(xml, '</grid>\\s*$', '  ' || '%s' || '\n</grid>\n', ''),\n"
+    "UPDATE meta_view SET xml = regexp_replace(regexp_replace(xml, '\\n\\s*<button name=\"lvmeDupliquerBtn\"[^>]*/>', '', 'g'),\n"
+    "    '(\\n\\s*<field )', E'\\n  ' || '%s' || '\\1', ''),\n"
     "  updated_on = now(), version = COALESCE(version, 0) + 1\n"
-    "WHERE name = '%s' AND module IS NULL AND xml NOT LIKE '%%lvmeDupliquerBtn%%';\n"
+    "WHERE name = '%s' AND module IS NULL;\n"
     % (q(BTN_LISTE % a), n) for n, a in listes)
 DASHLET = """<action-view name="action-lvme-cde-client-dashlet" title="Commandes clients" model="com.axelor.apps.sale.db.SaleOrder">
   <view type="grid" name="lvme-commande-client-grid"/>
