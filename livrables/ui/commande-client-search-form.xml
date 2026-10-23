@@ -74,7 +74,7 @@
       <button name="lvmeAlMargeNegBtn" title=" " css="lvme-alerte-rouge" hidden="true" colSpan="3" onClick="action-lvme-cde-client-alerte-marge-negative"/>
       <button name="lvmeAlMargeFaibleBtn" title=" " css="lvme-alerte-jaune" hidden="true" colSpan="3" onClick="action-lvme-cde-client-alerte-marge-faible"/>
       <button name="lvmeAlDevisBtn" title=" " css="lvme-alerte-jaune" hidden="true" colSpan="3" onClick="action-lvme-cde-client-alerte-devis"/>
-      <button name="lvmeAlAucuneBtn" title="✔ Aucune alerte" css="lvme-alerte-vert" hidden="true" readonly="true" colSpan="3"/>
+      <button name="lvmeAlAucuneBtn" title="✔ Aucune alerte" css="lvme-alerte-vert" hidden="true" readonly="true" colSpan="3" onClick="action-lvme-cde-client-alerte-aucune"/>
       <button name="lvmeAlRetirerBtn" title="✖ Retirer le filtre alerte" css="lvme-alerte-gris" showIf="$alerte" colSpan="3" onClick="action-lvme-cde-client-alerte-aucune"/>
     </panel>
   </panel>

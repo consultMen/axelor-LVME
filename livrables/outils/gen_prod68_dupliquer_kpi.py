@@ -112,7 +112,7 @@ panneau = ('  <!-- LVME : KPI et alertes des commandes clients (calculés à l\'
            '    <panel name="lvmeAlertesPanel" showTitle="false" colSpan="12">\n'
            + ''.join('      <button name="%s" title=" " css="%s" hidden="true" colSpan="3" onClick="%s"/>\n'
                      % (btn, css, 'action-lvme-cde-client-alerte-' + code) for k, btn, css, code in BOUTONS)
-           + '      <button name="lvmeAlAucuneBtn" title="✔ Aucune alerte" css="lvme-alerte-vert" hidden="true" readonly="true" colSpan="3"/>\n'
+           + '      <button name="lvmeAlAucuneBtn" title="✔ Aucune alerte" css="lvme-alerte-vert" hidden="true" readonly="true" colSpan="3" onClick="action-lvme-cde-client-alerte-aucune"/>\n'
            '      <button name="lvmeAlRetirerBtn" title="✖ Retirer le filtre alerte" css="lvme-alerte-gris" showIf="$alerte" colSpan="3"'
            ' onClick="action-lvme-cde-client-alerte-aucune"/>\n'
            '    </panel>\n'
@@ -122,7 +122,8 @@ p = os.path.join(UI, 'commande-client-search-form.xml')
 f = open(p, encoding='utf-8').read()
 if 'kpiCdeClientPanel' in f:  # nouvelle version du panneau : l'ancien est retiré
     i = f.index('  <!-- LVME : KPI')
-    j = f.index('  </panel>\n', f.index('name="kpiCdeClientPanel"')) + len('  </panel>\n')
+    # fin du panneau KPI = « </panel> » au niveau 2 (le panneau des alertes, imbriqué, a aussi un </panel>)
+    j = f.index('\n  </panel>\n', f.index('name="kpiCdeClientPanel"')) + len('\n  </panel>\n')
     f = f[:i] + f[j:]
 else:
     f = f.replace('onNew="action-lvme-cde-client-defaults"', 'onNew="action-lvme-cde-client-defaults,action-lvme-cde-client-kpi"', 1)
