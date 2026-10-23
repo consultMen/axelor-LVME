@@ -458,3 +458,38 @@
 [class*="_gridItem_"]:has(.lvme-ges-achats) ~ [class*="_gridItem_"] [class*="_body_"] [class*="_row_"]:nth-child(even) [class*="_column_"] {
   background-color: #ffffff;
 }
+
+/* Etat des stocks / liste des achats façon GESCOM : tout l'écran (pas seulement les panneaux), liste resserrée,
+   boutons gris encadrés comme GESCOM */
+[class*="_grid_"]:has(> [class*="_gridItem_"] .lvme-ges-etat) {
+  background-color: #c6daf0 !important;
+  padding: 6px;
+  border-radius: 4px;
+}
+[class*="_grid_"]:has(> [class*="_gridItem_"] .lvme-ges-achats) {
+  background-color: #f4f6fa !important;
+  padding: 6px;
+  border-radius: 4px;
+}
+.lvme-ges-achats,
+.lvme-ges-achats > [class*="_panel"],
+.lvme-ges-achats [class*="_body_"] {
+  background-color: #ffffff !important;
+}
+[class*="_gridItem_"]:has(.lvme-ges-etat) ~ [class*="_gridItem_"] [class*="_body_"] [class*="_row_"] [class*="_column_"],
+[class*="_gridItem_"]:has(.lvme-ges-achats) ~ [class*="_gridItem_"] [class*="_body_"] [class*="_row_"] [class*="_column_"] {
+  font-size: 12px;
+  padding-top: 2px !important;
+  padding-bottom: 2px !important;
+}
+[class*="_gridItem_"]:has(.lvme-ges-etat) ~ [class*="_gridItem_"] [class*="_header_"],
+[class*="_gridItem_"]:has(.lvme-ges-achats) ~ [class*="_gridItem_"] [class*="_header_"] {
+  font-size: 12px;
+}
+.lvme-ges-etat button,
+.lvme-ges-achats button {
+  background: linear-gradient(#ffffff, #dfe4ec) !important;
+  color: #10204a !important;
+  border: 1px solid #8c96a8 !important;
+  border-radius: 4px !important;
+}
