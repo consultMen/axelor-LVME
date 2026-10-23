@@ -101,6 +101,7 @@
       <field name="$livraisonPeriode" title="Période prédéfinie" type="integer" selection="lvme.etat.stock.periode.select"
         onChange="action-lvme-cde-client-periode-livraison"/>
       <button name="lancerRechercheBtn" title="Lancer la recherche" icon="search" css="btn-primary" onClick="action-lvme-cde-client-refresh"/>
+      <button name="lvmeKanbanBtn" title="Suivi des commandes clients" icon="view_kanban" css="lvme-btn-kanban" onClick="action-lvme-cde-client-kanban"/>
     </panel>
   </panel>
   <panel-dashlet name="commandesDashlet" title="Commandes clients" colSpan="12" height="600" action="action-lvme-cde-client-dashlet"/>

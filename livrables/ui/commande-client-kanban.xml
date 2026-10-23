@@ -1,0 +1,32 @@
+<kanban name="lvme-commande-client-kanban" title="Suivi des commandes clients" model="com.axelor.apps.sale.db.SaleOrder"
+  columnBy="lvmeEtapeCde" sequenceBy="lvmeKanbanSeq" orderBy="estimatedDeliveryDate" onMove="action-lvme-kanban-deplacer-cde-client" limit="30">
+  <!-- LVME : commandes clients en colonnes (Devis, En préparation, Expédiée = BL Flottant, Livrée, Facturée, Annulée) ;
+       déplacer une carte lance l'action de la fiche (confirmer, BL Flottant ; Livrée / Annulée : ouvre le BL / la
+       commande) ; carte rouge si la livraison prévue est dépassée -->
+  <field name="saleOrderSeq"/>
+  <field name="clientPartner"/>
+  <field name="estimatedDeliveryDate"/>
+  <field name="orderDate"/>
+  <field name="exTaxTotal"/>
+  <field name="marginRate"/>
+  <field name="lvmeEnRetard"/>
+  <field name="lvmeEtapeCde"/>
+  <hilite color="danger" if="lvmeEnRetard"/>
+  <template><![CDATA[
+    <Box style={{ borderLeft: '6px solid ' + ({1: '#6c757d', 2: '#fd7e14', 3: '#0dcaf0', 4: '#198754', 5: '#6f42c1', 6: '#dc3545'})[lvmeEtapeCde],
+      borderRadius: 8, padding: '6px 10px', background: lvmeEnRetard ? '#fff1f1' : 'transparent' }}>
+      <Box d="flex" style={{ justifyContent: 'space-between', alignItems: 'center', gap: 6 }}>
+        <Box style={{ fontSize: 15, fontWeight: 800, color: '#0a3d91' }}>{saleOrderSeq}</Box>
+        {lvmeEnRetard && <Badge bg="danger">⏰ En retard</Badge>}
+      </Box>
+      <Box style={{ fontWeight: 600, color: '#1b2a4a', margin: '2px 0 6px' }}>{$fmt('clientPartner')}</Box>
+      <Box style={{ fontSize: 12, color: '#555' }}>📝 Commande : <b>{$fmt('orderDate')}</b></Box>
+      <Box style={{ fontSize: 12, color: '#555' }}>🚚 Livraison : <b>{$fmt('estimatedDeliveryDate')}</b></Box>
+      <Box d="flex" style={{ justifyContent: 'space-between', alignItems: 'center', marginTop: 6 }}>
+        <Box style={{ fontSize: 12, fontWeight: 700, borderRadius: 10, padding: '1px 8px',
+          background: marginRate < 0 ? '#f8d7da' : '#e6f4ea', color: marginRate < 0 ? '#842029' : '#0f5132' }}>📈 {$fmt('marginRate')} %</Box>
+        <Box style={{ fontWeight: 800, fontSize: 13, color: '#0d6b3d' }}>{$fmt('exTaxTotal')} €</Box>
+      </Box>
+    </Box>
+  ]]></template>
+</kanban>

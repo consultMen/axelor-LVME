@@ -58,6 +58,25 @@
       ref="com.axelor.apps.base.db.Partner"/>
     <many-to-one name="deliveredPartner" title="Delivery partner"
       ref="com.axelor.apps.base.db.Partner"/>
+    <!-- LVME : Kanban « Suivi des commandes clients » : ordre des cartes, étape (1 Devis, 2 En préparation, 3 Expédiée
+      = BL Flottant, 4 Livrée, 5 Facturée, 6 Annulée) et retard de livraison -->
+    <integer name="lvmeKanbanSeq" title="Ordre Kanban"/>
+    <integer name="lvmeEtapeCde" title="Étape" selection="lvme.cde.client.etape.select" formula="true">
+      <![CDATA[
+      (CASE WHEN status_select = 5 THEN 6 WHEN status_select IN (1, 2) THEN 1 WHEN invoicing_state = 3 THEN 5
+        WHEN status_select = 4 OR delivery_state = 3 THEN 4
+        WHEN EXISTS (SELECT 1 FROM stock_stock_move WHERE stock_stock_move.type_select = 2
+          AND stock_stock_move.status_select = 2 AND stock_stock_move.lvme_bl_flottant
+          AND stock_stock_move.id IN (SELECT stock_stock_move_sale_order_set.stock_stock_move
+            FROM stock_stock_move_sale_order_set WHERE stock_stock_move_sale_order_set.sale_order_set = id)) THEN 3
+        ELSE 2 END)
+      ]]>
+    </integer>
+    <boolean name="lvmeEnRetard" title="En retard" formula="true">
+      <![CDATA[
+      (estimated_delivery_date < date(now()) AND status_select = 3 AND delivery_state != 3)
+      ]]>
+    </boolean>
     <extra-code>
             <![CDATA[
                 // INVOICE

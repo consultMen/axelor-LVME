@@ -4,6 +4,10 @@ import com.axelor.apps.base.service.exception.TraceBackService;
 import com.axelor.apps.purchase.db.PurchaseOrder;
 import com.axelor.apps.purchase.db.repo.PurchaseOrderRepository;
 import com.axelor.apps.purchase.service.PurchaseOrderWorkflowService;
+import com.axelor.apps.sale.db.SaleOrder;
+import com.axelor.apps.sale.db.repo.SaleOrderRepository;
+import com.axelor.apps.sale.service.saleorder.status.SaleOrderConfirmService;
+import com.axelor.apps.sale.service.saleorder.status.SaleOrderFinalizeService;
 import com.axelor.apps.stock.db.Nature;
 import com.axelor.apps.stock.db.StockMove;
 import com.axelor.apps.stock.db.repo.StockMoveRepository;
@@ -199,6 +203,106 @@ public class LvmeKanbanController {
                 + " » impossible depuis son étape actuelle."
                 + " Possible : Brouillon -> Validée (à embarquer) <-> Flottant -> Réceptionnée"
                 + " (ouvre l'arrivage pour le réel), ou -> Annulée.");
+      }
+      response.setReload(true);
+    } catch (Exception e) {
+      TraceBackService.trace(response, e);
+      response.setReload(true);
+    }
+  }
+
+  // étapes des commandes clients (lvme.cde.client.etape.select)
+  protected static final int CDE_DEVIS = 1;
+  protected static final int CDE_PREPARATION = 2;
+  protected static final int CDE_EXPEDIEE = 3;
+  protected static final int CDE_LIVREE = 4;
+  protected static final int CDE_FACTUREE = 5;
+  protected static final int CDE_ANNULEE = 6;
+
+  /** BL (livraisons client) planifiés, ni réalisés ni annulés, de la commande client. */
+  protected List<StockMove> blEnCours(SaleOrder commande) {
+    return Beans.get(StockMoveRepository.class)
+        .all()
+        .filter(
+            "?1 MEMBER OF self.saleOrderSet AND self.typeSelect = 2 AND self.statusSelect = 2", commande)
+        .order("id")
+        .fetch();
+  }
+
+  @Transactional(rollbackOn = {Exception.class})
+  public void deplacerCommandeClient(ActionRequest request, ActionResponse response) {
+    try {
+      Object cible = request.getContext().get("lvmeEtapeCde");
+      Long id = request.getContext().asType(SaleOrder.class).getId();
+      SaleOrder commande = id != null ? Beans.get(SaleOrderRepository.class).find(id) : null;
+      if (commande == null || cible == null) {
+        response.setReload(true);
+        return;
+      }
+      int etape = Integer.parseInt(cible.toString());
+      int status = commande.getStatusSelect();
+      String num = "Commande " + commande.getSaleOrderSeq();
+      boolean devis =
+          status == SaleOrderRepository.STATUS_DRAFT_QUOTATION
+              || status == SaleOrderRepository.STATUS_FINALIZED_QUOTATION;
+      boolean confirmee = status == SaleOrderRepository.STATUS_ORDER_CONFIRMED;
+
+      if (etape == CDE_PREPARATION && devis) {
+        // devis -> commande confirmée : le BL est créé « en cours de préparation »
+        if (status == SaleOrderRepository.STATUS_DRAFT_QUOTATION) {
+          Beans.get(SaleOrderFinalizeService.class).finalizeQuotation(commande);
+        }
+        String message = Beans.get(SaleOrderConfirmService.class).confirmSaleOrder(commande);
+        response.setNotify(
+            num + " confirmée." + (message != null && !message.isEmpty() ? " " + message : ""));
+      } else if ((etape == CDE_PREPARATION || etape == CDE_EXPEDIEE) && confirmee) {
+        // En préparation <-> Expédiée : case Flottant de ses BL
+        List<StockMove> bls = blEnCours(commande);
+        if (bls.isEmpty()) {
+          response.setError(num + " : aucun BL en cours.");
+        } else {
+          StockMoveRepository repo = Beans.get(StockMoveRepository.class);
+          for (StockMove bl : bls) {
+            bl.setLvmeBlFlottant(etape == CDE_EXPEDIEE);
+            repo.save(bl);
+          }
+          response.setNotify(
+              num + (etape == CDE_EXPEDIEE ? " expédiée (BL Flottant)." : " : BL en cours de préparation."));
+        }
+      } else if (etape == CDE_LIVREE && confirmee) {
+        // livraison = réaliser le BL (quantités, lots) : ouverture du BL
+        List<StockMove> bls = blEnCours(commande);
+        if (bls.isEmpty()) {
+          response.setError(num + " : aucun BL en cours à livrer.");
+        } else {
+          response.setView(
+              ActionView.define("BL : vérifiez puis « Réaliser »")
+                  .model(StockMove.class.getName())
+                  .add("form", "stock-move-form")
+                  .param("popup", "reload")
+                  .param("popup.maximized", "true")
+                  .param("forceEdit", "true")
+                  .context("_showRecord", bls.get(0).getId())
+                  .map());
+        }
+      } else if (etape == CDE_ANNULEE && status != SaleOrderRepository.STATUS_CANCELED) {
+        // l'annulation demande un motif : ouverture de la commande
+        response.setView(
+            ActionView.define("Commande client : annulation (bouton Annuler)")
+                .model(SaleOrder.class.getName())
+                .add("form", "sale-order-form")
+                .param("popup", "reload")
+                .param("popup.maximized", "true")
+                .param("forceEdit", "true")
+                .context("_showRecord", commande.getId())
+                .map());
+      } else if (etape == CDE_FACTUREE) {
+        response.setError(num + " : la facture se fait depuis la commande ou le BL (bouton de facturation).");
+      } else if (!(etape == CDE_DEVIS && devis)) {
+        response.setError(
+            num
+                + " : passage impossible depuis son étape actuelle. Possible : Devis -> En préparation"
+                + " (confirmer) <-> Expédiée -> Livrée (ouvre le BL), ou -> Annulée (ouvre la commande).");
       }
       response.setReload(true);
     } catch (Exception e) {

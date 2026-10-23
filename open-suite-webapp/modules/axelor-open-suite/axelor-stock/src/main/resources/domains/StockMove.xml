@@ -127,7 +127,7 @@
     <integer name="lvmeEtapeBl" title="Statut" selection="lvme.bl.etape.select"
       formula="true">
       <![CDATA[
-      (CASE status_select WHEN 1 THEN 1 WHEN 2 THEN (CASE WHEN COALESCE(lvme_bl_flottant, false) THEN 3 ELSE 2 END)
+      (CASE status_select WHEN 1 THEN 1 WHEN 2 THEN (CASE WHEN lvme_bl_flottant THEN 3 ELSE 2 END)
         WHEN 3 THEN 4 WHEN 4 THEN 5 END)
       ]]>
     </integer>
