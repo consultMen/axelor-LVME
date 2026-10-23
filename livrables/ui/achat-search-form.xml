@@ -1,6 +1,80 @@
 <form name="lvme-achat-search-form" title="liste des achats fournisseurs" model="com.axelor.utils.db.Wizard" width="large"
-  canNew="false" canSave="false" canCopy="false" canDelete="false" onNew="action-lvme-achat-defaults">
+  canNew="false" canSave="false" canCopy="false" canDelete="false" onNew="action-lvme-achat-defaults,action-lvme-achat-kpi">
   <!-- LVME : écran « liste des achats fournisseurs » de GESCOM : filtres + liste des commandes fournisseurs -->
+  <!-- LVME : KPI et alertes des achats (calculés à l'ouverture, action-lvme-achat-kpi) -->
+  <panel name="kpiAchatPanel" showTitle="false" colSpan="12">
+    <field name="$kpaEnCours" type="string" hidden="true"/>
+    <field name="$kpaEnCoursDetail" type="string" hidden="true"/>
+    <field name="$kpaFlottants" type="string" hidden="true"/>
+    <field name="$kpaFlottantsDetail" type="string" hidden="true"/>
+    <field name="$kpaAchatsMois" type="string" hidden="true"/>
+    <field name="$kpaAchatsMoisDetail" type="string" hidden="true"/>
+    <field name="$kpaAchatsEvol" type="string" hidden="true"/>
+    <field name="$kpaAchatsHausse" type="string" hidden="true"/>
+    <field name="$kpaARecevoir" type="string" hidden="true"/>
+    <field name="$kpaARecevoirDetail" type="string" hidden="true"/>
+    <field name="$alaRetard" type="string" hidden="true"/>
+    <field name="$alaBrouillons" type="string" hidden="true"/>
+    <field name="$alaAEmbarquer" type="string" hidden="true"/>
+    <field name="$alaAucune" type="string" hidden="true"/>
+    <field name="$kpaTuiles" showTitle="false" readonly="true" colSpan="12" type="string">
+      <viewer depends="$kpaEnCours,$kpaEnCoursDetail,$kpaFlottants,$kpaFlottantsDetail,$kpaAchatsMois,$kpaAchatsMoisDetail,$kpaAchatsEvol,$kpaAchatsHausse,$kpaARecevoir,$kpaARecevoirDetail,$alaRetard,$alaBrouillons,$alaAEmbarquer,$alaAucune"><![CDATA[
+        <>
+          <Box d="grid" style={{ gridTemplateColumns: 'repeat(4, 1fr)', gap: 14 }}>
+            <Box style={{ position: 'relative', overflow: 'hidden', background: 'linear-gradient(135deg, #1e6fe8, #0a3d91)', color: '#fff', borderRadius: 14, boxShadow: '0 6px 16px rgba(20,30,60,.25)', padding: '14px 16px', minHeight: 128 }}>
+              <Box style={{ position: 'absolute', right: -28, top: -28, width: 110, height: 110, borderRadius: 55, background: 'rgba(255,255,255,.14)' }}></Box>
+              <Box style={{ position: 'absolute', right: 30, bottom: -40, width: 80, height: 80, borderRadius: 40, background: 'rgba(255,255,255,.08)' }}></Box>
+              <Box d="flex" style={{ justifyContent: 'space-between', alignItems: 'center', position: 'relative' }}>
+                <Box style={{ fontSize: 12, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', opacity: .9 }}>Commandes en cours</Box>
+                <Box style={{ width: 40, height: 40, borderRadius: 20, background: 'rgba(255,255,255,.25)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>📋</Box>
+              </Box>
+              <Box style={{ fontSize: 32, fontWeight: 800, lineHeight: 1.2, marginTop: 4, position: 'relative' }}>{$kpaEnCours}</Box>
+              <Box style={{ fontSize: 12, opacity: .9, position: 'relative' }}>{$kpaEnCoursDetail}</Box>
+            </Box>
+            <Box style={{ position: 'relative', overflow: 'hidden', background: 'linear-gradient(135deg, #17a2b8, #0b5f6d)', color: '#fff', borderRadius: 14, boxShadow: '0 6px 16px rgba(20,30,60,.25)', padding: '14px 16px', minHeight: 128 }}>
+              <Box style={{ position: 'absolute', right: -28, top: -28, width: 110, height: 110, borderRadius: 55, background: 'rgba(255,255,255,.14)' }}></Box>
+              <Box style={{ position: 'absolute', right: 30, bottom: -40, width: 80, height: 80, borderRadius: 40, background: 'rgba(255,255,255,.08)' }}></Box>
+              <Box d="flex" style={{ justifyContent: 'space-between', alignItems: 'center', position: 'relative' }}>
+                <Box style={{ fontSize: 12, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', opacity: .9 }}>Flottants (en mer)</Box>
+                <Box style={{ width: 40, height: 40, borderRadius: 20, background: 'rgba(255,255,255,.25)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>🚢</Box>
+              </Box>
+              <Box style={{ fontSize: 32, fontWeight: 800, lineHeight: 1.2, marginTop: 4, position: 'relative' }}>{$kpaFlottants}</Box>
+              <Box style={{ fontSize: 12, opacity: .9, position: 'relative' }}>{$kpaFlottantsDetail}</Box>
+            </Box>
+            <Box style={{ position: 'relative', overflow: 'hidden', background: 'linear-gradient(135deg, #22a565, #0d6b3d)', color: '#fff', borderRadius: 14, boxShadow: '0 6px 16px rgba(20,30,60,.25)', padding: '14px 16px', minHeight: 128 }}>
+              <Box style={{ position: 'absolute', right: -28, top: -28, width: 110, height: 110, borderRadius: 55, background: 'rgba(255,255,255,.14)' }}></Box>
+              <Box style={{ position: 'absolute', right: 30, bottom: -40, width: 80, height: 80, borderRadius: 40, background: 'rgba(255,255,255,.08)' }}></Box>
+              <Box d="flex" style={{ justifyContent: 'space-between', alignItems: 'center', position: 'relative' }}>
+                <Box style={{ fontSize: 12, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', opacity: .9 }}>Achats HT du mois</Box>
+                <Box style={{ width: 40, height: 40, borderRadius: 20, background: 'rgba(255,255,255,.25)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>💶</Box>
+              </Box>
+              <Box style={{ fontSize: 32, fontWeight: 800, lineHeight: 1.2, marginTop: 4, position: 'relative' }}>{$kpaAchatsMois}</Box>
+              <Box style={{ fontSize: 12, opacity: .9, position: 'relative' }}>{$kpaAchatsMoisDetail}</Box>
+              <Box style={{ display: 'inline-block', position: 'relative', marginTop: 6, fontSize: 12, fontWeight: 700, padding: '2px 10px', borderRadius: 12, background: 'rgba(255,255,255,.95)', color: $kpaAchatsHausse ? '#0f5132' : '#b02a37' }}>{$kpaAchatsEvol}</Box>
+            </Box>
+            <Box style={{ position: 'relative', overflow: 'hidden', background: 'linear-gradient(135deg, #ff9a3c, #d9580d)', color: '#fff', borderRadius: 14, boxShadow: '0 6px 16px rgba(20,30,60,.25)', padding: '14px 16px', minHeight: 128 }}>
+              <Box style={{ position: 'absolute', right: -28, top: -28, width: 110, height: 110, borderRadius: 55, background: 'rgba(255,255,255,.14)' }}></Box>
+              <Box style={{ position: 'absolute', right: 30, bottom: -40, width: 80, height: 80, borderRadius: 40, background: 'rgba(255,255,255,.08)' }}></Box>
+              <Box d="flex" style={{ justifyContent: 'space-between', alignItems: 'center', position: 'relative' }}>
+                <Box style={{ fontSize: 12, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', opacity: .9 }}>À recevoir sous 7 jours</Box>
+                <Box style={{ width: 40, height: 40, borderRadius: 20, background: 'rgba(255,255,255,.25)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>📦</Box>
+              </Box>
+              <Box style={{ fontSize: 32, fontWeight: 800, lineHeight: 1.2, marginTop: 4, position: 'relative' }}>{$kpaARecevoir}</Box>
+              <Box style={{ fontSize: 12, opacity: .9, position: 'relative' }}>{$kpaARecevoirDetail}</Box>
+            </Box>
+          </Box>
+        </>
+      ]]></viewer>
+    </field>
+    <field name="$alerteAchat" type="string" hidden="true"/>
+    <panel name="lvmeAlertesAchatPanel" showTitle="false" colSpan="12">
+      <button name="lvmeAlaRetardBtn" title=" " css="lvme-alerte-rouge" hidden="true" colSpan="3" onClick="action-lvme-achat-alerte-retard"/>
+      <button name="lvmeAlaBrouillonsBtn" title=" " css="lvme-alerte-jaune" hidden="true" colSpan="3" onClick="action-lvme-achat-alerte-brouillons"/>
+      <button name="lvmeAlaAEmbarquerBtn" title=" " css="lvme-alerte-jaune" hidden="true" colSpan="3" onClick="action-lvme-achat-alerte-a-embarquer"/>
+      <button name="lvmeAlaAucuneBtn" title="✔ Aucune alerte" css="lvme-alerte-vert" hidden="true" readonly="true" colSpan="3" onClick="action-lvme-achat-alerte-aucune"/>
+      <button name="lvmeAlaRetirerBtn" title="✖ Retirer le filtre alerte" css="lvme-alerte-gris" showIf="$alerteAchat" colSpan="3" onClick="action-lvme-achat-alerte-aucune"/>
+    </panel>
+  </panel>
   <panel name="rechercheAchatPanel" showTitle="false" colSpan="12">
     <panel name="filtreDatePanel" colSpan="3" itemSpan="12">
       <field name="$dateDu" title="Date du" type="date"/>
