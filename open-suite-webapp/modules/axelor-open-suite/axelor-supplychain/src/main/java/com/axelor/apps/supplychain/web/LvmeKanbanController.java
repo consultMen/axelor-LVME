@@ -107,7 +107,8 @@ public class LvmeKanbanController {
       }
       switch (etape) {
         case ARR_BROUILLON:
-          response.setError("Un arrivage ne revient pas en brouillon depuis le Kanban.");
+          response.setError(
+              "Un arrivage ne revient pas en brouillon depuis le Kanban (colonne reçue : " + cible + ").");
           break;
         case ARR_A_EMBARQUER:
         case ARR_FLOTTANT:
@@ -333,7 +334,11 @@ public class LvmeKanbanController {
       } else if (!(etape == CDE_DEVIS && devis)) {
         response.setError(
             num
-                + " : passage impossible depuis son étape actuelle. Possible : Devis -> En préparation"
+                + " : passage impossible depuis son étape actuelle (étape "
+                + (commande.getLvmeEtapeCde() != null ? commande.getLvmeEtapeCde() : "?")
+                + ", colonne reçue : "
+                + cible
+                + "). Possible : Devis -> En préparation"
                 + " (confirmer) <-> Expédiée -> Livrée (ouvre le BL), ou -> Annulée (ouvre la commande).");
       }
       response.setReload(true);
