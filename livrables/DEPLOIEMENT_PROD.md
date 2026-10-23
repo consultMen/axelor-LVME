@@ -1,14 +1,15 @@
-# Déploiement prod LVME — correctifs Kanban + filtres de suivi + suppression multiple (PROD_73)
+# Déploiement prod LVME — correctifs Kanban, filtres de suivi, corbeille des listes, rotation par transport (PROD_73, PROD_74)
 
 Déjà en prod : PROD_63 à PROD_72. Code à déployer : tout `main` (Java : lecture de la colonne d'arrivée des Kanban,
 annulation d'une commande d'achat par sa fiche, suppression de plusieurs lignes cochées).
 
 | Script | Contenu |
 |---|---|
-| PROD_73 | Filtres tout prêts des 3 écrans « Suivi des … » ; le bouton « Suivi » garde les filtres de la liste ; « Supprimer la sélection » dans les listes Commandes clients / Achats / Arrivages |
+| PROD_73 | Filtres tout prêts des 3 écrans « Suivi des … » ; le bouton « Suivi » garde les filtres de la liste ; corbeille dans l'en-tête des listes des écrans de recherche (contrôle brouillon / annulé pour commandes et arrivages) |
+| PROD_74 | Rotation des stocks par lot : filtre Transport (Camion = Europe, Bateau = International) et colonne Transport en couleur |
 
-Même procédure que ci-dessous (sauvegarde, clone, build, **script PROD_73 seul**, bascule, redémarrage) :
-`psql -U axelor -d axelor -v ON_ERROR_STOP=1 -f livrables/PROD_73_filtres_suivi_suppression.sql`
+Même procédure que ci-dessous (sauvegarde, clone, build, **scripts PROD_73 puis PROD_74**, bascule, redémarrage) :
+`for n in 73 74; do psql -U axelor -d axelor -v ON_ERROR_STOP=1 -f $(ls livrables/PROD_${n}_*.sql) || break; done`
 
 ---
 

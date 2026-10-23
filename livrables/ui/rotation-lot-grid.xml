@@ -6,6 +6,11 @@
   <field name="productName" width="220"/>
   <field name="supplierName" width="170"/>
   <field name="stockLocation" width="90"/>
+  <!-- LVME : transport du lot en couleur (Camion = Europe en vert, Bateau = International en bleu) -->
+  <field name="lvmeTransport" title="Transport" width="100">
+    <hilite background="success" if="lvmeTransport == 'Camion'"/>
+    <hilite background="info" if="lvmeTransport == 'Bateau'"/>
+  </field>
   <field name="lotNumber" width="100"/>
   <field name="arrivalNumber" title="N° Arrivage" width="90"/>
   <field name="origine" width="70"/>

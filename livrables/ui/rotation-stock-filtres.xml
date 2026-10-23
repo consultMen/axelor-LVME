@@ -11,6 +11,7 @@
       <field name="$fournisseurAu" title="au" type="many-to-one" target="com.axelor.apps.base.db.Partner" domain="self.isSupplier = true" canNew="false" canEdit="false" canView="false"/>
       <field name="$origine" title="Origine" type="string" selection="lvme.origine.select"/>
       <field name="$frigo" title="Frigo" type="many-to-one" target="com.axelor.apps.stock.db.StockLocation" domain="self.typeSelect = 1" canNew="false" canEdit="false" canView="false"/>
+      <field name="$transport" title="Transport" type="string" widget="RadioSelect" selection="lvme.rotation.transport.select"/>
     </panel>
     <panel name="filtreEntreePanel" colSpan="4" itemSpan="12" showIf="$affichage != 2">
       <field name="$entreeDu" title="Entrée du" type="date"/>
