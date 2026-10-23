@@ -1,3 +1,17 @@
+# Déploiement prod LVME — correctifs Kanban + filtres de suivi + suppression multiple (PROD_73)
+
+Déjà en prod : PROD_63 à PROD_72. Code à déployer : tout `main` (Java : lecture de la colonne d'arrivée des Kanban,
+annulation d'une commande d'achat par sa fiche, suppression de plusieurs lignes cochées).
+
+| Script | Contenu |
+|---|---|
+| PROD_73 | Filtres tout prêts des 3 écrans « Suivi des … » ; le bouton « Suivi » garde les filtres de la liste ; « Supprimer la sélection » dans les listes Commandes clients / Achats / Arrivages |
+
+Même procédure que ci-dessous (sauvegarde, clone, build, **script PROD_73 seul**, bascule, redémarrage) :
+`psql -U axelor -d axelor -v ON_ERROR_STOP=1 -f livrables/PROD_73_filtres_suivi_suppression.sql`
+
+---
+
 # Déploiement prod LVME — lot « Commandes clients GESCOM, Kanban, KPI » du 23/10/2026 (PROD_63 à PROD_72)
 
 Déjà en prod : jusqu'à PROD_62 (+ PROD_60, 61). **PROD_52, 53, 54 (fiches Produit / Fournisseur) NE PAS lancer.**
