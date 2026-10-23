@@ -1,3 +1,39 @@
+# Déploiement prod LVME — lot « Commandes clients GESCOM, Kanban, KPI » du 23/10/2026 (PROD_63 à PROD_72)
+
+Déjà en prod : jusqu'à PROD_62 (+ PROD_60, 61). **PROD_52, 53, 54 (fiches Produit / Fournisseur) NE PAS lancer.**
+Code à déployer : tout `main` (dernier commit affiché à l'étape 3). Tous les scripts sont relançables.
+**Ordre obligatoire : scripts AVANT le démarrage de Tomcat sur le nouveau code** (colonnes ajoutées par PROD_63, 67, 69, 71).
+
+| Script | Contenu |
+|---|---|
+| PROD_63 | Fiche Commande client copiée sur GESCOM (+ colonnes `lvme_preparateur`, `lvme_frais_congelation`, `lvme_promo`) ; tableau des lignes GESCOM |
+| PROD_64 | Fenêtre « Lignes Commandes » GESCOM (bloc bleu, ligne du bas, boutons, F1, valeurs du lot au choix du lot, Taux TVA, remise à zéro au changement d'article) |
+| PROD_65 | Bouton Historique Lot = « Liste des Mouvements de Stock » GESCOM |
+| PROD_66 | Bouton Sélect Arrivage = « Sélection Arrivage » GESCOM (le lot choisi remplit la ligne) |
+| PROD_67 | Statuts des BL : Brouillon, En cours de préparation, Flottant, Réalisé, Annulé (+ colonne `lvme_bl_flottant`) |
+| PROD_68 | Dupliquer / Supprimer (fiches et listes Commandes clients, Achats, Arrivages) ; KPI et alertes des commandes clients |
+| PROD_69 | Kanban « Suivi des arrivages » / « Suivi des commandes d'achat » (+ colonnes `lvme_kanban_seq`) |
+| PROD_70 | KPI et alertes de la liste des achats fournisseurs |
+| PROD_71 | Kanban « Suivi des commandes clients » (+ colonne `lvme_kanban_seq`) |
+| PROD_72 | Fiche Commande fournisseur : statuts Brouillon / À embarquer / Flottant / En stock / Annulée |
+
+Code (sans script) : champs calculés (valeurs du lot sur la ligne de commande client, Colis Entrés / Sortis, Colis
+Dispo, étapes et retards des Kanban), Java Dupliquer / Supprimer / déplacement des cartes Kanban, `css/lvme.css` et
+`js/lvme.js` (F1, Sélect Arrivage, couleurs des fenêtres GESCOM, boutons).
+
+1. **PC** : `git push origin main`
+2. **Serveur — sauvegarde** : `pg_dump -U axelor -Fc axelor > ~/sauvegarde_axelor_$(date +%F_%H%M).dump`
+3. `cd ~/src && rm -rf axelor-LVME axelor-version_app axelor-version_app.war && git clone https://github.com/consultMen/axelor-LVME.git && cd axelor-LVME && git log --oneline -1`
+4. **Build** : `cd ~/src/axelor-LVME/open-suite-webapp && chmod +x gradlew && ./gradlew war -x test`
+5. **Scripts, depuis `~/src/axelor-LVME`**, dans l'ordre, chacun avec `psql -U axelor -d axelor -v ON_ERROR_STOP=1 -f livrables/PROD_N_….sql` :
+   PROD_63, 64, 65, 66, 67, 68, 69, 70, 71, 72 (s'arrêter au premier ERREUR et me l'envoyer)
+6. **Bascule** : war de `open-suite-webapp/build/libs/`, dézippé, **`~/axelor-config.prod.properties` recopié**, ancien `ROOT` mis de côté (`mv`), nouveau `ROOT`, redémarrage Tomcat + nginx.
+7. **Ctrl + F5** ; vérifier : Listes Commandes Clients (KPI, alertes, Dupliquer / Supprimer, Suivi des commandes
+   clients), une commande client et une ligne (bloc bleu, F1, Sélect Arrivage, Historique Lot), un BL (statuts, Flottant),
+   liste des achats (KPI, Suivi des commandes d'achat), Arrivages (Suivi des arrivages, déplacement d'une carte).
+
+---
+
 # Déploiement prod LVME — lot « Détail des lignes GESCOM » du 15/10/2026 (PROD_50, 51, 55 à 59)
 
 Déjà en prod : PROD_37 à PROD_49. **PROD_52, 53, 54 (fiches Produit / Fournisseur) NE PAS lancer** : en attente des
