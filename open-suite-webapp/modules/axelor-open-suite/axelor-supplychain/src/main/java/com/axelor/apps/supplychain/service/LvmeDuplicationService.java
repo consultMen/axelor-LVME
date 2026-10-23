@@ -24,16 +24,19 @@ import com.google.inject.persist.Transactional;
 import java.time.LocalDate;
 
 /**
- * LVME : bouton « Dupliquer » des commandes clients, commandes d'achat et arrivages (fiche et liste),
- * comme la copie native d'Axelor (même client / fournisseur, mêmes lignes, nouvelle pièce en
- * brouillon avec un nouveau numéro), enregistrée pour être ouverte tout de suite.
+ * LVME : bouton « Dupliquer » des commandes clients, commandes d'achat et arrivages (fiche et
+ * liste), comme la copie native d'Axelor (même client / fournisseur, mêmes lignes, nouvelle pièce
+ * en brouillon avec un nouveau numéro), enregistrée pour être ouverte tout de suite.
  *
  * <ul>
  *   <li>commande client : lots et arrivages choisis sur les lignes non repris (à rechoisir) ;
- *   <li>commande d'achat et arrivage : chaque ligne copiée reçoit un nouveau lot « AE » si l'article
- *       génère ses lots à l'achat, sinon pas de lot (comme la duplication d'une ligne d'achat) ;
- *   <li>arrivage : repart « à embarquer », sans lien avec les lignes de la commande d'achat d'origine
- *       (pour ne pas recompter les quantités reçues de cette commande).
+ *   <li>commande d'achat et arrivage : chaque ligne copiée reçoit un nouveau lot « AE » si
+ *       l'article génère ses lots à l'achat, sinon pas de lot (comme la duplication d'une ligne
+ *       d'achat) ;
+ *   <li>la copie est toujours en Brouillon : commande client en devis brouillon, commande d'achat
+ *       et arrivage en brouillon sans nature (étape « Brouillon » des listes et des Kanban) ;
+ *   <li>arrivage : sans lien avec les lignes de la commande d'achat d'origine (pour ne pas
+ *       recompter les quantités reçues de cette commande).
  * </ul>
  */
 public class LvmeDuplicationService {
@@ -48,6 +51,7 @@ public class LvmeDuplicationService {
   @Transactional(rollbackOn = {Exception.class})
   public SaleOrder dupliquerCommandeClient(SaleOrder saleOrder) {
     SaleOrder copie = saleOrderRepository.copy(saleOrder, true);
+    copie.setStatusSelect(SaleOrderRepository.STATUS_DRAFT_QUOTATION);
     if (copie.getSaleOrderLineList() != null) {
       for (SaleOrderLine line : copie.getSaleOrderLineList()) {
         if (line.getSaleOrderLineLotList() != null) {
@@ -63,7 +67,11 @@ public class LvmeDuplicationService {
 
   @Transactional(rollbackOn = {Exception.class})
   public PurchaseOrder dupliquerCommandeAchat(PurchaseOrder purchaseOrder) throws AxelorException {
-    PurchaseOrder copie = purchaseOrderRepository.save(purchaseOrderRepository.copy(purchaseOrder, true));
+    PurchaseOrder copie = purchaseOrderRepository.copy(purchaseOrder, true);
+    copie.setStatusSelect(PurchaseOrderRepository.STATUS_DRAFT);
+    // l'étape de la commande suit la nature de son arrivage : la copie n'a pas encore d'arrivage
+    copie.setNature(null);
+    copie = purchaseOrderRepository.save(copie);
     if (copie.getPurchaseOrderLineList() != null) {
       LocalDate date = copie.getOrderDate() != null ? copie.getOrderDate() : LocalDate.now();
       for (PurchaseOrderLine line : copie.getPurchaseOrderLineList()) {
@@ -84,7 +92,8 @@ public class LvmeDuplicationService {
   @Transactional(rollbackOn = {Exception.class})
   public StockMove dupliquerArrivage(StockMove arrivage) throws AxelorException {
     StockMove copie = stockMoveRepository.copy(arrivage, true);
-    copie.setNature(Nature.EN_COURS_DE_PRODUCTION);
+    copie.setStatusSelect(StockMoveRepository.STATUS_DRAFT);
+    copie.setNature(Nature.DRAFT);
     copie.setOrigin(null);
     // sinon la nature de la copie serait recopiée sur la commande d'achat d'origine
     if (copie.getPurchaseOrderSet() != null) {
