@@ -25,6 +25,7 @@
     <panel name="filtreNaturePanel" colSpan="3" itemSpan="12">
       <field name="$natureAchat" showTitle="false" type="integer" widget="RadioSelect" selection="lvme.achat.nature.select"/>
       <button name="lancerRechercheBtn" title="Lancer la recherche" icon="search" css="btn-primary" onClick="action-lvme-achat-refresh"/>
+      <button name="lvmeKanbanBtn" title="Vue Kanban" icon="view_kanban" onClick="action-lvme-achat-kanban"/>
       <button name="nouvelleCommandeBtn" title="Nouvelle commande" icon="plus" onClick="action-lvme-achat-new"/>
     </panel>
   </panel>

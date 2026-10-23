@@ -1,0 +1,34 @@
+<kanban name="lvme-arrivage-kanban" title="Arrivages" model="com.axelor.apps.stock.db.StockMove" columnBy="lvmeEtapeArrivage"
+  sequenceBy="id" orderBy="estimatedDate" draggable="false" limit="30">
+  <!-- LVME : arrivages en colonnes par étape (Brouillon, À embarquer, Flottant, Réel, Annulé) ; l'étape change
+       par les boutons de la fiche (cartes non déplaçables) ; carte rouge si l'arrivée prévue est dépassée -->
+  <field name="stockMoveSeq"/>
+  <field name="partner"/>
+  <field name="shipmentMode"/>
+  <field name="bateau"/>
+  <field name="estimatedDate"/>
+  <field name="nbColisTotal"/>
+  <field name="poidsTotal"/>
+  <field name="exTaxTotal"/>
+  <field name="lvmeEnRetard"/>
+  <hilite color="danger" if="lvmeEnRetard"/>
+  <template><![CDATA[
+    <>
+      <Box d="flex" style={{ justifyContent: 'space-between', alignItems: 'center' }}>
+        <Box style={{ fontSize: 15, fontWeight: 700, color: '#0a3d91' }}>{stockMoveSeq}</Box>
+        {lvmeEnRetard && <Badge bg="danger">En retard</Badge>}
+      </Box>
+      <Box style={{ fontWeight: 600, color: '#1b2a4a' }}>{$fmt('partner')}</Box>
+      <Box style={{ fontSize: 12, color: '#555' }}>
+        {shipmentMode && ((shipmentMode.name == 'Bateau' ? '🚢 ' : '🚚 ') + $fmt('shipmentMode'))}
+        {bateau && (' · ' + $fmt('bateau'))}
+      </Box>
+      <Box style={{ fontSize: 12, color: '#555' }}>Arrivée prévue : {$fmt('estimatedDate')}</Box>
+      <Box d="flex" style={{ gap: 10, fontSize: 12, marginTop: 4, flexWrap: 'wrap' }}>
+        <Box>📦 {$fmt('nbColisTotal')} colis</Box>
+        <Box>⚖ {$fmt('poidsTotal')} kg</Box>
+        <Box style={{ fontWeight: 600 }}>{$fmt('exTaxTotal')} € HT</Box>
+      </Box>
+    </>
+  ]]></template>
+</kanban>

@@ -121,15 +121,29 @@
     <decimal name="lvmeCouvert" title="Couvert" precision="20" scale="4" nullable="true"/>
     <decimal name="lvmeFlottant" title="Flottant" precision="20" scale="4" nullable="true"/>
     <decimal name="lvmeReel" title="Réel" precision="20" scale="4" nullable="true"/>
-    <!-- LVME : statuts d'un BL (livraison client) : Brouillon, En cours de préparation, Flottant (parti chez le
-      transporteur, bouton Flottant), Réalisé, Annulé ; le statut Axelor (statusSelect) ne change pas -->
+    <!-- LVME : statuts d'un BL (livraison client) : Brouillon, En cours de préparation, Flottant (parti
+      chez le transporteur, bouton Flottant), Réalisé, Annulé ; le statut Axelor (statusSelect) ne change pas -->
     <boolean name="lvmeBlFlottant" title="Flottant (BL)"/>
-    <integer name="lvmeEtapeBl" title="Statut" selection="lvme.bl.etape.select" formula="true">
+    <integer name="lvmeEtapeBl" title="Statut" selection="lvme.bl.etape.select"
+      formula="true">
       <![CDATA[
       (CASE status_select WHEN 1 THEN 1 WHEN 2 THEN (CASE WHEN COALESCE(lvme_bl_flottant, false) THEN 3 ELSE 2 END)
         WHEN 3 THEN 4 WHEN 4 THEN 5 END)
       ]]>
     </integer>
+    <!-- LVME : colonne du Kanban des arrivages (mêmes étapes que la barre de la fiche arrivage) : 0 Brouillon,
+      1 À embarquer, 2 Flottant, 3 Réel, 4 Annulé -->
+    <integer name="lvmeEtapeArrivage" title="Étape" selection="lvme.arrivage.etape.select" formula="true">
+      <![CDATA[
+      (CASE WHEN status_select = 4 THEN 4 WHEN status_select = 3 THEN 3 ELSE COALESCE(nature, 0) END)
+      ]]>
+    </integer>
+    <!-- LVME : arrivée prévue dépassée et arrivage pas encore réel (carte en rouge dans le Kanban) -->
+    <boolean name="lvmeEnRetard" title="En retard" formula="true">
+      <![CDATA[
+      (estimated_date < date(now()) AND status_select IN (1, 2) AND COALESCE(nature, 0) NOT IN (3, 4))
+      ]]>
+    </boolean>
     <boolean name="lvmeAEmbarquer" title="À embarquer" formula="true">
       <![CDATA[
       nature = 1

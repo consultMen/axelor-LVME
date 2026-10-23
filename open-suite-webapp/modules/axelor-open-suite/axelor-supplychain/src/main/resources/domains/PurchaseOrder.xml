@@ -38,6 +38,20 @@
       nature = 1
       ]]>
     </boolean>
+    <!-- LVME : colonne du Kanban des commandes d'achat : 1 Brouillon / demandée, 2 Validée (à embarquer),
+      3 Flottant, 4 Réceptionnée, 5 Annulée -->
+    <integer name="lvmeEtapeAchat" title="Étape" selection="lvme.achat.etape.select" formula="true">
+      <![CDATA[
+      (CASE WHEN status_select = 5 OR nature = 4 THEN 5 WHEN status_select = 4 OR nature = 3 THEN 4
+        WHEN nature = 2 THEN 3 WHEN status_select = 3 THEN 2 ELSE 1 END)
+      ]]>
+    </integer>
+    <!-- LVME : réception prévue dépassée et pas encore réceptionnée (carte en rouge dans le Kanban) -->
+    <boolean name="lvmeEnRetard" title="En retard" formula="true">
+      <![CDATA[
+      (estimated_receipt_date < date(now()) AND status_select IN (1, 2, 3) AND COALESCE(nature, 0) NOT IN (3, 4))
+      ]]>
+    </boolean>
     <many-to-one name="freightCarrierMode"
       ref="com.axelor.apps.stock.db.FreightCarrierMode"/>
 
