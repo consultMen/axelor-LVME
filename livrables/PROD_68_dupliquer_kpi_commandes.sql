@@ -64,7 +64,7 @@ UPDATE meta_view SET xml = regexp_replace(xml, '</grid>\s*$', '  ' || '<button n
   updated_on = now(), version = COALESCE(version, 0) + 1
 WHERE name = 'lvme-arrivage-grid' AND module IS NULL AND xml NOT LIKE '%lvmeDupliquerBtn%';
 
-DELETE FROM meta_action WHERE module IS NULL AND name IN ('action-lvme-dupliquer-cde-client', 'action-lvme-dupliquer-cde-achat', 'action-lvme-dupliquer-arrivage', 'action-lvme-cde-client-kpi');
+DELETE FROM meta_action WHERE module IS NULL AND name IN ('action-lvme-dupliquer-cde-client', 'action-lvme-dupliquer-cde-achat', 'action-lvme-dupliquer-arrivage', 'action-lvme-cde-client-kpi', 'action-lvme-cde-client-alerte-retard', 'action-lvme-cde-client-alerte-marge-negative', 'action-lvme-cde-client-alerte-marge-faible', 'action-lvme-cde-client-alerte-devis', 'action-lvme-cde-client-alerte-aucune', 'action-lvme-cde-client-refresh', 'action-lvme-cde-client-dashlet');
 INSERT INTO meta_action (id, version, created_on, name, type, model, xml, home, is_custom, priority) VALUES
 (nextval('meta_action_seq'), 0, now(), 'action-lvme-dupliquer-cde-client', 'action-method', NULL,
 '<action-method name="action-lvme-dupliquer-cde-client">
@@ -96,7 +96,88 @@ INSERT INTO meta_action (id, version, created_on, name, type, model, xml, home, 
   <attribute name="value" for="$alMargeFaible" expr="eval: def d1 = __date__.withDayOfMonth(1); def l = __repo__(com.axelor.apps.sale.db.SaleOrder).all().filter(''self.template = false AND self.statusSelect IN (3, 4) AND self.orderDate BETWEEN ?1 AND ?2'', d1, __date__).fetch(); def ca = ((l.collect { it.exTaxTotal ?: 0 }.sum() ?: 0) as BigDecimal); def mg = ((l.collect { it.totalGrossMargin ?: 0 }.sum() ?: 0) as BigDecimal); def pct = ca.signum() != 0 ? (mg * 100 / ca).setScale(1, java.math.RoundingMode.HALF_UP) : null; def f = java.text.NumberFormat.getIntegerInstance(java.util.Locale.FRANCE); pct != null &amp;&amp; pct &lt; 10 ? ''Marge du mois sous 10 %'' : null"/>
   <attribute name="value" for="$alDevis" expr="eval: def n = __repo__(com.axelor.apps.sale.db.SaleOrder).all().filter(''self.template = false AND self.statusSelect IN (1, 2) AND self.creationDate &lt; ?1'', __date__.minusDays(15)).count(); n &gt; 0 ? n + '' devis de plus de 15 jours non confirmé(s)'' : null"/>
   <attribute name="value" for="$alAucune" expr="eval: [{ -> def n = __repo__(com.axelor.apps.sale.db.SaleOrder).all().filter(''self.template = false AND self.statusSelect = 3 AND (self.deliveryState IS NULL OR self.deliveryState != 3) AND self.estimatedDeliveryDate &lt; ?1'', __date__).count(); n &gt; 0 ? n + '' commande(s) en retard de livraison'' : null }, { -> def n = __repo__(com.axelor.apps.sale.db.SaleOrder).all().filter(''self.template = false AND self.statusSelect = 3 AND (self.deliveryState IS NULL OR self.deliveryState != 3) AND self.totalGrossMargin &lt; 0'').count(); n &gt; 0 ? n + '' commande(s) en cours à marge négative'' : null }, { -> def d1 = __date__.withDayOfMonth(1); def l = __repo__(com.axelor.apps.sale.db.SaleOrder).all().filter(''self.template = false AND self.statusSelect IN (3, 4) AND self.orderDate BETWEEN ?1 AND ?2'', d1, __date__).fetch(); def ca = ((l.collect { it.exTaxTotal ?: 0 }.sum() ?: 0) as BigDecimal); def mg = ((l.collect { it.totalGrossMargin ?: 0 }.sum() ?: 0) as BigDecimal); def pct = ca.signum() != 0 ? (mg * 100 / ca).setScale(1, java.math.RoundingMode.HALF_UP) : null; def f = java.text.NumberFormat.getIntegerInstance(java.util.Locale.FRANCE); pct != null &amp;&amp; pct &lt; 10 ? ''Marge du mois sous 10 %'' : null }, { -> def n = __repo__(com.axelor.apps.sale.db.SaleOrder).all().filter(''self.template = false AND self.statusSelect IN (1, 2) AND self.creationDate &lt; ?1'', __date__.minusDays(15)).count(); n &gt; 0 ? n + '' devis de plus de 15 jours non confirmé(s)'' : null }].every { it() == null } ? ''Aucune alerte'' : null"/>
-</action-attrs>', false, false, 0);
+  <attribute name="title" for="lvmeAlRetardBtn" expr="eval: ''⚠ '' + ({ -> def n = __repo__(com.axelor.apps.sale.db.SaleOrder).all().filter(''self.template = false AND self.statusSelect = 3 AND (self.deliveryState IS NULL OR self.deliveryState != 3) AND self.estimatedDeliveryDate &lt; ?1'', __date__).count(); n &gt; 0 ? n + '' commande(s) en retard de livraison'' : null }() ?: '''')"/>
+  <attribute name="hidden" for="lvmeAlRetardBtn" expr="eval: { -> def n = __repo__(com.axelor.apps.sale.db.SaleOrder).all().filter(''self.template = false AND self.statusSelect = 3 AND (self.deliveryState IS NULL OR self.deliveryState != 3) AND self.estimatedDeliveryDate &lt; ?1'', __date__).count(); n &gt; 0 ? n + '' commande(s) en retard de livraison'' : null }() == null"/>
+  <attribute name="title" for="lvmeAlMargeNegBtn" expr="eval: ''⚠ '' + ({ -> def n = __repo__(com.axelor.apps.sale.db.SaleOrder).all().filter(''self.template = false AND self.statusSelect = 3 AND (self.deliveryState IS NULL OR self.deliveryState != 3) AND self.totalGrossMargin &lt; 0'').count(); n &gt; 0 ? n + '' commande(s) en cours à marge négative'' : null }() ?: '''')"/>
+  <attribute name="hidden" for="lvmeAlMargeNegBtn" expr="eval: { -> def n = __repo__(com.axelor.apps.sale.db.SaleOrder).all().filter(''self.template = false AND self.statusSelect = 3 AND (self.deliveryState IS NULL OR self.deliveryState != 3) AND self.totalGrossMargin &lt; 0'').count(); n &gt; 0 ? n + '' commande(s) en cours à marge négative'' : null }() == null"/>
+  <attribute name="title" for="lvmeAlMargeFaibleBtn" expr="eval: ''⚠ '' + ({ -> def d1 = __date__.withDayOfMonth(1); def l = __repo__(com.axelor.apps.sale.db.SaleOrder).all().filter(''self.template = false AND self.statusSelect IN (3, 4) AND self.orderDate BETWEEN ?1 AND ?2'', d1, __date__).fetch(); def ca = ((l.collect { it.exTaxTotal ?: 0 }.sum() ?: 0) as BigDecimal); def mg = ((l.collect { it.totalGrossMargin ?: 0 }.sum() ?: 0) as BigDecimal); def pct = ca.signum() != 0 ? (mg * 100 / ca).setScale(1, java.math.RoundingMode.HALF_UP) : null; def f = java.text.NumberFormat.getIntegerInstance(java.util.Locale.FRANCE); pct != null &amp;&amp; pct &lt; 10 ? ''Marge du mois sous 10 %'' : null }() ?: '''')"/>
+  <attribute name="hidden" for="lvmeAlMargeFaibleBtn" expr="eval: { -> def d1 = __date__.withDayOfMonth(1); def l = __repo__(com.axelor.apps.sale.db.SaleOrder).all().filter(''self.template = false AND self.statusSelect IN (3, 4) AND self.orderDate BETWEEN ?1 AND ?2'', d1, __date__).fetch(); def ca = ((l.collect { it.exTaxTotal ?: 0 }.sum() ?: 0) as BigDecimal); def mg = ((l.collect { it.totalGrossMargin ?: 0 }.sum() ?: 0) as BigDecimal); def pct = ca.signum() != 0 ? (mg * 100 / ca).setScale(1, java.math.RoundingMode.HALF_UP) : null; def f = java.text.NumberFormat.getIntegerInstance(java.util.Locale.FRANCE); pct != null &amp;&amp; pct &lt; 10 ? ''Marge du mois sous 10 %'' : null }() == null"/>
+  <attribute name="title" for="lvmeAlDevisBtn" expr="eval: ''⏳ '' + ({ -> def n = __repo__(com.axelor.apps.sale.db.SaleOrder).all().filter(''self.template = false AND self.statusSelect IN (1, 2) AND self.creationDate &lt; ?1'', __date__.minusDays(15)).count(); n &gt; 0 ? n + '' devis de plus de 15 jours non confirmé(s)'' : null }() ?: '''')"/>
+  <attribute name="hidden" for="lvmeAlDevisBtn" expr="eval: { -> def n = __repo__(com.axelor.apps.sale.db.SaleOrder).all().filter(''self.template = false AND self.statusSelect IN (1, 2) AND self.creationDate &lt; ?1'', __date__.minusDays(15)).count(); n &gt; 0 ? n + '' devis de plus de 15 jours non confirmé(s)'' : null }() == null"/>
+  <attribute name="hidden" for="lvmeAlAucuneBtn" expr="eval: { -> [{ -> def n = __repo__(com.axelor.apps.sale.db.SaleOrder).all().filter(''self.template = false AND self.statusSelect = 3 AND (self.deliveryState IS NULL OR self.deliveryState != 3) AND self.estimatedDeliveryDate &lt; ?1'', __date__).count(); n &gt; 0 ? n + '' commande(s) en retard de livraison'' : null }, { -> def n = __repo__(com.axelor.apps.sale.db.SaleOrder).all().filter(''self.template = false AND self.statusSelect = 3 AND (self.deliveryState IS NULL OR self.deliveryState != 3) AND self.totalGrossMargin &lt; 0'').count(); n &gt; 0 ? n + '' commande(s) en cours à marge négative'' : null }, { -> def d1 = __date__.withDayOfMonth(1); def l = __repo__(com.axelor.apps.sale.db.SaleOrder).all().filter(''self.template = false AND self.statusSelect IN (3, 4) AND self.orderDate BETWEEN ?1 AND ?2'', d1, __date__).fetch(); def ca = ((l.collect { it.exTaxTotal ?: 0 }.sum() ?: 0) as BigDecimal); def mg = ((l.collect { it.totalGrossMargin ?: 0 }.sum() ?: 0) as BigDecimal); def pct = ca.signum() != 0 ? (mg * 100 / ca).setScale(1, java.math.RoundingMode.HALF_UP) : null; def f = java.text.NumberFormat.getIntegerInstance(java.util.Locale.FRANCE); pct != null &amp;&amp; pct &lt; 10 ? ''Marge du mois sous 10 %'' : null }, { -> def n = __repo__(com.axelor.apps.sale.db.SaleOrder).all().filter(''self.template = false AND self.statusSelect IN (1, 2) AND self.creationDate &lt; ?1'', __date__.minusDays(15)).count(); n &gt; 0 ? n + '' devis de plus de 15 jours non confirmé(s)'' : null }].every { it() == null } ? ''Aucune alerte'' : null }() == null"/>
+</action-attrs>', false, false, 0),
+(nextval('meta_action_seq'), 0, now(), 'action-lvme-cde-client-alerte-retard', 'action-attrs', NULL,
+'<action-attrs name="action-lvme-cde-client-alerte-retard">
+  <attribute name="value" for="$alerte" expr="eval: ''retard''"/>
+  <attribute name="refresh" for="commandesDashlet" expr="eval: true"/>
+</action-attrs>', false, false, 0),
+(nextval('meta_action_seq'), 0, now(), 'action-lvme-cde-client-alerte-marge-negative', 'action-attrs', NULL,
+'<action-attrs name="action-lvme-cde-client-alerte-marge-negative">
+  <attribute name="value" for="$alerte" expr="eval: ''marge-negative''"/>
+  <attribute name="refresh" for="commandesDashlet" expr="eval: true"/>
+</action-attrs>', false, false, 0),
+(nextval('meta_action_seq'), 0, now(), 'action-lvme-cde-client-alerte-marge-faible', 'action-attrs', NULL,
+'<action-attrs name="action-lvme-cde-client-alerte-marge-faible">
+  <attribute name="value" for="$alerte" expr="eval: ''marge-faible''"/>
+  <attribute name="refresh" for="commandesDashlet" expr="eval: true"/>
+</action-attrs>', false, false, 0),
+(nextval('meta_action_seq'), 0, now(), 'action-lvme-cde-client-alerte-devis', 'action-attrs', NULL,
+'<action-attrs name="action-lvme-cde-client-alerte-devis">
+  <attribute name="value" for="$alerte" expr="eval: ''devis''"/>
+  <attribute name="refresh" for="commandesDashlet" expr="eval: true"/>
+</action-attrs>', false, false, 0),
+(nextval('meta_action_seq'), 0, now(), 'action-lvme-cde-client-alerte-aucune', 'action-attrs', NULL,
+'<action-attrs name="action-lvme-cde-client-alerte-aucune">
+  <attribute name="value" for="$alerte" expr="eval: null"/>
+  <attribute name="refresh" for="commandesDashlet" expr="eval: true"/>
+</action-attrs>', false, false, 0),
+(nextval('meta_action_seq'), 0, now(), 'action-lvme-cde-client-refresh', 'action-attrs', NULL,
+'<action-attrs name="action-lvme-cde-client-refresh">
+  <attribute name="value" for="$alerte" expr="eval: null"/>
+  <attribute name="refresh" for="commandesDashlet" expr="eval: true"/>
+</action-attrs>', false, false, 0),
+(nextval('meta_action_seq'), 0, now(), 'action-lvme-cde-client-dashlet', 'action-view', 'com.axelor.apps.sale.db.SaleOrder',
+'<action-view name="action-lvme-cde-client-dashlet" title="Commandes clients" model="com.axelor.apps.sale.db.SaleOrder">
+  <view type="grid" name="lvme-commande-client-grid"/>
+  <view type="form" name="sale-order-form"/>
+  <view-param name="popup" value="true"/>
+  <view-param name="popup-save" value="true"/>
+  <view-param name="popup.maximized" value="true"/>
+  <!-- sans alerte choisie : filtres de l''écran ; avec une alerte (bouton sous les KPI) : seulement les commandes
+       en alerte, sans les autres filtres -->
+  <domain>self.template = false AND (
+    (:_alerte = '''' AND self.statusSelect IN (3, 4)
+    AND ((:_etat = 1 AND self.statusSelect = 3 AND self.deliveryState != 3 AND (self.isReservation IS NULL OR self.isReservation = false))
+         OR (:_etat = 2 AND (self.statusSelect = 4 OR self.deliveryState = 3)) OR :_etat = 3
+         OR (:_etat = 4 AND self.isReservation = true AND self.statusSelect = 3))
+    AND (:_client = 0 OR self.clientPartner.id = :_client)
+    AND (:_commercial = 0 OR self.commercial.id = :_commercial)
+    AND (:_dateFiltre = false OR COALESCE(self.orderDate, self.creationDate) BETWEEN :_dateDu AND :_dateAu)
+    AND (:_livFiltre = false OR self.estimatedDeliveryDate BETWEEN :_livDu AND :_livAu))
+    OR (:_alerte = ''retard'' AND self.statusSelect = 3 AND (self.deliveryState IS NULL OR self.deliveryState != 3)
+        AND self.estimatedDeliveryDate &lt; :_aujourdhui)
+    OR (:_alerte = ''marge-negative'' AND self.statusSelect = 3 AND (self.deliveryState IS NULL OR self.deliveryState != 3)
+        AND self.totalGrossMargin &lt; 0)
+    OR (:_alerte = ''marge-faible'' AND self.statusSelect IN (3, 4) AND self.orderDate BETWEEN :_debutMois AND :_aujourdhui
+        AND self.marginRate &lt; 10)
+    OR (:_alerte = ''devis'' AND self.statusSelect IN (1, 2) AND self.creationDate &lt; :_dateDevis))</domain>
+  <context name="_alerte" expr="eval: alerte ?: ''''"/>
+  <context name="_aujourdhui" expr="eval: __date__"/>
+  <context name="_debutMois" expr="eval: __date__.withDayOfMonth(1)"/>
+  <context name="_dateDevis" expr="eval: __date__.minusDays(15)"/>
+  <context name="_etat" expr="eval: (etatCommande ?: 1) as Integer"/>
+  <context name="_client" expr="eval: (client?.id ?: 0) as Long"/>
+  <context name="_commercial" expr="eval: (commercialFiltre?.id ?: 0) as Long"/>
+  <context name="_dateFiltre" expr="eval: dateDu != null || dateAu != null"/>
+  <context name="_dateDu" expr="eval: dateDu ? java.time.LocalDate.parse(dateDu.toString().substring(0, 10)) : java.time.LocalDate.of(1900, 1, 1)"/>
+  <context name="_dateAu" expr="eval: dateAu ? java.time.LocalDate.parse(dateAu.toString().substring(0, 10)) : java.time.LocalDate.of(2999, 12, 31)"/>
+  <context name="_livFiltre" expr="eval: livraisonDu != null || livraisonAu != null"/>
+  <context name="_livDu" expr="eval: livraisonDu ? java.time.LocalDate.parse(livraisonDu.toString().substring(0, 10)) : java.time.LocalDate.of(1900, 1, 1)"/>
+  <context name="_livAu" expr="eval: livraisonAu ? java.time.LocalDate.parse(livraisonAu.toString().substring(0, 10)) : java.time.LocalDate.of(2999, 12, 31)"/>
+  <context name="_internalUser" expr="eval: __user__.id"/>
+  <context name="_template" expr="eval: false"/>
+  <context name="todayDate" expr="eval: __config__.date"/>
+</action-view>', false, false, 0);
 
 COMMIT;
 

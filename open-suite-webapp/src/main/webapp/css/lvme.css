@@ -337,3 +337,33 @@
 [class*="_modal-content"]:has(.lvme-gescom-fond) [class*="_modal-footer"] {
   background-color: #cddff7 !important;
 }
+/* boutons d'alerte sous les KPI des commandes clients : pastilles cliquables (filtrent la liste) */
+.lvme-alerte-rouge, .lvme-alerte-rouge button,
+.lvme-alerte-jaune, .lvme-alerte-jaune button,
+.lvme-alerte-vert, .lvme-alerte-vert button,
+.lvme-alerte-gris, .lvme-alerte-gris button {
+  border-radius: 18px !important;
+  font-weight: 600 !important;
+  box-shadow: 0 2px 6px rgba(20, 30, 60, .12);
+}
+.lvme-alerte-rouge, .lvme-alerte-rouge button {
+  background-color: #f8d7da !important;
+  color: #842029 !important;
+  border: 1px solid #f1aeb5 !important;
+}
+.lvme-alerte-jaune, .lvme-alerte-jaune button {
+  background-color: #fff3cd !important;
+  color: #664d03 !important;
+  border: 1px solid #ffe69c !important;
+}
+.lvme-alerte-vert, .lvme-alerte-vert button {
+  background-color: #d1e7dd !important;
+  color: #0f5132 !important;
+  border: 1px solid #a3cfbb !important;
+  opacity: 1 !important;
+}
+.lvme-alerte-gris, .lvme-alerte-gris button {
+  background-color: #fff !important;
+  color: #495057 !important;
+  border: 1px solid #ced4da !important;
+}

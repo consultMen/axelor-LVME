@@ -65,17 +65,18 @@
               <Box style={{ fontSize: 12, opacity: .9, position: 'relative' }}>{$kpiALivrerDetail}</Box>
             </Box>
           </Box>
-          <Box d="flex" style={{ flexWrap: 'wrap', gap: 8, marginTop: 12, alignItems: 'center', background: '#fff', borderRadius: 12, padding: '8px 12px', boxShadow: '0 2px 8px rgba(20,30,60,.12)' }}>
-            <Box style={{ fontSize: 13, fontWeight: 700, color: '#1b2a4a', marginRight: 4 }}>Alertes :</Box>
-            {$alRetard && <Box style={{ background: '#f8d7da', color: '#842029', borderRadius: 14, padding: '4px 12px', fontSize: 13, fontWeight: 600 }}>⚠ {$alRetard}</Box>}
-            {$alMargeNeg && <Box style={{ background: '#f8d7da', color: '#842029', borderRadius: 14, padding: '4px 12px', fontSize: 13, fontWeight: 600 }}>⚠ {$alMargeNeg}</Box>}
-            {$alMargeFaible && <Box style={{ background: '#fff3cd', color: '#664d03', borderRadius: 14, padding: '4px 12px', fontSize: 13, fontWeight: 600 }}>⚠ {$alMargeFaible}</Box>}
-            {$alDevis && <Box style={{ background: '#fff3cd', color: '#664d03', borderRadius: 14, padding: '4px 12px', fontSize: 13, fontWeight: 600 }}>⏳ {$alDevis}</Box>}
-            {$alAucune && <Box style={{ background: '#d1e7dd', color: '#0f5132', borderRadius: 14, padding: '4px 12px', fontSize: 13, fontWeight: 600 }}>✔ {$alAucune}</Box>}
-          </Box>
         </>
       ]]></viewer>
     </field>
+    <field name="$alerte" type="string" hidden="true"/>
+    <panel name="lvmeAlertesPanel" showTitle="false" colSpan="12">
+      <button name="lvmeAlRetardBtn" title=" " css="lvme-alerte-rouge" hidden="true" colSpan="3" onClick="action-lvme-cde-client-alerte-retard"/>
+      <button name="lvmeAlMargeNegBtn" title=" " css="lvme-alerte-rouge" hidden="true" colSpan="3" onClick="action-lvme-cde-client-alerte-marge-negative"/>
+      <button name="lvmeAlMargeFaibleBtn" title=" " css="lvme-alerte-jaune" hidden="true" colSpan="3" onClick="action-lvme-cde-client-alerte-marge-faible"/>
+      <button name="lvmeAlDevisBtn" title=" " css="lvme-alerte-jaune" hidden="true" colSpan="3" onClick="action-lvme-cde-client-alerte-devis"/>
+      <button name="lvmeAlAucuneBtn" title="✔ Aucune alerte" css="lvme-alerte-vert" hidden="true" readonly="true" colSpan="3"/>
+      <button name="lvmeAlRetirerBtn" title="✖ Retirer le filtre alerte" css="lvme-alerte-gris" showIf="$alerte" colSpan="3" onClick="action-lvme-cde-client-alerte-aucune"/>
+    </panel>
   </panel>
   <panel name="rechercheCdePanel" title="Recherche" colSpan="12">
     <panel name="filtreEtatPanel" colSpan="3" itemSpan="12">

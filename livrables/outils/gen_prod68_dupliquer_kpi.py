@@ -52,6 +52,11 @@ KPI = [
      "n &gt; 0 ? n + ' devis de plus de 15 jours non confirmé(s)' : null" % SO),
 ]
 ALERTES = ['$alRetard', '$alMargeNeg', '$alMargeFaible', '$alDevis']
+# boutons d'alerte : (valeur, bouton, style, code du filtre de la liste)
+BOUTONS = [('$alRetard', 'lvmeAlRetardBtn', 'lvme-alerte-rouge', 'retard'),
+           ('$alMargeNeg', 'lvmeAlMargeNegBtn', 'lvme-alerte-rouge', 'marge-negative'),
+           ('$alMargeFaible', 'lvmeAlMargeFaibleBtn', 'lvme-alerte-jaune', 'marge-faible'),
+           ('$alDevis', 'lvmeAlDevisBtn', 'lvme-alerte-jaune', 'devis')]
 # « Aucune alerte » : calculé en dernier, avec les mêmes requêtes que chaque alerte
 KPI.append(('$alAucune', '[' + ', '.join('{ -> %s }' % e for k, e in KPI if k in ALERTES)
             + "].every { it() == null } ? 'Aucune alerte' : null"))
@@ -100,18 +105,17 @@ panneau = ('  <!-- LVME : KPI et alertes des commandes clients (calculés à l\'
                    ": 'linear-gradient(135deg, #8a5cf0, #4b2a9e)'", '📈', '$kpiMarge', '$kpiMargeDetail')
            + tuile("À livrer aujourd'hui", "'linear-gradient(135deg, #ff9a3c, #d9580d)'", '🚚', '$kpiALivrer', '$kpiALivrerDetail')
            + '          </Box>\n'
-           "          <Box d=\"flex\" style={{ flexWrap: 'wrap', gap: 8, marginTop: 12, alignItems: 'center', background: '#fff', "
-           "borderRadius: 12, padding: '8px 12px', boxShadow: '0 2px 8px rgba(20,30,60,.12)' }}>\n"
-           "            <Box style={{ fontSize: 13, fontWeight: 700, color: '#1b2a4a', marginRight: 4 }}>Alertes :</Box>\n"
-           + pastille('$alRetard', '#f8d7da', '#842029', '⚠')
-           + pastille('$alMargeNeg', '#f8d7da', '#842029', '⚠')
-           + pastille('$alMargeFaible', '#fff3cd', '#664d03', '⚠')
-           + pastille('$alDevis', '#fff3cd', '#664d03', '⏳')
-           + pastille('$alAucune', '#d1e7dd', '#0f5132', '✔')
-           + '          </Box>\n'
            '        </>\n'
            '      ]]></viewer>\n'
            '    </field>\n'
+           '    <field name="$alerte" type="string" hidden="true"/>\n'
+           '    <panel name="lvmeAlertesPanel" showTitle="false" colSpan="12">\n'
+           + ''.join('      <button name="%s" title=" " css="%s" hidden="true" colSpan="3" onClick="%s"/>\n'
+                     % (btn, css, 'action-lvme-cde-client-alerte-' + code) for k, btn, css, code in BOUTONS)
+           + '      <button name="lvmeAlAucuneBtn" title="✔ Aucune alerte" css="lvme-alerte-vert" hidden="true" readonly="true" colSpan="3"/>\n'
+           '      <button name="lvmeAlRetirerBtn" title="✖ Retirer le filtre alerte" css="lvme-alerte-gris" showIf="$alerte" colSpan="3"'
+           ' onClick="action-lvme-cde-client-alerte-aucune"/>\n'
+           '    </panel>\n'
            '  </panel>\n')
 
 p = os.path.join(UI, 'commande-client-search-form.xml')
@@ -126,8 +130,17 @@ i = f.index('  <panel name="rechercheCdePanel"')
 f = f[:i] + panneau + f[i:]
 open(p, 'w', encoding='utf-8', newline='\n').write(f)
 
+EXPR = dict(KPI)
+# boutons d'alerte : titre = texte de l'alerte, caché s'il n'y a pas d'alerte
+ATTR_BTN = ''.join(
+    '  <attribute name="title" for="%s" expr="eval: \'%s \' + ({ -> %s }() ?: \'\')"/>\n'
+    '  <attribute name="hidden" for="%s" expr="eval: { -> %s }() == null"/>\n'
+    % (btn, icone, EXPR[k], btn, EXPR[k])
+    for (k, btn, css, code), icone in zip(BOUTONS, ['⚠', '⚠', '⚠', '⏳']))
+ATTR_BTN += '  <attribute name="hidden" for="lvmeAlAucuneBtn" expr="eval: { -> %s }() == null"/>\n' % EXPR['$alAucune']
 kpi_xml = ('<action-attrs name="action-lvme-cde-client-kpi">\n'
            + ''.join('  <attribute name="value" for="%s" expr="eval: %s"/>\n' % (k, e) for k, e in KPI)
+           + ATTR_BTN
            + '</action-attrs>')
 
 
@@ -159,13 +172,71 @@ maj_listes = ''.join(
     "  updated_on = now(), version = COALESCE(version, 0) + 1\n"
     "WHERE name = '%s' AND module IS NULL AND xml NOT LIKE '%%lvmeDupliquerBtn%%';\n"
     % (q(BTN_LISTE % a), n) for n, a in listes)
-noms = [m for m, _ in methodes] + ['action-lvme-cde-client-kpi']
+DASHLET = """<action-view name="action-lvme-cde-client-dashlet" title="Commandes clients" model="com.axelor.apps.sale.db.SaleOrder">
+  <view type="grid" name="lvme-commande-client-grid"/>
+  <view type="form" name="sale-order-form"/>
+  <view-param name="popup" value="true"/>
+  <view-param name="popup-save" value="true"/>
+  <view-param name="popup.maximized" value="true"/>
+  <!-- sans alerte choisie : filtres de l'écran ; avec une alerte (bouton sous les KPI) : seulement les commandes
+       en alerte, sans les autres filtres -->
+  <domain>self.template = false AND (
+    (:_alerte = '' AND self.statusSelect IN (3, 4)
+    AND ((:_etat = 1 AND self.statusSelect = 3 AND self.deliveryState != 3 AND (self.isReservation IS NULL OR self.isReservation = false))
+         OR (:_etat = 2 AND (self.statusSelect = 4 OR self.deliveryState = 3)) OR :_etat = 3
+         OR (:_etat = 4 AND self.isReservation = true AND self.statusSelect = 3))
+    AND (:_client = 0 OR self.clientPartner.id = :_client)
+    AND (:_commercial = 0 OR self.commercial.id = :_commercial)
+    AND (:_dateFiltre = false OR COALESCE(self.orderDate, self.creationDate) BETWEEN :_dateDu AND :_dateAu)
+    AND (:_livFiltre = false OR self.estimatedDeliveryDate BETWEEN :_livDu AND :_livAu))
+    OR (:_alerte = 'retard' AND self.statusSelect = 3 AND (self.deliveryState IS NULL OR self.deliveryState != 3)
+        AND self.estimatedDeliveryDate &lt; :_aujourdhui)
+    OR (:_alerte = 'marge-negative' AND self.statusSelect = 3 AND (self.deliveryState IS NULL OR self.deliveryState != 3)
+        AND self.totalGrossMargin &lt; 0)
+    OR (:_alerte = 'marge-faible' AND self.statusSelect IN (3, 4) AND self.orderDate BETWEEN :_debutMois AND :_aujourdhui
+        AND self.marginRate &lt; %d)
+    OR (:_alerte = 'devis' AND self.statusSelect IN (1, 2) AND self.creationDate &lt; :_dateDevis))</domain>
+  <context name="_alerte" expr="eval: alerte ?: ''"/>
+  <context name="_aujourdhui" expr="eval: __date__"/>
+  <context name="_debutMois" expr="eval: __date__.withDayOfMonth(1)"/>
+  <context name="_dateDevis" expr="eval: __date__.minusDays(15)"/>
+  <context name="_etat" expr="eval: (etatCommande ?: 1) as Integer"/>
+  <context name="_client" expr="eval: (client?.id ?: 0) as Long"/>
+  <context name="_commercial" expr="eval: (commercialFiltre?.id ?: 0) as Long"/>
+  <context name="_dateFiltre" expr="eval: dateDu != null || dateAu != null"/>
+  <context name="_dateDu" expr="eval: dateDu ? java.time.LocalDate.parse(dateDu.toString().substring(0, 10)) : java.time.LocalDate.of(1900, 1, 1)"/>
+  <context name="_dateAu" expr="eval: dateAu ? java.time.LocalDate.parse(dateAu.toString().substring(0, 10)) : java.time.LocalDate.of(2999, 12, 31)"/>
+  <context name="_livFiltre" expr="eval: livraisonDu != null || livraisonAu != null"/>
+  <context name="_livDu" expr="eval: livraisonDu ? java.time.LocalDate.parse(livraisonDu.toString().substring(0, 10)) : java.time.LocalDate.of(1900, 1, 1)"/>
+  <context name="_livAu" expr="eval: livraisonAu ? java.time.LocalDate.parse(livraisonAu.toString().substring(0, 10)) : java.time.LocalDate.of(2999, 12, 31)"/>
+  <context name="_internalUser" expr="eval: __user__.id"/>
+  <context name="_template" expr="eval: false"/>
+  <context name="todayDate" expr="eval: __config__.date"/>
+</action-view>""" % SEUIL_MARGE
+FILTRES = [(code, "'%s'" % code) for k, b, c, code in BOUTONS] + [('aucune', 'null')]
+ACT_ALERTES = [('action-lvme-cde-client-alerte-' + code,
+                '<action-attrs name="action-lvme-cde-client-alerte-%s">\n'
+                '  <attribute name="value" for="$alerte" expr="eval: %s"/>\n'
+                '  <attribute name="refresh" for="commandesDashlet" expr="eval: true"/>\n'
+                '</action-attrs>' % (code, val)) for code, val in FILTRES]
+# « Lancer la recherche » retire le filtre alerte
+ACT_ALERTES.append(('action-lvme-cde-client-refresh',
+                    '<action-attrs name="action-lvme-cde-client-refresh">\n'
+                    '  <attribute name="value" for="$alerte" expr="eval: null"/>\n'
+                    '  <attribute name="refresh" for="commandesDashlet" expr="eval: true"/>\n'
+                    '</action-attrs>'))
+ACT_ALERTES.append(('action-lvme-cde-client-dashlet', DASHLET))
+noms = [m for m, _ in methodes] + ['action-lvme-cde-client-kpi'] + [n for n, _ in ACT_ALERTES]
 actions = ',\n'.join(
     "(nextval('meta_action_seq'), 0, now(), '%s', 'action-method', NULL,\n"
     "'<action-method name=\"%s\">\n  <call class=\"com.axelor.apps.supplychain.web.LvmeDuplicationController\" method=\"%s\"/>\n"
     "</action-method>', false, false, 0)" % (m, m, j) for m, j in methodes)
 actions += (",\n(nextval('meta_action_seq'), 0, now(), 'action-lvme-cde-client-kpi', 'action-attrs', NULL,\n'%s', false, false, 0)"
             % q(kpi_xml))
+for n, x in ACT_ALERTES:
+    typ = 'action-view' if x.startswith('<action-view') else 'action-attrs'
+    mod = "'com.axelor.apps.sale.db.SaleOrder'" if typ == 'action-view' else 'NULL'
+    actions += ",\n(nextval('meta_action_seq'), 0, now(), '%s', '%s', %s,\n'%s', false, false, 0)" % (n, typ, mod, q(x))
 
 sql = '''-- =====================================================================
 -- PROD étape 68 : bouton « Dupliquer » et KPI des commandes clients
