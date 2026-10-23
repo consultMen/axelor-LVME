@@ -1,7 +1,7 @@
 <kanban name="lvme-arrivage-kanban" title="Arrivages" model="com.axelor.apps.stock.db.StockMove" columnBy="lvmeEtapeArrivage"
-  sequenceBy="id" orderBy="estimatedDate" draggable="false" limit="30">
-  <!-- LVME : arrivages en colonnes par étape (Brouillon, À embarquer, Flottant, Réel, Annulé) ; l'étape change
-       par les boutons de la fiche (cartes non déplaçables) ; carte rouge si l'arrivée prévue est dépassée -->
+  sequenceBy="lvmeKanbanSeq" orderBy="estimatedDate" onMove="action-lvme-kanban-deplacer-arrivage" limit="30">
+  <!-- LVME : arrivages en colonnes par étape (Brouillon, À embarquer, Flottant, Réel, Annulé) ; déplacer une carte
+       lance l'action de la fiche (Réel / Annulé : ouvre la fiche) ; carte rouge si l'arrivée prévue est dépassée -->
   <field name="stockMoveSeq"/>
   <field name="partner"/>
   <field name="shipmentMode"/>

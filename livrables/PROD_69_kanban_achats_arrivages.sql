@@ -4,11 +4,14 @@
 --     transport (bateau / camion, nom du bateau), arrivée prévue, colis, poids, montant HT ; rouge si en retard
 --   - Commandes d'achat : colonnes Brouillon / Validée (à embarquer) / Flottant / Réceptionnée / Annulée ;
 --     carte = N° commande, fournisseur, transport, dates de commande et de réception, montant HT et devise
---   - cartes non déplaçables (l'étape change par les boutons des fiches) ; clic sur une carte = fiche
+--   - déplacer une carte lance l'action de la fiche : arrivage Brouillon -> À embarquer (planifier),
+--     À embarquer <-> Flottant ; vers Réel ou Annulé : ouvre la fiche (saisie du réel / motif) ; un arrivage
+--     réel ou annulé ne bouge plus ; commande d'achat : Brouillon -> Validée (valider) ou -> Annulée
+--   - titres « Suivi des arrivages » / « Suivi des commandes d'achat » ; clic sur une carte = fiche
 --   - bouton « Vue Kanban » à côté de « Lancer la recherche » dans Liste des achats et Arrivages
 -- Sources : livrables/ui/arrivage-kanban.xml, livrables/ui/achat-kanban.xml
 -- Prérequis : code avec StockMove.lvmeEtapeArrivage / lvmeEnRetard et PurchaseOrder.lvmeEtapeAchat /
---   lvmeEnRetard (recompiler). Depuis la racine du dépôt. Relançable.
+--   lvmeEnRetard, lvmeKanbanSeq et LvmeKanbanController (recompiler). Depuis la racine du dépôt. Relançable.
 -- Retour arrière : DELETE FROM meta_view WHERE module IS NULL AND name IN ('lvme-arrivage-kanban', 'lvme-achat-kanban');
 -- =====================================================================
 \set kanbanArrivage `cat livrables/ui/arrivage-kanban.xml`
@@ -17,6 +20,10 @@ SELECT set_config('lvme.kanban_arrivage', :'kanbanArrivage', false) IS NOT NULL 
        set_config('lvme.kanban_achat', :'kanbanAchat', false) IS NOT NULL AS achat_lu;
 
 BEGIN;
+
+-- ordre des cartes dans les Kanban (cartes déplaçables)
+ALTER TABLE stock_stock_move ADD COLUMN IF NOT EXISTS lvme_kanban_seq integer;
+ALTER TABLE purchase_purchase_order ADD COLUMN IF NOT EXISTS lvme_kanban_seq integer;
 
 -- ---------- Étapes des commandes d'achat (celles des arrivages existent déjà : PROD_49) ----------
 INSERT INTO meta_select (id, version, name, priority, is_custom)
@@ -39,21 +46,30 @@ INSERT INTO meta_view (id, version, created_on, name, title, type, model, priori
  'com.axelor.apps.purchase.db.PurchaseOrder', 20, current_setting('lvme.kanban_achat'), false, false);
 
 -- ---------- Ouverture ----------
-DELETE FROM meta_action WHERE module IS NULL AND name IN ('action-lvme-arrivage-kanban', 'action-lvme-achat-kanban');
+DELETE FROM meta_action WHERE module IS NULL AND name IN ('action-lvme-arrivage-kanban', 'action-lvme-achat-kanban',
+  'action-lvme-kanban-deplacer-arrivage', 'action-lvme-kanban-deplacer-achat');
 INSERT INTO meta_action (id, version, created_on, name, type, model, xml, home, is_custom, priority) VALUES
 (nextval('meta_action_seq'), 0, now(), 'action-lvme-arrivage-kanban', 'action-view', 'com.axelor.apps.stock.db.StockMove',
-'<action-view name="action-lvme-arrivage-kanban" title="Arrivages (Kanban)" model="com.axelor.apps.stock.db.StockMove">
+'<action-view name="action-lvme-arrivage-kanban" title="Suivi des arrivages" model="com.axelor.apps.stock.db.StockMove">
   <view type="kanban" name="lvme-arrivage-kanban"/>
   <view type="grid" name="lvme-arrivage-grid"/>
   <view type="form" name="lvme-arrivage-form"/>
   <domain>self.typeSelect = 3 AND self.isReversion = FALSE</domain>
 </action-view>', false, false, 0),
 (nextval('meta_action_seq'), 0, now(), 'action-lvme-achat-kanban', 'action-view', 'com.axelor.apps.purchase.db.PurchaseOrder',
-'<action-view name="action-lvme-achat-kanban" title="Commandes d''achat (Kanban)" model="com.axelor.apps.purchase.db.PurchaseOrder">
+'<action-view name="action-lvme-achat-kanban" title="Suivi des commandes d''achat" model="com.axelor.apps.purchase.db.PurchaseOrder">
   <view type="kanban" name="lvme-achat-kanban"/>
   <view type="grid" name="lvme-achat-grid"/>
   <view type="form" name="purchase-order-form"/>
-</action-view>', false, false, 0);
+</action-view>', false, false, 0),
+(nextval('meta_action_seq'), 0, now(), 'action-lvme-kanban-deplacer-arrivage', 'action-method', NULL,
+'<action-method name="action-lvme-kanban-deplacer-arrivage">
+  <call class="com.axelor.apps.supplychain.web.LvmeKanbanController" method="deplacerArrivage"/>
+</action-method>', false, false, 0),
+(nextval('meta_action_seq'), 0, now(), 'action-lvme-kanban-deplacer-achat', 'action-method', NULL,
+'<action-method name="action-lvme-kanban-deplacer-achat">
+  <call class="com.axelor.apps.supplychain.web.LvmeKanbanController" method="deplacerCommandeAchat"/>
+</action-method>', false, false, 0);
 
 -- ---------- Bouton « Vue Kanban » à côté de « Lancer la recherche » ----------
 UPDATE meta_view SET xml = regexp_replace(xml, '(<button name="lancerRechercheBtn"[^>]*/>)',

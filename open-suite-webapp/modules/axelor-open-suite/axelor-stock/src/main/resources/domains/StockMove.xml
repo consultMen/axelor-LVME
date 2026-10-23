@@ -131,9 +131,12 @@
         WHEN 3 THEN 4 WHEN 4 THEN 5 END)
       ]]>
     </integer>
-    <!-- LVME : colonne du Kanban des arrivages (mêmes étapes que la barre de la fiche arrivage) : 0 Brouillon,
-      1 À embarquer, 2 Flottant, 3 Réel, 4 Annulé -->
-    <integer name="lvmeEtapeArrivage" title="Étape" selection="lvme.arrivage.etape.select" formula="true">
+    <!-- LVME : ordre des cartes dans le Kanban (déplacement des cartes) -->
+    <integer name="lvmeKanbanSeq" title="Ordre Kanban"/>
+    <!-- LVME : colonne du Kanban des arrivages (mêmes étapes que la barre de la fiche arrivage) : 0
+      Brouillon, 1 À embarquer, 2 Flottant, 3 Réel, 4 Annulé -->
+    <integer name="lvmeEtapeArrivage" title="Étape" selection="lvme.arrivage.etape.select"
+      formula="true">
       <![CDATA[
       (CASE WHEN status_select = 4 THEN 4 WHEN status_select = 3 THEN 3 ELSE COALESCE(nature, 0) END)
       ]]>
