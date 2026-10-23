@@ -8,7 +8,7 @@
 --     À embarquer <-> Flottant ; vers Réel ou Annulé : ouvre la fiche (saisie du réel / motif) ; un arrivage
 --     réel ou annulé ne bouge plus ; commande d'achat : Brouillon -> Validée (valider) ou -> Annulée
 --   - titres « Suivi des arrivages » / « Suivi des commandes d'achat » ; clic sur une carte = fiche
---   - bouton « Vue Kanban » à côté de « Lancer la recherche » dans Liste des achats et Arrivages
+--   - bouton « Suivi des commandes d'achat » / « Suivi des arrivages » à côté de « Lancer la recherche »
 -- Sources : livrables/ui/arrivage-kanban.xml, livrables/ui/achat-kanban.xml
 -- Prérequis : code avec StockMove.lvmeEtapeArrivage / lvmeEnRetard et PurchaseOrder.lvmeEtapeAchat /
 --   lvmeEnRetard, lvmeKanbanSeq et LvmeKanbanController (recompiler). Depuis la racine du dépôt. Relançable.
@@ -73,11 +73,11 @@ INSERT INTO meta_action (id, version, created_on, name, type, model, xml, home, 
 
 -- ---------- Bouton « Vue Kanban » à côté de « Lancer la recherche » ----------
 UPDATE meta_view SET xml = regexp_replace(xml, '(<button name="lancerRechercheBtn"[^>]*/>)',
-  '\1' || E'\n      ' || '<button name="lvmeKanbanBtn" title="Vue Kanban" icon="view_kanban" css="lvme-btn-kanban" onClick="action-lvme-achat-kanban"/>', ''),
+  '\1' || E'\n      ' || '<button name="lvmeKanbanBtn" title="Suivi des commandes d''achat" icon="view_kanban" css="lvme-btn-kanban" onClick="action-lvme-achat-kanban"/>', ''),
   updated_on = now(), version = COALESCE(version, 0) + 1
 WHERE name = 'lvme-achat-search-form' AND module IS NULL AND xml NOT LIKE '%lvmeKanbanBtn%';
 UPDATE meta_view SET xml = regexp_replace(xml, '(<button name="lancerRechercheBtn"[^>]*/>)',
-  '\1' || E'\n      ' || '<button name="lvmeKanbanBtn" title="Vue Kanban" icon="view_kanban" css="lvme-btn-kanban" onClick="action-lvme-arrivage-kanban"/>', ''),
+  '\1' || E'\n      ' || '<button name="lvmeKanbanBtn" title="Suivi des arrivages" icon="view_kanban" css="lvme-btn-kanban" onClick="action-lvme-arrivage-kanban"/>', ''),
   updated_on = now(), version = COALESCE(version, 0) + 1
 WHERE name = 'lvme-arrivage-search-form' AND module IS NULL AND xml NOT LIKE '%lvmeKanbanBtn%';
 
@@ -86,6 +86,14 @@ UPDATE meta_view SET xml = replace(xml, 'icon="view_kanban" onClick=', 'icon="vi
   updated_on = now(), version = COALESCE(version, 0) + 1
 WHERE name IN ('lvme-achat-search-form', 'lvme-arrivage-search-form') AND module IS NULL
   AND xml LIKE '%lvmeKanbanBtn%' AND xml NOT LIKE '%lvme-btn-kanban%';
+
+-- libellé du bouton : « Suivi des commandes d'achat » / « Suivi des arrivages » au lieu de « Vue Kanban »
+UPDATE meta_view SET xml = replace(xml, 'name="lvmeKanbanBtn" title="Vue Kanban"',
+  CASE name WHEN 'lvme-achat-search-form' THEN 'name="lvmeKanbanBtn" title="Suivi des commandes d''achat"'
+            ELSE 'name="lvmeKanbanBtn" title="Suivi des arrivages"' END),
+  updated_on = now(), version = COALESCE(version, 0) + 1
+WHERE name IN ('lvme-achat-search-form', 'lvme-arrivage-search-form') AND module IS NULL
+  AND xml LIKE '%name="lvmeKanbanBtn" title="Vue Kanban"%';
 
 COMMIT;
 
