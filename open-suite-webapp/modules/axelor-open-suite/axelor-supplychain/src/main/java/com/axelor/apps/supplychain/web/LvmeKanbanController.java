@@ -41,6 +41,18 @@ public class LvmeKanbanController {
   protected static final int ACH_RECEPTIONNEE = 4;
   protected static final int ACH_ANNULEE = 5;
 
+  /**
+   * Colonne d'arrivée de la carte : valeur brute envoyée par le Kanban dans le contexte de l'action (le
+   * champ étant calculé, la lire par le modèle pourrait renvoyer l'étape enregistrée et non la colonne).
+   */
+  protected Object colonneCible(ActionRequest request, String champ) {
+    Object contexte = request.getData() != null ? request.getData().get("context") : null;
+    if (contexte instanceof java.util.Map && ((java.util.Map<?, ?>) contexte).containsKey(champ)) {
+      return ((java.util.Map<?, ?>) contexte).get(champ);
+    }
+    return request.getContext().get(champ);
+  }
+
   /** Arrivages (réceptions fournisseur) non réalisés ni annulés de la commande d'achat. */
   protected List<StockMove> arrivagesEnCours(PurchaseOrder commande) {
     return Beans.get(StockMoveRepository.class)
@@ -62,15 +74,17 @@ public class LvmeKanbanController {
         return "Flottant";
       case ACH_RECEPTIONNEE:
         return "En stock";
-      default:
+      case ACH_ANNULEE:
         return "Annulée";
+      default:
+        return "étape " + etapeAchat;
     }
   }
 
   @Transactional(rollbackOn = {Exception.class})
   public void deplacerArrivage(ActionRequest request, ActionResponse response) {
     try {
-      Object cible = request.getContext().get("lvmeEtapeArrivage");
+      Object cible = colonneCible(request, "lvmeEtapeArrivage");
       Long id = request.getContext().asType(StockMove.class).getId();
       StockMoveRepository repo = Beans.get(StockMoveRepository.class);
       StockMove arrivage = id != null ? repo.find(id) : null;
@@ -78,7 +92,7 @@ public class LvmeKanbanController {
         response.setReload(true);
         return;
       }
-      int etape = Integer.parseInt(cible.toString());
+      int etape = (int) Double.parseDouble(cible.toString().trim());
       int status = arrivage.getStatusSelect();
 
       if (status == StockMoveRepository.STATUS_REALIZED
@@ -137,7 +151,7 @@ public class LvmeKanbanController {
   @Transactional(rollbackOn = {Exception.class})
   public void deplacerCommandeAchat(ActionRequest request, ActionResponse response) {
     try {
-      Object cible = request.getContext().get("lvmeEtapeAchat");
+      Object cible = colonneCible(request, "lvmeEtapeAchat");
       Long id = request.getContext().asType(PurchaseOrder.class).getId();
       PurchaseOrder commande =
           id != null ? Beans.get(PurchaseOrderRepository.class).find(id) : null;
@@ -145,7 +159,7 @@ public class LvmeKanbanController {
         response.setReload(true);
         return;
       }
-      int etape = Integer.parseInt(cible.toString());
+      int etape = (int) Double.parseDouble(cible.toString().trim());
       int status = commande.getStatusSelect();
       PurchaseOrderWorkflowService workflow = Beans.get(PurchaseOrderWorkflowService.class);
 
@@ -158,8 +172,16 @@ public class LvmeKanbanController {
       if (etape == ACH_ANNULEE
           && status != PurchaseOrderRepository.STATUS_CANCELED
           && status != PurchaseOrderRepository.STATUS_FINISHED) {
-        workflow.cancelPurchaseOrder(commande);
-        response.setNotify(num + " annulée.");
+        // annulation : dans la fiche (bouton Annuler), pour qu'un lâcher de carte maladroit n'annule rien
+        response.setView(
+            ActionView.define(num + " : annulation (bouton Annuler)")
+                .model(PurchaseOrder.class.getName())
+                .add("form", "purchase-order-form")
+                .param("popup", "reload")
+                .param("popup.maximized", "true")
+                .param("forceEdit", "true")
+                .context("_showRecord", commande.getId())
+                .map());
       } else if (etape == ACH_VALIDEE && brouillon) {
         workflow.validatePurchaseOrder(commande);
         response.setNotify(num + " validée (arrivage à embarquer créé).");
@@ -174,7 +196,8 @@ public class LvmeKanbanController {
             if (arrivage.getStatusSelect() == StockMoveRepository.STATUS_DRAFT) {
               Beans.get(StockMoveService.class).plan(arrivage);
             }
-            arrivage.setNature(etape == ACH_FLOTTANT ? Nature.FLOTTANT : Nature.EN_COURS_DE_PRODUCTION);
+            arrivage.setNature(
+                etape == ACH_FLOTTANT ? Nature.FLOTTANT : Nature.EN_COURS_DE_PRODUCTION);
             repo.save(arrivage);
           }
           response.setNotify(num + " : arrivage " + libelle(etape) + ".");
@@ -200,9 +223,13 @@ public class LvmeKanbanController {
             num
                 + " : passage vers « "
                 + libelle(etape)
-                + " » impossible depuis son étape actuelle."
+                + " » impossible depuis son étape actuelle (« "
+                + libelle(commande.getLvmeEtapeAchat() != null ? commande.getLvmeEtapeAchat() : 0)
+                + " », colonne reçue : "
+                + cible
+                + ")."
                 + " Possible : Brouillon -> À embarquer <-> Flottant -> En stock"
-                + " (ouvre l'arrivage pour le réel), ou -> Annulée.");
+                + " (ouvre l'arrivage pour le réel), ou -> Annulée (ouvre la commande).");
       }
       response.setReload(true);
     } catch (Exception e) {
@@ -224,7 +251,8 @@ public class LvmeKanbanController {
     return Beans.get(StockMoveRepository.class)
         .all()
         .filter(
-            "?1 MEMBER OF self.saleOrderSet AND self.typeSelect = 2 AND self.statusSelect = 2", commande)
+            "?1 MEMBER OF self.saleOrderSet AND self.typeSelect = 2 AND self.statusSelect = 2",
+            commande)
         .order("id")
         .fetch();
   }
@@ -232,14 +260,14 @@ public class LvmeKanbanController {
   @Transactional(rollbackOn = {Exception.class})
   public void deplacerCommandeClient(ActionRequest request, ActionResponse response) {
     try {
-      Object cible = request.getContext().get("lvmeEtapeCde");
+      Object cible = colonneCible(request, "lvmeEtapeCde");
       Long id = request.getContext().asType(SaleOrder.class).getId();
       SaleOrder commande = id != null ? Beans.get(SaleOrderRepository.class).find(id) : null;
       if (commande == null || cible == null) {
         response.setReload(true);
         return;
       }
-      int etape = Integer.parseInt(cible.toString());
+      int etape = (int) Double.parseDouble(cible.toString().trim());
       int status = commande.getStatusSelect();
       String num = "Commande " + commande.getSaleOrderSeq();
       boolean devis =
@@ -267,7 +295,10 @@ public class LvmeKanbanController {
             repo.save(bl);
           }
           response.setNotify(
-              num + (etape == CDE_EXPEDIEE ? " expédiée (BL Flottant)." : " : BL en cours de préparation."));
+              num
+                  + (etape == CDE_EXPEDIEE
+                      ? " expédiée (BL Flottant)."
+                      : " : BL en cours de préparation."));
         }
       } else if (etape == CDE_LIVREE && confirmee) {
         // livraison = réaliser le BL (quantités, lots) : ouverture du BL
@@ -297,7 +328,8 @@ public class LvmeKanbanController {
                 .context("_showRecord", commande.getId())
                 .map());
       } else if (etape == CDE_FACTUREE) {
-        response.setError(num + " : la facture se fait depuis la commande ou le BL (bouton de facturation).");
+        response.setError(
+            num + " : la facture se fait depuis la commande ou le BL (bouton de facturation).");
       } else if (!(etape == CDE_DEVIS && devis)) {
         response.setError(
             num
