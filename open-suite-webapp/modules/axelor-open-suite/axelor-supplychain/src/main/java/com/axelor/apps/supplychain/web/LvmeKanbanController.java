@@ -13,11 +13,13 @@ import com.axelor.meta.schema.actions.ActionView;
 import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
 import com.google.inject.persist.Transactional;
+import java.util.List;
 
 /**
  * LVME : déplacement d'une carte dans les Kanban « Suivi des arrivages » et « Suivi des commandes
  * d'achat ». Le déplacement lance la même action que le bouton de la fiche ; ce qui demande une
- * saisie (réel, motif d'annulation) ouvre la fiche. Un déplacement refusé remet la carte à sa place.
+ * saisie (réel, motif d'annulation) ouvre la fiche. Un déplacement refusé remet la carte à sa
+ * place.
  */
 public class LvmeKanbanController {
 
@@ -31,7 +33,35 @@ public class LvmeKanbanController {
   // étapes des commandes d'achat (lvme.achat.etape.select)
   protected static final int ACH_BROUILLON = 1;
   protected static final int ACH_VALIDEE = 2;
+  protected static final int ACH_FLOTTANT = 3;
+  protected static final int ACH_RECEPTIONNEE = 4;
   protected static final int ACH_ANNULEE = 5;
+
+  /** Arrivages (réceptions fournisseur) non réalisés ni annulés de la commande d'achat. */
+  protected List<StockMove> arrivagesEnCours(PurchaseOrder commande) {
+    return Beans.get(StockMoveRepository.class)
+        .all()
+        .filter(
+            "?1 MEMBER OF self.purchaseOrderSet AND self.typeSelect = 3 AND self.statusSelect IN (1, 2)",
+            commande)
+        .order("id")
+        .fetch();
+  }
+
+  protected String libelle(int etapeAchat) {
+    switch (etapeAchat) {
+      case ACH_BROUILLON:
+        return "Brouillon";
+      case ACH_VALIDEE:
+        return "à embarquer";
+      case ACH_FLOTTANT:
+        return "Flottant";
+      case ACH_RECEPTIONNEE:
+        return "Réceptionnée";
+      default:
+        return "Annulée";
+    }
+  }
 
   @Transactional(rollbackOn = {Exception.class})
   public void deplacerArrivage(ActionRequest request, ActionResponse response) {
@@ -47,7 +77,8 @@ public class LvmeKanbanController {
       int etape = Integer.parseInt(cible.toString());
       int status = arrivage.getStatusSelect();
 
-      if (status == StockMoveRepository.STATUS_REALIZED || status == StockMoveRepository.STATUS_CANCELED) {
+      if (status == StockMoveRepository.STATUS_REALIZED
+          || status == StockMoveRepository.STATUS_CANCELED) {
         response.setError(
             "Arrivage "
                 + arrivage.getStockMoveSeq()
@@ -65,7 +96,8 @@ public class LvmeKanbanController {
           if (status == StockMoveRepository.STATUS_DRAFT) {
             Beans.get(StockMoveService.class).plan(arrivage);
           }
-          arrivage.setNature(etape == ARR_FLOTTANT ? Nature.FLOTTANT : Nature.EN_COURS_DE_PRODUCTION);
+          arrivage.setNature(
+              etape == ARR_FLOTTANT ? Nature.FLOTTANT : Nature.EN_COURS_DE_PRODUCTION);
           repo.save(arrivage);
           response.setNotify(
               "Arrivage "
@@ -103,7 +135,8 @@ public class LvmeKanbanController {
     try {
       Object cible = request.getContext().get("lvmeEtapeAchat");
       Long id = request.getContext().asType(PurchaseOrder.class).getId();
-      PurchaseOrder commande = id != null ? Beans.get(PurchaseOrderRepository.class).find(id) : null;
+      PurchaseOrder commande =
+          id != null ? Beans.get(PurchaseOrderRepository.class).find(id) : null;
       if (commande == null || cible == null) {
         response.setReload(true);
         return;
@@ -112,20 +145,60 @@ public class LvmeKanbanController {
       int status = commande.getStatusSelect();
       PurchaseOrderWorkflowService workflow = Beans.get(PurchaseOrderWorkflowService.class);
 
-      if (etape == ACH_VALIDEE
-          && (status == PurchaseOrderRepository.STATUS_DRAFT
-              || status == PurchaseOrderRepository.STATUS_REQUESTED)) {
-        workflow.validatePurchaseOrder(commande);
-        response.setNotify("Commande " + commande.getPurchaseOrderSeq() + " validée.");
-      } else if (etape == ACH_ANNULEE
+      boolean brouillon =
+          status == PurchaseOrderRepository.STATUS_DRAFT
+              || status == PurchaseOrderRepository.STATUS_REQUESTED;
+      boolean validee = status == PurchaseOrderRepository.STATUS_VALIDATED;
+      String num = "Commande " + commande.getPurchaseOrderSeq();
+
+      if (etape == ACH_ANNULEE
           && status != PurchaseOrderRepository.STATUS_CANCELED
           && status != PurchaseOrderRepository.STATUS_FINISHED) {
         workflow.cancelPurchaseOrder(commande);
-        response.setNotify("Commande " + commande.getPurchaseOrderSeq() + " annulée.");
-      } else if (etape != ACH_BROUILLON || status != PurchaseOrderRepository.STATUS_DRAFT) {
+        response.setNotify(num + " annulée.");
+      } else if (etape == ACH_VALIDEE && brouillon) {
+        workflow.validatePurchaseOrder(commande);
+        response.setNotify(num + " validée (arrivage à embarquer créé).");
+      } else if ((etape == ACH_VALIDEE || etape == ACH_FLOTTANT) && validee) {
+        // À embarquer <-> Flottant : l'étape est celle de son arrivage (recopiée sur la commande)
+        List<StockMove> arrivages = arrivagesEnCours(commande);
+        if (arrivages.isEmpty()) {
+          response.setError(num + " : aucun arrivage en cours à passer " + libelle(etape) + ".");
+        } else {
+          StockMoveRepository repo = Beans.get(StockMoveRepository.class);
+          for (StockMove arrivage : arrivages) {
+            if (arrivage.getStatusSelect() == StockMoveRepository.STATUS_DRAFT) {
+              Beans.get(StockMoveService.class).plan(arrivage);
+            }
+            arrivage.setNature(etape == ACH_FLOTTANT ? Nature.FLOTTANT : Nature.EN_COURS_DE_PRODUCTION);
+            repo.save(arrivage);
+          }
+          response.setNotify(num + " : arrivage " + libelle(etape) + ".");
+        }
+      } else if (etape == ACH_RECEPTIONNEE && validee) {
+        // la réception demande la saisie du réel : ouverture de l'arrivage de la commande
+        List<StockMove> arrivages = arrivagesEnCours(commande);
+        if (arrivages.isEmpty()) {
+          response.setError(num + " : aucun arrivage en cours à réceptionner.");
+        } else {
+          response.setView(
+              ActionView.define("Arrivage : saisissez le réel puis « Saisie Réel »")
+                  .model(StockMove.class.getName())
+                  .add("form", "lvme-arrivage-form")
+                  .param("popup", "reload")
+                  .param("popup.maximized", "true")
+                  .param("forceEdit", "true")
+                  .context("_showRecord", arrivages.get(0).getId())
+                  .map());
+        }
+      } else if (!(etape == ACH_BROUILLON && brouillon)) {
         response.setError(
-            "Depuis ce Kanban, une commande d'achat se valide (Brouillon -> Validée) ou s'annule ;"
-                + " Flottant et Réceptionnée suivent son arrivage (Kanban « Suivi des arrivages »).");
+            num
+                + " : passage vers « "
+                + libelle(etape)
+                + " » impossible depuis son étape actuelle."
+                + " Possible : Brouillon -> Validée (à embarquer) <-> Flottant -> Réceptionnée"
+                + " (ouvre l'arrivage pour le réel), ou -> Annulée.");
       }
       response.setReload(true);
     } catch (Exception e) {

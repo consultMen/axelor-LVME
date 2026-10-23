@@ -73,13 +73,19 @@ INSERT INTO meta_action (id, version, created_on, name, type, model, xml, home, 
 
 -- ---------- Bouton « Vue Kanban » à côté de « Lancer la recherche » ----------
 UPDATE meta_view SET xml = regexp_replace(xml, '(<button name="lancerRechercheBtn"[^>]*/>)',
-  '\1' || E'\n      ' || '<button name="lvmeKanbanBtn" title="Vue Kanban" icon="view_kanban" onClick="action-lvme-achat-kanban"/>', ''),
+  '\1' || E'\n      ' || '<button name="lvmeKanbanBtn" title="Vue Kanban" icon="view_kanban" css="lvme-btn-kanban" onClick="action-lvme-achat-kanban"/>', ''),
   updated_on = now(), version = COALESCE(version, 0) + 1
 WHERE name = 'lvme-achat-search-form' AND module IS NULL AND xml NOT LIKE '%lvmeKanbanBtn%';
 UPDATE meta_view SET xml = regexp_replace(xml, '(<button name="lancerRechercheBtn"[^>]*/>)',
-  '\1' || E'\n      ' || '<button name="lvmeKanbanBtn" title="Vue Kanban" icon="view_kanban" onClick="action-lvme-arrivage-kanban"/>', ''),
+  '\1' || E'\n      ' || '<button name="lvmeKanbanBtn" title="Vue Kanban" icon="view_kanban" css="lvme-btn-kanban" onClick="action-lvme-arrivage-kanban"/>', ''),
   updated_on = now(), version = COALESCE(version, 0) + 1
 WHERE name = 'lvme-arrivage-search-form' AND module IS NULL AND xml NOT LIKE '%lvmeKanbanBtn%';
+
+-- bouton « Vue Kanban » déjà en place sans style : style ajouté
+UPDATE meta_view SET xml = replace(xml, 'icon="view_kanban" onClick=', 'icon="view_kanban" css="lvme-btn-kanban" onClick='),
+  updated_on = now(), version = COALESCE(version, 0) + 1
+WHERE name IN ('lvme-achat-search-form', 'lvme-arrivage-search-form') AND module IS NULL
+  AND xml LIKE '%lvmeKanbanBtn%' AND xml NOT LIKE '%lvme-btn-kanban%';
 
 COMMIT;
 
