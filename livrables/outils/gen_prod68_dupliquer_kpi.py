@@ -57,18 +57,25 @@ KPI.append(('$alAucune', '[' + ', '.join('{ -> %s }' % e for k, e in KPI if k in
             + "].every { it() == null } ? 'Aucune alerte' : null"))
 
 
-def tuile(titre, couleur, fond, icone, valeur, detail, extra='', couleur_valeur="'#1b2a4a'"):
-    return ("            <Box style={{ background: '#fff', borderRadius: 10, borderTop: '4px solid %s', "
-            "boxShadow: '0 1px 4px rgba(0,0,0,.15)', padding: '10px 14px' }}>\n"
-            "              <Box d=\"flex\" style={{ justifyContent: 'space-between', alignItems: 'center' }}>\n"
-            "                <Box style={{ fontSize: 12, color: '#555', fontWeight: 600, textTransform: 'uppercase' }}>%s</Box>\n"
-            "                <Box style={{ width: 34, height: 34, borderRadius: 17, background: '%s', display: 'flex', "
-            "alignItems: 'center', justifyContent: 'center', fontSize: 18 }}>%s</Box>\n"
+def tuile(titre, degrade, icone, valeur, detail, extra=''):
+    """Carte KPI en dégradé de couleur, texte blanc, icône dans une pastille translucide, cercle décoratif.
+    degrade : expression JSX du fond (chaîne entre quotes, ou condition)."""
+    return ("            <Box style={{ position: 'relative', overflow: 'hidden', background: %s, color: '#fff', "
+            "borderRadius: 14, boxShadow: '0 6px 16px rgba(20,30,60,.25)', padding: '14px 16px', minHeight: 128 }}>\n"
+            "              <Box style={{ position: 'absolute', right: -28, top: -28, width: 110, height: 110, borderRadius: 55, "
+            "background: 'rgba(255,255,255,.14)' }}></Box>\n"
+            "              <Box style={{ position: 'absolute', right: 30, bottom: -40, width: 80, height: 80, borderRadius: 40, "
+            "background: 'rgba(255,255,255,.08)' }}></Box>\n"
+            "              <Box d=\"flex\" style={{ justifyContent: 'space-between', alignItems: 'center', position: 'relative' }}>\n"
+            "                <Box style={{ fontSize: 12, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', "
+            "opacity: .9 }}>%s</Box>\n"
+            "                <Box style={{ width: 40, height: 40, borderRadius: 20, background: 'rgba(255,255,255,.25)', display: 'flex', "
+            "alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>%s</Box>\n"
             "              </Box>\n"
-            "              <Box style={{ fontSize: 28, fontWeight: 700, color: %s }}>{%s}</Box>\n"
-            "              <Box style={{ fontSize: 12, color: '#666' }}>{%s}</Box>\n"
+            "              <Box style={{ fontSize: 32, fontWeight: 800, lineHeight: 1.2, marginTop: 4, position: 'relative' }}>{%s}</Box>\n"
+            "              <Box style={{ fontSize: 12, opacity: .9, position: 'relative' }}>{%s}</Box>\n"
             "%s"
-            "            </Box>\n") % (couleur, titre, fond, icone, couleur_valeur, valeur, detail, extra)
+            "            </Box>\n") % (degrade, titre, icone, valeur, detail, extra)
 
 
 def pastille(champ, fond, texte, icone):
@@ -76,9 +83,9 @@ def pastille(champ, fond, texte, icone):
             "fontSize: 13, fontWeight: 600 }}>%s {%s}</Box>}\n") % (champ, fond, texte, icone, champ)
 
 
-EVOL = ("              <Box style={{ display: 'inline-block', marginTop: 4, fontSize: 12, fontWeight: 600, padding: '2px 8px', "
-        "borderRadius: 10, background: $kpiCaHausse ? '#d1e7dd' : '#f8d7da', color: $kpiCaHausse ? '#0f5132' : '#842029' }}>"
-        "{$kpiCaEvol}</Box>\n")
+EVOL = ("              <Box style={{ display: 'inline-block', position: 'relative', marginTop: 6, fontSize: 12, fontWeight: 700, "
+        "padding: '2px 10px', borderRadius: 12, background: 'rgba(255,255,255,.95)', "
+        "color: $kpiCaHausse ? '#0f5132' : '#b02a37' }}>{$kpiCaEvol}</Box>\n")
 
 panneau = ('  <!-- LVME : KPI et alertes des commandes clients (calculés à l\'ouverture, action-lvme-cde-client-kpi) -->\n'
            '  <panel name="kpiCdeClientPanel" showTitle="false" colSpan="12">\n'
@@ -87,13 +94,14 @@ panneau = ('  <!-- LVME : KPI et alertes des commandes clients (calculés à l\'
            '      <viewer depends="%s"><![CDATA[\n' % ','.join(k for k, _ in KPI)
            + '        <>\n'
            "          <Box d=\"grid\" style={{ gridTemplateColumns: 'repeat(4, 1fr)', gap: 14 }}>\n"
-           + tuile('Commandes en cours', '#0d6efd', '#e7f1ff', '📦', '$kpiEnCours', '$kpiEnCoursDetail')
-           + tuile('CA HT du mois', '#198754', '#e6f4ea', '💶', '$kpiCaMois', '$kpiCaMoisDetail', EVOL)
-           + tuile('% Marge du mois', '#6f42c1', '#efe8fb', '📈', '$kpiMarge', '$kpiMargeDetail', '',
-                   "$kpiMargeFaible ? '#dc3545' : '#1b2a4a'")
-           + tuile("À livrer aujourd'hui", '#fd7e14', '#fff1e6', '🚚', '$kpiALivrer', '$kpiALivrerDetail')
+           + tuile('Commandes en cours', "'linear-gradient(135deg, #1e6fe8, #0a3d91)'", '📦', '$kpiEnCours', '$kpiEnCoursDetail')
+           + tuile('CA HT du mois', "'linear-gradient(135deg, #22a565, #0d6b3d)'", '💶', '$kpiCaMois', '$kpiCaMoisDetail', EVOL)
+           + tuile('% Marge du mois', "$kpiMargeFaible ? 'linear-gradient(135deg, #e5484d, #9b1c22)' "
+                   ": 'linear-gradient(135deg, #8a5cf0, #4b2a9e)'", '📈', '$kpiMarge', '$kpiMargeDetail')
+           + tuile("À livrer aujourd'hui", "'linear-gradient(135deg, #ff9a3c, #d9580d)'", '🚚', '$kpiALivrer', '$kpiALivrerDetail')
            + '          </Box>\n'
-           "          <Box d=\"flex\" style={{ flexWrap: 'wrap', gap: 8, marginTop: 10, alignItems: 'center' }}>\n"
+           "          <Box d=\"flex\" style={{ flexWrap: 'wrap', gap: 8, marginTop: 12, alignItems: 'center', background: '#fff', "
+           "borderRadius: 12, padding: '8px 12px', boxShadow: '0 2px 8px rgba(20,30,60,.12)' }}>\n"
            "            <Box style={{ fontSize: 13, fontWeight: 700, color: '#1b2a4a', marginRight: 4 }}>Alertes :</Box>\n"
            + pastille('$alRetard', '#f8d7da', '#842029', '⚠')
            + pastille('$alMargeNeg', '#f8d7da', '#842029', '⚠')
