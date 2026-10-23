@@ -75,14 +75,14 @@
       <button name="lvmeAlaRetirerBtn" title="✖ Retirer le filtre alerte" css="lvme-alerte-gris" showIf="$alerteAchat" colSpan="3" onClick="action-lvme-achat-alerte-aucune"/>
     </panel>
   </panel>
-  <panel name="rechercheAchatPanel" showTitle="false" colSpan="12">
-    <panel name="filtreDatePanel" colSpan="3" itemSpan="12">
+  <panel name="rechercheAchatPanel" showTitle="false" colSpan="12" css="lvme-ges-achats">
+    <panel name="filtreDatePanel" colSpan="3" itemSpan="12" css="lvme-ges-dates-lavande">
       <field name="$dateDu" title="Date du" type="date"/>
       <field name="$dateAu" title="au" type="date"/>
       <field name="$datePeriode" title="Période prédéfinie" type="integer" selection="lvme.etat.stock.periode.select"
         onChange="action-lvme-achat-periode-date"/>
     </panel>
-    <panel name="filtreArriveePanel" colSpan="3" itemSpan="12">
+    <panel name="filtreArriveePanel" colSpan="3" itemSpan="12" css="lvme-ges-dates-lavande">
       <field name="$arriveeDu" title="Arrivée du" type="date"/>
       <field name="$arriveeAu" title="au" type="date"/>
       <field name="$arriveePeriode" title="Période prédéfinie" type="integer" selection="lvme.etat.stock.periode.select"

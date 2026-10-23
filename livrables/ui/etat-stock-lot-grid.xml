@@ -1,0 +1,43 @@
+<grid name="lvme-etat-stock-lot-grid" title="État des stocks par lots"
+  model="com.axelor.apps.supplychain.db.EtatStockLot" orderBy="productCode,arrivalDate"
+  canNew="false" canEdit="false" canDelete="false">
+  <toolbar>
+    <button name="lvmeLotsArchiverBtn" title="Archiver" icon="archive" prompt="Archiver les lots cochés ? Ils n'apparaîtront plus dans la liste ni dans les choix de lot (case « Lots archivés » pour les retrouver)." onClick="action-lvme-lots-archiver-selection"/>
+    <button name="lvmeLotsDesarchiverBtn" title="Désarchiver" icon="arrow-counterclockwise" onClick="action-lvme-lots-desarchiver-selection"/>
+  </toolbar>
+  <!-- LVME : colonnes et ordre de l'écran « Etat des stocks par lots » GESCOM ; Nb colis Stock et Nb colis Dispo en
+       jaune ; DLUO dépassée (rouge) / DLUO dans moins de 30 jours (orange), uniquement s'il reste du stock -->
+  <hilite color="danger" strong="true" if="dluo &amp;&amp; stockQty &gt; 0 &amp;&amp; $moment().diff(dluo, 'days') &gt; 0"/>
+  <hilite color="warning" if="dluo &amp;&amp; stockQty &gt; 0 &amp;&amp; $moment(dluo).diff($moment(), 'days') &lt;= 30"/>
+  <hilite color="info" if="natureArrivage == 2"/>
+  <hilite color="danger" if="stockQty &lt; 0"/>
+  <field name="productCode" title="Produit" width="110"/>
+  <field name="productName" title="Désignation" width="230"/>
+  <field name="supplierName" title="Fournisseur" width="130"/>
+  <field name="stockLocation" title="Frigo" width="80"/>
+  <field name="lotNumber" title="N° Lot" width="110"/>
+  <field name="arrivalNumber" title="N°Arrivage" width="85"/>
+  <field name="origine" title="Origine" selection="lvme.origine.select" width="65"/>
+  <field name="arrivalDate" title="Livrée le" width="90"/>
+  <field name="conditionnement" title="Conditionnement" width="120"/>
+  <field name="dluo" title="D. L. C." width="90">
+    <hilite color="danger" strong="true" if="dluo &amp;&amp; $moment().diff(dluo, 'days') &gt; 0"/>
+    <hilite color="warning" strong="true" if="dluo &amp;&amp; $moment(dluo).diff($moment(), 'days') &lt;= 30"/>
+  </field>
+  <field name="prixRevient" title="Prix Revient" width="70"/>
+  <field name="qtyPerColis" title="Un/Poids Colis" width="70"/>
+  <field name="nbColisIn" title="Nb Colis Entrées" aggregate="sum" width="75"/>
+  <field name="nbColisOut" title="Nb Colis Sorties" aggregate="sum" width="75"/>
+  <field name="nbColisCdes" title="Nb colis Cdes" aggregate="sum" width="70"/>
+  <field name="nbColisStock" title="Nb colis Stock" aggregate="sum" width="75">
+    <hilite background="warning" if="true"/>
+  </field>
+  <field name="stockQty" title="Unt/Poids Stock" aggregate="sum" width="85"/>
+  <field name="stockValue" title="Montant ht Stock" aggregate="sum" width="95"/>
+  <field name="nbColisDispo" title="Nb colis Dispo" aggregate="sum" width="75">
+    <hilite background="warning" if="true"/>
+  </field>
+  <field name="dispoQty" title="Unt/Poids Dispo" aggregate="sum" width="85"/>
+  <field name="natureLabel" title="Arrivage" width="70"/>
+  <field name="natureArrivage" hidden="true"/>
+</grid>

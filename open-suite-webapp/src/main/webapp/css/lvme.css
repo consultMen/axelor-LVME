@@ -389,3 +389,72 @@
 .lvme-btn-supprimer, .lvme-btn-supprimer button, .lvme-btn-supprimer * {
   color: #dc3545 !important;
 }
+
+/*
+ * « Etat des stocks par lots » façon GESCOM (panneaux css="lvme-ges-etat") : fond bleu clair, cadres de dates
+ * jaune pâle, liste avec lignes blanc / cyan (texte violet sur les lignes cyan), en-têtes bleus, Nb colis Stock et
+ * Nb colis Dispo en jaune. Les alertes DLUO (texte rouge / orange) restent prioritaires.
+ * La liste est repérée comme « voisine » du panneau des filtres (même fiche).
+ */
+[class*="_gridItem_"]:has(.lvme-ges-etat),
+[class*="_gridItem_"]:has(.lvme-ges-etat) ~ [class*="_gridItem_"],
+.lvme-ges-etat,
+.lvme-ges-etat [class*="_panel"],
+.lvme-ges-etat [class*="_body_"],
+.lvme-ges-etat [class*="_content_"] {
+  background-color: #c6daf0 !important;
+}
+.lvme-ges-dates-jaune,
+.lvme-ges-dates-jaune [class*="_panel"],
+.lvme-ges-dates-jaune [class*="_body_"],
+.lvme-ges-dates-jaune [class*="_content_"] {
+  background-color: #ffffc8 !important;
+}
+.lvme-ges-dates-jaune,
+.lvme-ges-cadre {
+  border: 1px solid #7f8fb0 !important;
+  border-radius: 3px;
+}
+[class*="_gridItem_"]:has(.lvme-ges-etat) ~ [class*="_gridItem_"] [class*="_header_"] [class*="_column_"] {
+  background-color: #b8d4f0 !important;
+  color: #10204a !important;
+  white-space: normal !important;
+}
+[class*="_gridItem_"]:has(.lvme-ges-etat) ~ [class*="_gridItem_"] [class*="_body_"] [class*="_row_"] [class*="_column_"] {
+  background-color: #ffffff;
+  color: #000000;
+}
+[class*="_gridItem_"]:has(.lvme-ges-etat) ~ [class*="_gridItem_"] [class*="_body_"] [class*="_row_"]:nth-child(even) [class*="_column_"] {
+  background-color: #ccffff;
+  color: #b000b0;
+}
+[class*="_gridItem_"]:has(.lvme-ges-etat) ~ [class*="_gridItem_"] .bg-warning {
+  background-color: #ffff99 !important;
+  color: #000000 !important;
+}
+
+/*
+ * « liste des achats fournisseurs » façon GESCOM (panneau css="lvme-ges-achats") : cadres de dates lavande, liste
+ * avec lignes jaune pâle / blanc, en-têtes bleus (couleurs de nature conservées).
+ */
+.lvme-ges-dates-lavande,
+.lvme-ges-dates-lavande [class*="_panel"],
+.lvme-ges-dates-lavande [class*="_body_"],
+.lvme-ges-dates-lavande [class*="_content_"] {
+  background-color: #cfcff2 !important;
+}
+.lvme-ges-dates-lavande {
+  border: 1px solid #8a8ac0 !important;
+  border-radius: 3px;
+}
+[class*="_gridItem_"]:has(.lvme-ges-achats) ~ [class*="_gridItem_"] [class*="_header_"] [class*="_column_"] {
+  background-color: #dbe8fb !important;
+  color: #1a2a9c !important;
+  white-space: normal !important;
+}
+[class*="_gridItem_"]:has(.lvme-ges-achats) ~ [class*="_gridItem_"] [class*="_body_"] [class*="_row_"]:nth-child(odd) [class*="_column_"] {
+  background-color: #ffff99;
+}
+[class*="_gridItem_"]:has(.lvme-ges-achats) ~ [class*="_gridItem_"] [class*="_body_"] [class*="_row_"]:nth-child(even) [class*="_column_"] {
+  background-color: #ffffff;
+}
