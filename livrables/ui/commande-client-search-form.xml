@@ -101,6 +101,7 @@
         onChange="action-lvme-cde-client-periode-livraison"/>
       <button name="lancerRechercheBtn" title="Lancer la recherche" icon="search" css="btn-primary" onClick="action-lvme-cde-client-refresh"/>
       <button name="lvmeKanbanBtn" title="Suivi des commandes clients" icon="view_kanban" css="lvme-btn-kanban" onClick="action-lvme-cde-client-kanban"/>
+      <button name="lvmeSelectionBtn" title="Supprimer une sélection" icon="delete" onClick="action-lvme-cde-client-dashlet"/>
       <button name="nouvelleCdeBtn" title="Nouvelle commande" icon="plus" css="lvme-btn-nouveau" onClick="action-lvme-cde-client-new"/>
     </panel>
   </panel>

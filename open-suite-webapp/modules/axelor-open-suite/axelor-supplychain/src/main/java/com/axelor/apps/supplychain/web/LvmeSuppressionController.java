@@ -14,126 +14,163 @@ import com.axelor.db.JPA;
 import com.axelor.inject.Beans;
 import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
-import com.google.inject.persist.Transactional;
+import com.axelor.rpc.Context;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
 /**
- * LVME : icône « Supprimer » des listes Commandes clients, Achats fournisseurs et Arrivages, comme
- * la suppression native d'Axelor : seulement une pièce en brouillon ou annulée (une commande
- * confirmée, une commande validée ou un arrivage planifié / réel s'annule d'abord dans sa fiche).
- * La suppression passe par le dépôt Axelor (mêmes contrôles que la corbeille native).
+ * LVME : suppression dans les listes Commandes clients, Achats fournisseurs et Arrivages, comme la
+ * suppression native d'Axelor : l'icône corbeille d'une ligne supprime cette ligne ; le bouton
+ * « Supprimer la sélection » de la barre de la liste supprime les lignes cochées. Seulement une pièce
+ * en brouillon ou annulée (une commande confirmée, une commande validée ou un arrivage planifié / réel
+ * s'annule d'abord dans sa fiche) : les autres lignes cochées sont laissées et listées dans le message.
  */
 public class LvmeSuppressionController {
 
-  @Transactional(rollbackOn = {Exception.class})
   public void supprimerCommandeClient(ActionRequest request, ActionResponse response) {
-    try {
-      Long id = request.getContext().asType(SaleOrder.class).getId();
-      SaleOrderRepository repo = Beans.get(SaleOrderRepository.class);
-      SaleOrder commande = id != null ? repo.find(id) : null;
-      if (commande == null) {
-        return;
-      }
-      int status = commande.getStatusSelect();
-      if (status != SaleOrderRepository.STATUS_DRAFT_QUOTATION
-          && status != SaleOrderRepository.STATUS_FINALIZED_QUOTATION
-          && status != SaleOrderRepository.STATUS_CANCELED) {
-        response.setError(
-            "Commande "
-                + commande.getSaleOrderSeq()
-                + " confirmée : annulez-la d'abord dans sa fiche, puis supprimez-la.");
-        return;
-      }
-      String num = commande.getSaleOrderSeq();
-      repo.remove(commande);
-      response.setNotify("Commande " + num + " supprimée.");
-      response.setReload(true);
-    } catch (Exception e) {
-      TraceBackService.trace(response, e);
-    }
+    supprimer(request, response, "commande(s) client", this::supprimerCommandeClient);
   }
 
-  @Transactional(rollbackOn = {Exception.class})
   public void supprimerCommandeAchat(ActionRequest request, ActionResponse response) {
-    try {
-      Long id = request.getContext().asType(PurchaseOrder.class).getId();
-      PurchaseOrderRepository repo = Beans.get(PurchaseOrderRepository.class);
-      PurchaseOrder commande = id != null ? repo.find(id) : null;
-      if (commande == null) {
-        return;
-      }
-      int status = commande.getStatusSelect();
-      if (status != PurchaseOrderRepository.STATUS_DRAFT
-          && status != PurchaseOrderRepository.STATUS_REQUESTED
-          && status != PurchaseOrderRepository.STATUS_CANCELED) {
-        response.setError(
-            "Commande "
-                + commande.getPurchaseOrderSeq()
-                + " validée : annulez-la d'abord dans sa fiche, puis supprimez-la.");
-        return;
-      }
-      String num = commande.getPurchaseOrderSeq();
-      repo.remove(commande);
-      response.setNotify("Commande " + num + " supprimée.");
-      response.setReload(true);
-    } catch (Exception e) {
-      TraceBackService.trace(response, e);
-    }
+    supprimer(request, response, "commande(s) d'achat", this::supprimerCommandeAchat);
   }
 
-  @Transactional(rollbackOn = {Exception.class})
   public void supprimerArrivage(ActionRequest request, ActionResponse response) {
+    supprimer(request, response, "arrivage(s)", this::supprimerArrivage);
+  }
+
+  /**
+   * Lignes cochées (_ids, bouton de la barre) ou ligne cliquée (id, icône de la ligne) ; chaque pièce
+   * est supprimée dans sa propre transaction, les refus sont listés.
+   */
+  protected void supprimer(
+      ActionRequest request,
+      ActionResponse response,
+      String libelle,
+      Function<Long, String> suppression) {
     try {
-      Long id = request.getContext().asType(StockMove.class).getId();
-      StockMoveRepository repo = Beans.get(StockMoveRepository.class);
-      StockMove arrivage = id != null ? repo.find(id) : null;
-      if (arrivage == null) {
+      Context context = request.getContext();
+      List<Long> ids = new ArrayList<>();
+      Object selection = context.get("_ids");
+      if (selection instanceof List && !((List<?>) selection).isEmpty()) {
+        for (Object id : (List<?>) selection) {
+          ids.add(Long.valueOf(id.toString()));
+        }
+      } else if (context.get("id") != null) {
+        ids.add(Long.valueOf(context.get("id").toString()));
+      }
+      if (ids.isEmpty()) {
+        response.setInfo("Cochez au moins une ligne de la liste.");
         return;
       }
-      int status = arrivage.getStatusSelect();
-      if (status != StockMoveRepository.STATUS_DRAFT
-          && status != StockMoveRepository.STATUS_CANCELED) {
-        response.setError(
-            "Arrivage "
-                + arrivage.getStockMoveSeq()
-                + (status == StockMoveRepository.STATUS_REALIZED
-                    ? " réel : il est entré en stock, il ne peut plus être supprimé (annulez-le dans sa fiche)."
-                    : " en cours : annulez-le d'abord dans sa fiche, puis supprimez-le."));
-        return;
-      }
-      String num = arrivage.getStockMoveSeq();
-      // les lots créés pour ses lignes (lot « d'origine » = ligne de l'arrivage) en sont détachés, sinon la
-      // base refuse de supprimer les lignes ; un lot qui ne sert plus nulle part est supprimé avec l'arrivage
-      TrackingNumberRepository lotRepo = Beans.get(TrackingNumberRepository.class);
-      List<TrackingNumber> lots = new ArrayList<>();
-      if (arrivage.getStockMoveLineList() != null) {
-        for (StockMoveLine line : arrivage.getStockMoveLineList()) {
-          if (line.getId() == null) {
-            continue;
-          }
-          for (TrackingNumber lot :
-              lotRepo.all().filter("self.originStockMoveLine.id = ?1", line.getId()).fetch()) {
-            lot.setOriginStockMoveLine(null);
-            lots.add(lot);
-          }
+      int supprimees = 0;
+      List<String> refus = new ArrayList<>();
+      for (Long id : ids) {
+        String[] resultat = new String[1];
+        try {
+          JPA.runInTransaction(() -> resultat[0] = suppression.apply(id));
+        } catch (Exception e) {
+          resultat[0] = "#" + id + " : " + e.getMessage();
+        }
+        if (resultat[0] == null) {
+          supprimees++;
+        } else {
+          refus.add(resultat[0]);
         }
       }
-      repo.remove(arrivage);
-      JPA.flush();
-      for (TrackingNumber lot : lots) {
-        if (!lotUtilise(lot)) {
-          lotRepo.remove(lot);
-        }
+      if (refus.isEmpty()) {
+        response.setNotify(supprimees + " " + libelle + " supprimé(e)(s).");
+      } else {
+        String message =
+            (supprimees > 0 ? supprimees + " " + libelle + " supprimé(e)(s).<br/>" : "")
+                + "Non supprimé(e)(s) :<br/>- "
+                + String.join("<br/>- ", refus);
+        response.setError(message);
       }
-      response.setNotify("Arrivage " + (num != null ? num : "") + " supprimé.");
       response.setReload(true);
     } catch (Exception e) {
       TraceBackService.trace(response, e);
     }
   }
 
-  /** Le lot est-il encore utilisé (mouvement de stock, ligne d'achat, stock, lot choisi en vente) ? */
+  /** null si la commande est supprimée, sinon la raison du refus. */
+  protected String supprimerCommandeClient(Long id) {
+    SaleOrderRepository repo = Beans.get(SaleOrderRepository.class);
+    SaleOrder commande = repo.find(id);
+    if (commande == null) {
+      return null;
+    }
+    int status = commande.getStatusSelect();
+    if (status != SaleOrderRepository.STATUS_DRAFT_QUOTATION
+        && status != SaleOrderRepository.STATUS_FINALIZED_QUOTATION
+        && status != SaleOrderRepository.STATUS_CANCELED) {
+      return "Commande " + commande.getSaleOrderSeq() + " confirmée : l'annuler d'abord dans sa fiche";
+    }
+    repo.remove(commande);
+    return null;
+  }
+
+  protected String supprimerCommandeAchat(Long id) {
+    PurchaseOrderRepository repo = Beans.get(PurchaseOrderRepository.class);
+    PurchaseOrder commande = repo.find(id);
+    if (commande == null) {
+      return null;
+    }
+    int status = commande.getStatusSelect();
+    if (status != PurchaseOrderRepository.STATUS_DRAFT
+        && status != PurchaseOrderRepository.STATUS_REQUESTED
+        && status != PurchaseOrderRepository.STATUS_CANCELED) {
+      return "Commande " + commande.getPurchaseOrderSeq() + " validée : l'annuler d'abord dans sa fiche";
+    }
+    repo.remove(commande);
+    return null;
+  }
+
+  protected String supprimerArrivage(Long id) {
+    StockMoveRepository repo = Beans.get(StockMoveRepository.class);
+    StockMove arrivage = repo.find(id);
+    if (arrivage == null) {
+      return null;
+    }
+    int status = arrivage.getStatusSelect();
+    if (status != StockMoveRepository.STATUS_DRAFT
+        && status != StockMoveRepository.STATUS_CANCELED) {
+      return "Arrivage "
+          + arrivage.getStockMoveSeq()
+          + (status == StockMoveRepository.STATUS_REALIZED
+              ? " réel : entré en stock, ne peut plus être supprimé"
+              : " en cours : l'annuler d'abord dans sa fiche");
+    }
+    // les lots créés pour ses lignes (lot « d'origine » = ligne de l'arrivage) en sont détachés, sinon
+    // la base refuse de supprimer les lignes ; un lot qui ne sert plus nulle part est supprimé aussi
+    TrackingNumberRepository lotRepo = Beans.get(TrackingNumberRepository.class);
+    List<TrackingNumber> lots = new ArrayList<>();
+    if (arrivage.getStockMoveLineList() != null) {
+      for (StockMoveLine line : arrivage.getStockMoveLineList()) {
+        if (line.getId() == null) {
+          continue;
+        }
+        for (TrackingNumber lot :
+            lotRepo.all().filter("self.originStockMoveLine.id = ?1", line.getId()).fetch()) {
+          lot.setOriginStockMoveLine(null);
+          lots.add(lot);
+        }
+      }
+    }
+    repo.remove(arrivage);
+    JPA.flush();
+    for (TrackingNumber lot : lots) {
+      if (!lotUtilise(lot)) {
+        lotRepo.remove(lot);
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Le lot est-il encore utilisé (mouvement de stock, ligne d'achat, stock, lot choisi en vente) ?
+   */
   protected boolean lotUtilise(TrackingNumber lot) {
     String[] requetes = {
       "SELECT COUNT(x) FROM StockMoveLine x WHERE x.trackingNumber.id = :id",
@@ -143,7 +180,10 @@ public class LvmeSuppressionController {
     };
     for (String requete : requetes) {
       Long n =
-          JPA.em().createQuery(requete, Long.class).setParameter("id", lot.getId()).getSingleResult();
+          JPA.em()
+              .createQuery(requete, Long.class)
+              .setParameter("id", lot.getId())
+              .getSingleResult();
       if (n != null && n > 0) {
         return true;
       }

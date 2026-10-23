@@ -1,0 +1,15 @@
+<search-filters name="lvme-arrivage-kanban-filters" model="com.axelor.apps.stock.db.StockMove" title="Filtres des arrivages">
+  <!-- LVME : filtres tout prêts du Kanban « Suivi des arrivages » (menu ▾ de la recherche) -->
+  <filter name="lvme-arr-retard" title="En retard">
+    <domain>self.lvmeEnRetard = true</domain>
+  </filter>
+  <filter name="lvme-arr-bateau" title="Bateau">
+    <domain>self.shipmentMode.name = 'Bateau'</domain>
+  </filter>
+  <filter name="lvme-arr-camion" title="Camion">
+    <domain>self.shipmentMode.name = 'Camion'</domain>
+  </filter>
+  <filter name="lvme-arr-mois" title="Arrivée prévue ce mois">
+    <domain>YEAR(self.estimatedDate) = YEAR(CURRENT_DATE) AND MONTH(self.estimatedDate) = MONTH(CURRENT_DATE)</domain>
+  </filter>
+</search-filters>

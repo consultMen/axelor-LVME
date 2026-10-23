@@ -1,0 +1,15 @@
+<search-filters name="lvme-commande-client-kanban-filters" model="com.axelor.apps.sale.db.SaleOrder" title="Filtres des commandes clients">
+  <!-- LVME : filtres tout prêts du Kanban « Suivi des commandes clients » (menu ▾ de la recherche) -->
+  <filter name="lvme-cde-retard" title="En retard">
+    <domain>self.lvmeEnRetard = true</domain>
+  </filter>
+  <filter name="lvme-cde-aujourdhui" title="Livraison aujourd'hui">
+    <domain>self.estimatedDeliveryDate = CURRENT_DATE</domain>
+  </filter>
+  <filter name="lvme-cde-marge" title="Marge négative">
+    <domain>self.marginRate &lt; 0</domain>
+  </filter>
+  <filter name="lvme-cde-mois" title="Commandes du mois">
+    <domain>YEAR(self.orderDate) = YEAR(CURRENT_DATE) AND MONTH(self.orderDate) = MONTH(CURRENT_DATE)</domain>
+  </filter>
+</search-filters>

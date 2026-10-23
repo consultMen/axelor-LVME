@@ -1,0 +1,15 @@
+<search-filters name="lvme-achat-kanban-filters" model="com.axelor.apps.purchase.db.PurchaseOrder" title="Filtres des commandes d'achat">
+  <!-- LVME : filtres tout prêts du Kanban « Suivi des commandes d'achat » (menu ▾ de la recherche) -->
+  <filter name="lvme-ach-retard" title="En retard">
+    <domain>self.lvmeEnRetard = true</domain>
+  </filter>
+  <filter name="lvme-ach-bateau" title="Bateau">
+    <domain>self.shipmentMode.name = 'Bateau'</domain>
+  </filter>
+  <filter name="lvme-ach-camion" title="Camion">
+    <domain>self.shipmentMode.name = 'Camion'</domain>
+  </filter>
+  <filter name="lvme-ach-mois" title="Réception prévue ce mois">
+    <domain>YEAR(self.estimatedReceiptDate) = YEAR(CURRENT_DATE) AND MONTH(self.estimatedReceiptDate) = MONTH(CURRENT_DATE)</domain>
+  </filter>
+</search-filters>
