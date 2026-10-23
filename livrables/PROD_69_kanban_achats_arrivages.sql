@@ -2,7 +2,7 @@
 -- PROD étape 69 : vues Kanban des commandes d'achat et des arrivages
 --   - Arrivages : colonnes Brouillon / À embarquer / Flottant / Réel / Annulé ; carte = N° arrivage, fournisseur,
 --     transport (bateau / camion, nom du bateau), arrivée prévue, colis, poids, montant HT ; rouge si en retard
---   - Commandes d'achat : colonnes Brouillon / Validée (à embarquer) / Flottant / Réceptionnée / Annulée ;
+--   - Commandes d'achat : colonnes Brouillon / À embarquer / Flottant / En stock / Annulée ;
 --     carte = N° commande, fournisseur, transport, dates de commande et de réception, montant HT et devise
 --   - déplacer une carte lance l'action de la fiche : arrivage Brouillon -> À embarquer (planifier),
 --     À embarquer <-> Flottant ; vers Réel ou Annulé : ouvre la fiche (saisie du réel / motif) ; un arrivage
@@ -33,8 +33,8 @@ DELETE FROM meta_select_item WHERE select_id = (SELECT id FROM meta_select WHERE
 INSERT INTO meta_select_item (id, version, select_id, value, title, order_seq)
 SELECT nextval('meta_select_item_seq'), 0, s.id, v.value, v.title, v.seq
 FROM meta_select s
-JOIN (VALUES ('1', 'Brouillon', 1), ('2', 'Validée (à embarquer)', 2), ('3', 'Flottant', 3),
-             ('4', 'Réceptionnée', 4), ('5', 'Annulée', 5)) AS v(value, title, seq) ON true
+JOIN (VALUES ('1', 'Brouillon', 1), ('2', 'À embarquer', 2), ('3', 'Flottant', 3),
+             ('4', 'En stock', 4), ('5', 'Annulée', 5)) AS v(value, title, seq) ON true
 WHERE s.name = 'lvme.achat.etape.select';
 
 -- ---------- Vues Kanban ----------

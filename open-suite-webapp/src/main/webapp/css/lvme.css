@@ -376,3 +376,12 @@
   font-weight: 600 !important;
   box-shadow: 0 3px 8px rgba(75, 42, 158, .35);
 }
+/* bouton « Nouvelle commande » des listes Commandes clients / Achats, à côté des boutons de suivi */
+.lvme-btn-nouveau, .lvme-btn-nouveau button {
+  background: linear-gradient(135deg, #22a565, #0d6b3d) !important;
+  color: #fff !important;
+  border: 0 !important;
+  border-radius: 8px !important;
+  font-weight: 600 !important;
+  box-shadow: 0 3px 8px rgba(13, 107, 61, .35);
+}

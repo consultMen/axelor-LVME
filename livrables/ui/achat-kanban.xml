@@ -1,6 +1,6 @@
 <kanban name="lvme-achat-kanban" title="Commandes d'achat" model="com.axelor.apps.purchase.db.PurchaseOrder"
   columnBy="lvmeEtapeAchat" sequenceBy="lvmeKanbanSeq" orderBy="estimatedReceiptDate" onMove="action-lvme-kanban-deplacer-achat" limit="30">
-  <!-- LVME : commandes d'achat en colonnes par étape (Brouillon, Validée (à embarquer), Flottant, Réceptionnée,
+  <!-- LVME : commandes d'achat en colonnes par étape (Brouillon, À embarquer, Flottant, En stock,
        Annulée) ; déplacer une carte valide ou annule la commande ; carte rouge si la réception
        prévue est dépassée -->
   <field name="purchaseOrderSeq"/>

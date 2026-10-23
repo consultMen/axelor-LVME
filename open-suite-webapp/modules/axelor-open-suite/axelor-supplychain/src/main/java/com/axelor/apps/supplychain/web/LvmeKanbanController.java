@@ -61,7 +61,7 @@ public class LvmeKanbanController {
       case ACH_FLOTTANT:
         return "Flottant";
       case ACH_RECEPTIONNEE:
-        return "Réceptionnée";
+        return "En stock";
       default:
         return "Annulée";
     }
@@ -183,7 +183,7 @@ public class LvmeKanbanController {
         // la réception demande la saisie du réel : ouverture de l'arrivage de la commande
         List<StockMove> arrivages = arrivagesEnCours(commande);
         if (arrivages.isEmpty()) {
-          response.setError(num + " : aucun arrivage en cours à réceptionner.");
+          response.setError(num + " : aucun arrivage en cours à mettre en stock.");
         } else {
           response.setView(
               ActionView.define("Arrivage : saisissez le réel puis « Saisie Réel »")
@@ -201,7 +201,7 @@ public class LvmeKanbanController {
                 + " : passage vers « "
                 + libelle(etape)
                 + " » impossible depuis son étape actuelle."
-                + " Possible : Brouillon -> Validée (à embarquer) <-> Flottant -> Réceptionnée"
+                + " Possible : Brouillon -> À embarquer <-> Flottant -> En stock"
                 + " (ouvre l'arrivage pour le réel), ou -> Annulée.");
       }
       response.setReload(true);

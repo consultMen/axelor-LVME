@@ -40,8 +40,8 @@
     </boolean>
     <!-- LVME : ordre des cartes dans le Kanban (déplacement des cartes) -->
     <integer name="lvmeKanbanSeq" title="Ordre Kanban"/>
-    <!-- LVME : colonne du Kanban des commandes d'achat : 1 Brouillon / demandée, 2 Validée (à embarquer),
-      3 Flottant, 4 Réceptionnée, 5 Annulée -->
+    <!-- LVME : étape de la commande d'achat (Kanban et barre de la fiche) : 1 Brouillon / demandée, 2 À embarquer,
+      3 Flottant, 4 En stock, 5 Annulée -->
     <integer name="lvmeEtapeAchat" title="Étape" selection="lvme.achat.etape.select"
       formula="true">
       <![CDATA[

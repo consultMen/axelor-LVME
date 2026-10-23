@@ -11,7 +11,9 @@
     <!-- LVME : en-tête condensé comme la fiche Arrivage (copie GESCOM) : Fournisseur | Commande |
        Devise + totaux | Actions, sans barre latérale ni « Paramètres » ; onglets du bas inchangés -->
   <panel name="overviewPanel" colSpan="12">
-    <field name="statusSelect" showTitle="false" readonly="true" colSpan="12" widget="NavSelect"/>
+    <!-- LVME : statuts de la commande d'achat comme le Kanban : Brouillon, À embarquer, Flottant, En stock, Annulée -->
+    <field name="lvmeEtapeAchat" showTitle="false" readonly="true" colSpan="12" widget="NavSelect"/>
+    <field name="statusSelect" hidden="true"/>
     <panel name="mainPanel" readonlyIf="statusSelect == 4" colSpan="12" css="lvme-gescom">
     <panel name="lvmeFournisseurPanel" colSpan="4" itemSpan="6" css="lvme-gescom lvme-gescom-box">
       <field colSpan="8" name="supplierPartner" title="Fournisseur" hideIf="company == null" readonlyIf="statusSelect >= 3" canEdit="false" onChange="action-group-purchase-order-partner-onchange" onSelect="action-set-supplier-partner-domain" form-view="partner-form" grid-view="partner-grid" x-image-field="picture"/>
