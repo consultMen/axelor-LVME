@@ -14,43 +14,92 @@ DST = os.path.join(RACINE, 'livrables', 'PROD_68_dupliquer_kpi_commandes.sql')
 # ---------- fiche de recherche des commandes clients : KPI en haut ----------
 SO = 'com.axelor.apps.sale.db.SaleOrder'
 EN_COURS = "self.template = false AND self.statusSelect = 3 AND (self.deliveryState IS NULL OR self.deliveryState != 3)"
-MOIS = ("def d1 = __date__.withDayOfMonth(1); def d2 = __date__.withDayOfMonth(__date__.lengthOfMonth()); "
+MOIS = ("def d1 = __date__.withDayOfMonth(1); "
         "def l = __repo__(%s).all().filter('self.template = false AND self.statusSelect IN (3, 4) "
-        "AND self.orderDate BETWEEN ?1 AND ?2', d1, d2).fetch(); "
+        "AND self.orderDate BETWEEN ?1 AND ?2', d1, __date__).fetch(); "
         "def ca = ((l.collect { it.exTaxTotal ?: 0 }.sum() ?: 0) as BigDecimal); "
         "def mg = ((l.collect { it.totalGrossMargin ?: 0 }.sum() ?: 0) as BigDecimal); "
+        "def pct = ca.signum() != 0 ? (mg * 100 / ca).setScale(1, java.math.RoundingMode.HALF_UP) : null; "
         "def f = java.text.NumberFormat.getIntegerInstance(java.util.Locale.FRANCE); " % SO)
+# même période du mois précédent (du 1er au même jour), pour la tendance du CA
+PREC = ("def lp = __repo__(%s).all().filter('self.template = false AND self.statusSelect IN (3, 4) "
+        "AND self.orderDate BETWEEN ?1 AND ?2', d1.minusMonths(1), __date__.minusMonths(1)).fetch(); "
+        "def cap = ((lp.collect { it.exTaxTotal ?: 0 }.sum() ?: 0) as BigDecimal); " % SO)
+SEUIL_MARGE = 10  # % : en dessous, alerte « marge faible »
 KPI = [
     ('$kpiEnCours', "__repo__(%s).all().filter('%s').count().toString()" % (SO, EN_COURS)),
-    ('$kpiEnCoursDetail', "__repo__(%s).all().filter('self.template = false AND self.statusSelect IN (1, 2)').count() + ' devis en préparation'" % SO),
+    ('$kpiEnCoursDetail', "def l = __repo__(%s).all().filter('%s').fetch(); "
+     "java.text.NumberFormat.getIntegerInstance(java.util.Locale.FRANCE).format(((l.collect { it.exTaxTotal ?: 0 }.sum() ?: 0) as BigDecimal)"
+     ".setScale(0, java.math.RoundingMode.HALF_UP)) + ' € HT à livrer'" % (SO, EN_COURS)),
     ('$kpiCaMois', MOIS + "f.format(ca.setScale(0, java.math.RoundingMode.HALF_UP)) + ' €'"),
     ('$kpiCaMoisDetail', MOIS + "l.size() + ' commande(s) depuis le ' + d1.format(java.time.format.DateTimeFormatter.ofPattern('dd/MM'))"),
-    ('$kpiMarge', MOIS + "ca.signum() != 0 ? (mg * 100 / ca).setScale(1, java.math.RoundingMode.HALF_UP).toString().replace('.', ',') + ' %' : 'n.d.'"),
+    ('$kpiCaEvol', MOIS + PREC + "def v = cap.signum() == 0 ? null : ((ca - cap) * 100 / cap).setScale(0, java.math.RoundingMode.HALF_UP); "
+     "v == null ? 'Pas de comparaison' : (v.signum() &gt;= 0 ? '▲ +' : '▼ ') + v + ' % vs mois dernier'"),
+    ('$kpiCaHausse', MOIS + PREC + "ca &gt;= cap ? 'true' : null"),
+    ('$kpiMarge', MOIS + "pct != null ? pct.toString().replace('.', ',') + ' %' : 'n.d.'"),
     ('$kpiMargeDetail', MOIS + "'Marge HT : ' + f.format(mg.setScale(0, java.math.RoundingMode.HALF_UP)) + ' €'"),
+    ('$kpiMargeFaible', MOIS + "pct != null &amp;&amp; pct &lt; %d ? 'true' : null" % SEUIL_MARGE),
     ('$kpiALivrer', "__repo__(%s).all().filter('%s AND self.estimatedDeliveryDate = ?1', __date__).count().toString()" % (SO, EN_COURS)),
-    ('$kpiRetard', "__repo__(%s).all().filter('%s AND self.estimatedDeliveryDate &lt; ?1', __date__).count() + ' en retard'" % (SO, EN_COURS)),
+    ('$kpiALivrerDetail', "__repo__(%s).all().filter('%s AND self.estimatedDeliveryDate = ?1', __date__.plusDays(1)).count() + ' à livrer demain'" % (SO, EN_COURS)),
+    # alertes : texte si l'alerte existe, rien sinon
+    ('$alRetard', "def n = __repo__(%s).all().filter('%s AND self.estimatedDeliveryDate &lt; ?1', __date__).count(); "
+     "n &gt; 0 ? n + ' commande(s) en retard de livraison' : null" % (SO, EN_COURS)),
+    ('$alMargeNeg', "def n = __repo__(%s).all().filter('%s AND self.totalGrossMargin &lt; 0').count(); "
+     "n &gt; 0 ? n + ' commande(s) en cours à marge négative' : null" % (SO, EN_COURS)),
+    ('$alMargeFaible', MOIS + "pct != null &amp;&amp; pct &lt; %d ? 'Marge du mois sous %d %%' : null" % (SEUIL_MARGE, SEUIL_MARGE)),
+    ('$alDevis', "def n = __repo__(%s).all().filter('self.template = false AND self.statusSelect IN (1, 2) "
+     "AND self.creationDate &lt; ?1', __date__.minusDays(15)).count(); "
+     "n &gt; 0 ? n + ' devis de plus de 15 jours non confirmé(s)' : null" % SO),
 ]
+ALERTES = ['$alRetard', '$alMargeNeg', '$alMargeFaible', '$alDevis']
+# « Aucune alerte » : calculé en dernier, avec les mêmes requêtes que chaque alerte
+KPI.append(('$alAucune', '[' + ', '.join('{ -> %s }' % e for k, e in KPI if k in ALERTES)
+            + "].every { it() == null } ? 'Aucune alerte' : null"))
 
 
-def tuile(titre, couleur, valeur, detail, couleur_detail='#666'):
-    return ('            <Box style={{ border: \'1px solid %s\', borderLeft: \'6px solid %s\', borderRadius: 8, padding: 12 }}>\n'
-            '              <Box style={{ fontSize: 13, color: \'#666\' }}>%s</Box>\n'
-            '              <Box style={{ fontSize: 26, fontWeight: \'bold\' }}>{%s}</Box>\n'
-            '              <Box style={{ fontSize: 12, color: \'%s\' }}>{%s}</Box>\n'
-            '            </Box>\n') % (couleur, couleur, titre, valeur, couleur_detail, detail)
+def tuile(titre, couleur, fond, icone, valeur, detail, extra='', couleur_valeur="'#1b2a4a'"):
+    return ("            <Box style={{ background: '#fff', borderRadius: 10, borderTop: '4px solid %s', "
+            "boxShadow: '0 1px 4px rgba(0,0,0,.15)', padding: '10px 14px' }}>\n"
+            "              <Box d=\"flex\" style={{ justifyContent: 'space-between', alignItems: 'center' }}>\n"
+            "                <Box style={{ fontSize: 12, color: '#555', fontWeight: 600, textTransform: 'uppercase' }}>%s</Box>\n"
+            "                <Box style={{ width: 34, height: 34, borderRadius: 17, background: '%s', display: 'flex', "
+            "alignItems: 'center', justifyContent: 'center', fontSize: 18 }}>%s</Box>\n"
+            "              </Box>\n"
+            "              <Box style={{ fontSize: 28, fontWeight: 700, color: %s }}>{%s}</Box>\n"
+            "              <Box style={{ fontSize: 12, color: '#666' }}>{%s}</Box>\n"
+            "%s"
+            "            </Box>\n") % (couleur, titre, fond, icone, couleur_valeur, valeur, detail, extra)
 
 
-panneau = ('  <!-- LVME : 4 KPI des commandes clients (calculés à l\'ouverture, action-lvme-cde-client-kpi) -->\n'
+def pastille(champ, fond, texte, icone):
+    return ("            {%s && <Box style={{ background: '%s', color: '%s', borderRadius: 14, padding: '4px 12px', "
+            "fontSize: 13, fontWeight: 600 }}>%s {%s}</Box>}\n") % (champ, fond, texte, icone, champ)
+
+
+EVOL = ("              <Box style={{ display: 'inline-block', marginTop: 4, fontSize: 12, fontWeight: 600, padding: '2px 8px', "
+        "borderRadius: 10, background: $kpiCaHausse ? '#d1e7dd' : '#f8d7da', color: $kpiCaHausse ? '#0f5132' : '#842029' }}>"
+        "{$kpiCaEvol}</Box>\n")
+
+panneau = ('  <!-- LVME : KPI et alertes des commandes clients (calculés à l\'ouverture, action-lvme-cde-client-kpi) -->\n'
            '  <panel name="kpiCdeClientPanel" showTitle="false" colSpan="12">\n'
            + ''.join('    <field name="%s" type="string" hidden="true"/>\n' % k for k, _ in KPI)
            + '    <field name="$kpiCdeTuiles" showTitle="false" readonly="true" colSpan="12" type="string">\n'
            '      <viewer depends="%s"><![CDATA[\n' % ','.join(k for k, _ in KPI)
            + '        <>\n'
-           '          <Box d="grid" style={{ gridTemplateColumns: \'repeat(4, 1fr)\', gap: 12 }}>\n'
-           + tuile('Commandes en cours', '#0d6efd', '$kpiEnCours', '$kpiEnCoursDetail')
-           + tuile('CA HT du mois', '#198754', '$kpiCaMois', '$kpiCaMoisDetail')
-           + tuile('% Marge du mois', '#6f42c1', '$kpiMarge', '$kpiMargeDetail')
-           + tuile("À livrer aujourd'hui", '#fd7e14', '$kpiALivrer', '$kpiRetard', '#dc3545')
+           "          <Box d=\"grid\" style={{ gridTemplateColumns: 'repeat(4, 1fr)', gap: 14 }}>\n"
+           + tuile('Commandes en cours', '#0d6efd', '#e7f1ff', '📦', '$kpiEnCours', '$kpiEnCoursDetail')
+           + tuile('CA HT du mois', '#198754', '#e6f4ea', '💶', '$kpiCaMois', '$kpiCaMoisDetail', EVOL)
+           + tuile('% Marge du mois', '#6f42c1', '#efe8fb', '📈', '$kpiMarge', '$kpiMargeDetail', '',
+                   "$kpiMargeFaible ? '#dc3545' : '#1b2a4a'")
+           + tuile("À livrer aujourd'hui", '#fd7e14', '#fff1e6', '🚚', '$kpiALivrer', '$kpiALivrerDetail')
+           + '          </Box>\n'
+           "          <Box d=\"flex\" style={{ flexWrap: 'wrap', gap: 8, marginTop: 10, alignItems: 'center' }}>\n"
+           "            <Box style={{ fontSize: 13, fontWeight: 700, color: '#1b2a4a', marginRight: 4 }}>Alertes :</Box>\n"
+           + pastille('$alRetard', '#f8d7da', '#842029', '⚠')
+           + pastille('$alMargeNeg', '#f8d7da', '#842029', '⚠')
+           + pastille('$alMargeFaible', '#fff3cd', '#664d03', '⚠')
+           + pastille('$alDevis', '#fff3cd', '#664d03', '⏳')
+           + pastille('$alAucune', '#d1e7dd', '#0f5132', '✔')
            + '          </Box>\n'
            '        </>\n'
            '      ]]></viewer>\n'
@@ -59,11 +108,15 @@ panneau = ('  <!-- LVME : 4 KPI des commandes clients (calculés à l\'ouverture
 
 p = os.path.join(UI, 'commande-client-search-form.xml')
 f = open(p, encoding='utf-8').read()
-if 'kpiCdeClientPanel' not in f:
+if 'kpiCdeClientPanel' in f:  # nouvelle version du panneau : l'ancien est retiré
+    i = f.index('  <!-- LVME : KPI')
+    j = f.index('  </panel>\n', f.index('name="kpiCdeClientPanel"')) + len('  </panel>\n')
+    f = f[:i] + f[j:]
+else:
     f = f.replace('onNew="action-lvme-cde-client-defaults"', 'onNew="action-lvme-cde-client-defaults,action-lvme-cde-client-kpi"', 1)
-    i = f.index('  <panel name="rechercheCdePanel"')
-    f = f[:i] + panneau + f[i:]
-    open(p, 'w', encoding='utf-8', newline='\n').write(f)
+i = f.index('  <panel name="rechercheCdePanel"')
+f = f[:i] + panneau + f[i:]
+open(p, 'w', encoding='utf-8', newline='\n').write(f)
 
 kpi_xml = ('<action-attrs name="action-lvme-cde-client-kpi">\n'
            + ''.join('  <attribute name="value" for="%s" expr="eval: %s"/>\n' % (k, e) for k, e in KPI)
