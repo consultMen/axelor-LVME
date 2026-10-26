@@ -134,8 +134,8 @@
         <field name="externalReference" title="Ref Cde" colSpan="8" hideIf="company == null" onChange="action-sale-sale-order-attrs-external-reference"/>
         <field name="carrierPartner" title="Transporteur" colSpan="8" canEdit="false" domain="self.isCarrier = TRUE AND (self.companySet IS EMPTY OR :company MEMBER OF self.companySet)" form-view="partner-form" grid-view="partner-grid" x-image-field="picture"/>
         <field name="portPaye" title="Port Payé" colSpan="4"/>
+        <field height="2" name="internalNote" title="&lt; Commentaire &gt;" colSpan="12" widget="Html" x-lite="true"/>
         <field name="coutPortKg" title="Coût port/kg" colSpan="4"/>
-        <field height="2" name="internalNote" title="&lt; Commentaire &gt;" colSpan="8" widget="Html" x-lite="true"/>
     </panel>
     <panel name="actionsPanel" colSpan="2" itemSpan="12">
       <button name="lvmeFermerBtn" title="Fermer" icon="x-circle" css="btn-danger" onClick="close"/>

@@ -141,8 +141,9 @@ cde_new = '\n'.join([
     F(d1('externalReference'), 8, 'Ref Cde'),
     F(d1('carrierPartner'), 8, 'Transporteur'),
     F(d1('portPaye'), 4, 'Port Payé'),
+    # commentaire sur toute la largeur du cadre, coût du port juste dessous (comme GESCOM)
+    F(seta(d1('internalNote'), 'height', '2'), 12, '&lt; Commentaire &gt;'),
     F(d1('coutPortKg'), 4, 'Coût port/kg'),
-    F(seta(d1('internalNote'), 'height', '2'), 8, '&lt; Commentaire &gt;'),
     '    </panel>'])
 
 # ---------- boutons (ancienne barre latérale) à droite, en premier Imprimer commande ----------
