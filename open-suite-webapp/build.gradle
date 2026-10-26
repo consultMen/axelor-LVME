@@ -199,6 +199,18 @@ tasks.named('copyWebapp') {
       if (!html.contains('js/lvme.js')) {
         html = html.replace('</head>', '    <script src="./js/lvme.js"></script>\n  </head>')
       }
+      // LVME : application installable sur téléphone et PC (icône, plein écran sans barre du navigateur)
+      // (src/main/webapp/js/lvme-manifest.json et img/pwa ; dans js/ car Axelor y laisse l'accès sans connexion)
+      if (!html.contains('lvme-manifest.json')) {
+        html = html.replace('</head>',
+          '    <link rel="manifest" href="./js/lvme-manifest.json">\n' +
+          '    <meta name="theme-color" content="#ffffff">\n' +
+          '    <meta name="mobile-web-app-capable" content="yes">\n' +
+          '    <meta name="apple-mobile-web-app-capable" content="yes">\n' +
+          '    <meta name="apple-mobile-web-app-title" content="LVME">\n' +
+          '    <meta name="apple-mobile-web-app-status-bar-style" content="default">\n' +
+          '    <link rel="apple-touch-icon" href="./img/pwa/lvme-apple-180.png">\n  </head>')
+      }
       index.write(html, 'UTF-8')
     }
   }
