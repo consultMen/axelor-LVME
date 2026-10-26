@@ -178,14 +178,14 @@
   font-size: 15px;
   text-align: center;
 }
-[class*="_formView_"]:has(.lvme-cde-violet) [class*="_main_"] > [class*="_panel_"]:has([class*="_header_"] [class*="_column_"]) [class*="_body_"] [class*="_row_"]:nth-child(even) [class*="_column_"] {
+[class*="_formView_"]:has(.lvme-cde-statut) [class*="_main_"] > [class*="_panel_"]:has([class*="_header_"] [class*="_column_"]) [class*="_body_"] [class*="_row_"]:nth-child(even) [class*="_column_"] {
   background-color: #ccffff;
 }
-[class*="_formView_"]:has(.lvme-cde-violet) [class*="_main_"] > [class*="_panel_"]:has([class*="_header_"] [class*="_column_"]) [class*="_hilite-warning_"] {
+[class*="_formView_"]:has(.lvme-cde-statut) [class*="_main_"] > [class*="_panel_"]:has([class*="_header_"] [class*="_column_"]) [class*="_hilite-warning_"] {
   background-color: #ffffc0 !important;
   color: #000;
 }
-[class*="_formView_"]:has(.lvme-cde-violet) [class*="_main_"] > [class*="_panel_"]:has([class*="_header_"] [class*="_column_"]) [class*="_hilite-yellow_"] {
+[class*="_formView_"]:has(.lvme-cde-statut) [class*="_main_"] > [class*="_panel_"]:has([class*="_header_"] [class*="_column_"]) [class*="_hilite-yellow_"] {
   background-color: #ffff00 !important;
   color: #000;
 }
@@ -498,11 +498,11 @@
 /*
  * Fiche Commande client resserrée comme GESCOM : toute la fiche visible à 100 %. Axelor ne reprend pas le css des
  * panneaux du premier niveau de la fiche (mainPanel, lvmeGescomPanel) : la fiche est reconnue à son bloc Commande
- * (css="lvme-cde-violet"). Libellés plus petits jamais coupés ; cases et boutons moins hauts ; en-tête plus bas ;
+ * (css="lvme-cde-statut", absent de la fenêtre de ligne qui a aussi lvme-cde-violet). Libellés plus petits jamais coupés ; cases et boutons moins hauts ; en-tête plus bas ;
  * libellés à gauche des cases dans le bloc Client.
  */
-[class*="_formView_"]:has(.lvme-cde-violet),
-[class*="_formView_"]:has(.lvme-cde-violet) * {
+[class*="_formView_"]:has(.lvme-cde-statut),
+[class*="_formView_"]:has(.lvme-cde-statut) * {
   --ax-form-row-gap: .15rem !important;
   --ax-form-column-gap: .5rem !important;
   --ax-theme-form-row-gap: .15rem !important;
@@ -513,8 +513,8 @@
   --ax-panel-header-title-padding: .15rem .4rem !important;
   --ax-input-padding: .05rem .4rem !important;
 }
-[class*="_formView_"]:has(.lvme-cde-violet) label,
-[class*="_formView_"]:has(.lvme-cde-violet) [class*="_labelText_"] {
+[class*="_formView_"]:has(.lvme-cde-statut) label,
+[class*="_formView_"]:has(.lvme-cde-statut) [class*="_labelText_"] {
   font-size: 12px !important;
   white-space: nowrap !important;
   overflow: visible !important;
@@ -522,73 +522,73 @@
   line-height: 1.1 !important;
   margin-bottom: 0 !important;
 }
-[class*="_formView_"]:has(.lvme-cde-violet) [class*="_main_"] input:not([type="checkbox"]):not([type="radio"]),
-[class*="_formView_"]:has(.lvme-cde-violet) [class*="_main_"] select {
+[class*="_formView_"]:has(.lvme-cde-statut) [class*="_main_"] input:not([type="checkbox"]):not([type="radio"]),
+[class*="_formView_"]:has(.lvme-cde-statut) [class*="_main_"] select {
   font-size: 13px !important;
   min-height: 0 !important;
   height: 24px;
   padding-top: 0 !important;
   padding-bottom: 0 !important;
 }
-[class*="_formView_"]:has(.lvme-cde-violet) [class*="_main_"] button {
+[class*="_formView_"]:has(.lvme-cde-statut) [class*="_main_"] button {
   padding-top: 2px !important;
   padding-bottom: 2px !important;
   font-size: 13px !important;
   min-height: 0 !important;
 }
-[class*="_formView_"]:has(.lvme-cde-violet) [class*="_main_"] textarea,
-[class*="_formView_"]:has(.lvme-cde-violet) [class*="_main_"] [contenteditable] {
+[class*="_formView_"]:has(.lvme-cde-statut) [class*="_main_"] textarea,
+[class*="_formView_"]:has(.lvme-cde-statut) [class*="_main_"] [contenteditable] {
   min-height: 0 !important;
   max-height: 46px;
 }
 /* barre des statuts (Devis brouillon, Devis finalisé…) plus basse */
-[class*="_formView_"]:has(.lvme-cde-violet) [class*="_main_"] > [class*="_panel_"]:first-child [class*="_step"],
-[class*="_formView_"]:has(.lvme-cde-violet) [class*="_main_"] > [class*="_panel_"]:first-child [class*="_nav"] {
+[class*="_formView_"]:has(.lvme-cde-statut) [class*="_main_"] > [class*="_panel_"]:first-child [class*="_step"],
+[class*="_formView_"]:has(.lvme-cde-statut) [class*="_main_"] > [class*="_panel_"]:first-child [class*="_nav"] {
   font-size: 13px !important;
 }
 /* lignes du tableau des commandes resserrées */
-[class*="_formView_"]:has(.lvme-cde-violet) [class*="_main_"] > [class*="_panel_"]:has([class*="_header_"] [class*="_column_"]) [class*="_body_"] [class*="_row_"] [class*="_column_"] {
+[class*="_formView_"]:has(.lvme-cde-statut) [class*="_main_"] > [class*="_panel_"]:has([class*="_header_"] [class*="_column_"]) [class*="_body_"] [class*="_row_"] [class*="_column_"] {
   padding-top: 2px !important;
   padding-bottom: 2px !important;
   font-size: 13px;
 }
 /* libellés à GAUCHE des cases dans le bloc Client (comme GESCOM) : hauteur divisée par deux ; le bloc Commande,
    trop étroit pour trois cases par ligne, garde ses libellés au-dessus */
-[class*="_formView_"]:has(.lvme-cde-violet) .lvme-gescom-box [class*="_container_"]:has(> [class*="_title_"]) {
+[class*="_formView_"]:has(.lvme-cde-statut) .lvme-gescom-box [class*="_container_"]:has(> [class*="_title_"]) {
   flex-direction: row !important;
   align-items: center;
   gap: 6px;
 }
-[class*="_formView_"]:has(.lvme-cde-violet) .lvme-gescom-box [class*="_container_"]:has(> [class*="_title_"]) > [class*="_title_"] {
+[class*="_formView_"]:has(.lvme-cde-statut) .lvme-gescom-box [class*="_container_"]:has(> [class*="_title_"]) > [class*="_title_"] {
   flex: 0 1 auto;
   min-width: 58px;
 }
 /* case jamais écrasée par un libellé long (% Frais Commission…) : le libellé passe alors sur deux lignes */
-[class*="_formView_"]:has(.lvme-cde-violet) .lvme-gescom-box [class*="_container_"]:has(> [class*="_title_"]) > [class*="_title_"] label,
-[class*="_formView_"]:has(.lvme-cde-violet) .lvme-gescom-box [class*="_container_"]:has(> [class*="_title_"]) > [class*="_title_"] [class*="_labelText_"] {
+[class*="_formView_"]:has(.lvme-cde-statut) .lvme-gescom-box [class*="_container_"]:has(> [class*="_title_"]) > [class*="_title_"] label,
+[class*="_formView_"]:has(.lvme-cde-statut) .lvme-gescom-box [class*="_container_"]:has(> [class*="_title_"]) > [class*="_title_"] [class*="_labelText_"] {
   white-space: normal !important;
 }
-[class*="_formView_"]:has(.lvme-cde-violet) .lvme-gescom-box [class*="_container_"]:has(> [class*="_title_"]) > :not([class*="_title_"]) {
+[class*="_formView_"]:has(.lvme-cde-statut) .lvme-gescom-box [class*="_container_"]:has(> [class*="_title_"]) > :not([class*="_title_"]) {
   flex: 1 1 auto;
   min-width: 52px;
 }
 /* en-tête : pas de ligne vide sous la barre des statuts quand la commande n'a pas encore de numéro */
-[class*="_formView_"]:has(.lvme-cde-violet) [class*="_gridItem_"]:has(> [class*="_viewer_"] h3:empty) {
+[class*="_formView_"]:has(.lvme-cde-statut) [class*="_gridItem_"]:has(> [class*="_viewer_"] h3:empty) {
   display: none;
 }
-[class*="_formView_"]:has(.lvme-cde-violet) [class*="_main_"] > [class*="_panel_"]:first-child h3 {
+[class*="_formView_"]:has(.lvme-cde-statut) [class*="_main_"] > [class*="_panel_"]:first-child h3 {
   font-size: 16px;
   margin: 0;
 }
 /* commentaire : simple case de texte comme GESCOM (sans barre de mise en forme), deux lignes de haut */
-.lvme-cde-violet .custom-html-editor-toolbar {
+[class*="_formView_"]:has(.lvme-cde-statut) .lvme-cde-violet .custom-html-editor-toolbar {
   display: none !important;
 }
-.lvme-cde-violet .custom-html-editor-container {
+[class*="_formView_"]:has(.lvme-cde-statut) .lvme-cde-violet .custom-html-editor-container {
   height: auto !important;
   min-height: 0 !important;
 }
-.lvme-cde-violet .custom-html-editor-content {
+[class*="_formView_"]:has(.lvme-cde-statut) .lvme-cde-violet .custom-html-editor-content {
   height: 40px !important;
   min-height: 0 !important;
   overflow: auto;
