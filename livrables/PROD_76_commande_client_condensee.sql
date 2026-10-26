@@ -40,3 +40,25 @@ UPDATE meta_view SET xml = replace(xml,
   updated_on = now(), version = COALESCE(version, 0) + 1
 WHERE name = 'sale-order-form' AND module IS NULL AND priority = 30
   AND xml LIKE '%name="mainInvoicingAddress.addressL4" title="Adresse"%';
+
+-- boutons de droite : Finaliser / Confirmation Commande en premier, puis Fermer et Imprimer commande
+-- (remis devant « Complete manually sale order », le bouton qui suit les deux Confirmation Commande)
+UPDATE meta_view SET xml = replace(replace(xml,
+  $q$
+      <button name="lvmeFermerBtn" title="Fermer" icon="x-circle" css="btn-danger" onClick="close"/>
+      <button name="lvmeImprimerCommandeBtn" title="Imprimer commande" icon="printer" showIf="id" onClick="save,action-sale-order-view-reports-wizard"/>$q$, ''),
+  $q$
+      <button if="(__config__.app.isApp('supplychain') &amp;&amp; __config__.app.getApp('supplychain')?.allowCompleteManuallySaleOrder) || (!__config__.app.isApp('supplychain'))" name="completeManuallySaleOrderBtn"$q$,
+  $q$
+      <button name="lvmeFermerBtn" title="Fermer" icon="x-circle" css="btn-danger" onClick="close"/>
+      <button name="lvmeImprimerCommandeBtn" title="Imprimer commande" icon="printer" showIf="id" onClick="save,action-sale-order-view-reports-wizard"/>
+      <button if="(__config__.app.isApp('supplychain') &amp;&amp; __config__.app.getApp('supplychain')?.allowCompleteManuallySaleOrder) || (!__config__.app.isApp('supplychain'))" name="completeManuallySaleOrderBtn"$q$),
+  updated_on = now(), version = COALESCE(version, 0) + 1
+WHERE name = 'sale-order-form' AND module IS NULL AND priority = 30
+  AND position('name="lvmeFermerBtn"' IN xml) < position('name="finalizeBtn"' IN xml)
+  AND position($q$
+      <button if="(__config__.app.isApp('supplychain') &amp;&amp; __config__.app.getApp('supplychain')?.allowCompleteManuallySaleOrder) || (!__config__.app.isApp('supplychain'))" name="completeManuallySaleOrderBtn"$q$ IN xml) > 0;
+
+SELECT position('name="finalizeBtn"' IN xml) < position('name="lvmeFermerBtn"' IN xml) AS fermer_apres_finaliser,
+       xml LIKE '%name="completeManuallySaleOrderBtn"%' AS bouton_terminer_present
+FROM meta_view WHERE name = 'sale-order-form' AND module IS NULL AND priority = 30;

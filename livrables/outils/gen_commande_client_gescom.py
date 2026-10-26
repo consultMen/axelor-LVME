@@ -146,15 +146,19 @@ cde_new = '\n'.join([
     F(d1('coutPortKg'), 4, 'Coût port/kg'),
     '    </panel>'])
 
-# ---------- boutons (ancienne barre latérale) à droite, en premier Imprimer commande ----------
+# ---------- boutons (ancienne barre latérale) à droite : Finaliser / Confirmation Commande en premier, puis Fermer
+# et Imprimer commande, puis les autres ----------
 act_buttons = re.findall(r'<button\b' + A + r'*?/>', actions, re.S)
 act_fields = re.findall(r'<field\b' + A + r'*?/>', actions, re.S)
+act_buttons = [seta(b, 'title', 'Confirmation Commande') if 'name="confirmOrderBtn"' in b else b for b in act_buttons]
+n_valid = max(i for i, b in enumerate(act_buttons) if 'name="finalizeBtn"' in b or 'name="confirmOrderBtn"' in b) + 1
 boutons = '\n'.join(
-    ['    <panel name="actionsPanel" colSpan="2" itemSpan="12">',
-     '      <button name="lvmeFermerBtn" title="Fermer" icon="x-circle" css="btn-danger" onClick="close"/>',
-     '      <button name="lvmeImprimerCommandeBtn" title="Imprimer commande" icon="printer" '
-     'showIf="id" onClick="save,action-sale-order-view-reports-wizard"/>']
-    + ['      ' + (seta(b, 'title', 'Confirmation Commande') if 'name="confirmOrderBtn"' in b else b) for b in act_buttons] + ['      ' + f for f in act_fields] + ['    </panel>'])
+    ['    <panel name="actionsPanel" colSpan="2" itemSpan="12">']
+    + ['      ' + b for b in act_buttons[:n_valid]]
+    + ['      <button name="lvmeFermerBtn" title="Fermer" icon="x-circle" css="btn-danger" onClick="close"/>',
+       '      <button name="lvmeImprimerCommandeBtn" title="Imprimer commande" icon="printer" '
+       'showIf="id" onClick="save,action-sale-order-view-reports-wizard"/>']
+    + ['      ' + b for b in act_buttons[n_valid:]] + ['      ' + f for f in act_fields] + ['    </panel>'])
 
 # ---------- cadre des totaux, gris comme GESCOM ----------
 NUM = '(+%s || 0).toLocaleString("fr-FR", { minimumFractionDigits: %d, maximumFractionDigits: %d })'
