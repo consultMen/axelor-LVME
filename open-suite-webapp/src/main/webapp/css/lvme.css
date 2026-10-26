@@ -522,8 +522,7 @@
   margin-bottom: 0 !important;
 }
 [class*="_formView_"]:has(.lvme-cde-violet) [class*="_main_"] input:not([type="checkbox"]):not([type="radio"]),
-[class*="_formView_"]:has(.lvme-cde-violet) [class*="_main_"] select,
-[class*="_formView_"]:has(.lvme-cde-violet) [class*="_main_"] [class*="_viewer_"] {
+[class*="_formView_"]:has(.lvme-cde-violet) [class*="_main_"] select {
   font-size: 13px !important;
   min-height: 0 !important;
   height: 24px;
@@ -545,11 +544,6 @@
 [class*="_formView_"]:has(.lvme-cde-violet) [class*="_main_"] > [class*="_panel_"]:first-child [class*="_step"],
 [class*="_formView_"]:has(.lvme-cde-violet) [class*="_main_"] > [class*="_panel_"]:first-child [class*="_nav"] {
   font-size: 13px !important;
-}
-/* fond gris GESCOM derrière le bloc Client / Commande */
-[class*="_formView_"]:has(.lvme-cde-violet) [class*="_main_"] > [class*="_panel_"]:has(.lvme-cde-violet),
-[class*="_formView_"]:has(.lvme-cde-violet) [class*="_main_"] > [class*="_panel_"]:has(.lvme-cde-violet) > * > * > [class*="_content_"] {
-  background-color: #dfe3ec !important;
 }
 /* lignes du tableau des commandes resserrées */
 .lvme-cde-grid [class*="_body_"] [class*="_row_"] [class*="_column_"] {
