@@ -12,6 +12,8 @@ import com.axelor.apps.stock.db.Nature;
 import com.axelor.apps.stock.db.StockMove;
 import com.axelor.apps.stock.db.repo.StockMoveRepository;
 import com.axelor.apps.stock.service.StockMoveService;
+import com.axelor.db.JPA;
+import com.axelor.db.Model;
 import com.axelor.inject.Beans;
 import com.axelor.meta.schema.actions.ActionView;
 import com.axelor.rpc.ActionRequest;
@@ -42,8 +44,22 @@ public class LvmeKanbanController {
   protected static final int ACH_ANNULEE = 5;
 
   /**
-   * Colonne d'arrivée de la carte : valeur brute envoyée par le Kanban dans le contexte de l'action (le
-   * champ étant calculé, la lire par le modèle pourrait renvoyer l'étape enregistrée et non la colonne).
+   * Kanban : après l'action, Axelor enregistre la carte (colonne, ordre) avec la version qu'elle avait au
+   * moment du déplacement. Si l'action a modifié la fiche (étape, validation…), on lui renvoie la version
+   * à jour, sinon Axelor affiche « Modification concurrente détectée ».
+   */
+  protected void versionAJour(ActionResponse response, Class<? extends Model> classe, Long id) {
+    JPA.flush();
+    Model fiche = JPA.em().find(classe, id);
+    if (fiche != null) {
+      response.setValue("version", fiche.getVersion());
+    }
+  }
+
+  /**
+   * Colonne d'arrivée de la carte : valeur brute envoyée par le Kanban dans le contexte de l'action
+   * (le champ étant calculé, la lire par le modèle pourrait renvoyer l'étape enregistrée et non la
+   * colonne).
    */
   protected Object colonneCible(ActionRequest request, String champ) {
     Object contexte = request.getData() != null ? request.getData().get("context") : null;
@@ -108,7 +124,9 @@ public class LvmeKanbanController {
       switch (etape) {
         case ARR_BROUILLON:
           response.setError(
-              "Un arrivage ne revient pas en brouillon depuis le Kanban (colonne reçue : " + cible + ").");
+              "Un arrivage ne revient pas en brouillon depuis le Kanban (colonne reçue : "
+                  + cible
+                  + ").");
           break;
         case ARR_A_EMBARQUER:
         case ARR_FLOTTANT:
@@ -142,6 +160,7 @@ public class LvmeKanbanController {
         default:
           break;
       }
+      versionAJour(response, StockMove.class, id);
       response.setReload(true);
     } catch (Exception e) {
       TraceBackService.trace(response, e);
@@ -173,7 +192,8 @@ public class LvmeKanbanController {
       if (etape == ACH_ANNULEE
           && status != PurchaseOrderRepository.STATUS_CANCELED
           && status != PurchaseOrderRepository.STATUS_FINISHED) {
-        // annulation : dans la fiche (bouton Annuler), pour qu'un lâcher de carte maladroit n'annule rien
+        // annulation : dans la fiche (bouton Annuler), pour qu'un lâcher de carte maladroit
+        // n'annule rien
         response.setView(
             ActionView.define(num + " : annulation (bouton Annuler)")
                 .model(PurchaseOrder.class.getName())
@@ -232,6 +252,7 @@ public class LvmeKanbanController {
                 + " Possible : Brouillon -> À embarquer <-> Flottant -> En stock"
                 + " (ouvre l'arrivage pour le réel), ou -> Annulée (ouvre la commande).");
       }
+      versionAJour(response, PurchaseOrder.class, id);
       response.setReload(true);
     } catch (Exception e) {
       TraceBackService.trace(response, e);
@@ -341,6 +362,7 @@ public class LvmeKanbanController {
                 + "). Possible : Devis -> En préparation"
                 + " (confirmer) <-> Expédiée -> Livrée (ouvre le BL), ou -> Annulée (ouvre la commande).");
       }
+      versionAJour(response, SaleOrder.class, id);
       response.setReload(true);
     } catch (Exception e) {
       TraceBackService.trace(response, e);
