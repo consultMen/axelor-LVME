@@ -588,3 +588,24 @@
   min-height: 0 !important;
   overflow: auto;
 }
+/* boutons de droite de la fiche Commande client (panneau qui suit le bloc Commande) : boutons gris encadrés de
+   GESCOM au lieu des couleurs Axelor ; seule l'icône garde sa couleur (Fermer en rouge, validations en vert) */
+[class*="_gridItem_"].lvme-cde-violet + [class*="_gridItem_"] button {
+  background: linear-gradient(#ffffff, #dfe4ec) !important;
+  color: #10204a !important;
+  border: 1px solid #8c96a8 !important;
+  border-radius: 4px !important;
+  box-shadow: none !important;
+}
+[class*="_gridItem_"].lvme-cde-violet + [class*="_gridItem_"] button:hover:not(:disabled) {
+  background: linear-gradient(#ffffff, #cdd5e2) !important;
+}
+[class*="_gridItem_"].lvme-cde-violet + [class*="_gridItem_"] button.btn-danger svg,
+[class*="_gridItem_"].lvme-cde-violet + [class*="_gridItem_"] button[class*="danger"] svg,
+[class*="_gridItem_"].lvme-cde-violet + [class*="_gridItem_"] button[class*="danger"] i {
+  color: #d01010 !important;
+}
+[class*="_gridItem_"].lvme-cde-violet + [class*="_gridItem_"] button[class*="success"] svg,
+[class*="_gridItem_"].lvme-cde-violet + [class*="_gridItem_"] button[class*="success"] i {
+  color: #1a9a2a !important;
+}
