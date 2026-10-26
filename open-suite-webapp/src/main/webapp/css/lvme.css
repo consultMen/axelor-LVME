@@ -239,7 +239,7 @@
 }
 .lvme-ligne-cde [class*="_container_"]:has(> [class*="_title_"]) > :not([class*="_title_"]) {
   flex: 1 1 auto;
-  min-width: 0;
+  min-width: 52px;
 }
 .lvme-ligne-cde [class*="_title_"] label,
 .lvme-ligne-cde [class*="_label_"] {
@@ -560,12 +560,17 @@
   gap: 6px;
 }
 [class*="_formView_"]:has(.lvme-cde-violet) .lvme-gescom-box [class*="_container_"]:has(> [class*="_title_"]) > [class*="_title_"] {
-  flex: 0 0 auto;
+  flex: 0 1 auto;
   min-width: 58px;
+}
+/* case jamais écrasée par un libellé long (% Frais Commission…) : le libellé passe alors sur deux lignes */
+[class*="_formView_"]:has(.lvme-cde-violet) .lvme-gescom-box [class*="_container_"]:has(> [class*="_title_"]) > [class*="_title_"] label,
+[class*="_formView_"]:has(.lvme-cde-violet) .lvme-gescom-box [class*="_container_"]:has(> [class*="_title_"]) > [class*="_title_"] [class*="_labelText_"] {
+  white-space: normal !important;
 }
 [class*="_formView_"]:has(.lvme-cde-violet) .lvme-gescom-box [class*="_container_"]:has(> [class*="_title_"]) > :not([class*="_title_"]) {
   flex: 1 1 auto;
-  min-width: 0;
+  min-width: 52px;
 }
 /* en-tête : pas de ligne vide sous la barre des statuts quand la commande n'a pas encore de numéro */
 [class*="_formView_"]:has(.lvme-cde-violet) [class*="_gridItem_"]:has(> [class*="_viewer_"] h3:empty) {
