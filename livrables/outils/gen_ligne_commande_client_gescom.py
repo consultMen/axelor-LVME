@@ -144,11 +144,11 @@ bloc = '\n'.join([
     ro('lvmeMarque', 'Marque', 3),
     ro('lvmeColisPalette', 'Nb Colis / Palette', 2),
     prendre('fraisCongelation', 2, 'Frais de Stockage'),
-    prendre('tauxRFA', 2, '% RFA sur Produits'),
+    prendre('tauxRFA', 3, '% RFA sur Produits'),
     prendre('tauxCommission', 2, '% Commission'),  # à côté de % RFA (PROD_77)
     ro('lvmeZonePeche', 'Zone pêche', 2),
     ro('lvmeColisCouche', 'Colis / Couche', 2),
-    '        <field name="lvmePromo" title="Prix Promo" colSpan="2"/>',
+    '        <field name="lvmePromo" title="Prix Promo" colSpan="1"/>',
     '        <!-- ligne du bas GESCOM sur une seule ligne, même ordre, chaque case encadrée (css lvme-ligne-bas :',
     '             grille de 14 colonnes au lieu de 12) -->',
     '        <panel name="lvmeLigneBasPanel" colSpan="12" css="lvme-ligne-bas">',

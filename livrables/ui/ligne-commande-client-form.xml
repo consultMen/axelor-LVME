@@ -90,11 +90,11 @@
         <field name="lvmeMarque" title="Marque" readonly="true" colSpan="3"/>
         <field name="lvmeColisPalette" title="Nb Colis / Palette" readonly="true" colSpan="2"/>
         <field name="fraisCongelation" title="Frais de Stockage" readonly="true" hideIf="product == null" colSpan="2" widget="Decimal" x-scale="4"/>
-        <field name="tauxRFA" title="% RFA sur Produits" readonly="true" hideIf="product == null" colSpan="2" widget="Decimal" x-scale="2"/>
+        <field name="tauxRFA" title="% RFA sur Produits" readonly="true" hideIf="product == null" colSpan="3" widget="Decimal" x-scale="2"/>
         <field name="tauxCommission" title="% Commission" readonly="true" hideIf="product == null" colSpan="2" widget="Decimal" x-scale="2"/>
         <field name="lvmeZonePeche" title="Zone pêche" readonly="true" colSpan="2"/>
         <field name="lvmeColisCouche" title="Colis / Couche" readonly="true" colSpan="2"/>
-        <field name="lvmePromo" title="Prix Promo" colSpan="2"/>
+        <field name="lvmePromo" title="Prix Promo" colSpan="1"/>
         <!-- ligne du bas GESCOM sur une seule ligne, même ordre, chaque case encadrée (css lvme-ligne-bas :
              grille de 14 colonnes au lieu de 12) -->
         <panel name="lvmeLigneBasPanel" colSpan="12" css="lvme-ligne-bas">

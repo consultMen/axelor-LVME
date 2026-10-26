@@ -2,6 +2,7 @@
 -- PROD étape 77 : fiche Commande client et fenêtre Lignes Commandes
 --   - fenêtre Lignes Commandes : « % Commission » à côté de « % RFA sur Produits » (il était seul sous la ligne
 --     du bas) ; Frais de Stockage, % RFA, % Commission, Zone pêche, Colis / Couche, Prix Promo sur une ligne
+--     (% RFA plus large, Prix Promo plus étroit)
 --   - fiche Commande client : le texte tapé dans « < Commentaire > » est recopié aussitôt dans l'onglet
 --     Commentaire (« Commentaire à afficher »), sans enregistrer
 -- Depuis la racine du dépôt. Relançable.
@@ -32,6 +33,16 @@ UPDATE meta_view SET xml = replace(replace(replace(xml,
   updated_on = now(), version = COALESCE(version, 0) + 1
 WHERE name = 'sale-order-line-form' AND module IS NULL AND priority = 30
   AND position($q$      <field name="tauxCommission" title="% Commission" readonly="true" hideIf="product == null" colSpan="3" widget="Decimal" x-scale="2"/>$q$ IN xml) > 0;
+
+-- % RFA sur Produits plus large (son libellé est long), Prix Promo (une case à cocher) plus étroit :
+-- Frais de Stockage 2 | % RFA sur Produits 3 | % Commission 2 | Zone pêche 2 | Colis / Couche 2 | Prix Promo 1
+UPDATE meta_view SET xml = replace(replace(xml,
+  '<field name="tauxRFA" title="% RFA sur Produits" readonly="true" hideIf="product == null" colSpan="2" widget="Decimal" x-scale="2"/>',
+  '<field name="tauxRFA" title="% RFA sur Produits" readonly="true" hideIf="product == null" colSpan="3" widget="Decimal" x-scale="2"/>'),
+  '<field name="lvmePromo" title="Prix Promo" colSpan="2"/>', '<field name="lvmePromo" title="Prix Promo" colSpan="1"/>'),
+  updated_on = now(), version = COALESCE(version, 0) + 1
+WHERE name = 'sale-order-line-form' AND module IS NULL AND priority = 30
+  AND xml LIKE '%name="tauxRFA" title="% RFA sur Produits" readonly="true" hideIf="product == null" colSpan="2"%';
 
 COMMIT;
 

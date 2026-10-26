@@ -281,13 +281,19 @@
   justify-content: flex-start !important;
   text-align: left !important;
 }
-/* un mot trop long pour sa case (« Commandées » quand la fenêtre est agrandie) passe à la ligne au lieu de sortir
-   du cadre */
+/* titres plus petits pour que « Commandés » / « Commandées » tiennent dans la case ; un mot encore trop long est coupé
+   avec un trait d'union (Comman-dées) au lieu de sortir du cadre ou d'être coupé n'importe où */
 .lvme-ligne-cde .lvme-ligne-bas label,
 .lvme-ligne-cde .lvme-ligne-bas [class*="_labelText_"] {
-  overflow-wrap: anywhere;
+  font-size: 10px !important;
+  overflow-wrap: normal !important;
+  word-break: normal !important;
+  hyphens: auto;
   min-width: 0;
   max-width: 100%;
+}
+.lvme-ligne-cde .lvme-ligne-bas [class*="_gridItem_"] {
+  padding: 2px 3px;
 }
 .lvme-btn-gris,
 .lvme-btn-gris button {
