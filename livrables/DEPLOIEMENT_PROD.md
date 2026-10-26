@@ -8,7 +8,7 @@ annulation d'une commande d'achat par sa fiche, suppression de plusieurs lignes 
 | PROD_73 | Filtres tout prêts des 3 écrans « Suivi des … » ; le bouton « Suivi » garde les filtres de la liste ; corbeille dans l'en-tête des listes des écrans de recherche (contrôle brouillon / annulé pour commandes et arrivages) |
 | PROD_74 | Rotation des stocks par lot : filtre Transport (Camion = Europe, Bateau = International) et colonne Transport en couleur |
 | PROD_75 | Etat des stocks par lots et liste des achats aux couleurs GESCOM (colonnes GESCOM + Dispo, lignes alternées, cadres de dates ; Numéro Arrivage dans la liste des achats) |
-| PROD_76 | Fiche Commande client resserrée pour tenir à l'écran à 100 % |
+| PROD_76 | Fiche Commande client resserrée pour tenir à l'écran à 100 % (libellés à gauche dans le bloc Client, couleurs du tableau des lignes) ; Finaliser / Confirmation Commande au-dessus de Fermer |
 
 Même procédure que ci-dessous (sauvegarde, clone, build, **scripts PROD_73 à 76**, bascule, redémarrage) :
 `for n in 73 74 75 76; do psql -U axelor -d axelor -v ON_ERROR_STOP=1 -f $(ls livrables/PROD_${n}_*.sql) || break; done`
