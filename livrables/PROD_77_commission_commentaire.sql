@@ -2,7 +2,7 @@
 -- PROD étape 77 : fiche Commande client et fenêtre Lignes Commandes
 --   - fenêtre Lignes Commandes : « % Commission » à côté de « % RFA sur Produits » (il était seul sous la ligne
 --     du bas) ; Frais de Stockage, % RFA, % Commission, Zone pêche, Colis / Couche, Prix Promo sur une ligne
---     (% RFA plus large, Prix Promo plus étroit)
+--     (% RFA plus large, Prix Promo plus étroit) ; case unité de la quantité titrée « Unité » et lisible
 --   - fiche Commande client : le texte tapé dans « < Commentaire > » est recopié aussitôt dans l'onglet
 --     Commentaire (« Commentaire à afficher »), sans enregistrer
 -- Depuis la racine du dépôt. Relançable.
@@ -43,6 +43,14 @@ UPDATE meta_view SET xml = replace(replace(xml,
   updated_on = now(), version = COALESCE(version, 0) + 1
 WHERE name = 'sale-order-line-form' AND module IS NULL AND priority = 30
   AND xml LIKE '%name="tauxRFA" title="% RFA sur Produits" readonly="true" hideIf="product == null" colSpan="2"%';
+
+-- unité de la quantité (case à droite de Qtes Commandées) : titre « Unité » et plus d'icône « fiche », qui ne
+-- laissait plus de place au texte (Sac, Kg…)
+UPDATE meta_view SET xml = replace(xml, '<field css="lvme-case" title=" " name="unit" ',
+  '<field canView="false" css="lvme-case" title="Unité" name="unit" '),
+  updated_on = now(), version = COALESCE(version, 0) + 1
+WHERE name = 'sale-order-line-form' AND module IS NULL AND priority = 30
+  AND xml LIKE '%<field css="lvme-case" title=" " name="unit" %';
 
 COMMIT;
 

@@ -159,7 +159,7 @@ bloc = '\n'.join([
     prendre('nbColis', 1, 'Nb Colis Commandés', QV),
     ro('lvmeQteDispo', 'Qtes Dispo', 1),
     prendre('qty', 1, 'Qtes Commandées', QV),
-    prendre('unit', 1, ' ', Q),
+    '        ' + seta(prendre('unit', 1, 'Unité', Q).strip(), 'canView', 'false'),  # titre et sans icône « fiche » : l'unité reste lisible (PROD_77)
     prendre('poidsTotalNet', 1, 'Poids en Kg'),
     prendre('prixRevient', 1, 'Prix Revient'),
     prendre('price', 1, 'Prix Vente', QV),
