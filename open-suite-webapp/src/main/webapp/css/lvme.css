@@ -495,47 +495,61 @@
 }
 
 /*
- * Fiche Commande client resserrée comme GESCOM (panneaux css="lvme-cde-serre", avec lvme-compact) : toute la fiche
- * visible à 100 % ; libellés plus petits mais jamais coupés ; cases et boutons moins hauts ; en-tête plus bas.
+ * Fiche Commande client resserrée comme GESCOM : toute la fiche visible à 100 %. Axelor ne reprend pas le css des
+ * panneaux du premier niveau de la fiche (mainPanel, lvmeGescomPanel) : la fiche est reconnue à son bloc Commande
+ * (css="lvme-cde-violet"). Libellés plus petits jamais coupés ; cases et boutons moins hauts ; en-tête plus bas ;
+ * libellés à gauche des cases dans le bloc Client.
  */
-.lvme-cde-serre [class*="_label_"],
-.lvme-cde-serre [class*="_labelText_"],
-.lvme-cde-serre label {
+[class*="_formView_"]:has(.lvme-cde-violet),
+[class*="_formView_"]:has(.lvme-cde-violet) * {
+  --ax-form-row-gap: .15rem !important;
+  --ax-form-column-gap: .5rem !important;
+  --ax-theme-form-row-gap: .15rem !important;
+  --ax-theme-form-column-gap: .5rem !important;
+  --ax-form-padding: .3rem !important;
+  --ax-panel-body-padding: .3rem !important;
+  --ax-panel-header-padding: .1rem !important;
+  --ax-panel-header-title-padding: .15rem .4rem !important;
+  --ax-input-padding: .05rem .4rem !important;
+}
+[class*="_formView_"]:has(.lvme-cde-violet) label,
+[class*="_formView_"]:has(.lvme-cde-violet) [class*="_labelText_"] {
   font-size: 12px !important;
-  white-space: normal !important;
+  white-space: nowrap !important;
   overflow: visible !important;
   text-overflow: clip !important;
   line-height: 1.1 !important;
+  margin-bottom: 0 !important;
 }
-.lvme-cde-serre input:not([type="checkbox"]):not([type="radio"]),
-.lvme-cde-serre select,
-.lvme-cde-serre [class*="_viewer_"] {
+[class*="_formView_"]:has(.lvme-cde-violet) [class*="_main_"] input:not([type="checkbox"]):not([type="radio"]),
+[class*="_formView_"]:has(.lvme-cde-violet) [class*="_main_"] select,
+[class*="_formView_"]:has(.lvme-cde-violet) [class*="_main_"] [class*="_viewer_"] {
   font-size: 13px !important;
   min-height: 0 !important;
-  height: 26px;
-  padding-top: 1px !important;
-  padding-bottom: 1px !important;
+  height: 24px;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
 }
-.lvme-cde-serre button {
-  padding-top: 3px !important;
-  padding-bottom: 3px !important;
+[class*="_formView_"]:has(.lvme-cde-violet) [class*="_main_"] button {
+  padding-top: 2px !important;
+  padding-bottom: 2px !important;
   font-size: 13px !important;
   min-height: 0 !important;
 }
-.lvme-cde-serre textarea {
+[class*="_formView_"]:has(.lvme-cde-violet) [class*="_main_"] textarea,
+[class*="_formView_"]:has(.lvme-cde-violet) [class*="_main_"] [contenteditable] {
   min-height: 0 !important;
-  max-height: 60px;
+  max-height: 46px;
 }
-.lvme-cde-entete .large,
-.lvme-cde-entete h1,
-.lvme-cde-entete h2,
-.lvme-cde-entete h3 {
-  font-size: 20px !important;
-  margin: 0 !important;
-}
-.lvme-cde-entete [class*="_nav"],
-.lvme-cde-entete [class*="_step"] {
+/* barre des statuts (Devis brouillon, Devis finalisé…) plus basse */
+[class*="_formView_"]:has(.lvme-cde-violet) [class*="_main_"] > [class*="_panel_"]:first-child [class*="_step"],
+[class*="_formView_"]:has(.lvme-cde-violet) [class*="_main_"] > [class*="_panel_"]:first-child [class*="_nav"] {
   font-size: 13px !important;
+}
+/* fond gris GESCOM derrière le bloc Client / Commande */
+[class*="_formView_"]:has(.lvme-cde-violet) [class*="_main_"] > [class*="_panel_"]:has(.lvme-cde-violet),
+[class*="_formView_"]:has(.lvme-cde-violet) [class*="_main_"] > [class*="_panel_"]:has(.lvme-cde-violet) > * > * > [class*="_content_"] {
+  background-color: #dfe3ec !important;
 }
 /* lignes du tableau des commandes resserrées */
 .lvme-cde-grid [class*="_body_"] [class*="_row_"] [class*="_column_"] {
@@ -543,18 +557,39 @@
   padding-bottom: 2px !important;
   font-size: 13px;
 }
-/* fiche Commande client resserrée : libellés à GAUCHE des cases dans le bloc Client / Commande (comme GESCOM),
-   ce qui divise la hauteur par deux */
-.lvme-cde-client.lvme-cde-serre [class*="_container_"]:has(> [class*="_title_"]) {
+/* libellés à GAUCHE des cases dans le bloc Client (comme GESCOM) : hauteur divisée par deux ; le bloc Commande,
+   trop étroit pour trois cases par ligne, garde ses libellés au-dessus */
+[class*="_formView_"]:has(.lvme-cde-violet) .lvme-gescom-box [class*="_container_"]:has(> [class*="_title_"]) {
   flex-direction: row !important;
   align-items: center;
   gap: 6px;
 }
-.lvme-cde-client.lvme-cde-serre [class*="_container_"]:has(> [class*="_title_"]) > [class*="_title_"] {
+[class*="_formView_"]:has(.lvme-cde-violet) .lvme-gescom-box [class*="_container_"]:has(> [class*="_title_"]) > [class*="_title_"] {
   flex: 0 0 auto;
-  min-width: 70px;
+  min-width: 58px;
 }
-.lvme-cde-client.lvme-cde-serre [class*="_container_"]:has(> [class*="_title_"]) > :not([class*="_title_"]) {
+[class*="_formView_"]:has(.lvme-cde-violet) .lvme-gescom-box [class*="_container_"]:has(> [class*="_title_"]) > :not([class*="_title_"]) {
   flex: 1 1 auto;
   min-width: 0;
+}
+/* en-tête : pas de ligne vide sous la barre des statuts quand la commande n'a pas encore de numéro */
+[class*="_formView_"]:has(.lvme-cde-violet) [class*="_gridItem_"]:has(> [class*="_viewer_"] h3:empty) {
+  display: none;
+}
+[class*="_formView_"]:has(.lvme-cde-violet) [class*="_main_"] > [class*="_panel_"]:first-child h3 {
+  font-size: 16px;
+  margin: 0;
+}
+/* commentaire : simple case de texte comme GESCOM (sans barre de mise en forme), deux lignes de haut */
+.lvme-cde-violet .custom-html-editor-toolbar {
+  display: none !important;
+}
+.lvme-cde-violet .custom-html-editor-container {
+  height: auto !important;
+  min-height: 0 !important;
+}
+.lvme-cde-violet .custom-html-editor-content {
+  height: 40px !important;
+  min-height: 0 !important;
+  overflow: auto;
 }
