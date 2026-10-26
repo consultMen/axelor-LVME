@@ -1,6 +1,10 @@
 # Génère axelor-stock/src/main/resources/reports/LvmeArrivage.rptdesign (BIRT) :
-# impression de l'écran Arrivage GESCOM (en-tête Fournisseur / Arrivage / Devise + lignes + Somme).
+# impression de l'écran Arrivage GESCOM (en-tête Fournisseur / Arrivage / Devise + lignes + Somme), aux couleurs de
+# la fiche comme l'impression de la commande client : logo LVME en haut à gauche, valeurs sur fond jaune pâle en
+# bleu, cadre Fournisseur bleu, tableau Flottant / Réel (en-têtes bleus, libellés magenta), lignes une sur deux
+# grises, colonnes de saisie en jaune.
 # Usage : python livrables/outils/gen_rapport_arrivage.py   (depuis la racine du dépôt)
+import base64
 import html
 import os
 
@@ -22,14 +26,17 @@ def h(x):
 
 
 def ligne(label, x):
-    return (f"'<tr><td style=\"color:#666;padding-right:6px\">{label}</td><td><b>' || "
-            f"{h(x)} || '</b></td></tr>'")
+    return (f"'<tr><td style=\"color:#444;padding:1px 6px 1px 0;white-space:nowrap\">{label}</td>"
+            f"<td style=\"background-color:#ffffc4;color:#1a1ad6;border:1px solid #c8c8c8;padding:0 4px;"
+            f"width:100%\">' || {h(x)} || '&#160;</td></tr>'")
 
 
-def bloc(titre, items):
-    return ("'<div style=\"font-weight:bold;border-bottom:1px solid #999;margin-bottom:2px\">" + titre
-            + "</div><table style=\"font-size:8pt\">' || "
-            + " || ".join(ligne(l, x) for l, x in items) + " || '</table>'")
+def bloc(titre, items, cadre=False):
+    # cadre bleu autour du bloc Fournisseur, comme sur la fiche
+    style = 'border:1.5px solid #3c3cd8;padding:4px 6px;' if cadre else 'padding:4px 6px;'
+    return ("'<div style=\"" + style + "\"><div style=\"font-weight:bold;color:#1a2a6c;border-bottom:1px solid #999;"
+            "margin-bottom:3px\">" + titre + "</div><table style=\"font-size:8pt;width:100%;border-spacing:0 1px\">' || "
+            + " || ".join(ligne(l, x) for l, x in items) + " || '</table></div>'")
 
 
 QTE = "CASE WHEN sm.status_select = 3 THEN l.real_qty ELSE l.qty END"
@@ -49,12 +56,12 @@ def case_fl(expr, reel, dec):
 
 def tableau_fl_re():
     """tableau GESCOM du bloc Devise : Flottant => / Réel => (Mt Achat HT, Nb Colis, Poids Total, Frais Appr)"""
-    th = '<th style="color:#8b1a8b;padding:0 4px;text-align:right">'
-    td = '<td style="text-align:right;padding:0 4px;border:1px solid #ccc">'
+    th = '<th style="color:#1a1ad6;font-style:italic;font-weight:normal;padding:0 4px;text-align:center">'
+    td = '<td style="text-align:right;padding:0 4px;border:1px solid #c8c8c8;background-color:#ffffc4;color:#1a1ad6">'
     out = ("'<table style=\"font-size:8pt;margin-top:4px;border-collapse:collapse\"><tr><th></th>"
            + th + "Mt Achat HT</th>" + th + "Nb Colis</th>" + th + "Poids Total</th>" + th + "Frais Appr</th></tr>'")
     for lib, reel in (("Flottant =&gt;", False), ("Réel =&gt;", True)):
-        out += f" || '<tr><td style=\"color:#c000c0;padding-right:4px\">{lib}</td>{td}' || "
+        out += f" || '<tr><td style=\"color:#c000c0;font-style:italic;padding-right:4px\">{lib}</td>{td}' || "
         out += case_fl('sm.ex_tax_total', reel, 2) + f" || '</td>{td}' || "
         out += case_fl('sm.nb_colis_total', reel, 0) + f" || '</td>{td}' || "
         out += case_fl('sm.poids_total', reel, 2) + f" || '</td>{td}' || "
@@ -75,7 +82,7 @@ SELECT
      ('Tél.', 'p.fixed_phone'),
      ('Email', 'em.address'),
      ('Règlement', 'pm.name'),
-     ('Échéance', 'pc.name')])} AS bloc1,
+     ('Échéance', 'pc.name')], cadre=True)} AS bloc1,
   {bloc('Arrivage', [
      ('Opérateur', 'bu.full_name'),
      ('Frigo', 'fr.name'),
@@ -122,6 +129,8 @@ LIMIT 1
 """
 
 # (nom, titre, expression SQL, largeur en pouces, aligné à droite)
+# colonnes en jaune sur la fiche (colonnes de saisie) : même fond à l'impression
+JAUNES = ('cond', 'pa', 'unite', 'colis', 'parcolis', 'qte')
 COLS = [
     ('produit', 'Produit', 'pr.code', 0.9, False),
     ('designation', 'Désignation', 'l.product_name', 2.0, False),
@@ -168,6 +177,10 @@ SELECT 1, 0, '1',
   {SEL_TOTAL}
 {JOINS}
 ) x ORDER BY ordre, seq"""
+
+# logo LVME de l'application (img/lvme-logo.png) intégré au modèle : imprimé même sans logo sur la fiche société
+LOGO_B64 = base64.b64encode(open(os.path.join(RACINE, "open-suite-webapp", "src", "main", "webapp", "img",
+                                              "lvme-logo.png"), "rb").read()).decode("ascii")
 
 _id = [100]
 
@@ -280,31 +293,30 @@ def build():
             <column id="{nid()}"><property name="width">30%</property></column>
             <detail>
                 <row id="{nid()}">
+                    <!-- logo LVME en haut à gauche, comme l'impression de la commande client -->
                     <cell id="{nid()}">
-                        <property name="colSpan">2</property>
                         <property name="paddingBottom">6pt</property>
-                        <property name="verticalAlign">bottom</property>
+                        <image id="{nid()}">
+                            <property name="height">1.8cm</property>
+                            <property name="source">embed</property>
+                            <property name="imageName">lvme-logo.png</property>
+                        </image>
+                    </cell>
+                    <cell id="{nid()}">
+                        <property name="paddingBottom">6pt</property>
+                        <property name="verticalAlign">middle</property>
                         <text-data id="{nid()}">
-                            <expression name="valueExpr">"&lt;span style='font-size:15pt;font-weight:bold'&gt;ARRIVAGE N° " + row["numero"] + "&lt;/span&gt;"</expression>
+                            <expression name="valueExpr">"&lt;div style='text-align:center;font-size:16pt;font-weight:bold;color:#3D3DBF'&gt;Arrivage N° " + row["numero"] + "&lt;/div&gt;"</expression>
                             <property name="contentType">html</property>
                         </text-data>
                     </cell>
-                    <!-- logo de la société en haut à droite : hauteur fixe, proportions gardées -->
                     <cell id="{nid()}">
                         <property name="textAlign">right</property>
-                        <property name="paddingBottom">6pt</property>
-                        <image id="{nid()}">
-                            <property name="height">1.6cm</property>
-                            <property name="proportionalScale">true</property>
-                            <list-property name="visibility">
-                                <structure>
-                                    <property name="format">all</property>
-                                    <expression name="valueExpr" type="javascript">row["logo_path"] == null</expression>
-                                </structure>
-                            </list-property>
-                            <property name="source">file</property>
-                            <expression name="uri" type="javascript">params["AttachmentPath"].value + row["logo_path"]</expression>
-                        </image>
+                        <label id="{nid()}">
+                            <property name="fontSize">7pt</property>
+                            <property name="color">#808080</property>
+                            <text-property name="text">Document interne LVME</text-property>
+                        </label>
                     </cell>
                 </row>
                 <row id="{nid()}">
@@ -317,8 +329,9 @@ def build():
     # largeurs en % de la page (A4 paysage) : les poids relatifs de COLS sont ramenés à 100 %
     poids = sum(c[3] for c in COLS)
     col_defs = "\n".join(f'            <column id="{nid()}"><property name="width">{round(c[3] * 100 / poids, 2)}%</property></column>' for c in COLS)
-    hdr_cells = "\n".join(cell(label(c[1], c[4]), BORDER + '\n                        <property name="backgroundColor">#E8E8E8</property>') for c in COLS)
-    det_cells = "\n".join(cell(data(c[0], c[4]), BORDER) for c in COLS)
+    hdr_cells = "\n".join(cell(label(c[1], c[4]), BORDER + '\n                        <property name="backgroundColor">#D6D6D6</property>') for c in COLS)
+    jaune = '\n                        <property name="backgroundColor">#FFFF99</property>'
+    det_cells = "\n".join(cell(data(c[0], c[4]), BORDER + (jaune if c[0] in JAUNES else '')) for c in COLS)
     lignes_table = f"""        <table id="{nid()}">
             <property name="marginTop">8pt</property>
             <property name="width">100%</property>
@@ -336,6 +349,14 @@ def build():
             <detail>
                 <row id="{nid()}">
                     <list-property name="highlightRules">
+                        <structure>
+                            <property name="operator">eq</property>
+                            <property name="backgroundColor">#E8E8E8</property>
+                            <expression name="testExpr" type="javascript">row.__rownum % 2</expression>
+                            <simple-property-list name="value1">
+                                <value type="javascript">1</value>
+                            </simple-property-list>
+                        </structure>
                         <structure>
                             <property name="operator">eq</property>
                             <property name="fontWeight">bold</property>
@@ -417,6 +438,13 @@ def build():
             </page-footer>
         </simple-master-page>
     </page-setup>
+    <list-property name="images">
+        <structure>
+            <property name="name">lvme-logo.png</property>
+            <property name="type">image/png</property>
+            <property name="data">{LOGO_B64}</property>
+        </structure>
+    </list-property>
     <body>
 {entete_table}
 {lignes_table}
