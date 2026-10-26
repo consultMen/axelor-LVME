@@ -156,7 +156,8 @@
 /*
  * Fiche Commande client copiée sur GESCOM (panneaux css="lvme-cde-client") : cases de saisie blanches,
  * texte foncé (pas le jaune de l'arrivage), libellés violets du bloc Commande, statut en bleu ;
- * tableau des lignes (css="lvme-cde-grid") : lignes blanc / cyan en alternance, colonnes Colis Cdes et
+ * tableau des lignes (le css="lvme-cde-grid" de son panneau du premier niveau n'est pas repris : il est reconnu
+ * comme le panneau à liste de la fiche) : lignes blanc / cyan en alternance, colonnes Colis Cdes et
  * Nb unités ou Poids cdés jaune pâle, Prix Vente jaune vif.
  */
 .lvme-cde-fond {
@@ -177,14 +178,14 @@
   font-size: 15px;
   text-align: center;
 }
-.lvme-cde-grid [class*="_body_"] [class*="_row_"]:nth-child(even) [class*="_column_"] {
+[class*="_formView_"]:has(.lvme-cde-violet) [class*="_main_"] > [class*="_panel_"]:has([class*="_header_"] [class*="_column_"]) [class*="_body_"] [class*="_row_"]:nth-child(even) [class*="_column_"] {
   background-color: #ccffff;
 }
-.lvme-cde-grid .bg-warning {
+[class*="_formView_"]:has(.lvme-cde-violet) [class*="_main_"] > [class*="_panel_"]:has([class*="_header_"] [class*="_column_"]) [class*="_hilite-warning_"] {
   background-color: #ffffc0 !important;
   color: #000;
 }
-.lvme-cde-grid .bg-yellow {
+[class*="_formView_"]:has(.lvme-cde-violet) [class*="_main_"] > [class*="_panel_"]:has([class*="_header_"] [class*="_column_"]) [class*="_hilite-yellow_"] {
   background-color: #ffff00 !important;
   color: #000;
 }
@@ -546,7 +547,7 @@
   font-size: 13px !important;
 }
 /* lignes du tableau des commandes resserrées */
-.lvme-cde-grid [class*="_body_"] [class*="_row_"] [class*="_column_"] {
+[class*="_formView_"]:has(.lvme-cde-violet) [class*="_main_"] > [class*="_panel_"]:has([class*="_header_"] [class*="_column_"]) [class*="_body_"] [class*="_row_"] [class*="_column_"] {
   padding-top: 2px !important;
   padding-bottom: 2px !important;
   font-size: 13px;
