@@ -142,7 +142,8 @@ cde_new = '\n'.join([
     F(d1('carrierPartner'), 8, 'Transporteur'),
     F(d1('portPaye'), 4, 'Port Payé'),
     # commentaire sur toute la largeur du cadre, coût du port juste dessous (comme GESCOM)
-    F(seta(d1('internalNote'), 'height', '2'), 12, '&lt; Commentaire &gt;'),
+    F(seta(seta(d1('internalNote'), 'height', '2'), 'onChange', 'action-lvme-cde-commentaire-copie'), 12,
+      '&lt; Commentaire &gt;'),  # recopié dans l'onglet Commentaire (PROD_77)
     F(d1('coutPortKg'), 4, 'Coût port/kg'),
     '    </panel>'])
 

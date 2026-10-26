@@ -281,6 +281,14 @@
   justify-content: flex-start !important;
   text-align: left !important;
 }
+/* un mot trop long pour sa case (« Commandées » quand la fenêtre est agrandie) passe à la ligne au lieu de sortir
+   du cadre */
+.lvme-ligne-cde .lvme-ligne-bas label,
+.lvme-ligne-cde .lvme-ligne-bas [class*="_labelText_"] {
+  overflow-wrap: anywhere;
+  min-width: 0;
+  max-width: 100%;
+}
 .lvme-btn-gris,
 .lvme-btn-gris button {
   background-color: #eef0f3 !important;
