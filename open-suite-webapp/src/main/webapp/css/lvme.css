@@ -266,6 +266,21 @@
   white-space: normal !important;
   line-height: 1.1;
 }
+/* titres de la ligne du bas tous pareils (comme Nb Colis Commandés / Qtes Commandées) : alignés à gauche, sur deux
+   lignes si besoin, et cases toutes calées en bas de leur cadre pour rester alignées */
+.lvme-ligne-cde .lvme-ligne-bas [class*="_gridItem_"]:not(:empty) {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+.lvme-ligne-cde .lvme-ligne-bas [class*="_container_"]:has(> [class*="_title_"]) {
+  justify-content: flex-end;
+}
+.lvme-ligne-cde .lvme-ligne-bas [class*="_title_"],
+.lvme-ligne-cde .lvme-ligne-bas label {
+  justify-content: flex-start !important;
+  text-align: left !important;
+}
 .lvme-btn-gris,
 .lvme-btn-gris button {
   background-color: #eef0f3 !important;
@@ -573,6 +588,10 @@
   flex-direction: column !important;
   align-items: stretch !important;
   gap: 0 !important;
+}
+/* petit espace entre Code postal et Ville */
+[class*="_formView_"]:has(.lvme-cde-statut) .lvme-gescom-box [class*="_gridItem_"][style*="grid-column: 5 / 13"] {
+  padding-left: 12px;
 }
 [class*="_formView_"]:has(.lvme-cde-statut) .lvme-gescom-box [class*="_container_"]:has(> [class*="_title_"]) > :not([class*="_title_"]) {
   flex: 1 1 auto;
