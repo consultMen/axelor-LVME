@@ -3,7 +3,8 @@
 --   - modèle d'impression « LVME Commande client » sur LvmeCommandeClient.rptdesign : logo LVME en haut à gauche,
 --     cadre Client, cadre Commande, statut et totaux, puis les lignes avec toutes les colonnes de la fiche
 --     (PR, marges), aux couleurs de la fiche
---   - bouton « Imprimer commande » de la fiche : imprime directement ce modèle (n'est pas le modèle de la
+--   - boutons « Imprimer commande » et « Rapports » (renommé « Imprimer ») : impriment directement ce modèle, sans
+--     fenêtre de choix (ce n'est pas le modèle de la
 --     configuration des ventes : il ne part donc jamais en pièce jointe chez le client)
 -- Prérequis : code avec LvmeImpressionController et reports/LvmeCommandeClient.rptdesign (recompiler).
 -- Depuis la racine du dépôt. Relançable.
@@ -60,12 +61,21 @@ UPDATE meta_view SET xml = replace(xml,
 WHERE name = 'sale-order-form' AND module IS NULL AND priority = 30
   AND xml LIKE '%name="lvmeImprimerCommandeBtn"%onClick="save,action-sale-order-view-reports-wizard"%';
 
+-- bouton « Rapports » de la barre du haut (renommé « Imprimer ») : même impression directe, plus de fenêtre de
+-- choix du modèle
+UPDATE meta_view SET xml = replace(xml,
+  '<button name="printBtn" title="Reports" hideIf="clientPartner == null" readonlyIf="!id" icon="fa-print" onClick="save,action-sale-order-view-reports-wizard"/>',
+  '<button name="printBtn" title="Imprimer" hideIf="clientPartner == null" readonlyIf="!id" icon="fa-print" onClick="save,action-lvme-cde-imprimer"/>'),
+  updated_on = now(), version = COALESCE(version, 0) + 1
+WHERE name = 'sale-order-form' AND module IS NULL AND priority = 30
+  AND xml LIKE '%name="printBtn"%onClick="save,action-sale-order-view-reports-wizard"%';
+
 COMMIT;
 
 SELECT pt.name AS modele, bt.template_link AS fichier,
   (SELECT count(*) FROM base_birt_template_parameter x WHERE x.birt_template = bt.id) AS parametres,
-  (SELECT xml LIKE '%action-lvme-cde-imprimer%' FROM meta_view
-    WHERE name = 'sale-order-form' AND module IS NULL AND priority = 30) AS bouton_branche
+  (SELECT (length(xml) - length(replace(xml, 'action-lvme-cde-imprimer', ''))) / 24 FROM meta_view
+    WHERE name = 'sale-order-form' AND module IS NULL AND priority = 30) AS boutons_branches
 FROM base_printing_template pt
 JOIN base_printing_template_line l ON l.print_template = pt.id
 JOIN base_birt_template bt ON bt.id = l.birt_template

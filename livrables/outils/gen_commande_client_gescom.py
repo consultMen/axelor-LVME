@@ -267,5 +267,11 @@ m = re.search(r'\sonLoad="([^"]*)"', out[:out.index('>')])
 out = out.replace('onLoad="%s"' % m.group(1), 'onLoad="%s,%s"' % (m.group(1), SOMME), 1)
 # Client et contact sans vignette (image) devant le nom : elle laissait un vide à gauche du champ
 out = re.sub(r'(<field\b' + A + r'*?name="(?:clientPartner|contactPartner)"' + A + r'*?) x-image-field="picture"', r'\1', out)
+# bouton « Rapports » de la barre : imprime directement le modèle interne LVME, sans fenêtre de choix (PROD_78)
+ANCIEN_IMPRIMER = ('<button name="printBtn" title="Reports" hideIf="clientPartner == null" readonlyIf="!id" '
+                   'icon="fa-print" onClick="save,action-sale-order-view-reports-wizard"/>')
+assert ANCIEN_IMPRIMER in out
+out = out.replace(ANCIEN_IMPRIMER, '<button name="printBtn" title="Imprimer" hideIf="clientPartner == null" '
+                  'readonlyIf="!id" icon="fa-print" onClick="save,action-lvme-cde-imprimer"/>')
 open(DST, 'w', encoding='utf-8', newline='\r\n').write(out)
 print('ok', DST, len(out))

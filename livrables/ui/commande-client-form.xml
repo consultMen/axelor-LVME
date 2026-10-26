@@ -1,6 +1,6 @@
 <form id="sale-order-form" name="sale-order-form" title="Sale order" model="com.axelor.apps.sale.db.SaleOrder" onLoad="action-group-supplychain-saleorder-onload,action-lvme-commande-client-attrs-somme" onSave="action-lvme-reservation-check-droits,action-budget-sale-order-group-on-save" onNew="action-sale-order-method-onnew">
   <toolbar>
-    <button name="printBtn" title="Reports" hideIf="clientPartner == null" readonlyIf="!id" icon="fa-print" onClick="save,action-sale-order-view-reports-wizard"/>
+    <button name="printBtn" title="Imprimer" hideIf="clientPartner == null" readonlyIf="!id" icon="fa-print" onClick="save,action-lvme-cde-imprimer"/>
     <button name="sendByEmailBtn" title="Send email" hidden="true" showIf="id" icon="fa-envelope" onClick="action-send-by-email-with-template"/>
     <button if="__config__.app.getApp('sale')?.getIsEnableCalculationEntireQuotation()" name="recomputePricesBtn" title="Recompute prices" showIf="statusSelect == 1" icon="fa-calculator" onClick="action-sale-order-group-recompute-prices-btn"/>
   </toolbar>
