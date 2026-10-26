@@ -158,7 +158,7 @@ boutons = '\n'.join(
     + ['      ' + b for b in act_buttons[:n_valid]]
     + ['      <button name="lvmeFermerBtn" title="Fermer" icon="x-circle" css="btn-danger" onClick="close"/>',
        '      <button name="lvmeImprimerCommandeBtn" title="Imprimer commande" icon="printer" '
-       'showIf="id" onClick="save,action-sale-order-view-reports-wizard"/>']
+       'showIf="id" onClick="save,action-lvme-cde-imprimer"/>']  # impression interne LVME (PROD_78)
     + ['      ' + b for b in act_buttons[n_valid:]] + ['      ' + f for f in act_fields] + ['    </panel>'])
 
 # ---------- cadre des totaux, gris comme GESCOM ----------

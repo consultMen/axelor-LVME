@@ -1,4 +1,4 @@
-# Déploiement prod LVME — correctifs Kanban, filtres de suivi, corbeille des listes, rotation par transport (PROD_73 à PROD_77)
+# Déploiement prod LVME — correctifs Kanban, filtres de suivi, corbeille des listes, rotation par transport (PROD_73 à PROD_78)
 
 Déjà en prod : PROD_63 à PROD_72. Code à déployer : tout `main` (Java : lecture de la colonne d'arrivée des Kanban,
 annulation d'une commande d'achat par sa fiche, suppression de plusieurs lignes cochées).
@@ -10,9 +10,10 @@ annulation d'une commande d'achat par sa fiche, suppression de plusieurs lignes 
 | PROD_75 | Etat des stocks par lots et liste des achats aux couleurs GESCOM (colonnes GESCOM + Dispo, lignes alternées, cadres de dates ; Numéro Arrivage dans la liste des achats) |
 | PROD_76 | Fiche Commande client resserrée pour tenir à l'écran à 100 % (libellés à gauche dans le bloc Client, couleurs du tableau des lignes) ; Finaliser / Confirmation Commande au-dessus de Fermer |
 | PROD_77 | Fenêtre Lignes Commandes : % Commission à côté de % RFA sur Produits ; fiche Commande client : « < Commentaire > » recopié aussitôt dans l'onglet Commentaire |
+| PROD_78 | Impression interne LVME de la commande client (bouton « Imprimer commande ») : logo LVME, cadres Client / Commande, totaux et lignes aux couleurs de la fiche ; **prérequis : code** (LvmeImpressionController, reports/LvmeCommandeClient.rptdesign) |
 
-Même procédure que ci-dessous (sauvegarde, clone, build, **scripts PROD_73 à 77**, bascule, redémarrage) :
-`for n in 73 74 75 76 77; do psql -U axelor -d axelor -v ON_ERROR_STOP=1 -f $(ls livrables/PROD_${n}_*.sql) || break; done`
+Même procédure que ci-dessous (sauvegarde, clone, build, **scripts PROD_73 à 78**, bascule, redémarrage) :
+`for n in 73 74 75 76 77 78; do psql -U axelor -d axelor -v ON_ERROR_STOP=1 -f $(ls livrables/PROD_${n}_*.sql) || break; done`
 
 ---
 
