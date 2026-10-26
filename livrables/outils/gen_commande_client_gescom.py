@@ -250,8 +250,8 @@ tech = ('  <panel name="lvmeTechPanel" hidden="true" colSpan="12">\n'
 
 new_main = ('  <!-- LVME : copie de la « Fiche Commande client » GESCOM : Client | Commande | boutons, totaux, puis le\n'
             '       tableau des lignes ; statuts conservés ; réservation, livraison, paramètres en onglets -->\n'
-            '  <panel name="mainPanel" colSpan="12">\n' + top.rstrip() + '\n    ' + details + '\n  </panel>\n'
-            '  <panel name="lvmeGescomPanel" colSpan="12" css="lvme-cde-client lvme-cde-fond">\n'
+            '  <panel name="mainPanel" colSpan="12" css="lvme-compact lvme-cde-serre lvme-cde-entete">\n' + top.rstrip() + '\n    ' + details + '\n  </panel>\n'
+            '  <panel name="lvmeGescomPanel" colSpan="12" css="lvme-cde-client lvme-cde-fond lvme-compact lvme-cde-serre">\n'
             + client_new + '\n' + cde_new + '\n' + boutons + '\n' + totaux + '\n'
             '    ' + info_client + '\n'
             '  </panel>\n' + lignes_xml + '\n')

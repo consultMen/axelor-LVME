@@ -493,3 +493,53 @@
   border: 1px solid #8c96a8 !important;
   border-radius: 4px !important;
 }
+
+/*
+ * Fiche Commande client resserrée comme GESCOM (panneaux css="lvme-cde-serre", avec lvme-compact) : toute la fiche
+ * visible à 100 % ; libellés plus petits mais jamais coupés ; cases et boutons moins hauts ; en-tête plus bas.
+ */
+.lvme-cde-serre [class*="_label_"],
+.lvme-cde-serre [class*="_labelText_"],
+.lvme-cde-serre label {
+  font-size: 12px !important;
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  line-height: 1.1 !important;
+}
+.lvme-cde-serre input:not([type="checkbox"]):not([type="radio"]),
+.lvme-cde-serre select,
+.lvme-cde-serre [class*="_viewer_"] {
+  font-size: 13px !important;
+  min-height: 0 !important;
+  height: 26px;
+  padding-top: 1px !important;
+  padding-bottom: 1px !important;
+}
+.lvme-cde-serre button {
+  padding-top: 3px !important;
+  padding-bottom: 3px !important;
+  font-size: 13px !important;
+  min-height: 0 !important;
+}
+.lvme-cde-serre textarea {
+  min-height: 0 !important;
+  max-height: 60px;
+}
+.lvme-cde-entete .large,
+.lvme-cde-entete h1,
+.lvme-cde-entete h2,
+.lvme-cde-entete h3 {
+  font-size: 20px !important;
+  margin: 0 !important;
+}
+.lvme-cde-entete [class*="_nav"],
+.lvme-cde-entete [class*="_step"] {
+  font-size: 13px !important;
+}
+/* lignes du tableau des commandes resserrées */
+.lvme-cde-grid [class*="_body_"] [class*="_row_"] [class*="_column_"] {
+  padding-top: 2px !important;
+  padding-bottom: 2px !important;
+  font-size: 13px;
+}

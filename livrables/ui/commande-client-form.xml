@@ -17,7 +17,7 @@
   </menubar>
     <!-- LVME : copie de la « Fiche Commande client » GESCOM : Client | Commande | boutons, totaux, puis le
        tableau des lignes ; statuts conservés ; réservation, livraison, paramètres en onglets -->
-  <panel name="mainPanel" colSpan="12">
+  <panel name="mainPanel" colSpan="12" css="lvme-compact lvme-cde-serre lvme-cde-entete">
 
     <panel name="blockedCustCreditExceedPanel" colSpan="12">
       <field name="blockedOnCustCreditExceed" showTitle="false" readonly="true" showIf="blockedOnCustCreditExceed &amp;&amp; !manualUnblock" colSpan="4">
@@ -100,7 +100,7 @@
       </field>
     </panel>
   </panel>
-  <panel name="lvmeGescomPanel" colSpan="12" css="lvme-cde-client lvme-cde-fond">
+  <panel name="lvmeGescomPanel" colSpan="12" css="lvme-cde-client lvme-cde-fond lvme-compact lvme-cde-serre">
     <panel name="lvmeClientPanel" colSpan="6" css="lvme-cde-client lvme-gescom-box">
       <panel name="lvmeClientGauche" colSpan="6" itemSpan="12" showTitle="false">
         <field colSpan="12" name="clientPartner" title="Client" hideIf="company == null" readonlyIf="statusSelect > 1" onChange="action-sale-order-method-client-partner-onchange,action-sale-order-record-set-remise-rfa" onSelect="action-sale-order-method-set-client-partner-domain" required="true" form-view="partner-form" grid-view="partner-grid" x-image-field="picture"/>
