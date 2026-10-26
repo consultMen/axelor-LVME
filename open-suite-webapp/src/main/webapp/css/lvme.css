@@ -543,3 +543,18 @@
   padding-bottom: 2px !important;
   font-size: 13px;
 }
+/* fiche Commande client resserrée : libellés à GAUCHE des cases dans le bloc Client / Commande (comme GESCOM),
+   ce qui divise la hauteur par deux */
+.lvme-cde-client.lvme-cde-serre [class*="_container_"]:has(> [class*="_title_"]) {
+  flex-direction: row !important;
+  align-items: center;
+  gap: 6px;
+}
+.lvme-cde-client.lvme-cde-serre [class*="_container_"]:has(> [class*="_title_"]) > [class*="_title_"] {
+  flex: 0 0 auto;
+  min-width: 70px;
+}
+.lvme-cde-client.lvme-cde-serre [class*="_container_"]:has(> [class*="_title_"]) > :not([class*="_title_"]) {
+  flex: 1 1 auto;
+  min-width: 0;
+}

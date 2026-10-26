@@ -27,3 +27,16 @@ UPDATE meta_view SET xml = replace(xml,
   updated_on = now(), version = COALESCE(version, 0) + 1
 WHERE name = 'sale-order-form' AND module IS NULL AND priority = 30
   AND xml LIKE '%name="internalNote" title="&lt; Commentaire &gt;" colSpan="8"%';
+
+-- bloc Client : plus de vignette (image) devant Client et contact (vide à gauche), plus de 2e libellé « Adresse »
+UPDATE meta_view SET xml = regexp_replace(regexp_replace(xml,
+  '(<field[^\n]*name="clientPartner"[^\n]*?) x-image-field="picture"', '\1'),
+  '(<field[^\n]*name="contactPartner"[^\n]*?) x-image-field="picture"', '\1'),
+  updated_on = now(), version = COALESCE(version, 0) + 1
+WHERE name = 'sale-order-form' AND module IS NULL AND priority = 30 AND xml ~ 'name="(clientPartner|contactPartner)"[^\n]*x-image-field';
+UPDATE meta_view SET xml = replace(xml,
+  '<field name="mainInvoicingAddress.addressL4" title="Adresse" readonly="true" colSpan="12" showIf="mainInvoicingAddress"/>',
+  '<field name="mainInvoicingAddress.addressL4" title="" readonly="true" colSpan="12" showTitle="false" showIf="mainInvoicingAddress"/>'),
+  updated_on = now(), version = COALESCE(version, 0) + 1
+WHERE name = 'sale-order-form' AND module IS NULL AND priority = 30
+  AND xml LIKE '%name="mainInvoicingAddress.addressL4" title="Adresse"%';

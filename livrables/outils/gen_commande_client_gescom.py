@@ -108,7 +108,7 @@ client_new = '\n'.join([
     '      <panel name="lvmeClientGauche" colSpan="6" itemSpan="12" showTitle="false">',
     F(c1('clientPartner'), 12, 'Client'),
     F(adr, 12, 'Adresse'),
-    ro('mainInvoicingAddress.addressL4', 'Adresse', 12, ' showIf="mainInvoicingAddress"'),
+    ro('mainInvoicingAddress.addressL4', '', 12, ' showTitle="false" showIf="mainInvoicingAddress"'),
     ro('mainInvoicingAddress.addressL5', '', 12, ' showIf="mainInvoicingAddress.addressL5"'),
     ro('mainInvoicingAddress.zip', 'Code postal', 4),
     ro('mainInvoicingAddress.city.name', 'Ville', 8),
@@ -260,5 +260,7 @@ new_main = ('  <!-- LVME : copie de la « Fiche Commande client » GESCOM : Clie
 out = head_form + new_main + tech + '  ' + tabs + '\n  ' + attrs_panel + '\n  ' + other_infos + '\n  ' + mail + '\n</form>\n'
 m = re.search(r'\sonLoad="([^"]*)"', out[:out.index('>')])
 out = out.replace('onLoad="%s"' % m.group(1), 'onLoad="%s,%s"' % (m.group(1), SOMME), 1)
+# Client et contact sans vignette (image) devant le nom : elle laissait un vide à gauche du champ
+out = re.sub(r'(<field\b' + A + r'*?name="(?:clientPartner|contactPartner)"' + A + r'*?) x-image-field="picture"', r'\1', out)
 open(DST, 'w', encoding='utf-8', newline='\r\n').write(out)
 print('ok', DST, len(out))
