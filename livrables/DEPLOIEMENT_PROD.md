@@ -11,7 +11,7 @@ annulation d'une commande d'achat par sa fiche, suppression de plusieurs lignes 
 | PROD_76 | Fiche Commande client resserrée pour tenir à l'écran à 100 % (libellés à gauche dans le bloc Client, couleurs du tableau des lignes) ; Finaliser / Confirmation Commande au-dessus de Fermer |
 | PROD_77 | Fenêtre Lignes Commandes : % Commission à côté de % RFA sur Produits ; fiche Commande client : « < Commentaire > » recopié aussitôt dans l'onglet Commentaire |
 
-Même procédure que ci-dessous (sauvegarde, clone, build, **scripts PROD_73 à 76**, bascule, redémarrage) :
+Même procédure que ci-dessous (sauvegarde, clone, build, **scripts PROD_73 à 77**, bascule, redémarrage) :
 `for n in 73 74 75 76 77; do psql -U axelor -d axelor -v ON_ERROR_STOP=1 -f $(ls livrables/PROD_${n}_*.sql) || break; done`
 
 ---
