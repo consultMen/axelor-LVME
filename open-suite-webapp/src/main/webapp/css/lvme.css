@@ -563,10 +563,16 @@
   flex: 0 1 auto;
   min-width: 58px;
 }
-/* case jamais écrasée par un libellé long (% Frais Commission…) : le libellé passe alors sur deux lignes */
+/* libellés du bloc Client sur une seule ligne ; Code postal / Ville et les quatre % (Rem/Fact., RFA, Frais Cong., Frais Commission), deux par
+   ligne, gardent leur libellé au-dessus de la case : trop étroits pour un libellé à gauche */
 [class*="_formView_"]:has(.lvme-cde-statut) .lvme-gescom-box [class*="_container_"]:has(> [class*="_title_"]) > [class*="_title_"] label,
 [class*="_formView_"]:has(.lvme-cde-statut) .lvme-gescom-box [class*="_container_"]:has(> [class*="_title_"]) > [class*="_title_"] [class*="_labelText_"] {
-  white-space: normal !important;
+  white-space: nowrap !important;
+}
+[class*="_formView_"]:has(.lvme-cde-statut) .lvme-gescom-box [class*="_gridItem_"]:is([style*="grid-column: 1 / 7"], [style*="grid-column: 7 / 13"], [style*="grid-column: 1 / 5"], [style*="grid-column: 5 / 13"]) > [class*="_container_"]:has(> [class*="_title_"]) {
+  flex-direction: column !important;
+  align-items: stretch !important;
+  gap: 0 !important;
 }
 [class*="_formView_"]:has(.lvme-cde-statut) .lvme-gescom-box [class*="_container_"]:has(> [class*="_title_"]) > :not([class*="_title_"]) {
   flex: 1 1 auto;
