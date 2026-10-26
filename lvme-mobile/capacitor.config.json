@@ -1,0 +1,13 @@
+{
+  "appId": "com.lvme.sofrimar",
+  "appName": "LVME",
+  "webDir": "www",
+  "server": {
+    "url": "https://lvme-erp.com",
+    "cleartext": false,
+    "allowNavigation": ["lvme-erp.com"]
+  },
+  "android": {
+    "allowMixedContent": false
+  }
+}

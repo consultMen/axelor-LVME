@@ -1,0 +1,16 @@
+{
+  "name": "lvme-mobile",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Application Android LVME Sofrimar : ouvre l'ERP LVME (lvme-erp.com) en plein écran, sans navigateur",
+  "scripts": {
+    "sync": "cap sync android"
+  },
+  "dependencies": {
+    "@capacitor/android": "8.5.3",
+    "@capacitor/core": "8.5.3"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "8.5.3"
+  }
+}
