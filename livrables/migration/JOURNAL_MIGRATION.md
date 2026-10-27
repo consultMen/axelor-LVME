@@ -72,6 +72,68 @@ PARAMETRES_TAXES : table vide dans GESCOM. Les taux de TVA sont dans `table_base
 vente, 343 avec gencode, 217 avec réf. douanière, 487 avec nom scientifique ; 66 familles ; 15 unités ajoutées ;
 0 article sans unité.
 
+## 3 bis. Étape 02 : tiers (`MIG_02_tiers.sql`)
+
+**Fichiers :**
+- CLIENTS (2 186), clientAD (110 adresses de livraison), FOU (1 371), TRANSPORTEUR (50), commercial (33) ;
+- SECTEUR (16), groupement (55), FAMILLES_CLIENTS (9), pays (41), clientcoditour (71) ;
+- table_base (conditions RGT… et modes MODRGT…).
+- Tables vides dans GESCOM : CODE_RGT, MODE_RGT (les règlements sont dans table_base) et rfa_client (le % RFA est
+  dans CLIENT.rfa).
+
+**Listes complétées :** 34 pays, 16 secteurs, 9 catégories de clients, 55 groupements (avec % RFA), 35 conditions de
+paiement (n jours date de facture ou fin de mois, jour d'échéance « le 10 »…).
+
+**Modes de paiement** (Axelor existants) :
+- VIREMENT → Enc. Virement ; CHÈQUE → Enc. Chèque ; ESPÈCES → Enc. Espèces ; CB → Enc. Carte bancaire ;
+- TRAITE, TRAITE DIRECTE, BILLET À ORDRE → Enc. LCR ;
+- PAIEMENT LIVRAISON, SANS RÈGLEMENT → Enc. Autre ;
+- fournisseurs : VIREMENT → Déc. Virement.
+
+**Commerciaux :** les 33 commerciaux GESCOM deviennent des utilisateurs Axelor, avec le code `com<code GESCOM>`
+(ex. com03 = MICHELE BARTOLINI), bloqués et sans mot de passe utilisable (décision du 27/10). À activer pour ceux qui
+se connecteront.
+
+**Clients :**
+
+| GESCOM | Axelor |
+|---|---|
+| CLCLEUNIK | clé GESCOM `GESCOM-CLI-<n>` |
+| REFCPT | code client (les deux codes sont conservés, décision du 27/10) |
+| LIBELLE, ADR1-3, CODP, VILLE, CODPAY | nom, adresse principale, pays |
+| TEL, PORTABLE, ADEMAIL | téléphone, portable, e-mail |
+| FAX, NOTES, CODE_NAF | dans la description |
+| HORAIRE | commentaire de livraison |
+| SIRET (hors 000…), TVAINTRA | SIRET, n° TVA intracom. |
+| SECTEUR / FAMILLECLT / GROUP_1 | secteur / catégorie / groupement |
+| rfa / POURC_COMM / REMMAX | % RFA / % commission / % remise facture |
+| MODREGT / REGL1 | condition / mode de paiement ; MODREGT = COMPTANT → case « Client comptant » (266) |
+| TRANSPORTEUR / COMMERCIAL | transporteur / commercial (utilisateur) |
+| PORT_PAYE, RETIRE | port payé, client archivé (258) |
+| DEV = 66 | dollar |
+| NOMRESP | contact du client (1 768) |
+| clientcoditour | code Coditour |
+| clientAD | adresses de livraison (110) |
+
+**Fournisseurs :** code (REFCPT), nom, pays, adresse et contacts quand ils existent (peu remplis dans GESCOM),
+condition / mode de paiement, devise, SIRET, TVA.
+- 173 codes fournisseurs étaient déjà pris par un client (même REFCPT). Ils sont repris en `F-<code>`.
+- Le fournisseur habituel est relié à 1 548 articles (FOCLEUNIK).
+
+**Transporteurs :** nom, adresse, téléphones, e-mail, contact, en activité ou archivé.
+
+**Chaque client et fournisseur** est rattaché à la société LVME, avec les comptes client / fournisseur par défaut de
+la configuration comptable.
+
+**Restent dans l'archive :** encours, plafond de crédit, client payeur / central, RIB / IBAN / BIC, domiciliation,
+tournée, tarif, type de BL, périodicité de facturation, GROUP_2, % frais congélation (2 clients, 1,5 % : le taux se
+règle sur la commande).
+
+**Contrôle (essai local, annulé) :**
+- identique entre GESCOM et Axelor : 2 186 clients, 1 371 fournisseurs, 50 transporteurs, 110 adresses de
+  livraison, 266 clients comptant, 33 commerciaux ;
+- d'après GESCOM : 98 clients sans secteur, 22 sans groupement et 92 sans adresse.
+
 ## 4. Points ouverts à faire préciser par le client
 
 - **cdv** (931 articles, ex. 100 403 ; 210 322) : signification inconnue. Pas trouvé dans `table_base`. Gardé dans
@@ -81,3 +143,7 @@ vente, 343 avec gencode, 217 avec réf. douanière, 487 avec nom scientifique ; 
   - `tva` = 4 → TVAPRO1 « ventes marchandises 5,5 % » ; `tva` = 382 → TVAPRO8 « R.R.R. accordées 5,5 % ».
   - Dans Axelor, la famille comptable « Produit surgelé » applique la « TVA taux normal ».
   - Paramétrage comptable à vérifier avec le client (non modifié par la migration).
+- **Conditions de paiement** : les échéances (n jours date de facture / fin de mois, jour « le 10 ») ont été
+  traduites en conditions Axelor. Le calcul des échéances est à vérifier avec le client sur une facture test.
+- **Modes de paiement** traite / billet à ordre : repris en « LCR » dans Axelor, à confirmer.
+- **Commerciaux** : indiquer lesquels doivent pouvoir se connecter (activation et mot de passe).
