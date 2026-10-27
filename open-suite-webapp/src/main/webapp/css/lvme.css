@@ -1343,3 +1343,81 @@
 [class*="_formView_"]:has(.lvme-ges-dates-lavande):has(.lvme-btn-kanban) [class*="_main_"] > :last-child {
   height: calc(100vh - 384px) !important;
 }
+
+/*
+ * Listes « Articles » (ventes et achats) comme GESCOM, sur un seul écran à 100 % (repère css="lvme-ges-art" sur
+ * « Recherche rapide par ») : cadre Recherche bordé de bleu, écriture et cases plus petites, en-têtes gris dégradé,
+ * lignes blanc / gris très clair serrées, ligne sélectionnée bleu nuit, liste sur toute la hauteur restante.
+ */
+[class*="_formView_"]:has(.lvme-ges-art),
+[class*="_formView_"]:has(.lvme-ges-art) * {
+  --ax-form-row-gap: .15rem !important;
+  --ax-theme-form-row-gap: .15rem !important;
+  --ax-form-padding: .25rem !important;
+  --ax-panel-body-padding: .3rem !important;
+  --ax-panel-header-padding: .1rem .3rem !important;
+  --ax-panel-header-title-padding: .1rem .3rem !important;
+  --ax-input-padding: 0 .35rem !important;
+}
+[class*="_formView_"]:has(.lvme-ges-art) [class*="_main_"] > [class*="_panel_"]:first-child {
+  border: 1px solid #2b45c8 !important;
+}
+[class*="_formView_"]:has(.lvme-ges-art) [class*="_main_"] > [class*="_panel_"] [class*="_container_"]:has(> [class*="_title_"]) {
+  flex-direction: row !important;
+  align-items: center;
+  gap: 6px;
+}
+[class*="_formView_"]:has(.lvme-ges-art) [class*="_main_"] > [class*="_panel_"] [class*="_container_"]:has(> [class*="_title_"]) > :not([class*="_title_"]) {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+[class*="_formView_"]:has(.lvme-ges-art) [class*="_main_"] > [class*="_panel_"] label,
+[class*="_formView_"]:has(.lvme-ges-art) [class*="_main_"] > [class*="_panel_"] [class*="_labelText_"] {
+  font-size: 12px !important;
+  white-space: nowrap !important;
+  margin-bottom: 0 !important;
+}
+[class*="_formView_"]:has(.lvme-ges-art) [class*="_main_"] > [class*="_panel_"] input:not([type="checkbox"]):not([type="radio"]),
+[class*="_formView_"]:has(.lvme-ges-art) [class*="_main_"] > [class*="_panel_"] select {
+  font-size: 12px !important;
+  min-height: 0 !important;
+  height: 22px;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+[class*="_formView_"]:has(.lvme-ges-art) [class*="_main_"] > [class*="_panel_"] button {
+  font-size: 12px !important;
+  padding-top: 2px !important;
+  padding-bottom: 2px !important;
+  min-height: 0 !important;
+}
+[class*="_formView_"]:has(.lvme-ges-art) [class*="_main_"] > [class*="_container_"] {
+  height: calc(100vh - 175px) !important;
+  min-height: 240px;
+}
+[class*="_formView_"]:has(.lvme-ges-art) [class*="_main_"] > [class*="_container_"] [class*="_header_"] [class*="_column_"] {
+  background: linear-gradient(#f4f4f4, #cdcdcd) !important;
+  color: #222 !important;
+  font-size: 11.5px !important;
+  white-space: normal !important;
+  line-height: 1.1;
+}
+[class*="_formView_"]:has(.lvme-ges-art) [class*="_main_"] > [class*="_container_"] [class*="_body_"] [class*="_row_6j3fy"] {
+  height: 20px !important;
+  min-height: 0 !important;
+}
+[class*="_formView_"]:has(.lvme-ges-art) [class*="_main_"] > [class*="_container_"] [class*="_body_"] [class*="_row_"] [class*="_column_"] {
+  background-color: #ffffff;
+  color: #000000;
+  font-size: 11.5px !important;
+  padding-top: 1px !important;
+  padding-bottom: 1px !important;
+  border-right: 1px solid #d6d6d6;
+}
+[class*="_formView_"]:has(.lvme-ges-art) [class*="_main_"] > [class*="_container_"] [class*="_body_"] [class*="_row_"]:nth-child(even) [class*="_column_"] {
+  background-color: #f0f0f0;
+}
+[class*="_formView_"]:has(.lvme-ges-art) [class*="_main_"] > [class*="_container_"] [class*="_body_"] [class*="_row_"][class*="_selected_"] [class*="_column_"] {
+  background-color: #14234f !important;
+  color: #ffffff !important;
+}

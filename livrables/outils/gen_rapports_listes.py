@@ -155,3 +155,59 @@ rapport('LvmeListeRotations.rptdesign', p_o | {'Filtres'}, [jeu_o],
         + tableau('RotationsDS', COLS_ROTATIONS, LIGNES_ROTATIONS, ('#FFFFFF', '#FFFFFF'),
                   prop('backgroundColor', '#DCDCDC'), sommes=SOMMES_ROT,
                   groupe=('produit', 'Totaux', '#FFFF99', SOMMES_ROT)))
+
+# ---------- liste des commandes clients (mêmes filtres que l'écran, y compris les alertes) ----------
+SQL_CDES = '''SELECT so.sale_order_seq AS numero, CASE WHEN so.is_reservation THEN 'Oui' ELSE '' END AS reservation,
+  CASE WHEN so.is_reservation THEN current_date - DATE(COALESCE(so.confirmation_date_time, so.created_on)) END
+    AS age_resa,
+  so.order_date AS date_cde, cli.name AS client, cli.partner_seq AS code,
+  (SELECT string_agg(sm.stock_move_seq, ', ') FROM stock_stock_move sm WHERE sm.type_select = 2 AND sm.status_select <> 4
+    AND sm.id IN (SELECT x.stock_stock_move FROM stock_stock_move_sale_order_set x WHERE x.sale_order_set = so.id))
+    AS numero_bl,
+  city.name AS ville, cli.fixed_phone AS telephone, so.ex_tax_total AS montant, so.total_gross_margin AS marge,
+  so.margin_rate AS pct_marge, com.code AS commercial, com.name AS responsable,
+  so.estimated_delivery_date AS date_livraison, prep.name AS preparateur, so.external_reference AS ref_client
+FROM sale_sale_order so
+LEFT JOIN base_partner cli ON cli.id = so.client_partner
+LEFT JOIN base_address adr ON adr.id = so.main_invoicing_address
+LEFT JOIN base_city city ON city.id = adr.city
+LEFT JOIN auth_user com ON com.id = so.commercial
+LEFT JOIN auth_user prep ON prep.id = so.lvme_preparateur
+WHERE so.template = false AND (
+  (:Alerte = '' AND so.status_select IN (3, 4)
+    AND ((CAST(:Etat AS integer) = 1 AND so.status_select = 3 AND so.delivery_state <> 3
+          AND (so.is_reservation IS NULL OR so.is_reservation = false))
+      OR (CAST(:Etat AS integer) = 2 AND (so.status_select = 4 OR so.delivery_state = 3)) OR CAST(:Etat AS integer) = 3
+      OR (CAST(:Etat AS integer) = 4 AND so.is_reservation = true AND so.status_select = 3))
+    AND (CAST(:Client AS bigint) = 0 OR so.client_partner = CAST(:Client AS bigint))
+    AND (CAST(:Commercial AS bigint) = 0 OR so.commercial = CAST(:Commercial AS bigint))
+    AND (:DateFiltre = '0' OR COALESCE(so.order_date, so.creation_date) BETWEEN CAST(:DateDu AS date) AND CAST(:DateAu AS date))
+    AND (:LivFiltre = '0' OR so.estimated_delivery_date BETWEEN CAST(:LivDu AS date) AND CAST(:LivAu AS date)))
+  OR (:Alerte = 'retard' AND so.status_select = 3 AND (so.delivery_state IS NULL OR so.delivery_state <> 3)
+    AND so.estimated_delivery_date < current_date)
+  OR (:Alerte = 'marge-negative' AND so.status_select = 3 AND (so.delivery_state IS NULL OR so.delivery_state <> 3)
+    AND so.total_gross_margin < 0)
+  OR (:Alerte = 'marge-faible' AND so.status_select IN (3, 4)
+    AND so.order_date BETWEEN date_trunc('month', current_date)::date AND current_date AND so.margin_rate < 10)
+  OR (:Alerte = 'devis' AND so.status_select IN (1, 2) AND so.creation_date < current_date - 15))
+ORDER BY so.order_date DESC NULLS LAST, so.id DESC'''
+COLS_CDES = [('numero', 'string'), ('reservation', 'string'), ('age_resa', 'integer'), ('date_cde', 'date'),
+             ('client', 'string'), ('code', 'string'), ('numero_bl', 'string'), ('ville', 'string'),
+             ('telephone', 'string'), ('montant', 'decimal'), ('marge', 'decimal'), ('pct_marge', 'decimal'),
+             ('commercial', 'string'), ('responsable', 'string'), ('date_livraison', 'date'),
+             ('preparateur', 'string'), ('ref_client', 'string')]
+LIGNES_CDES = [
+    ('N° Commande', 'numero', 1.7, None, None), ('Réservation', 'reservation', 1.1, None, None),
+    ('Âge résa (j)', 'age_resa', 0.9, '#,##0', None), ('Date', 'date_cde', 1.4, 'date', None),
+    ('Client', 'client', 3.6, None, None), ('Code', 'code', 1.3, None, None), ('N° BL', 'numero_bl', 1.4, None, None),
+    ('Ville', 'ville', 1.8, None, None), ('Téléphone', 'telephone', 1.8, None, None),
+    ('Montant HT', 'montant', 1.6, '#,##0.00', None), ('Marge ht', 'marge', 1.4, '#,##0.00', None),
+    ('% Marge', 'pct_marge', 1.0, '#,##0.00', None), ('Commercial', 'commercial', 1.4, None, None),
+    ('Nom responsable', 'responsable', 1.8, None, None), ('Date livraison', 'date_livraison', 1.4, 'date', None),
+    ('Préparateur', 'preparateur', 1.5, None, None), ('Ref Cde Client', 'ref_client', 1.6, None, None),
+]
+jeu_c, p_c = jeu('CommandesDS', SQL_CDES, COLS_CDES)
+rapport('LvmeListeCommandesClients.rptdesign', p_c | {'Filtres'}, [jeu_c],
+        entete('Listes Commandes Clients', FILTRES)
+        + tableau('CommandesDS', COLS_CDES, LIGNES_CDES, ('#FFFFFF', '#F4F4F4'),
+                  prop('backgroundColor', '#DCDCDC'), sommes=('montant', 'marge')))
