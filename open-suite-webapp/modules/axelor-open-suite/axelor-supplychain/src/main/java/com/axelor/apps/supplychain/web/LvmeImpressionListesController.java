@@ -13,11 +13,11 @@ import java.util.Map;
 
 /**
  * Boutons d'impression des listes, comme GESCOM : « Imprimer » (achats fournisseurs, commandes
- * clients, historique prix, état des stocks par lots), « Synthèse » (synthèse des arrivages),
- * « Editer » (arrivages), « Liste des Rotations » (rotation des stocks par lot). Chaque impression
- * reprend les filtres de l'écran (mêmes règles que la liste affichée) ; modèles LvmeListeAchats /
- * LvmeListeCommandesClients / LvmeListeArrivages / LvmeListeRotations / LvmeHistoriquePrix /
- * LvmeEtatStockLots / LvmeSyntheseArrivages.rptdesign.
+ * clients, historique prix, état des stocks par lots, RFA par produit / facture), « Synthèse »
+ * (synthèse des arrivages), « Editer » (arrivages), « Liste des Rotations » (rotation des stocks par
+ * lot). Chaque impression reprend les filtres de l'écran (mêmes règles que la liste affichée) ;
+ * modèles LvmeListeAchats / LvmeListeCommandesClients / LvmeListeArrivages / LvmeListeRotations /
+ * LvmeHistoriquePrix / LvmeEtatStockLots / LvmeSyntheseArrivages / LvmeListeRfa.rptdesign.
  */
 public class LvmeImpressionListesController {
 
@@ -177,8 +177,7 @@ public class LvmeImpressionListesController {
       StringBuilder filtres = new StringBuilder();
       ajouter(filtres, client != null ? "Client " + client.getName() : "");
       ajouter(
-          filtres,
-          produit != null ? "Produit " + produit.getCode() + " " + produit.getName() : "");
+          filtres, produit != null ? "Produit " + produit.getCode() + " " + produit.getName() : "");
       ajouterPeriode(filtres, "Période", c.get("dateDu"), c.get("dateAu"));
       ouvrir(
           response,
@@ -187,7 +186,8 @@ public class LvmeImpressionListesController {
               .addParam("Client", String.valueOf(client != null ? client.getId() : 0L))
               .addParam("DateDu", date(c.get("dateDu"), DEBUT))
               .addParam("DateAu", date(c.get("dateAu"), FIN))
-              .addParam("Filtres", filtres.length() == 0 ? "Toutes les ventes" : filtres.toString()),
+              .addParam(
+                  "Filtres", filtres.length() == 0 ? "Toutes les ventes" : filtres.toString()),
           "Historique prix");
     } catch (Exception e) {
       TraceBackService.trace(response, e);
@@ -237,7 +237,8 @@ public class LvmeImpressionListesController {
       Object nature = c.get("natureArrivage");
       ouvrir(
           response,
-          ReportFactory.createReport("LvmeEtatStockLots.rptdesign", "Etat des stocks par lots-${date}")
+          ReportFactory.createReport(
+                  "LvmeEtatStockLots.rptdesign", "Etat des stocks par lots-${date}")
               .addParam("ArtDu", artDuCode)
               .addParam("ArtAu", artAuCode)
               .addParam("FouDu", fouDuNom)
@@ -277,7 +278,9 @@ public class LvmeImpressionListesController {
           filtres,
           numDu.isEmpty() && numAu.isEmpty()
               ? ""
-              : "Arrivage N° du " + (numDu.isEmpty() ? "…" : numDu) + " au "
+              : "Arrivage N° du "
+                  + (numDu.isEmpty() ? "…" : numDu)
+                  + " au "
                   + (numAu.isEmpty() ? "…" : numAu));
       ajouterPeriode(filtres, "Arrivée", c.get("arriveeDu"), c.get("arriveeAu"));
       ouvrir(
@@ -288,8 +291,27 @@ public class LvmeImpressionListesController {
               .addParam("NumAu", numAu.isEmpty() ? "zzzzzzzzzzzz" : numAu)
               .addParam("Du", date(c.get("arriveeDu"), DEBUT))
               .addParam("Au", date(c.get("arriveeAu"), FIN))
-              .addParam("Filtres", filtres.length() == 0 ? "Tous les arrivages" : filtres.toString()),
+              .addParam(
+                  "Filtres", filtres.length() == 0 ? "Tous les arrivages" : filtres.toString()),
           "Synthèse des Arrivages");
+    } catch (Exception e) {
+      TraceBackService.trace(response, e);
+    }
+  }
+
+  /** « Imprimer » de l'écran Liste des RFA par produit / facture. */
+  public void imprimerRfa(ActionRequest request, ActionResponse response) {
+    try {
+      Map<String, Object> c = request.getContext();
+      StringBuilder filtres = new StringBuilder();
+      ajouterPeriode(filtres, "Factures", c.get("factureDu"), c.get("factureAu"));
+      ouvrir(
+          response,
+          ReportFactory.createReport("LvmeListeRfa.rptdesign", "Liste des RFA-${date}")
+              .addParam("Du", date(c.get("factureDu"), DEBUT))
+              .addParam("Au", date(c.get("factureAu"), FIN))
+              .addParam("Filtres", filtres.length() == 0 ? "Toutes les factures" : filtres.toString()),
+          "Liste des RFA par produit / facture");
     } catch (Exception e) {
       TraceBackService.trace(response, e);
     }

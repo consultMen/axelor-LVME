@@ -1,0 +1,17 @@
+<form name="lvme-rfa-article-form" title="Règle RFA par produit" model="com.axelor.apps.supplychain.db.RfaArticle"
+  width="large" onNew="action-lvme-rfa-article-defaults">
+  <!-- LVME : règle de RFA par produit (table RFA_ART de GESCOM) : % accordé à un client ou à un groupement, sur un
+       article ou une famille, pendant une période -->
+  <panel name="reglePanel" title="Règle RFA" colSpan="12">
+    <field name="typeClient" widget="RadioSelect" colSpan="4"/>
+    <field name="client" colSpan="8" showIf="typeClient == 1" requiredIf="typeClient == 1" domain="self.isCustomer = true"
+      canNew="false"/>
+    <field name="groupement" colSpan="8" showIf="typeClient == 2" requiredIf="typeClient == 2" canNew="false"/>
+    <field name="typeArticle" widget="RadioSelect" colSpan="4"/>
+    <field name="product" colSpan="8" showIf="typeArticle == 1" requiredIf="typeArticle == 1" canNew="false"/>
+    <field name="famille" colSpan="8" showIf="typeArticle == 2" requiredIf="typeArticle == 2" canNew="false"/>
+    <field name="dateDebut" colSpan="4"/>
+    <field name="dateFin" colSpan="4"/>
+    <field name="pourcRfa" colSpan="4"/>
+  </panel>
+</form>

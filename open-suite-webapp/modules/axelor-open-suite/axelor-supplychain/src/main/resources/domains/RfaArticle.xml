@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<domain-models xmlns="http://axelor.com/xml/ns/domain-models"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://axelor.com/xml/ns/domain-models http://axelor.com/xml/ns/domain-models/domain-models_7.4.xsd">
+
+  <module name="supplychain" package="com.axelor.apps.supplychain.db"/>
+
+  <!-- LVME : règle de RFA par produit (table RFA_ART de GESCOM) : % de RFA accordé à un client ou à un groupement,
+    sur un article ou une famille d'articles, pendant une période. Sert à l'écran « Liste des RFA par produit /
+    facture ». -->
+  <entity name="RfaArticle" cacheable="false">
+    <integer name="typeClient" title="Pour" selection="lvme.rfa.type.client.select" default="1" required="true"/>
+    <many-to-one name="client" ref="com.axelor.apps.base.db.Partner" title="Client"/>
+    <many-to-one name="groupement" ref="com.axelor.apps.sale.db.Groupement" title="Groupement"/>
+    <integer name="typeArticle" title="Sur" selection="lvme.rfa.type.article.select" default="1" required="true"/>
+    <many-to-one name="product" ref="com.axelor.apps.base.db.Product" title="Article"/>
+    <many-to-one name="famille" ref="com.axelor.apps.base.db.ProductCategory" title="Famille"/>
+    <date name="dateDebut" title="Du"/>
+    <date name="dateFin" title="Au"/>
+    <decimal name="pourcRfa" title="% RFA" precision="5" scale="2" default="0"/>
+  </entity>
+
+</domain-models>

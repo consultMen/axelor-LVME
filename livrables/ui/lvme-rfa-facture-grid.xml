@@ -1,0 +1,15 @@
+<grid name="lvme-rfa-facture-grid" title="RFA par produit / facture" model="com.axelor.apps.supplychain.db.RfaFacture"
+  orderBy="groupementCode,clientCode,dateFacture,numeroFacture" canNew="false" canEdit="false" canDelete="false">
+  <!-- LVME : colonnes de « LISTE DES RFA PAR PRODUIT/FACTURE » GESCOM -->
+  <field name="groupementCode" title="Groupement" width="90"/>
+  <field name="groupementNom" title="Nom Groupement" width="170"/>
+  <field name="clientCode" title="Client" width="90"/>
+  <field name="clientNom" title="Nom" width="230"/>
+  <field name="numeroFacture" title="Numéro Facture" width="100"/>
+  <field name="dateFacture" title="Date Facture" width="90"/>
+  <field name="produit" title="Produit" width="260"/>
+  <field name="montantHt" title="Montant H.T." aggregate="sum" width="100"/>
+  <field name="pourcRfa" title="% Remise" width="70"/>
+  <field name="montantRfa" title="Montant Remise" aggregate="sum" width="100"/>
+  <field name="invoice" hidden="true"/>
+</grid>

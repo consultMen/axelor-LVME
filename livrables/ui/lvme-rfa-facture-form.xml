@@ -1,0 +1,23 @@
+<form name="lvme-rfa-facture-form" title="Liste des RFA par produit / facture" model="com.axelor.utils.db.Wizard"
+  width="large" canNew="false" canSave="false" canCopy="false" canDelete="false" onNew="action-lvme-rfa-facture-group-onnew">
+  <!-- LVME : écran « LISTE DES RFA PAR PRODUIT/FACTURE » de GESCOM, sur un seul écran (cadre Factures
+       css="lvme-ges-rfa") : Factures du / au, période prédéfinie, Lancer la recherche, Imprimer, liste avec la somme
+       du montant HT et de la remise -->
+  <panel name="filtresRfaPanel" showTitle="false" colSpan="12">
+    <panel name="filtreFacturesPanel" colSpan="3" itemSpan="12" css="lvme-ges-rfa">
+      <field name="$factureDu" title="Factures du" type="date"/>
+      <field name="$factureAu" title="au" type="date"/>
+      <field name="$facturePeriode" title="Période prédéfinie" type="integer" selection="lvme.etat.stock.periode.select"
+        onChange="action-lvme-rfa-facture-periode"/>
+    </panel>
+    <panel name="filtreBoutonPanel" colSpan="2" itemSpan="12">
+      <button name="lancerRechercheBtn" title="Lancer la recherche" icon="search" onClick="action-lvme-rfa-facture-refresh"/>
+    </panel>
+    <panel name="filtreImprimerPanel" colSpan="7">
+      <spacer colSpan="9"/>
+      <button name="imprimerBtn" title="Imprimer" icon="printer" colSpan="3" onClick="action-lvme-rfa-facture-imprimer"/>
+    </panel>
+  </panel>
+  <panel-dashlet name="rfaDashlet" title="RFA par produit / facture" showTitle="false" colSpan="12" height="600"
+    action="action-lvme-rfa-facture-dashlet"/>
+</form>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<domain-models xmlns="http://axelor.com/xml/ns/domain-models"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://axelor.com/xml/ns/domain-models http://axelor.com/xml/ns/domain-models/domain-models_7.4.xsd">
+
+  <module name="supplychain" package="com.axelor.apps.supplychain.db"/>
+
+  <!-- LVME : écran « Liste des RFA par produit / facture » de GESCOM : une ligne par ligne de facture client
+    (factures et avoirs validés) qui a une règle de RFA (RfaArticle). Modèle en lecture seule adossé à la vue SQL
+    lvme_rfa_facture (sql/lvme_rfa_facture.sql). -->
+  <entity name="RfaFacture" table="lvme_rfa_facture" cacheable="false">
+    <many-to-one name="invoice" ref="com.axelor.apps.account.db.Invoice" column="invoice_id" title="Facture"/>
+    <many-to-one name="invoiceLine" ref="com.axelor.apps.account.db.InvoiceLine" column="invoice_line_id"
+      title="Ligne de facture"/>
+    <many-to-one name="client" ref="com.axelor.apps.base.db.Partner" column="client_id" title="Client"/>
+    <many-to-one name="groupement" ref="com.axelor.apps.sale.db.Groupement" column="groupement_id"
+      title="Groupement"/>
+    <string name="groupementCode" column="groupement_code" title="Groupement"/>
+    <string name="groupementNom" column="groupement_nom" title="Nom Groupement"/>
+    <string name="clientCode" column="client_code" title="Client"/>
+    <string name="clientNom" column="client_nom" title="Nom"/>
+    <string name="numeroFacture" column="numero_facture" title="Numéro Facture"/>
+    <date name="dateFacture" column="date_facture" title="Date Facture"/>
+    <string name="produit" column="produit" title="Produit"/>
+    <decimal name="montantHt" column="montant_ht" title="Montant H.T." precision="20" scale="2"/>
+    <decimal name="pourcRfa" column="pourc_rfa" title="% Remise" precision="5" scale="2"/>
+    <decimal name="montantRfa" column="montant_rfa" title="Montant Remise" precision="20" scale="2"/>
+  </entity>
+
+</domain-models>

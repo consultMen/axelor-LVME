@@ -1,0 +1,13 @@
+<grid name="lvme-rfa-article-grid" title="Règles RFA par produit" model="com.axelor.apps.supplychain.db.RfaArticle"
+  orderBy="-dateDebut,id">
+  <!-- LVME : règles de RFA par produit (table RFA_ART de GESCOM) -->
+  <field name="typeClient" title="Pour" width="100"/>
+  <field name="client" title="Client" width="220"/>
+  <field name="groupement" title="Groupement" width="180"/>
+  <field name="typeArticle" title="Sur" width="90"/>
+  <field name="product" title="Article" width="260"/>
+  <field name="famille" title="Famille" width="150"/>
+  <field name="dateDebut" title="Du" width="90"/>
+  <field name="dateFin" title="Au" width="90"/>
+  <field name="pourcRfa" title="% RFA" width="70"/>
+</grid>

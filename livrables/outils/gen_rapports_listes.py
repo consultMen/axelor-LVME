@@ -341,3 +341,25 @@ rapport('LvmeSyntheseArrivages.rptdesign', p_s | {'Filtres'}, [jeu_s],
                   groupe=('arrivage', 'Totaux', '#A0F8F8', ('nb_colis', 'poids_total'),
                           ('arrivage', 'fournisseur', 'code_fournisseur', 'date_embarquement', 'date_arrivee')),
                   extra_ligne=prop('color', '#8B2BC9')))
+
+# ---------- liste des RFA par produit / facture (même période que l'écran, somme HT et remise) ----------
+SQL_RFA = '''SELECT r.groupement_code, r.groupement_nom, r.client_code, r.client_nom, r.numero_facture, r.date_facture,
+  r.produit, r.montant_ht, r.pourc_rfa, r.montant_rfa
+FROM lvme_rfa_facture r
+WHERE r.date_facture BETWEEN CAST(:Du AS date) AND CAST(:Au AS date)
+ORDER BY r.groupement_code, r.client_code, r.date_facture, r.numero_facture'''
+COLS_RFA = [('groupement_code', 'string'), ('groupement_nom', 'string'), ('client_code', 'string'),
+            ('client_nom', 'string'), ('numero_facture', 'string'), ('date_facture', 'date'), ('produit', 'string'),
+            ('montant_ht', 'decimal'), ('pourc_rfa', 'decimal'), ('montant_rfa', 'decimal')]
+LIGNES_RFA = [
+    ('Groupement', 'groupement_code', 1.4, None, None), ('Nom Groupement', 'groupement_nom', 2.8, None, None),
+    ('Client', 'client_code', 1.5, None, None), ('Nom', 'client_nom', 3.8, None, None),
+    ('Numéro Facture', 'numero_facture', 1.6, None, None), ('Date Facture', 'date_facture', 1.4, 'date', None),
+    ('Produit', 'produit', 4.4, None, None), ('Montant H.T.', 'montant_ht', 1.6, '#,##0.00', None),
+    ('% Remise', 'pourc_rfa', 1.0, '#,##0.00', None), ('Montant Remise', 'montant_rfa', 1.6, '#,##0.00', None),
+]
+jeu_f, p_f = jeu('RfaDS', SQL_RFA, COLS_RFA)
+rapport('LvmeListeRfa.rptdesign', p_f | {'Filtres'}, [jeu_f],
+        entete('Liste des RFA par produit / facture', FILTRES)
+        + tableau('RfaDS', COLS_RFA, LIGNES_RFA, ('#FFFFFF', '#EEF4FC'),
+                  prop('backgroundColor', '#CFE3FB'), sommes=('montant_ht', 'montant_rfa')))
