@@ -1,6 +1,6 @@
 <grid name="lvme-lots-verifies-grid" title="Lots Vérifiés" model="com.axelor.apps.supplychain.db.EtatStockLot" orderBy="entryDate" canNew="false" canEdit="false" canDelete="false">
-  <!-- LVME : colonnes de l'écran « Lots Vérifiés » GESCOM -->
-  <hilite color="success" if="lotVerifie"/>
+  <!-- LVME : colonnes de l'écran « Lots Vérifiés » GESCOM (lignes blanc / gris comme GESCOM, case Vérif cochée pour
+       les lots vérifiés : couleurs dans css/lvme.css) -->
   <field name="lotNumber" title="N° Lot" width="110"/>
   <field name="arrivalNumber" title="N° Arrivage" width="100"/>
   <field name="origine" title="Origine" selection="lvme.origine.select" width="90"/>

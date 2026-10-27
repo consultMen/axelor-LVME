@@ -1,13 +1,15 @@
 <form name="lvme-lots-verifies-form" title="Lots Vérifiés" model="com.axelor.utils.db.Wizard" width="large"
   canNew="false" canSave="false" canCopy="false" canDelete="false" onNew="action-lvme-lots-verifies-defaults">
-  <!-- LVME : écran « Lots Vérifiés » de GESCOM (diapo 21) -->
+  <!-- LVME : écran « Lots Vérifiés » de GESCOM (diapo 21), sur un seul écran comme GESCOM (cadre Produit
+       css="lvme-ges-lots-verif") : Référence produit ou Lot n°, cadre Entrées, cadre Sélection, Afficher Lots / Fermer à
+       droite ; en bas N° Lot, Lot vérifié / non vérifié, Valider / Annuler -->
   <panel name="filtresLotsPanel" showTitle="false" colSpan="12">
-    <panel name="filtreProduitPanel" colSpan="4" itemSpan="12">
+    <panel name="filtreProduitPanel" colSpan="4" itemSpan="12" css="lvme-ges-lots-verif">
       <field name="$produit" title="Référence Produit" type="many-to-one" target="com.axelor.apps.base.db.Product"
         canNew="false" canEdit="false" canView="false"/>
-      <field name="$numeroLot" title="ou Lot n°" type="string"/>
+      <field name="$numeroLot" title="ou Lot n°" type="string" css="lvme-lot-violet"/>
     </panel>
-    <panel name="filtreEntreePanel" colSpan="3" itemSpan="12">
+    <panel name="filtreEntreePanel" colSpan="3" itemSpan="12" css="lvme-ges-cadre-gris">
       <field name="$entreeDu" title="Entrées du" type="date"/>
       <field name="$entreeAu" title="au" type="date"/>
       <field name="$entreePeriode" title="Période prédéfinie" type="integer" selection="lvme.etat.stock.periode.select"
@@ -17,14 +19,19 @@
       <field name="$selectionLots" showTitle="false" type="integer" widget="RadioSelect" selection="lvme.lots.selection.select"/>
     </panel>
     <panel name="filtreBoutonPanel" colSpan="2" itemSpan="12">
-      <button name="afficherLotsBtn" title="Afficher Lots" icon="check-circle" css="btn-success" onClick="action-lvme-lots-verifies-refresh"/>
+      <button name="afficherLotsBtn" title="Afficher Lots" icon="check-circle" onClick="action-lvme-lots-verifies-refresh"/>
+      <button name="fermerBtn" title="Fermer" icon="x-circle" onClick="close"/>
     </panel>
   </panel>
-  <panel-dashlet name="lotsDashlet" title="Lots" colSpan="12" height="520" action="action-lvme-lots-verifies-dashlet"/>
+  <panel-dashlet name="lotsDashlet" title="Lots" showTitle="false" colSpan="12" height="520" action="action-lvme-lots-verifies-dashlet"/>
   <panel name="verificationPanel" showTitle="false" colSpan="12">
     <field name="$lotAVerifier" title="N° Lot" type="many-to-one" target="com.axelor.apps.stock.db.TrackingNumber"
-      colSpan="4" canNew="false" canEdit="false" canView="false"/>
-    <field name="$verification" showTitle="false" type="integer" widget="RadioSelect" selection="lvme.lots.verification.select" colSpan="4"/>
-    <button name="validerVerifBtn" title="Valider" icon="check" css="btn-success" colSpan="2" onClick="action-lvme-lots-verifies-valider"/>
+      colSpan="3" canNew="false" canEdit="false" canView="false" css="lvme-cadre-orange"/>
+    <field name="$verification" showTitle="false" type="integer" widget="RadioSelect" selection="lvme.lots.verification.select"
+      colSpan="3" css="lvme-cadre-orange"/>
+    <panel name="verificationBoutonsPanel" showTitle="false" colSpan="2" itemSpan="12">
+      <button name="validerVerifBtn" title="Valider" icon="check-circle" onClick="action-lvme-lots-verifies-valider"/>
+      <button name="annulerVerifBtn" title="Annuler" icon="slash-circle" onClick="action-lvme-lots-verifies-annuler"/>
+    </panel>
   </panel>
 </form>
