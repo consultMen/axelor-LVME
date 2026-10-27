@@ -36,7 +36,7 @@ décisions, contrôles, points ouverts.
 | zonepecheoct.csv | gescom.zone_peche | 33 | |
 | ModePECHEOCT.csv | gescom.modepeche | 8 | |
 | table_baseOCT.csv | gescom.table_base | 993 | table des paramètres GESCOM (TVA, modes de règlement…) |
-| GENCODE_ARTICLESOCT.csv | gescom.gencod_articles | 66 | **à refaire** : copie exacte du fichier des familles |
+| GENCODE_ARTICLESOCT.csv | — | — | écarté : copie du fichier des familles ; GENCOD_ARTICLES et CLIENT_GENCOD sont vides dans GESCOM (gencode des articles repris depuis ARTICLES.GENCOD) |
 
 PARAMETRES_TAXES : table vide dans GESCOM. Les taux de TVA sont dans `table_base`.
 
@@ -68,8 +68,9 @@ PARAMETRES_TAXES : table vide dans GESCOM. Les taux de TVA sont dans `table_base
   durabilité, stock mini, promos, mémos de prix, cdv, sous-famille (IDSFAMART, 56 articles).
   - Dans LVME, marque, origine, zone et conditionnement se saisissent sur les lignes d'achat et d'arrivage.
 
-**Contrôle (essai local, annulé) :** 1 872 articles GESCOM → 1 872 articles Axelor ; 66 familles ; 0 article sans
-unité.
+**Contrôle (base locale, 27/10/2026) :** identique entre GESCOM et Axelor : 1 872 articles, dont 884 avec prix de
+vente, 343 avec gencode, 217 avec réf. douanière, 487 avec nom scientifique ; 66 familles ; 15 unités ajoutées ;
+0 article sans unité.
 
 ## 4. Points ouverts à faire préciser par le client
 
