@@ -323,6 +323,23 @@ SELECT nextval('stock_stock_location_line_seq'), 0, now(), 'GESCOM-STKL-' || s.l
   0, 0, 0
 FROM mig_stock s;
 
+-- totaux des arrivages et commandes : GESCOM ne les remplit pas pour un flottant (MT_HT, COLIS, POIDS à 0) ; somme
+-- des lignes quand le total GESCOM est vide ou nul (comme Axelor à l'enregistrement d'un arrivage)
+UPDATE stock_stock_move m SET nb_colis_total = x.colis, poids_total = x.poids, ex_tax_total = x.montant,
+  version = m.version + 1
+FROM (SELECT l.stock_move, sum(coalesce(l.nb_colis, 0)) AS colis, sum(coalesce(l.poids_total_net, l.qty, 0)) AS poids,
+             sum(coalesce(l.montant_reel, 0)) AS montant
+      FROM stock_stock_move_line l WHERE l.import_id LIKE 'GESCOM-ARRL-%' GROUP BY l.stock_move) x
+WHERE m.id = x.stock_move AND m.import_id LIKE 'GESCOM-ARR-%'
+  AND coalesce(m.nb_colis_total, 0) = 0 AND coalesce(m.poids_total, 0) = 0 AND coalesce(m.ex_tax_total, 0) = 0
+  AND (x.colis <> 0 OR x.poids <> 0 OR x.montant <> 0);
+UPDATE purchase_purchase_order o SET nb_colis_total = m.nb_colis_total, poids_total = m.poids_total,
+  ex_tax_total = m.ex_tax_total, company_ex_tax_total = m.ex_tax_total, tax_total = round(m.ex_tax_total * 0.055, 2),
+  in_tax_total = round(m.ex_tax_total * 1.055, 2), version = o.version + 1
+FROM stock_stock_move m
+WHERE m.import_id = o.import_id AND o.import_id LIKE 'GESCOM-ARR-%' AND coalesce(o.ex_tax_total, 0) = 0
+  AND coalesce(o.nb_colis_total, 0) = 0 AND (coalesce(m.ex_tax_total, 0) <> 0 OR coalesce(m.nb_colis_total, 0) <> 0);
+
 -- correction des lignes déjà migrées sans frigo GESCOM (parties dans l'emplacement virtuel de réception) : FRIGO
 UPDATE stock_stock_move_line SET to_stock_location = (SELECT frigo_defaut FROM mig_def), version = version + 1
 WHERE import_id LIKE 'GESCOM-ARRL-%' AND to_stock_location = (SELECT reception FROM mig_def);

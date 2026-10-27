@@ -224,6 +224,14 @@ arrivage réel. Les valeurs déjà présentes ne sont pas touchées.
 - Les mettre tous en Flottant fausserait la Synthèse des Arrivages, l'État des stocks, l'Historique produit et la
   Rotation (réceptions depuis 2014 vues comme jamais arrivées). C'est à confirmer avec le client.
 
+**Arrivages flottants (189), vérifiés le 28/10 :**
+- **155 sont vides dans GESCOM** : un en-tête sans aucune ligne dans ARR_LIGNE, avec des totaux à 0. Ils datent de 2014
+  à 2026, 81 sans date : sans doute créés puis jamais remplis ou abandonnés. Ils sont repris tels quels (Flottant,
+  0). Le client doit dire s'il faut les passer en « Annulé ».
+- **34 ont des lignes** (94 lignes avec quantité, prix et lot). GESCOM laisse à 0 les totaux de l'en-tête d'un
+  flottant : ils sont calculés à partir des lignes (colis, poids, montant HT), comme Axelor à l'enregistrement. Les
+  totaux GESCOM non nuls restent prioritaires.
+
 **Mode de transport :**
 - Il vient du type d'arrivage GESCOM (`typ_arrivage` : 379 = CAMION, 380 = BATEAU, 381 = AVION ; mode « Avion »
   ajouté).
