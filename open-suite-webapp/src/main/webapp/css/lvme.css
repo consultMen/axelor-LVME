@@ -906,3 +906,96 @@
   padding-left: 2px !important;
   padding-right: 2px !important;
 }
+
+/*
+ * Listes « Commandes clients » et « Achats fournisseurs » tenues sur un seul écran à 100 % comme GESCOM (écran
+ * reconnu à ses boutons Suivi et « Retirer le filtre alerte ») : KPI plus bas, filtres resserrés avec libellés à
+ * gauche, liste sur toute la hauteur restante (elle défile seule). KPI, alertes et boutons gardés.
+ */
+[class*="_formView_"]:has(.lvme-btn-kanban):has(.lvme-alerte-gris),
+[class*="_formView_"]:has(.lvme-btn-kanban):has(.lvme-alerte-gris) * {
+  --ax-form-row-gap: .15rem !important;
+  --ax-theme-form-row-gap: .15rem !important;
+  --ax-form-padding: .25rem !important;
+  --ax-panel-body-padding: .3rem !important;
+  --ax-panel-header-padding: .1rem .3rem !important;
+  --ax-panel-header-title-padding: .1rem .3rem !important;
+  --ax-input-padding: 0 .35rem !important;
+}
+/* cartes KPI : moins hautes, chiffre plus petit */
+[class*="_formView_"]:has(.lvme-btn-kanban):has(.lvme-alerte-gris) [class*="_viewer_"] [style*="min-height: 128px"] {
+  min-height: 0 !important;
+  padding: 6px 12px !important;
+}
+[class*="_formView_"]:has(.lvme-btn-kanban):has(.lvme-alerte-gris) [class*="_viewer_"] [style*="font-size: 32px"] {
+  font-size: 21px !important;
+  margin-top: 0 !important;
+}
+/* filtres : libellés à gauche, écriture et cases plus petites */
+[class*="_formView_"]:has(.lvme-btn-kanban):has(.lvme-alerte-gris) [class*="_main_"] > [class*="_panel_"]:nth-child(2) [class*="_container_"]:has(> [class*="_title_"]) {
+  flex-direction: row !important;
+  align-items: center;
+  gap: 6px;
+}
+[class*="_formView_"]:has(.lvme-btn-kanban):has(.lvme-alerte-gris) [class*="_main_"] > [class*="_panel_"]:nth-child(2) [class*="_container_"]:has(> [class*="_title_"]) > [class*="_title_"] {
+  flex: 0 0 auto;
+  min-width: 74px;
+}
+[class*="_formView_"]:has(.lvme-btn-kanban):has(.lvme-alerte-gris) [class*="_main_"] > [class*="_panel_"]:nth-child(2) [class*="_container_"]:has(> [class*="_title_"]) > :not([class*="_title_"]) {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+[class*="_formView_"]:has(.lvme-btn-kanban):has(.lvme-alerte-gris) [class*="_main_"] > [class*="_panel_"]:nth-child(2) label,
+[class*="_formView_"]:has(.lvme-btn-kanban):has(.lvme-alerte-gris) [class*="_main_"] > [class*="_panel_"]:nth-child(2) [class*="_labelText_"] {
+  font-size: 12px !important;
+  white-space: nowrap !important;
+  margin-bottom: 0 !important;
+}
+[class*="_formView_"]:has(.lvme-btn-kanban):has(.lvme-alerte-gris) [class*="_main_"] > [class*="_panel_"]:nth-child(2) input:not([type="checkbox"]):not([type="radio"]),
+[class*="_formView_"]:has(.lvme-btn-kanban):has(.lvme-alerte-gris) [class*="_main_"] > [class*="_panel_"]:nth-child(2) select {
+  font-size: 12px !important;
+  min-height: 0 !important;
+  height: 22px;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+[class*="_formView_"]:has(.lvme-btn-kanban):has(.lvme-alerte-gris) [class*="_main_"] > [class*="_panel_"]:nth-child(2) [class*="_radio_"],
+[class*="_formView_"]:has(.lvme-btn-kanban):has(.lvme-alerte-gris) [class*="_main_"] > [class*="_panel_"]:nth-child(2) [class*="_radio_"] * {
+  font-size: 12px !important;
+  line-height: 15px !important;
+}
+[class*="_formView_"]:has(.lvme-btn-kanban):has(.lvme-alerte-gris) [class*="_main_"] > [class*="_panel_"]:nth-child(2) [class*="_radio_"] [class*="_mb-1_"] {
+  margin-bottom: 0 !important;
+}
+[class*="_formView_"]:has(.lvme-btn-kanban):has(.lvme-alerte-gris) [class*="_main_"] > [class*="_panel_"] button {
+  font-size: 12px !important;
+  padding-top: 2px !important;
+  padding-bottom: 2px !important;
+  min-height: 0 !important;
+}
+[class*="_formView_"]:has(.lvme-btn-kanban):has(.lvme-alerte-gris) [class*="_main_"] > [class*="_panel_"]:nth-child(2) > [class*="_header_"] {
+  min-height: 0 !important;
+  font-size: 13px;
+}
+/* liste : toute la hauteur restante de l'écran, lignes serrées */
+[class*="_formView_"]:has(.lvme-btn-kanban):has(.lvme-alerte-gris) [class*="_main_"] > :last-child {
+  height: calc(100vh - 362px) !important;
+  min-height: 220px;
+}
+[class*="_formView_"]:has(.lvme-btn-kanban):has(.lvme-alerte-gris) [class*="_main_"] > :last-child [class*="_body_"] [class*="_row_6j3fy"] {
+  height: 22px !important;
+  min-height: 0 !important;
+}
+[class*="_formView_"]:has(.lvme-btn-kanban):has(.lvme-alerte-gris) [class*="_main_"] > :last-child [class*="_column_"] {
+  font-size: 12px !important;
+  padding-top: 1px !important;
+  padding-bottom: 1px !important;
+}
+/* boutons de droite : texte jamais coupé (sur deux lignes si besoin) */
+[class*="_formView_"]:has(.lvme-btn-kanban):has(.lvme-alerte-gris) [class*="_grid_"]:has(> .lvme-btn-kanban) button,
+[class*="_formView_"]:has(.lvme-btn-kanban):has(.lvme-alerte-gris) [class*="_grid_"]:has(> .lvme-btn-kanban) button * {
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  line-height: 1.15;
+}

@@ -75,7 +75,7 @@
     </panel>
   </panel>
   <panel name="rechercheCdePanel" title="Recherche" colSpan="12">
-    <panel name="filtreEtatPanel" colSpan="3" itemSpan="12">
+    <panel name="filtreEtatPanel" colSpan="2" itemSpan="12">
       <field name="$etatCommande" showTitle="false" type="integer" widget="RadioSelect" selection="lvme.commande.client.etat.select"/>
     </panel>
     <panel name="filtreClientPanel" colSpan="3" itemSpan="12">
@@ -84,7 +84,7 @@
       <field name="$commercialFiltre" title="Commercial" type="many-to-one" target="com.axelor.auth.db.User"
         canNew="false" canEdit="false" canView="false"/>
     </panel>
-    <panel name="filtreDatePanel" colSpan="3" itemSpan="12">
+    <panel name="filtreDatePanel" colSpan="2" itemSpan="12">
       <field name="$dateDu" title="Date du" type="date"/>
       <field name="$dateAu" title="au" type="date"/>
       <field name="$datePeriode" title="Période prédéfinie" type="integer" selection="lvme.etat.stock.periode.select"
@@ -96,6 +96,9 @@
       <field name="$livraisonPeriode" title="Période prédéfinie" type="integer" selection="lvme.etat.stock.periode.select"
         onChange="action-lvme-cde-client-periode-livraison"/>
       <button name="lancerRechercheBtn" title="Lancer la recherche" icon="search" css="btn-primary" onClick="action-lvme-cde-client-refresh"/>
+    </panel>
+    <!-- boutons à droite de la recherche, comme GESCOM -->
+    <panel name="filtreBoutonsPanel" colSpan="2" itemSpan="12">
       <button name="lvmeKanbanBtn" title="Suivi des commandes clients" icon="view_kanban" css="lvme-btn-kanban" onClick="action-lvme-cde-client-kanban"/>
       <button name="nouvelleCdeBtn" title="Nouvelle commande" icon="plus" css="lvme-btn-nouveau" onClick="action-lvme-cde-client-new"/>
     </panel>
