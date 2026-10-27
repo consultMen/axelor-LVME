@@ -120,7 +120,8 @@ condition / mode de paiement, devise, SIRET, TVA.
 - 173 codes fournisseurs étaient déjà pris par un client (même REFCPT). Ils sont repris en `F-<code>`.
 - Le fournisseur habituel est relié à 1 548 articles (FOCLEUNIK).
 
-**Transporteurs :** nom, adresse, téléphones, e-mail, contact, en activité ou archivé.
+**Transporteurs :** nom, adresse, téléphones, e-mail, contact. EN_ACTIVITE vaut 0 pour les 50 transporteurs GESCOM
+(champ non utilisé : GXO sert à 557 clients) ; il n'est donc pas repris, aucun transporteur n'est archivé.
 
 **Chaque client et fournisseur** est rattaché à la société LVME, avec les comptes client / fournisseur par défaut de
 la configuration comptable.

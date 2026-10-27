@@ -177,10 +177,13 @@ SELECT m.id, 0, now(), m.cle, 'GESCOM', 1, coalesce(gescom.txt(t.nom), gescom.tx
   coalesce(gescom.txt(t.nom), gescom.txt(t.code), 'Transporteur ' || m.ref),
   true, false, false, false, false, false, gescom.txt(t.tel), gescom.txt(t.portable), e.id,
   NULLIF(concat_ws(E'\n', 'Contact : ' || gescom.txt(t.contact), 'Fax : ' || gescom.txt(t.fax), gescom.txt(t.obs)), ''),
-  d.euro, d.langue, coalesce(btrim(t.en_activite), '1') = '0'
+  d.euro, d.langue, false
 FROM mig_tiers m JOIN gescom.transporteur t ON m.genre = 'TRA' AND btrim(t.idtransporteur) = m.ref
 LEFT JOIN mig_email e ON e.cle = m.cle CROSS JOIN mig_def d
 WHERE m.nouveau;
+
+-- EN_ACTIVITE vaut 0 pour tous les transporteurs GESCOM (champ non utilisé, GXO sert à 557 clients) : jamais archivés
+UPDATE base_partner SET archived = false WHERE import_id LIKE 'GESCOM-TRA-%' AND archived;
 
 -- ---------- fournisseurs ----------
 INSERT INTO base_partner (id, version, created_on, import_id, import_origin, partner_type_select, partner_seq, name,
