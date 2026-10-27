@@ -3,8 +3,9 @@
 filtres de l'écran (passés par LvmeImpressionListesController) et les colonnes de la liste, aux couleurs GESCOM, avec
 le logo LVME en haut à gauche.
 
-Écrit LvmeListeAchats.rptdesign, LvmeListeArrivages.rptdesign et LvmeListeRotations.rptdesign dans
-axelor-supplychain/src/main/resources/reports (recompiler). Boutons : PROD_87.
+Écrit LvmeListeAchats.rptdesign, LvmeListeArrivages, LvmeListeRotations, LvmeListeCommandesClients,
+LvmeHistoriquePrix et LvmeEtatStockLots.rptdesign dans
+axelor-supplychain/src/main/resources/reports (recompiler). Boutons : PROD_87, 88 et 89.
 """
 import os
 import sys
@@ -211,3 +212,100 @@ rapport('LvmeListeCommandesClients.rptdesign', p_c | {'Filtres'}, [jeu_c],
         entete('Listes Commandes Clients', FILTRES)
         + tableau('CommandesDS', COLS_CDES, LIGNES_CDES, ('#FFFFFF', '#F4F4F4'),
                   prop('backgroundColor', '#DCDCDC'), sommes=('montant', 'marge')))
+
+# ---------- historique prix (F1 de la ligne de commande client, mêmes filtres que l'écran) ----------
+SQL_HISTO_PRIX = '''SELECT p.code AS reference,
+  COALESCE('B.L. N° ' || bl.stock_move_seq || ' Du ' || to_char(COALESCE(bl.real_date, bl.estimated_date), 'YYYYMMDD'),
+    'Cde N° ' || COALESCE(so.sale_order_seq, '') || ' Du ' || to_char(COALESCE(so.order_date, so.creation_date), 'YYYYMMDD'))
+    || '/' || COALESCE(cli.partner_seq, '') AS piece,
+  COALESCE(bl.real_date, bl.estimated_date, so.order_date, so.creation_date) AS date_piece,
+  (SELECT string_agg(DISTINCT sml.origine, ', ') FROM stock_stock_move_line sml WHERE sml.id IN (
+    SELECT tn.origin_stock_move_line FROM stock_tracking_number tn WHERE tn.id IN (
+      SELECT x.tracking_number FROM supplychain_sale_order_line_lot x WHERE x.sale_order_line = l.id))) AS origine,
+  l.conditionnement, l.poids_par_colis AS poids_unitaire, l.nb_colis, l.poids_total_net AS poids,
+  l.price_discounted AS prix_net, l.ex_tax_total AS montant
+FROM sale_sale_order_line l
+JOIN sale_sale_order so ON so.id = l.sale_order
+JOIN base_product p ON p.id = l.product
+LEFT JOIN base_partner cli ON cli.id = so.client_partner
+LEFT JOIN stock_stock_move bl ON bl.id = (SELECT max(sml.stock_move) FROM stock_stock_move_line sml
+    WHERE sml.sale_order_line = l.id AND sml.stock_move IN (SELECT s.id FROM stock_stock_move s WHERE s.status_select <> 4))
+WHERE so.template = false AND so.status_select <> 5
+  AND (CAST(:Produit AS bigint) = 0 OR l.product = CAST(:Produit AS bigint))
+  AND (CAST(:Client AS bigint) = 0 OR so.client_partner = CAST(:Client AS bigint))
+  AND COALESCE(so.order_date, so.creation_date) BETWEEN CAST(:DateDu AS date) AND CAST(:DateAu AS date)
+ORDER BY so.order_date DESC NULLS LAST, l.id DESC'''
+COLS_HISTO_PRIX = [('reference', 'string'), ('piece', 'string'), ('date_piece', 'date'), ('origine', 'string'),
+                   ('conditionnement', 'string'), ('poids_unitaire', 'decimal'), ('nb_colis', 'decimal'),
+                   ('poids', 'decimal'), ('prix_net', 'decimal'), ('montant', 'decimal')]
+LIGNES_HISTO_PRIX = [
+    ('Référence', 'reference', 1.6, None, None), ('Désignation', 'piece', 4.2, None, None),
+    ('Date', 'date_piece', 1.3, 'date', None), ('Origine', 'origine', 1.2, None, None),
+    ('Conditionnement', 'conditionnement', 3.0, None, None),
+    ('Poids Unitaire', 'poids_unitaire', 1.1, '#,##0.000', None), ('Nbre Colis', 'nb_colis', 1.0, '#,##0', None),
+    ('Poids', 'poids', 1.1, '#,##0.000', None), ('P.Vente Net', 'prix_net', 1.2, '#,##0.00', None),
+    ('Montant H.T.', 'montant', 1.4, '#,##0.00', None),
+]
+jeu_h, p_h = jeu('HistoriquePrixDS', SQL_HISTO_PRIX, COLS_HISTO_PRIX)
+rapport('LvmeHistoriquePrix.rptdesign', p_h | {'Filtres'}, [jeu_h],
+        entete('Historique prix', FILTRES)
+        + tableau('HistoriquePrixDS', COLS_HISTO_PRIX, LIGNES_HISTO_PRIX, ('#FFFFFF', '#F4F4F4'),
+                  prop('backgroundColor', '#DCDCDC'), sommes=('nb_colis', 'poids', 'montant')))
+
+# ---------- état des stocks par lots (mêmes filtres que l'écran) ----------
+SQL_ETAT_STOCK = '''SELECT e.product_code AS produit, e.product_name AS designation, e.supplier_name AS fournisseur,
+  loc.name AS frigo, e.lot_number AS lot, e.arrival_number AS arrivage, e.origine, e.arrival_date AS livree_le,
+  e.conditionnement, e.dluo, e.prix_revient, e.qty_per_colis AS poids_colis, e.nb_colis_in AS colis_entrees,
+  e.nb_colis_out AS colis_sorties, e.nb_colis_cdes AS colis_cdes, e.nb_colis_stock AS colis_stock,
+  e.stock_qty AS poids_stock, e.stock_value AS valeur_stock,
+  COALESCE(e.nb_colis_stock, 0) - COALESCE(e.nb_colis_cdes, 0) AS colis_dispo,
+  e.dispo_qty AS poids_dispo, e.nature_label AS nature
+FROM lvme_etat_stock_lot e
+LEFT JOIN stock_stock_location loc ON loc.id = e.stock_location_id
+WHERE (:ArtDu = '' OR e.product_code >= :ArtDu) AND (:ArtAu = '' OR e.product_code <= :ArtAu)
+  AND (:FouDu = '' OR e.supplier_name >= :FouDu) AND (:FouAu = '' OR e.supplier_name <= :FouAu)
+  AND (CAST(:Famille AS bigint) = 0 OR e.product_category_id = CAST(:Famille AS bigint))
+  AND (CAST(:Frigo AS bigint) = 0 OR e.stock_location_id = CAST(:Frigo AS bigint))
+  AND (:Origine = '' OR e.origine = :Origine)
+  AND LOWER(COALESCE(e.lot_number, '')) LIKE :Lot
+  AND (:EntreeFiltre = '0' OR e.entry_date BETWEEN CAST(:EntreeDu AS date) AND CAST(:EntreeAu AS date))
+  AND (:DdmFiltre = '0' OR e.dluo BETWEEN CAST(:DdmDu AS date) AND CAST(:DdmAu AS date))
+  AND (:LivrFiltre = '0' OR e.arrival_date BETWEEN CAST(:LivrDu AS date) AND CAST(:LivrAu AS date))
+  AND (CAST(:Nature AS integer) = 0 OR e.nature_arrivage = CAST(:Nature AS integer))
+  AND ((CAST(:Etat AS integer) = 1 AND e.stock_qty > 0) OR (CAST(:Etat AS integer) = 2 AND e.stock_qty = 0)
+    OR (CAST(:Etat AS integer) = 3 AND e.stock_qty < 0) OR (CAST(:Etat AS integer) = 4 AND e.stock_qty <> 0)
+    OR CAST(:Etat AS integer) = 5)
+  AND ((CAST(:Etat AS integer) = 5 AND e.lot_archive = true) OR (CAST(:Etat AS integer) <> 5 AND e.lot_archive = false))
+  AND (:DispoNeg = '0' OR e.dispo_qty < 0)
+  AND (CAST(:Dluo AS integer) = 0 OR (CAST(:Dluo AS integer) = 1 AND e.dluo < current_date)
+    OR (CAST(:Dluo AS integer) = 2 AND e.dluo BETWEEN current_date AND current_date + 30)
+    OR (CAST(:Dluo AS integer) = 3 AND e.dluo <= current_date + 30))
+ORDER BY e.product_code, e.arrival_date, e.lot_number'''
+COLS_ETAT_STOCK = [('produit', 'string'), ('designation', 'string'), ('fournisseur', 'string'), ('frigo', 'string'),
+                   ('lot', 'string'), ('arrivage', 'string'), ('origine', 'string'), ('livree_le', 'date'),
+                   ('conditionnement', 'string'), ('dluo', 'date'), ('prix_revient', 'decimal'),
+                   ('poids_colis', 'decimal'), ('colis_entrees', 'decimal'), ('colis_sorties', 'decimal'),
+                   ('colis_cdes', 'decimal'), ('colis_stock', 'decimal'), ('poids_stock', 'decimal'),
+                   ('valeur_stock', 'decimal'), ('colis_dispo', 'decimal'), ('poids_dispo', 'decimal'),
+                   ('nature', 'string')]
+LIGNES_ETAT_STOCK = [
+    ('Produit', 'produit', 1.4, None, None), ('Désignation', 'designation', 2.8, None, None),
+    ('Fournisseur', 'fournisseur', 1.9, None, None), ('Frigo', 'frigo', 0.9, None, None),
+    ('N° Lot', 'lot', 1.4, None, None), ('N°Arrivage', 'arrivage', 1.2, None, None),
+    ('Origine', 'origine', 0.8, None, None), ('Livrée le', 'livree_le', 1.2, 'date', None),
+    ('Conditionnement', 'conditionnement', 1.5, None, None), ('D. L. C.', 'dluo', 1.2, 'date', None),
+    ('Prix Revient', 'prix_revient', 0.9, '#,##0.00', None), ('Un/Poids Colis', 'poids_colis', 0.9, '#,##0.##', None),
+    ('Nb Colis Entrées', 'colis_entrees', 0.9, '#,##0', None), ('Nb Colis Sorties', 'colis_sorties', 0.9, '#,##0', None),
+    ('Nb colis Cdes', 'colis_cdes', 0.9, '#,##0', None), ('Nb colis Stock', 'colis_stock', 0.9, '#,##0', '#FFFF99'),
+    ('Unt/Poids Stock', 'poids_stock', 1.1, '#,##0.000', None),
+    ('Montant ht Stock', 'valeur_stock', 1.2, '#,##0.00', None),
+    ('Nb colis Dispo', 'colis_dispo', 0.9, '#,##0', None), ('Unt/Poids Dispo', 'poids_dispo', 1.1, '#,##0.000', None),
+    ('Arrivage', 'nature', 1.0, None, None),
+]
+jeu_e, p_e = jeu('EtatStockDS', SQL_ETAT_STOCK, COLS_ETAT_STOCK)
+rapport('LvmeEtatStockLots.rptdesign', p_e | {'Filtres'}, [jeu_e],
+        entete('État des stocks par lots', FILTRES)
+        + tableau('EtatStockDS', COLS_ETAT_STOCK, LIGNES_ETAT_STOCK, ('#FFFFFF', '#F4F4F4'),
+                  prop('backgroundColor', '#DCDCDC'),
+                  sommes=('colis_entrees', 'colis_sorties', 'colis_cdes', 'colis_stock', 'poids_stock',
+                          'valeur_stock', 'colis_dispo', 'poids_dispo')))

@@ -1,4 +1,4 @@
-# Déploiement prod LVME — correctifs Kanban, filtres de suivi, corbeille des listes, rotation par transport (PROD_73 à PROD_88)
+# Déploiement prod LVME — correctifs Kanban, filtres de suivi, corbeille des listes, rotation par transport (PROD_73 à PROD_89)
 
 Déjà en prod : PROD_63 à PROD_72. Code à déployer : tout `main` (Java : lecture de la colonne d'arrivée des Kanban,
 annulation d'une commande d'achat par sa fiche, suppression de plusieurs lignes cochées).
@@ -21,9 +21,10 @@ annulation d'une commande d'achat par sa fiche, suppression de plusieurs lignes 
 | PROD_86 | Rotation des stocks par lot aux couleurs GESCOM : colonne Nb colis Stock jaune (lignes de totaux jaunes dans css/lvme.css) |
 | PROD_87 | Boutons d'impression des listes comme GESCOM : « Imprimer » (achats), « Editer » (arrivages), « Liste des Rotations » (rotation) ; **prérequis : code** (LvmeImpressionListesController, reports/LvmeListe*.rptdesign) |
 | PROD_88 | Bouton « Imprimer » de la liste des commandes clients ; listes Articles (ventes / achats) comme GESCOM sur un seul écran ; **prérequis : code** (LvmeImpressionListesController.imprimerCommandesClients, reports/LvmeListeCommandesClients.rptdesign) |
+| PROD_89 | Boutons « Imprimer » de l'Historique prix et de l'État des stocks par lots (logo LVME, colonnes et filtres de l'écran, sommes) ; **prérequis : code** (LvmeImpressionListesController.imprimerHistoriquePrix / imprimerEtatStock, reports/LvmeHistoriquePrix.rptdesign, LvmeEtatStockLots.rptdesign) |
 
-Même procédure que ci-dessous (sauvegarde, clone, build, **scripts PROD_73 à 88**, bascule, redémarrage) :
-`for n in 73 74 75 76 77 78 79 80 81 82 83 84 85 86 87 88; do psql -U axelor -d axelor -v ON_ERROR_STOP=1 -f $(ls livrables/PROD_${n}_*.sql) || break; done`
+Même procédure que ci-dessous (sauvegarde, clone, build, **scripts PROD_73 à 89**, bascule, redémarrage) :
+`for n in 73 74 75 76 77 78 79 80 81 82 83 84 85 86 87 88 89; do psql -U axelor -d axelor -v ON_ERROR_STOP=1 -f $(ls livrables/PROD_${n}_*.sql) || break; done`
 
 ---
 

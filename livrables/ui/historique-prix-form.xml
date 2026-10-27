@@ -17,6 +17,7 @@
     </panel>
     <panel name="histoRecherchePanel" colSpan="2" itemSpan="12" css="lvme-histo-filtres">
       <button name="rechercheBtn" title="Recherche" icon="search" onClick="action-lvme-cdes-client-lignes-refresh"/>
+      <button name="imprimerBtn" title="Imprimer" icon="printer" onClick="action-lvme-historique-prix-imprimer"/>
     </panel>
   </panel>
   <panel-dashlet name="lignesDashlet" title="Historique prix" colSpan="12" height="500"

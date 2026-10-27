@@ -13,9 +13,10 @@ import java.util.Map;
 
 /**
  * Boutons d'impression des listes, comme GESCOM : « Imprimer » (achats fournisseurs, commandes
- * clients), « Editer » (arrivages), « Liste des Rotations » (rotation des stocks par lot). Chaque
- * impression reprend les filtres de l'écran (mêmes règles que la liste affichée) ; modèles
- * LvmeListeAchats / LvmeListeCommandesClients / LvmeListeArrivages / LvmeListeRotations.rptdesign.
+ * clients, historique prix, état des stocks par lots), « Editer » (arrivages), « Liste des
+ * Rotations » (rotation des stocks par lot). Chaque impression reprend les filtres de l'écran (mêmes
+ * règles que la liste affichée) ; modèles LvmeListeAchats / LvmeListeCommandesClients /
+ * LvmeListeArrivages / LvmeListeRotations / LvmeHistoriquePrix / LvmeEtatStockLots.rptdesign.
  */
 public class LvmeImpressionListesController {
 
@@ -161,6 +162,104 @@ public class LvmeImpressionListesController {
               .addParam("LivAu", date(c.get("livraisonAu"), FIN))
               .addParam("Filtres", filtres.toString()),
           "Listes Commandes Clients");
+    } catch (Exception e) {
+      TraceBackService.trace(response, e);
+    }
+  }
+
+  /** « Imprimer » de l'écran Historique prix (F1 de la ligne de commande client). */
+  public void imprimerHistoriquePrix(ActionRequest request, ActionResponse response) {
+    try {
+      Map<String, Object> c = request.getContext();
+      Partner client = JPA.find(Partner.class, id(c.get("client")));
+      Product produit = JPA.find(Product.class, id(c.get("produit")));
+      StringBuilder filtres = new StringBuilder();
+      ajouter(filtres, client != null ? "Client " + client.getName() : "");
+      ajouter(
+          filtres,
+          produit != null ? "Produit " + produit.getCode() + " " + produit.getName() : "");
+      ajouterPeriode(filtres, "Période", c.get("dateDu"), c.get("dateAu"));
+      ouvrir(
+          response,
+          ReportFactory.createReport("LvmeHistoriquePrix.rptdesign", "Historique prix-${date}")
+              .addParam("Produit", String.valueOf(produit != null ? produit.getId() : 0L))
+              .addParam("Client", String.valueOf(client != null ? client.getId() : 0L))
+              .addParam("DateDu", date(c.get("dateDu"), DEBUT))
+              .addParam("DateAu", date(c.get("dateAu"), FIN))
+              .addParam("Filtres", filtres.length() == 0 ? "Toutes les ventes" : filtres.toString()),
+          "Historique prix");
+    } catch (Exception e) {
+      TraceBackService.trace(response, e);
+    }
+  }
+
+  /** « Imprimer » de l'écran État des stocks par lots. */
+  public void imprimerEtatStock(ActionRequest request, ActionResponse response) {
+    try {
+      Map<String, Object> c = request.getContext();
+      Product artDu = JPA.find(Product.class, id(c.get("articleDu")));
+      Product artAu = JPA.find(Product.class, id(c.get("articleAu")));
+      Partner fouDu = JPA.find(Partner.class, id(c.get("fournisseurDu")));
+      Partner fouAu = JPA.find(Partner.class, id(c.get("fournisseurAu")));
+      String artDuCode = artDu != null ? artDu.getCode() : "";
+      String artAuCode = artAu != null ? artAu.getCode() : artDuCode;
+      String fouDuNom = fouDu != null ? fouDu.getFullName() : "";
+      String fouAuNom = fouAu != null ? fouAu.getFullName() : fouDuNom;
+      String lot = texte(c.get("numeroLot")).trim().toLowerCase();
+      String etat = texte(c.get("etatLot"));
+      etat = etat.isEmpty() ? "1" : etat;
+      String dluo = texte(c.get("dluoFiltre"));
+      boolean dispoNegatif = Boolean.TRUE.equals(c.get("dispoNegatif"));
+      StringBuilder filtres =
+          new StringBuilder(
+              "2".equals(etat)
+                  ? "Lots soldés"
+                  : "3".equals(etat)
+                      ? "Lots négatifs"
+                      : "4".equals(etat)
+                          ? "Lots non soldés + négatifs"
+                          : "5".equals(etat) ? "Lots archivés" : "Lots non soldés");
+      ajouter(filtres, artDuCode.isEmpty() ? "" : "Article " + artDuCode + " à " + artAuCode);
+      ajouter(filtres, fouDuNom.isEmpty() ? "" : "Fournisseur " + fouDuNom + " à " + fouAuNom);
+      ajouter(filtres, lot.isEmpty() ? "" : "N° Lot " + lot);
+      ajouterPeriode(filtres, "Entrée", c.get("entreeDu"), c.get("entreeAu"));
+      ajouterPeriode(filtres, "D.D.M.", c.get("ddmDu"), c.get("ddmAu"));
+      ajouterPeriode(filtres, "Livraison", c.get("livrDu"), c.get("livrAu"));
+      ajouter(
+          filtres,
+          "1".equals(dluo)
+              ? "DLUO dépassées (périmés)"
+              : "2".equals(dluo)
+                  ? "DLUO dans moins de 30 jours"
+                  : "3".equals(dluo) ? "DLUO dépassées + moins de 30 jours" : "");
+      ajouter(filtres, dispoNegatif ? "Dispo négatifs" : "");
+      Object nature = c.get("natureArrivage");
+      ouvrir(
+          response,
+          ReportFactory.createReport("LvmeEtatStockLots.rptdesign", "Etat des stocks par lots-${date}")
+              .addParam("ArtDu", artDuCode)
+              .addParam("ArtAu", artAuCode)
+              .addParam("FouDu", fouDuNom)
+              .addParam("FouAu", fouAuNom)
+              .addParam("Famille", String.valueOf(id(c.get("famille"))))
+              .addParam("Frigo", String.valueOf(id(c.get("frigo"))))
+              .addParam("Origine", texte(c.get("origine")))
+              .addParam("Lot", "%" + lot + "%")
+              .addParam("EntreeFiltre", filtre(c.get("entreeDu"), c.get("entreeAu")))
+              .addParam("EntreeDu", date(c.get("entreeDu"), DEBUT))
+              .addParam("EntreeAu", date(c.get("entreeAu"), FIN))
+              .addParam("DdmFiltre", filtre(c.get("ddmDu"), c.get("ddmAu")))
+              .addParam("DdmDu", date(c.get("ddmDu"), DEBUT))
+              .addParam("DdmAu", date(c.get("ddmAu"), FIN))
+              .addParam("LivrFiltre", filtre(c.get("livrDu"), c.get("livrAu")))
+              .addParam("LivrDu", date(c.get("livrDu"), DEBUT))
+              .addParam("LivrAu", date(c.get("livrAu"), FIN))
+              .addParam("Nature", nature != null ? nature.toString() : "0")
+              .addParam("Etat", etat)
+              .addParam("DispoNeg", dispoNegatif ? "1" : "0")
+              .addParam("Dluo", dluo.isEmpty() ? "0" : dluo)
+              .addParam("Filtres", filtres.toString()),
+          "État des stocks par lots");
     } catch (Exception e) {
       TraceBackService.trace(response, e);
     }
