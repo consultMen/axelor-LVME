@@ -1,7 +1,7 @@
 <grid name="lvme-synthese-arrivage-grid" title="Synthèse des Arrivages" model="com.axelor.apps.supplychain.db.SyntheseArrivage"
   groupBy="entete" orderBy="arrivage,productCode,lotNumber" canNew="false" canEdit="false" canDelete="false">
-  <!-- LVME : colonnes de l'écran « Synthèse des Arrivages » GESCOM, regroupées par arrivage -->
-  <hilite color="pink" if="true"/>
+  <!-- LVME : colonnes de l'écran « Synthèse des Arrivages » GESCOM, regroupées par arrivage (couleurs GESCOM dans
+       css/lvme.css : arrivage en blanc, lignes cyan au texte violet, totaux de l'arrivage) -->
   <field name="entete" hidden="true"/>
   <field name="arrivage" title="N°Arrivage" width="95"/>
   <field name="fournisseur" title="Fournisseur" width="140"/>

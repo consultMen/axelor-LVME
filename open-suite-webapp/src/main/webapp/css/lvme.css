@@ -1421,3 +1421,107 @@
   background-color: #14234f !important;
   color: #ffffff !important;
 }
+
+/*
+ * « Synthèse des Arrivages » copiée sur GESCOM, sur un seul écran à 100 % (écran reconnu au cadre N° d'arrivage
+ * css="lvme-ges-synth") : fond gris-bleu, libellés à gauche, cadre Arrivée jaune, boutons gris, en-têtes gris,
+ * ligne de l'arrivage en blanc, lignes produit cyan au texte violet, totaux de l'arrivage cyan, liste sur toute la
+ * hauteur restante (elle défile seule), bouton Synthèse en bas à droite.
+ */
+[class*="_formView_"]:has(.lvme-ges-synth),
+[class*="_formView_"]:has(.lvme-ges-synth) * {
+  --ax-form-row-gap: .1rem !important;
+  --ax-theme-form-row-gap: .1rem !important;
+  --ax-form-padding: .25rem !important;
+  --ax-panel-body-padding: .3rem !important;
+  --ax-input-padding: 0 .35rem !important;
+}
+[class*="_formView_"]:has(.lvme-ges-synth) [class*="_main_"],
+[class*="_formView_"]:has(.lvme-ges-synth) [class*="_main_"] > [class*="_panel_"],
+[class*="_formView_"]:has(.lvme-ges-synth) [class*="_main_"] > [class*="_panel_"] [class*="_body_"]:not(.lvme-ges-dates-jaune-rot [class*="_body_"]) {
+  background-color: #c8d3e6 !important;
+}
+[class*="_formView_"]:has(.lvme-ges-synth) [class*="_main_"] > [class*="_panel_"] [class*="_container_"]:has(> [class*="_title_"]) {
+  flex-direction: row !important;
+  align-items: center;
+  gap: 6px;
+}
+[class*="_formView_"]:has(.lvme-ges-synth) [class*="_main_"] > [class*="_panel_"] [class*="_container_"]:has(> [class*="_title_"]) > [class*="_title_"] {
+  flex: 0 0 auto;
+  min-width: 82px;
+}
+[class*="_formView_"]:has(.lvme-ges-synth) [class*="_main_"] > [class*="_panel_"] [class*="_container_"]:has(> [class*="_title_"]) > :not([class*="_title_"]) {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+[class*="_formView_"]:has(.lvme-ges-synth) [class*="_main_"] > [class*="_panel_"] label,
+[class*="_formView_"]:has(.lvme-ges-synth) [class*="_main_"] > [class*="_panel_"] [class*="_labelText_"] {
+  font-size: 12px !important;
+  color: #10204a !important;
+  white-space: nowrap !important;
+  margin-bottom: 0 !important;
+}
+[class*="_formView_"]:has(.lvme-ges-synth) [class*="_main_"] > [class*="_panel_"] input:not([type="checkbox"]):not([type="radio"]),
+[class*="_formView_"]:has(.lvme-ges-synth) [class*="_main_"] > [class*="_panel_"] select {
+  font-size: 12px !important;
+  min-height: 0 !important;
+  height: 22px;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  background-color: #ffffff !important;
+}
+.lvme-ges-synth input {
+  text-align: right;
+}
+[class*="_formView_"]:has(.lvme-ges-synth) [class*="_main_"] > [class*="_panel_"] button {
+  background: linear-gradient(#ffffff, #dfe4ec) !important;
+  color: #10204a !important;
+  border: 1px solid #8c96a8 !important;
+  border-radius: 4px !important;
+  font-size: 12px !important;
+  padding-top: 2px !important;
+  padding-bottom: 2px !important;
+  min-height: 0 !important;
+}
+/* liste : toute la hauteur restante, lignes serrées */
+[class*="_formView_"]:has(.lvme-ges-synth) [class*="_main_"] > [class*="_container_"] {
+  height: calc(100vh - 262px) !important;
+  min-height: 220px;
+}
+[class*="_formView_"]:has(.lvme-ges-synth) [class*="_main_"] > [class*="_container_"] [class*="_header_"] [class*="_column_"] {
+  background: linear-gradient(#f4f4f4, #cdcdcd) !important;
+  color: #222222 !important;
+  font-size: 11.5px !important;
+  white-space: normal !important;
+  line-height: 1.1;
+}
+[class*="_formView_"]:has(.lvme-ges-synth) [class*="_main_"] > [class*="_container_"] [class*="_body_"] [class*="_row_6j3fy"] {
+  height: 20px !important;
+  min-height: 0 !important;
+}
+[class*="_formView_"]:has(.lvme-ges-synth) [class*="_main_"] > [class*="_container_"] [class*="_body_"] [class*="_row_"] [class*="_column_"] {
+  background-color: #a0f8f8;
+  color: #8b2bc9;
+  font-size: 11.5px !important;
+  padding-top: 1px !important;
+  padding-bottom: 1px !important;
+  border-right: 1px solid #7fdede;
+}
+/* ligne de l'arrivage (n°, fournisseur, code, dates) en blanc, texte noir */
+[class*="_formView_"]:has(.lvme-ges-synth) [class*="_main_"] > [class*="_container_"] [class*="_body_"] [class*="_groupRow_"],
+[class*="_formView_"]:has(.lvme-ges-synth) [class*="_main_"] > [class*="_container_"] [class*="_body_"] [class*="_groupRow_"] * {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  font-size: 11.5px !important;
+}
+/* totaux de l'arrivage : cyan, texte violet en gras */
+[class*="_formView_"]:has(.lvme-ges-synth) [class*="_main_"] > [class*="_container_"] [class*="_body_"] [class*="_footerRow_"],
+[class*="_formView_"]:has(.lvme-ges-synth) [class*="_main_"] > [class*="_container_"] [class*="_body_"] [class*="_footerRow_"] [class*="_column_"] {
+  background-color: #a0f8f8 !important;
+  color: #8b2bc9 !important;
+  font-weight: 700;
+}
+[class*="_formView_"]:has(.lvme-ges-synth) [class*="_main_"] > [class*="_container_"] [class*="_body_"] [class*="_row_"][class*="_selected_"] [class*="_column_"] {
+  background-color: #2f5fbf !important;
+  color: #ffffff !important;
+}

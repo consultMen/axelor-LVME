@@ -139,11 +139,15 @@ def entete(titre, sous_titre_expr=None):
 
 def tableau(dataset, cols_ds, colonnes, couleurs, entete_style, sommes=(), groupe=None, extra_ligne=''):
     """colonnes : (titre, colonne, largeur cm, format, fond de cellule ou None) ; couleurs : (fond ligne paire,
-    fond ligne impaire) ; groupe : (colonne de groupe, libellé de la ligne de totaux, couleur, sommes du groupe)."""
+    fond ligne impaire) ; groupe : (colonne de groupe, libellé de la ligne de totaux, couleur, sommes du groupe[,
+    colonnes de la ligne d'en-tête du groupe]) : avec ces colonnes, chaque groupe commence par une ligne d'en-tête
+    (comme les arrivages de la Synthèse GESCOM) et elles restent vides sur les lignes de détail."""
+    tete_g = groupe[4] if groupe and len(groupe) > 4 else ()
     cell = bordure('#C8C8C8') + padding()
     tete = ''.join(cellule(label(t, taille='6.5pt', gras=True, couleur='#10204A', align='center'),
                            entete_style + cell + prop('verticalAlign', 'bottom')) for t, _, _, _, _ in colonnes)
-    detail = ''.join(cellule(data(c, f, taille='6.5pt', align='right' if f and f != 'date' else None),
+    detail = ''.join(cellule('' if c in tete_g else data(c, f, taille='6.5pt',
+                                                          align='right' if f and f != 'date' else None),
                              cell + (prop('backgroundColor', fond) if fond else '')) for _, c, _, f, fond in colonnes)
     regles = ('<list-property name="highlightRules">' + ''.join(
         '<structure>' + prop('operator', 'eq') + prop('backgroundColor', fond)
@@ -153,22 +157,27 @@ def tableau(dataset, cols_ds, colonnes, couleurs, entete_style, sommes=(), group
     agg = agregats(sommes)
     groupes = ''
     if groupe:
-        col_g, lib_g, fond_g, sommes_g = groupe
+        col_g, lib_g, fond_g, sommes_g = groupe[:4]
         agg += agregats(sommes_g, prefixe='grp_', groupe='groupe')
         pied_g = ''
         for i, (_, c, _, f, _) in enumerate(colonnes):
-            if i == 0:
+            if i == 0 and not tete_g:
                 contenu = data(col_g, taille='6.5pt', gras=True)
-            elif i == 1:
+            elif i == (0 if tete_g else 1):
                 contenu = label(lib_g, taille='6.5pt', gras=True)
             elif c in sommes_g:
                 contenu = data('grp_' + c, f, taille='6.5pt', gras=True, align='right')
             else:
                 contenu = ''
             pied_g += cellule(contenu, cell + prop('backgroundColor', fond_g))
+        en_tete_g = ''
+        if tete_g:
+            en_tete_g = '<header><row id="%s">%s</row></header>' % (nid(), ''.join(
+                cellule(data(c, f, taille='6.5pt', gras=True) if c in tete_g else '', cell + prop('backgroundColor', '#FFFFFF'))
+                for _, c, _, f, _ in colonnes))
         groupes = ('<group id="%s">' % nid() + prop('groupName', 'groupe')
                    + '<expression name="keyExpr" type="javascript">row["%s"]</expression>' % col_g
-                   + '<footer><row id="%s">%s</row></footer></group>' % (nid(), pied_g))
+                   + en_tete_g + '<footer><row id="%s">%s</row></footer></group>' % (nid(), pied_g))
     pied = ''.join(cellule(data('total_' + c, f, taille='6.5pt', gras=True, align='right') if c in sommes else '',
                            cell + entete_style) for _, c, _, f, _ in colonnes)
     return ('<table id="%s">' % nid() + prop('width', '100%') + prop('marginTop', '4px') + prop('dataSet', dataset)

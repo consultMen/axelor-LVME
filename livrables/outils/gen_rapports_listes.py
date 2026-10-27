@@ -309,3 +309,35 @@ rapport('LvmeEtatStockLots.rptdesign', p_e | {'Filtres'}, [jeu_e],
                   prop('backgroundColor', '#DCDCDC'),
                   sommes=('colis_entrees', 'colis_sorties', 'colis_cdes', 'colis_stock', 'poids_stock',
                           'valeur_stock', 'colis_dispo', 'poids_dispo')))
+
+# ---------- synthèse des arrivages (bouton « Synthèse » GESCOM : en-tête par arrivage, lignes cyan, totaux) ----------
+SQL_SYNTHESE = '''SELECT s.arrivage, s.fournisseur, s.code_fournisseur, s.date_embarquement, s.date_arrivee,
+  s.product_code AS produit, s.designation, s.origine, s.conditionnement, s.frigo, s.lot_number AS lot, s.dlc,
+  s.unite, s.nb_colis, s.poids_colis, s.poids_total, s.pa
+FROM lvme_synthese_arrivage s
+WHERE s.arrivage >= :NumDu AND s.arrivage <= :NumAu
+  AND s.date_arrivee BETWEEN CAST(:Du AS date) AND CAST(:Au AS date)
+ORDER BY s.arrivage, s.product_code, s.lot_number'''
+COLS_SYNTHESE = [('arrivage', 'string'), ('fournisseur', 'string'), ('code_fournisseur', 'string'),
+                 ('date_embarquement', 'date'), ('date_arrivee', 'date'), ('produit', 'string'),
+                 ('designation', 'string'), ('origine', 'string'), ('conditionnement', 'string'), ('frigo', 'string'),
+                 ('lot', 'string'), ('dlc', 'date'), ('unite', 'string'), ('nb_colis', 'decimal'),
+                 ('poids_colis', 'decimal'), ('poids_total', 'decimal'), ('pa', 'decimal')]
+LIGNES_SYNTHESE = [
+    ('N°Arrivage', 'arrivage', 1.3, None, None), ('Fournisseur', 'fournisseur', 2.4, None, None),
+    ('Code Fournisseur', 'code_fournisseur', 1.2, None, None), ('Date Embarq.', 'date_embarquement', 1.2, 'date', None),
+    ('Date Arrivée', 'date_arrivee', 1.2, 'date', None), ('Produit', 'produit', 1.5, None, None),
+    ('Désignation', 'designation', 3.2, None, None), ('Origine', 'origine', 1.1, None, None),
+    ('Conditionnement', 'conditionnement', 1.6, None, None), ('Frigo', 'frigo', 1.0, None, None),
+    ('N° Lot', 'lot', 1.4, None, None), ('D. L. C.', 'dlc', 1.2, 'date', None), ('Unité', 'unite', 0.7, None, None),
+    ('Nb Colis Entrées', 'nb_colis', 0.9, '#,##0', None), ('Poids Colis', 'poids_colis', 0.8, '#,##0.##', None),
+    ('Poids Total', 'poids_total', 1.1, '#,##0', None), ('pa', 'pa', 0.8, '#,##0.00', None),
+]
+jeu_s, p_s = jeu('SyntheseDS', SQL_SYNTHESE, COLS_SYNTHESE)
+rapport('LvmeSyntheseArrivages.rptdesign', p_s | {'Filtres'}, [jeu_s],
+        entete('Synthèse des Arrivages', FILTRES)
+        + tableau('SyntheseDS', COLS_SYNTHESE, LIGNES_SYNTHESE, ('#A0F8F8', '#A0F8F8'),
+                  prop('backgroundColor', '#DCDCDC'), sommes=('nb_colis', 'poids_total'),
+                  groupe=('arrivage', 'Totaux', '#A0F8F8', ('nb_colis', 'poids_total'),
+                          ('arrivage', 'fournisseur', 'code_fournisseur', 'date_embarquement', 'date_arrivee')),
+                  extra_ligne=prop('color', '#8B2BC9')))

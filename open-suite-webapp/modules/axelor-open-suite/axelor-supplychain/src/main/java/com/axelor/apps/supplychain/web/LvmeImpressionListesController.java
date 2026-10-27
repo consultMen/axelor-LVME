@@ -13,10 +13,11 @@ import java.util.Map;
 
 /**
  * Boutons d'impression des listes, comme GESCOM : « Imprimer » (achats fournisseurs, commandes
- * clients, historique prix, état des stocks par lots), « Editer » (arrivages), « Liste des
- * Rotations » (rotation des stocks par lot). Chaque impression reprend les filtres de l'écran (mêmes
- * règles que la liste affichée) ; modèles LvmeListeAchats / LvmeListeCommandesClients /
- * LvmeListeArrivages / LvmeListeRotations / LvmeHistoriquePrix / LvmeEtatStockLots.rptdesign.
+ * clients, historique prix, état des stocks par lots), « Synthèse » (synthèse des arrivages),
+ * « Editer » (arrivages), « Liste des Rotations » (rotation des stocks par lot). Chaque impression
+ * reprend les filtres de l'écran (mêmes règles que la liste affichée) ; modèles LvmeListeAchats /
+ * LvmeListeCommandesClients / LvmeListeArrivages / LvmeListeRotations / LvmeHistoriquePrix /
+ * LvmeEtatStockLots / LvmeSyntheseArrivages.rptdesign.
  */
 public class LvmeImpressionListesController {
 
@@ -260,6 +261,35 @@ public class LvmeImpressionListesController {
               .addParam("Dluo", dluo.isEmpty() ? "0" : dluo)
               .addParam("Filtres", filtres.toString()),
           "État des stocks par lots");
+    } catch (Exception e) {
+      TraceBackService.trace(response, e);
+    }
+  }
+
+  /** « Synthèse » de l'écran Synthèse des Arrivages. */
+  public void imprimerSyntheseArrivages(ActionRequest request, ActionResponse response) {
+    try {
+      Map<String, Object> c = request.getContext();
+      String numDu = texte(c.get("arrivageDu")).trim();
+      String numAu = texte(c.get("arrivageAu")).trim();
+      StringBuilder filtres = new StringBuilder();
+      ajouter(
+          filtres,
+          numDu.isEmpty() && numAu.isEmpty()
+              ? ""
+              : "Arrivage N° du " + (numDu.isEmpty() ? "…" : numDu) + " au "
+                  + (numAu.isEmpty() ? "…" : numAu));
+      ajouterPeriode(filtres, "Arrivée", c.get("arriveeDu"), c.get("arriveeAu"));
+      ouvrir(
+          response,
+          ReportFactory.createReport(
+                  "LvmeSyntheseArrivages.rptdesign", "Synthese des arrivages-${date}")
+              .addParam("NumDu", numDu)
+              .addParam("NumAu", numAu.isEmpty() ? "zzzzzzzzzzzz" : numAu)
+              .addParam("Du", date(c.get("arriveeDu"), DEBUT))
+              .addParam("Au", date(c.get("arriveeAu"), FIN))
+              .addParam("Filtres", filtres.length() == 0 ? "Tous les arrivages" : filtres.toString()),
+          "Synthèse des Arrivages");
     } catch (Exception e) {
       TraceBackService.trace(response, e);
     }
