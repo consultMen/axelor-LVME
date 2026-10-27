@@ -7,8 +7,13 @@
     <panel name="rechercheDossiersPanel" title="Recherche" colSpan="9">
       <panel name="filtreTypePanel" colSpan="4" itemSpan="12" css="lvme-ges-dossiers">
         <field name="$typeDoc" title="Type doc" type="integer" selection="lvme.dossier.type.select" onChange="action-lvme-dossiers-refresh"/>
-        <field name="$client" title="Client" type="many-to-one" target="com.axelor.apps.base.db.Partner"
-          domain="self.isCustomer = true" canNew="false" canEdit="false" canView="false"/>
+        <!-- Secteur commercial (GMS…) = « Secteur d'activité » du client ; vide = TOUS -->
+        <field name="$secteur" title="Secteur" type="many-to-one" target="com.axelor.apps.base.db.IndustrySector"
+          canNew="false" canEdit="false" canView="false" onChange="action-lvme-dossiers-refresh"/>
+        <field name="$clientCompte" showTitle="false" type="integer" widget="RadioSelect" selection="lvme.dossier.client.compte.select"
+          colSpan="5" onChange="action-lvme-dossiers-refresh"/>
+        <field name="$client" title="Client" showTitle="false" type="many-to-one" target="com.axelor.apps.base.db.Partner"
+          domain="self.isCustomer = true" colSpan="7" canNew="false" canEdit="false" canView="false"/>
         <field name="$transporteur" title="Transporteur" type="many-to-one" target="com.axelor.apps.base.db.Partner"
           domain="self.isCarrier = true OR self.id IN (SELECT sm.carrierPartner.id FROM StockMove sm WHERE sm.carrierPartner IS NOT NULL)" canNew="false" canEdit="false" canView="false" showIf="$typeDoc != 2"/>
       </panel>
@@ -27,10 +32,10 @@
     </panel>
     <panel name="boutonsDossiersPanel" showTitle="false" colSpan="3" itemSpan="12">
       <!-- boutons GESCOM à droite de la page, icône après le texte (css/lvme.css) ; F12 = Quitter (js/lvme.js) -->
-      <button name="quitterBtn" title="Quitter" icon="x-circle-fill" css="lvme-btn-ges lvme-btn-ges-rouge" onClick="close"/>
-      <button name="nouveauBlBtn" title="Nouveau BL" icon="file-earmark" css="lvme-btn-ges lvme-btn-ges-espace" onClick="action-lvme-dossiers-nouveau-bl"/>
-      <button name="nouveauRetourBtn" title="Nouveau retour" icon="file-earmark" css="lvme-btn-ges" onClick="action-lvme-dossiers-nouveau-retour"/>
-      <button name="suppressionBtn" title="Suppression" icon="dash-lg" css="lvme-btn-ges lvme-btn-ges-rouge lvme-btn-ges-espace" onClick="action-lvme-dossiers-suppression"/>
+      <button name="quitterBtn" title="Quitter" icon="cancel" css="lvme-btn-ges lvme-btn-ges-rouge" onClick="close"/>
+      <button name="nouveauBlBtn" title="Nouveau BL" icon="description" css="lvme-btn-ges lvme-btn-ges-espace" onClick="action-lvme-dossiers-nouveau-bl"/>
+      <button name="nouveauRetourBtn" title="Nouveau retour" icon="description" css="lvme-btn-ges" onClick="action-lvme-dossiers-nouveau-retour"/>
+      <button name="suppressionBtn" title="Suppression" icon="remove" css="lvme-btn-ges lvme-btn-ges-rouge lvme-btn-ges-espace" onClick="action-lvme-dossiers-suppression"/>
     </panel>
     <field name="$numero" title="Recherche direct par N°" type="string" colSpan="3" onChange="action-lvme-dossiers-refresh"/>
   </panel>

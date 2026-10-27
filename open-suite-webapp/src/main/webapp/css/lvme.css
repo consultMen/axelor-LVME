@@ -1626,7 +1626,7 @@
 }
 /* listes : toute la hauteur restante, en-têtes gris, lignes serrées */
 [class*="_formView_"]:has(.lvme-ges-dossiers) [class*="_main_"] > [class*="_container_"] {
-  height: calc(100vh - 262px) !important;
+  height: calc(100vh - 300px) !important;
   min-height: 220px;
 }
 [class*="_formView_"]:has(.lvme-ges-lots-verif) [class*="_main_"] > [class*="_container_"] {
@@ -1663,32 +1663,30 @@
   color: #ffffff !important;
 }
 /* boutons GESCOM (Listes Dossiers : Quitter, Nouveau BL, Nouveau retour, Suppression) : étroits, collés à droite de
-   la page, icône après le texte (croix / barre rouges), espace entre les groupes */
-[class*="_gridItem_"]:has(> .lvme-btn-ges),
-[class*="_gridItem_"]:has(> * > .lvme-btn-ges) {
+   la page, icône après le texte (croix / barre rouges), espace entre les groupes ; la classe css du bouton est posée
+   par Axelor sur sa case (_gridItem_) */
+[class*="_gridItem_"].lvme-btn-ges > [class*="_container_"] {
   display: flex !important;
   justify-content: flex-end;
 }
-[class*="_formView_"] [class*="_main_"] button.lvme-btn-ges {
+[class*="_formView_"] [class*="_main_"] [class*="_gridItem_"].lvme-btn-ges button {
   width: 150px !important;
+}
+.lvme-btn-ges button [class*="_titleContent_"] {
+  display: flex !important;
   flex-direction: row-reverse !important;
   justify-content: space-between !important;
-  gap: 8px;
-  padding-left: 10px !important;
-  padding-right: 8px !important;
+  align-items: center;
+  width: 100%;
 }
-.lvme-btn-ges i,
-.lvme-btn-ges svg,
-.lvme-btn-ges [class*="icon"] {
+.lvme-btn-ges button [class*="_icon_"] {
   color: #5b8fd6 !important;
-  fill: currentColor;
+  font-size: 18px !important;
 }
-.lvme-btn-ges-rouge i,
-.lvme-btn-ges-rouge svg,
-.lvme-btn-ges-rouge [class*="icon"] {
+.lvme-btn-ges-rouge button [class*="_icon_"] {
   color: #e01e2b !important;
+  font-weight: 700;
 }
-[class*="_gridItem_"]:has(> .lvme-btn-ges-espace),
-[class*="_gridItem_"]:has(> * > .lvme-btn-ges-espace) {
+[class*="_gridItem_"].lvme-btn-ges-espace {
   margin-top: 12px !important;
 }
