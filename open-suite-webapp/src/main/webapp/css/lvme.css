@@ -632,3 +632,158 @@
   min-height: 0 !important;
   overflow: auto;
 }
+
+/*
+ * Etat des stocks par lots tenu sur un seul écran à 100 % comme GESCOM : écran reconnu à son cadre de dates
+ * (css="lvme-ges-dates-jaune" ; le css des panneaux du premier niveau n'est pas repris par Axelor). Filtres
+ * resserrés, libellés à gauche dans les cadres Article / Fournisseur, options sur deux colonnes, alerte DLUO sur
+ * une ligne, liste des lots sur toute la hauteur restante (elle défile seule, comme dans GESCOM).
+ */
+[class*="_formView_"]:has(.lvme-ges-dates-jaune),
+[class*="_formView_"]:has(.lvme-ges-dates-jaune) * {
+  --ax-form-row-gap: .1rem !important;
+  --ax-form-column-gap: .5rem !important;
+  --ax-theme-form-row-gap: .1rem !important;
+  --ax-theme-form-column-gap: .5rem !important;
+  --ax-form-padding: .25rem !important;
+  --ax-panel-body-padding: .25rem !important;
+  --ax-panel-header-padding: .1rem !important;
+  --ax-input-padding: 0 .35rem !important;
+}
+[class*="_formView_"]:has(.lvme-ges-dates-jaune) [class*="_main_"] > [class*="_panel_"] label,
+[class*="_formView_"]:has(.lvme-ges-dates-jaune) [class*="_main_"] > [class*="_panel_"] [class*="_labelText_"] {
+  font-size: 11.5px !important;
+  line-height: 1.15 !important;
+  margin-bottom: 0 !important;
+  white-space: nowrap !important;
+}
+[class*="_formView_"]:has(.lvme-ges-dates-jaune) [class*="_main_"] > [class*="_panel_"] input:not([type="checkbox"]):not([type="radio"]),
+[class*="_formView_"]:has(.lvme-ges-dates-jaune) [class*="_main_"] > [class*="_panel_"] select {
+  font-size: 12.5px !important;
+  min-height: 0 !important;
+  height: 22px;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+[class*="_formView_"]:has(.lvme-ges-dates-jaune) [class*="_main_"] > [class*="_panel_"] button {
+  font-size: 12px !important;
+  padding-top: 2px !important;
+  padding-bottom: 2px !important;
+  min-height: 0 !important;
+}
+/* alerte DLUO et son bouton sur une seule ligne */
+[class*="_formView_"]:has(.lvme-ges-dates-jaune) [class*="_main_"] > [class*="_panel_"]:first-child [class*="_grid_"] {
+  display: flex !important;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+[class*="_formView_"]:has(.lvme-ges-dates-jaune) [class*="_main_"] > [class*="_panel_"]:first-child [class*="_gridItem_"] {
+  flex: 0 0 auto;
+  margin: 0 !important;
+}
+/* filtres sur 4 colonnes : Article | Fournisseur | dates | options (plus large pour ses deux colonnes) */
+[class*="_formView_"]:has(.lvme-ges-dates-jaune) [class*="_grid_"]:has(> .lvme-ges-dates-jaune) {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.05fr) minmax(0, 1.45fr) !important;
+}
+[class*="_formView_"]:has(.lvme-ges-dates-jaune) [class*="_grid_"]:has(> .lvme-ges-dates-jaune) > [class*="_gridItem_"] {
+  grid-column: auto !important;
+}
+/* libellés à gauche dans les cadres Article et Fournisseur */
+[class*="_formView_"]:has(.lvme-ges-dates-jaune) [class*="_grid_"]:has(> .lvme-ges-dates-jaune) > [class*="_gridItem_"]:nth-child(-n+2) [class*="_container_"]:has(> [class*="_title_"]) {
+  flex-direction: row !important;
+  align-items: center;
+  gap: 6px;
+}
+[class*="_formView_"]:has(.lvme-ges-dates-jaune) [class*="_grid_"]:has(> .lvme-ges-dates-jaune) > [class*="_gridItem_"]:nth-child(-n+2) [class*="_container_"]:has(> [class*="_title_"]) > [class*="_title_"] {
+  flex: 0 0 auto;
+  min-width: 82px;
+}
+[class*="_formView_"]:has(.lvme-ges-dates-jaune) [class*="_grid_"]:has(> .lvme-ges-dates-jaune) > [class*="_gridItem_"]:nth-child(-n+2) [class*="_container_"]:has(> [class*="_title_"]) > :not([class*="_title_"]) {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+/* options : deux colonnes (Arrivage + Lots | DLUO + case + boutons), choix serrés */
+.lvme-ges-cadre [class*="_grid_"] {
+  display: block !important;
+  column-count: 2;
+  column-gap: 10px;
+}
+.lvme-ges-cadre [class*="_grid_"] > [class*="_gridItem_"] {
+  break-inside: avoid;
+  margin: 0 0 3px 0 !important;
+}
+.lvme-ges-cadre input[type="radio"],
+.lvme-ges-cadre input[type="checkbox"] {
+  margin-top: 0 !important;
+  width: 12px;
+  height: 12px;
+}
+.lvme-ges-cadre [class*="_radio"],
+.lvme-ges-cadre [class*="form-check"] {
+  min-height: 0 !important;
+  margin-bottom: 0 !important;
+  line-height: 1.2;
+}
+.lvme-ges-cadre label,
+.lvme-ges-cadre [class*="_labelText_"] {
+  font-size: 11px !important;
+  white-space: normal !important;
+}
+.lvme-ges-cadre [class*="_radio_"],
+.lvme-ges-cadre [class*="_radio_"] * {
+  font-size: 11px !important;
+  line-height: 14px !important;
+}
+.lvme-ges-cadre [class*="_radio_"] [class*="_mb-1_"] {
+  margin-bottom: 0 !important;
+}
+/* liste des lots : toute la hauteur restante de l'écran (elle défile seule) et lignes serrées comme GESCOM */
+[class*="_formView_"]:has(.lvme-ges-dates-jaune) [class*="_main_"] > :last-child {
+  height: calc(100vh - 330px) !important;
+  min-height: 220px;
+}
+[class*="_formView_"]:has(.lvme-ges-dates-jaune) [class*="_main_"] > :last-child [class*="_row_6j3fy"] {
+  height: 21px !important;
+  min-height: 0 !important;
+}
+[class*="_formView_"]:has(.lvme-ges-dates-jaune) [class*="_main_"] > :last-child [class*="_column_"] {
+  font-size: 11.5px !important;
+  padding-top: 1px !important;
+  padding-bottom: 1px !important;
+}
+/* couleurs GESCOM de l'écran (posées avant sur des panneaux du premier niveau, ignorés par Axelor) : fond bleu
+   clair, liste blanc / cyan (texte violet sur les lignes cyan, alertes DLUO rouges / orange prioritaires), en-têtes
+   bleus, Nb colis Stock / Dispo en jaune, boutons gris encadrés */
+[class*="_formView_"]:has(.lvme-ges-dates-jaune) [class*="_main_"],
+[class*="_formView_"]:has(.lvme-ges-dates-jaune) [class*="_main_"] > [class*="_panel_"],
+[class*="_formView_"]:has(.lvme-ges-dates-jaune) [class*="_main_"] > [class*="_panel_"] [class*="_body_"],
+[class*="_formView_"]:has(.lvme-ges-dates-jaune) [class*="_main_"] > [class*="_panel_"] [class*="_content_"]:not(.lvme-ges-dates-jaune [class*="_content_"]) {
+  background-color: #c6daf0 !important;
+}
+[class*="_formView_"]:has(.lvme-ges-dates-jaune) [class*="_main_"] > :last-child [class*="_header_"] [class*="_column_"] {
+  background-color: #b8d4f0 !important;
+  color: #10204a !important;
+  font-size: 11.5px !important;
+  white-space: normal !important;
+  line-height: 1.1;
+}
+[class*="_formView_"]:has(.lvme-ges-dates-jaune) [class*="_main_"] > :last-child [class*="_body_"] [class*="_row_6j3fy"] [class*="_column_"] {
+  background-color: #ffffff;
+}
+[class*="_formView_"]:has(.lvme-ges-dates-jaune) [class*="_main_"] > :last-child [class*="_body_"] [class*="_row_6j3fy"]:nth-child(even) [class*="_column_"] {
+  background-color: #ccffff;
+}
+[class*="_formView_"]:has(.lvme-ges-dates-jaune) [class*="_main_"] > :last-child [class*="_body_"] [class*="_row_6j3fy"]:nth-child(even):not([class*="_hilite-"]) [class*="_column_"] {
+  color: #b000b0;
+}
+[class*="_formView_"]:has(.lvme-ges-dates-jaune) [class*="_main_"] > :last-child [class*="_hilite-warning_"] {
+  background-color: #ffff99 !important;
+  color: #000000 !important;
+}
+[class*="_formView_"]:has(.lvme-ges-dates-jaune) .lvme-ges-cadre button {
+  background: linear-gradient(#ffffff, #dfe4ec) !important;
+  color: #10204a !important;
+  border: 1px solid #8c96a8 !important;
+  border-radius: 4px !important;
+}
