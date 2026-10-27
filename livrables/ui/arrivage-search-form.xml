@@ -6,22 +6,26 @@
       <field name="$fournisseur" title="Fournisseur" type="many-to-one" target="com.axelor.apps.base.db.Partner"
         domain="self.isSupplier = true" canNew="false" canEdit="false" canView="false"/>
       <field name="$numeroArrivage" title="N° Arrivage" type="string" onChange="action-lvme-arrivage-refresh"/>
+      <!-- sous le fournisseur, comme GESCOM -->
+      <button name="lancerRechercheBtn" title="Lancer la recherche" icon="search" css="btn-primary" onClick="action-lvme-arrivage-refresh"/>
     </panel>
-    <panel name="filtreDatePanel" colSpan="3" itemSpan="12">
+    <panel name="filtreDatePanel" colSpan="2" itemSpan="12">
       <field name="$dateDu" title="Date du" type="date"/>
       <field name="$dateAu" title="au" type="date"/>
       <field name="$datePeriode" title="Période prédéfinie" type="integer" selection="lvme.etat.stock.periode.select"
         onChange="action-lvme-arrivage-periode-date"/>
     </panel>
-    <panel name="filtreArriveePanel" colSpan="3" itemSpan="12">
+    <panel name="filtreArriveePanel" colSpan="2" itemSpan="12">
       <field name="$arriveeDu" title="Arrivée du" type="date"/>
       <field name="$arriveeAu" title="au" type="date"/>
       <field name="$arriveePeriode" title="Période prédéfinie" type="integer" selection="lvme.etat.stock.periode.select"
         onChange="action-lvme-arrivage-periode-arrivee"/>
     </panel>
-    <panel name="filtreNaturePanel" title="Nature" colSpan="3" itemSpan="12">
+    <panel name="filtreNaturePanel" title="Nature" colSpan="3" itemSpan="12" css="lvme-ges-arr">
       <field name="$natureFiltre" showTitle="false" type="integer" widget="RadioSelect" selection="lvme.arrivage.nature.select"/>
-      <button name="lancerRechercheBtn" title="Lancer la recherche" icon="search" css="btn-primary" onClick="action-lvme-arrivage-refresh"/>
+    </panel>
+    <!-- boutons à droite de la recherche, comme GESCOM -->
+    <panel name="filtreBoutonsPanel" colSpan="2" itemSpan="12">
       <button name="lvmeKanbanBtn" title="Suivi des arrivages" icon="view_kanban" css="lvme-btn-kanban" onClick="action-lvme-arrivage-kanban"/>
       <button name="lvmeArchivageBtn" title="Archiver / Désarchiver" icon="archive" onClick="action-lvme-arrivage-dashlet"/>
       <button name="nouvelArrivageBtn" title="Nouveau Arrivage" icon="plus" onClick="action-lvme-arrivage-new"/>

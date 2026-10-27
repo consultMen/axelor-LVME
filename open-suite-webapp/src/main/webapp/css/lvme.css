@@ -1139,3 +1139,182 @@
   text-align: center;
   font-weight: 600;
 }
+
+/*
+ * Listes « Arrivages » (repère css="lvme-ges-arr") et « Rotation des stocks » (repère css="lvme-ges-rot") sur un
+ * seul écran à 100 % comme GESCOM : filtres resserrés avec libellés à gauche, choix serrés, KPI moins hauts, liste
+ * sur toute la hauteur restante (elle défile seule) avec lignes serrées.
+ */
+[class*="_formView_"]:is(:has(.lvme-ges-arr), :has(.lvme-ges-rot)),
+[class*="_formView_"]:is(:has(.lvme-ges-arr), :has(.lvme-ges-rot)) * {
+  --ax-form-row-gap: .1rem !important;
+  --ax-theme-form-row-gap: .1rem !important;
+  --ax-form-padding: .25rem !important;
+  --ax-panel-body-padding: .3rem !important;
+  --ax-panel-header-padding: .1rem .3rem !important;
+  --ax-panel-header-title-padding: .1rem .3rem !important;
+  --ax-input-padding: 0 .35rem !important;
+}
+[class*="_formView_"]:is(:has(.lvme-ges-arr), :has(.lvme-ges-rot)) [class*="_main_"] > [class*="_panel_"] [class*="_container_"]:has(> [class*="_title_"]) {
+  flex-direction: row !important;
+  align-items: center;
+  gap: 6px;
+}
+[class*="_formView_"]:is(:has(.lvme-ges-arr), :has(.lvme-ges-rot)) [class*="_main_"] > [class*="_panel_"] [class*="_container_"]:has(> [class*="_title_"]) > [class*="_title_"] {
+  flex: 0 0 auto;
+  min-width: 70px;
+}
+[class*="_formView_"]:is(:has(.lvme-ges-arr), :has(.lvme-ges-rot)) [class*="_main_"] > [class*="_panel_"] [class*="_container_"]:has(> [class*="_title_"]) > :not([class*="_title_"]) {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+[class*="_formView_"]:is(:has(.lvme-ges-arr), :has(.lvme-ges-rot)) [class*="_main_"] > [class*="_panel_"] label,
+[class*="_formView_"]:is(:has(.lvme-ges-arr), :has(.lvme-ges-rot)) [class*="_main_"] > [class*="_panel_"] [class*="_labelText_"] {
+  font-size: 12px !important;
+  white-space: nowrap !important;
+  margin-bottom: 0 !important;
+}
+[class*="_formView_"]:is(:has(.lvme-ges-arr), :has(.lvme-ges-rot)) [class*="_main_"] > [class*="_panel_"] input:not([type="checkbox"]):not([type="radio"]),
+[class*="_formView_"]:is(:has(.lvme-ges-arr), :has(.lvme-ges-rot)) [class*="_main_"] > [class*="_panel_"] select {
+  font-size: 12px !important;
+  min-height: 0 !important;
+  height: 22px;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+[class*="_formView_"]:is(:has(.lvme-ges-arr), :has(.lvme-ges-rot)) [class*="_main_"] > [class*="_panel_"] [class*="_radio_"],
+[class*="_formView_"]:is(:has(.lvme-ges-arr), :has(.lvme-ges-rot)) [class*="_main_"] > [class*="_panel_"] [class*="_radio_"] * {
+  font-size: 12px !important;
+  line-height: 15px !important;
+}
+[class*="_formView_"]:is(:has(.lvme-ges-arr), :has(.lvme-ges-rot)) [class*="_main_"] > [class*="_panel_"] [class*="_radio_"] [class*="_mb-1_"] {
+  margin-bottom: 0 !important;
+}
+[class*="_formView_"]:is(:has(.lvme-ges-arr), :has(.lvme-ges-rot)) [class*="_main_"] > [class*="_panel_"] button {
+  font-size: 12px !important;
+  padding-top: 2px !important;
+  padding-bottom: 2px !important;
+  min-height: 0 !important;
+  white-space: normal !important;
+  line-height: 1.15;
+}
+[class*="_formView_"]:is(:has(.lvme-ges-arr), :has(.lvme-ges-rot)) [class*="_main_"] > [class*="_panel_"] button * {
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+}
+/* KPI de la rotation moins hauts */
+[class*="_formView_"]:has(.lvme-ges-rot) [class*="_viewer_"] [style*="padding: 12px"] {
+  padding: 5px 10px !important;
+}
+[class*="_formView_"]:has(.lvme-ges-rot) [class*="_viewer_"] [style*="font-size: 26px"] {
+  font-size: 18px !important;
+  line-height: 1.2;
+}
+[class*="_formView_"]:has(.lvme-ges-rot) [class*="_viewer_"] [style*="border-radius: 8px"] [style*="font-size: 13px"] {
+  font-size: 12px !important;
+}
+[class*="_formView_"]:has(.lvme-ges-rot) [class*="_viewer_"] [style*="border-radius: 8px"] [style*="font-size: 12px"] {
+  font-size: 11px !important;
+  line-height: 1.2;
+}
+/* type de transport (Tous / Camion / Bateau, trois choix courts) côte à côte */
+[class*="_gridItem_"].lvme-ges-rot + [class*="_gridItem_"] [class*="_radio_"] {
+  flex-direction: row !important;
+  flex-wrap: wrap;
+  gap: 2px 12px;
+}
+/* liste : toute la hauteur restante, lignes serrées */
+[class*="_formView_"]:has(.lvme-ges-arr) [class*="_main_"] > [class*="_container_"] {
+  height: calc(100vh - 205px) !important;
+  min-height: 220px;
+}
+[class*="_formView_"]:has(.lvme-ges-rot) [class*="_main_"] > [class*="_container_"] {
+  height: calc(100vh - 375px) !important;
+  min-height: 200px;
+}
+[class*="_formView_"]:is(:has(.lvme-ges-arr), :has(.lvme-ges-rot)) [class*="_main_"] > [class*="_container_"] [class*="_body_"] [class*="_row_6j3fy"] {
+  height: 21px !important;
+  min-height: 0 !important;
+}
+[class*="_formView_"]:is(:has(.lvme-ges-arr), :has(.lvme-ges-rot)) [class*="_main_"] > [class*="_container_"] [class*="_column_"] {
+  font-size: 11.5px !important;
+  padding-top: 1px !important;
+  padding-bottom: 1px !important;
+}
+[class*="_formView_"]:is(:has(.lvme-ges-arr), :has(.lvme-ges-rot)) [class*="_main_"] > [class*="_container_"] [class*="_header_"] [class*="_column_"] {
+  white-space: normal !important;
+  line-height: 1.1;
+}
+
+/* Couleurs GESCOM — Arrivages : fond blanc, cadre Recherche bordé, en-têtes gris dégradé, lignes blanc / bleu très
+   clair, ligne sélectionnée bleu nuit */
+[class*="_formView_"]:has(.lvme-ges-arr) [class*="_main_"] > [class*="_panel_"]:first-child {
+  border: 1px solid #a9b6c9 !important;
+}
+[class*="_formView_"]:has(.lvme-ges-arr) [class*="_main_"] > [class*="_container_"] [class*="_header_"] [class*="_column_"],
+[class*="_formView_"]:has(.lvme-ges-rot) [class*="_main_"] > [class*="_container_"] [class*="_header_"] [class*="_column_"] {
+  background: linear-gradient(#f4f4f4, #cdcdcd) !important;
+  color: #222 !important;
+}
+[class*="_formView_"]:has(.lvme-ges-arr) [class*="_main_"] > [class*="_container_"] [class*="_body_"] [class*="_row_"] [class*="_column_"] {
+  background-color: #ffffff;
+  border-right: 1px solid #d6dbe3;
+}
+[class*="_formView_"]:has(.lvme-ges-arr) [class*="_main_"] > [class*="_container_"] [class*="_body_"] [class*="_row_"]:nth-child(even) [class*="_column_"] {
+  background-color: #e9f0fa;
+}
+[class*="_formView_"]:is(:has(.lvme-ges-arr), :has(.lvme-ges-rot), :has(.lvme-ges-dates-lavande)) [class*="_main_"] > [class*="_container_"] [class*="_body_"] [class*="_row_"][class*="_selected_"] [class*="_column_"] {
+  background-color: #14234f !important;
+  color: #ffffff !important;
+}
+
+/* Couleurs GESCOM — Rotation des stocks : fond gris-bleu clair, cadre Entrée jaune pâle, lignes blanches séparées
+   par des traits gris (les couleurs Camion / Bateau et les alertes restent) */
+[class*="_formView_"]:has(.lvme-ges-rot) [class*="_main_"],
+[class*="_formView_"]:has(.lvme-ges-rot) [class*="_main_"] > [class*="_panel_"]:not(:first-child),
+[class*="_formView_"]:has(.lvme-ges-rot) [class*="_main_"] > [class*="_panel_"]:not(:first-child) [class*="_body_"] {
+  background-color: #e9eef6 !important;
+}
+.lvme-ges-dates-jaune-rot,
+.lvme-ges-dates-jaune-rot [class*="_panel"],
+.lvme-ges-dates-jaune-rot [class*="_body_"],
+.lvme-ges-dates-jaune-rot [class*="_content_"] {
+  background-color: #ffffc8 !important;
+}
+.lvme-ges-dates-jaune-rot {
+  border: 1px solid #7f8fb0 !important;
+  border-radius: 3px;
+}
+[class*="_formView_"]:has(.lvme-ges-rot) [class*="_main_"] > [class*="_container_"] [class*="_body_"] [class*="_row_"] [class*="_column_"] {
+  border-right: 1px solid #d0d0d0;
+  border-bottom: 1px solid #e2e2e2;
+}
+
+/* Couleurs GESCOM — Liste des achats fournisseurs (posées avant sur des panneaux du premier niveau, ignorés par
+   Axelor) : en-têtes bleu clair au texte bleu, lignes jaune pâle / blanc */
+[class*="_formView_"]:has(.lvme-ges-dates-lavande) [class*="_main_"] > [class*="_container_"] [class*="_header_"] [class*="_column_"] {
+  background-color: #dbe8fb !important;
+  color: #1a2a9c !important;
+  white-space: normal !important;
+}
+[class*="_formView_"]:has(.lvme-ges-dates-lavande) [class*="_main_"] > [class*="_container_"] [class*="_body_"] [class*="_row_"]:nth-child(odd) [class*="_column_"] {
+  background-color: #ffff99;
+}
+[class*="_formView_"]:has(.lvme-ges-dates-lavande) [class*="_main_"] > [class*="_container_"] [class*="_body_"] [class*="_row_"]:nth-child(even) [class*="_column_"] {
+  background-color: #f4f7ff;
+}
+/* « Type transport » : libellé au-dessus, les trois choix sur une ligne en dessous */
+[class*="_formView_"]:has(.lvme-ges-rot) [class*="_gridItem_"].lvme-ges-rot + [class*="_gridItem_"] [class*="_container_"]:has([class*="_radio_"]) {
+  flex-direction: column !important;
+  align-items: stretch !important;
+  gap: 0 !important;
+}
+/* boutons Lancer la recherche / Recalculer les KPI à droite, sur la ligne des filtres (Axelor les mettait sur une
+   ligne à part à cause des cadres masqués du mode « par produit ») */
+@media (min-width: 992px) {
+  [class*="_formView_"]:has(.lvme-ges-rot) [class*="_grid_"]:has(> .lvme-ges-rot) > [class*="_gridItem_"]:last-child {
+    grid-column: 11 / 13 !important;
+    grid-row: 2 !important;
+  }
+}
