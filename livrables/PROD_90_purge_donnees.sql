@@ -128,6 +128,30 @@ SELECT m.full_name AS modele, lower(m.table_name) AS tbl, (lower(m.table_name) I
 FROM meta_model m
 WHERE lower(m.table_name) IN (SELECT tbl FROM purge_total UNION SELECT tbl FROM purge_partiel);
 
+-- vitesse : sur la prod, les contrôles des clés ligne à ligne sont trop lents (colonnes sans index). Super-utilisateur :
+-- contrôles coupés le temps de la purge, puis contrôle complet des références avant le COMMIT ; sinon : index
+-- temporaires sur les colonnes qui pointent vers les données supprimées (supprimés avant le COMMIT)
+CREATE TEMP TABLE purge_index (nom text) ON COMMIT DROP;
+DO $$
+DECLARE r record; i int := 0;
+BEGIN
+  IF (SELECT rolsuper FROM pg_roles WHERE rolname = current_user) THEN
+    PERFORM set_config('session_replication_role', 'replica', true);
+    RAISE NOTICE 'Contrôles des clés coupés pendant la purge (contrôle complet à la fin)';
+  ELSE
+    FOR r IN SELECT DISTINCT f.src, f.col FROM purge_fk f
+               WHERE f.tgt IN (SELECT tbl FROM purge_total UNION SELECT tbl FROM purge_partiel UNION SELECT 'mail_message')
+                 AND NOT EXISTS (SELECT 1 FROM pg_index x JOIN pg_attribute a
+                                   ON a.attrelid = x.indrelid AND a.attnum = x.indkey[0]
+                                 WHERE x.indrelid = f.src::regclass AND a.attname = f.col) LOOP
+      i := i + 1;
+      EXECUTE format('CREATE INDEX purge_tmp_%s ON %s (%I)', i, r.src, r.col);
+      INSERT INTO purge_index VALUES ('purge_tmp_' || i);
+    END LOOP;
+    RAISE NOTICE 'Index temporaires créés : %', i;
+  END IF;
+END $$;
+
 -- suppression : une seule instruction, les contrôles des clés se font à la fin (l'ordre n'a pas d'importance)
 DO $$
 DECLARE r record; sql text := ''; sel text := ''; i int := 0; res text;
@@ -163,6 +187,31 @@ BEGIN
     DELETE FROM mail_follower f USING purge_modele pm WHERE pm.modele = f.related_model
       AND (NOT pm.partiel OR f.related_id NOT IN (SELECT id FROM purge_garde WHERE tbl = pm.tbl));
   END IF;
+END $$;
+
+-- contrôle complet : plus aucune ligne ne pointe vers une donnée supprimée (sinon tout est annulé)
+DO $$
+DECLARE r record; n bigint; casses text := '';
+BEGIN
+  FOR r IN SELECT * FROM purge_fk
+             WHERE tgt IN (SELECT tbl FROM purge_total UNION SELECT tbl FROM purge_partiel UNION SELECT 'mail_message') LOOP
+    EXECUTE format('SELECT count(*) FROM %s s WHERE s.%I IS NOT NULL AND NOT EXISTS (SELECT 1 FROM %s t WHERE t.id = s.%I)',
+                   r.src, r.col, r.tgt, r.col) INTO n;
+    IF n > 0 THEN
+      casses := casses || format(E'
+  %s.%s -> %s : %s ligne(s)', r.src, r.col, r.tgt, n);
+    END IF;
+  END LOOP;
+  IF casses <> '' THEN
+    RAISE EXCEPTION 'Purge annulée, rien n''a été supprimé. Références cassées :%', casses;
+  END IF;
+  RAISE NOTICE 'Contrôle des références : OK';
+  IF (SELECT rolsuper FROM pg_roles WHERE rolname = current_user) THEN
+    PERFORM set_config('session_replication_role', 'origin', true);
+  END IF;
+  FOR r IN SELECT nom FROM purge_index LOOP
+    EXECUTE 'DROP INDEX ' || r.nom;
+  END LOOP;
 END $$;
 
 -- compteurs (n° de commandes, d'achats, d'arrivages, de BL, de lots, de tiers, de factures…) remis à 1
