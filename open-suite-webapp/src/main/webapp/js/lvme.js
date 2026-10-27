@@ -1,6 +1,7 @@
 /*
  * LVME : raccourcis clavier des écrans façon GESCOM (ajouté à la page Axelor par build.gradle, tâche copyWebapp).
  *   F1 : « F1 : Historique Prix » de la fenêtre Lignes Commandes ouverte, à la place de l'aide du navigateur.
+ *   F12 : bouton « Fermer(F12) » affiché (Historique Produit).
  * Axelor n'écrit pas le nom du bouton dans la page : le bouton est retrouvé par son libellé.
  */
 (function () {
@@ -26,6 +27,19 @@
     e.stopPropagation();
     var b = boutonVisible(LIBELLE_F1);
     if (b) {
+      b.click();
+    }
+  }, true);
+
+  // F12 : bouton « Fermer(F12) » affiché (Historique Produit), comme GESCOM ; sans ce bouton, F12 garde son effet
+  window.addEventListener('keydown', function (e) {
+    if (e.key !== 'F12' || e.ctrlKey || e.altKey || e.metaKey || e.shiftKey) {
+      return;
+    }
+    var b = boutonVisible('Fermer(F12)');
+    if (b) {
+      e.preventDefault();
+      e.stopPropagation();
       b.click();
     }
   }, true);
