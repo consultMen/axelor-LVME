@@ -237,6 +237,14 @@ arrivage réel. Les valeurs déjà présentes ne sont pas touchées.
   un simple libellé.
 - La colonne « Prix Revient » (prix de revient au kg) et « Nb unt ou Poids / Colis » sont remplies.
 
+**Fiche « Ligne d'arrivage » complétée (28/10) :**
+- colis par couche (11 492 lignes) et par palette (14 091) ;
+- unités total ;
+- taux de TVA 5,5 % (TVA déductible, R2_D) sur les 11 705 lignes où GESCOM l'indique ;
+- lot fournisseur de la ligne GESCOM quand le lot n'en avait pas : 15 585 lignes ont maintenant un lot fournisseur.
+- La ligne « Flottant » de la fiche n'est affichée que pour un arrivage non réalisé ; pour un arrivage réel, seule la
+  ligne « Réel » est remplie (fonctionnement de l'écran).
+
 **Mode de transport :**
 - Il vient du type d'arrivage GESCOM (`typ_arrivage` : 379 = CAMION, 380 = BATEAU, 381 = AVION ; mode « Avion »
   ajouté).

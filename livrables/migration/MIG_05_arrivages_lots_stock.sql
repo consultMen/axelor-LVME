@@ -406,6 +406,49 @@ UPDATE purchase_purchase_order_line SET pr_kg = coalesce(pr_kg, prix_revient_ree
 WHERE import_id LIKE 'GESCOM-ARRL-%'
   AND ((pr_kg IS NULL AND prix_revient_reel IS NOT NULL) OR (nb_unites_par_colis IS NULL AND poids_par_colis IS NOT NULL));
 
+-- compléments de la fiche « Ligne d'arrivage » (corrige aussi les lignes déjà migrées) : colis par couche / palette,
+-- unités total, taux de TVA 5,5 % (TVA déductible) quand GESCOM l'indique, lot fournisseur de la ligne GESCOM
+CREATE TEMP TABLE mig_compl ON COMMIT DROP AS
+SELECT g.*, 'GESCOM-ARRL-' || btrim(g.idarr_ligne) AS cle FROM gescom.arr_ligne g;
+CREATE INDEX ON mig_compl (cle);
+UPDATE purchase_purchase_order_line p SET nb_colis_par_couche = NULLIF(gescom.num(g.colis_couche), 0),
+  nb_colis_par_palette = NULLIF(gescom.num(g.colis_pal), 0),
+  nb_unites_par_colis = coalesce(p.nb_unites_par_colis, p.poids_par_colis),
+  unites_tot = coalesce(p.nb_colis, 0) * coalesce(p.nb_unites_par_colis, p.poids_par_colis, 0), version = p.version + 1
+FROM mig_compl g
+WHERE p.import_id = g.cle AND (p.nb_colis_par_couche IS NULL AND p.nb_colis_par_palette IS NULL AND p.unites_tot IS NULL);
+UPDATE stock_stock_move_line l SET unites_tot = coalesce(l.nb_colis, 0) * coalesce(l.nb_unites_par_colis, 0),
+  version = l.version + 1
+WHERE l.import_id LIKE 'GESCOM-ARRL-%' AND l.unites_tot IS NULL;
+INSERT INTO purchase_purchase_order_line_tax_line_set (purchase_purchase_order_line, tax_line_set)
+SELECT p.id, (SELECT tl.id FROM account_tax_line tl JOIN account_tax t ON t.id = tl.tax WHERE t.code = 'R2_D' ORDER BY tl.id LIMIT 1)
+FROM purchase_purchase_order_line p JOIN mig_compl g ON g.cle = p.import_id
+WHERE gescom.num(g.taux_tva) = 5.5
+  AND EXISTS (SELECT 1 FROM account_tax t WHERE t.code = 'R2_D')
+  AND NOT EXISTS (SELECT 1 FROM purchase_purchase_order_line_tax_line_set x WHERE x.purchase_purchase_order_line = p.id);
+-- lot fournisseur indiqué sur la ligne GESCOM (LOT_FOURN) quand le lot n'en a pas
+CREATE TEMP TABLE mig_lotf_ligne ON COMMIT DROP AS
+SELECT DISTINCT ON (m.partner, l.product, upper(btrim(g.lot_fourn))) m.partner AS fournisseur, l.product,
+  btrim(g.lot_fourn) AS numero, upper(btrim(g.lot_fourn)) AS cle_num,
+  (SELECT x.id FROM stock_lot_fournisseur x WHERE x.product = l.product AND x.supplier IS NOT DISTINCT FROM m.partner
+     AND upper(x.supplier_lot_number) = upper(btrim(g.lot_fourn)) LIMIT 1) AS id
+FROM stock_stock_move_line l JOIN stock_stock_move m ON m.id = l.stock_move JOIN mig_compl g ON g.cle = l.import_id
+WHERE l.lot_fournisseur IS NULL AND gescom.txt(g.lot_fourn) IS NOT NULL
+ORDER BY m.partner, l.product, upper(btrim(g.lot_fourn));
+ALTER TABLE mig_lotf_ligne ADD COLUMN nouveau boolean;
+UPDATE mig_lotf_ligne SET nouveau = (id IS NULL);
+UPDATE mig_lotf_ligne SET id = nextval('stock_lot_fournisseur_seq') WHERE id IS NULL;
+INSERT INTO stock_lot_fournisseur (id, version, created_on, import_id, import_origin, supplier, product, supplier_lot_number)
+SELECT id, 0, now(), 'GESCOM-LOTF-' || id, 'GESCOM', fournisseur, product, numero FROM mig_lotf_ligne WHERE nouveau;
+UPDATE stock_stock_move_line l SET lot_fournisseur = f.id, version = l.version + 1
+FROM stock_stock_move m, mig_compl g, mig_lotf_ligne f
+WHERE m.id = l.stock_move AND g.cle = l.import_id AND l.lot_fournisseur IS NULL
+  AND f.fournisseur IS NOT DISTINCT FROM m.partner AND f.product = l.product AND f.cle_num = upper(btrim(g.lot_fourn));
+UPDATE stock_tracking_number t SET lot_fournisseur = l.lot_fournisseur, version = t.version + 1
+FROM stock_stock_move_line l
+WHERE l.id = t.origin_stock_move_line AND t.lot_fournisseur IS NULL AND l.lot_fournisseur IS NOT NULL
+  AND t.import_id LIKE 'GESCOM-LOT-%';
+
 -- ---------- articles sans prix / poids : dernier arrivage ----------
 UPDATE base_product p SET
   purchase_price = CASE WHEN coalesce(p.purchase_price, 0) = 0 THEN coalesce(x.prix_achat, 0) ELSE p.purchase_price END,
