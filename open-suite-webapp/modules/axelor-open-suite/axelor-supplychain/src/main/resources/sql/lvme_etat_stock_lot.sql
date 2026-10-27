@@ -9,7 +9,9 @@
 -- Règles :
 --   Entrées   = quantités reçues du lot sur ce frigo (BR réalisés)
 --   Stock     = quantité actuelle de la ligne de lot du frigo
---   Sorties   = Entrées - Stock (réel) ; 0 pour un flottant
+--   Sorties   = Entrées - Stock (réel) ; flottant : ventes / réservations déjà faites sur le lot en mer
+--   Flottant (comme GESCOM, décision du 28/10/2026) : stock = entrées - sorties ; la ligne de lot d'un flottant porte
+--   « moins les sorties » (à la réception, la quantité reçue s'y ajoute et le stock devient entrées - sorties en frigo)
 --   Commandes = lignes de livraison client planifiées sur ce lot / frigo
 --   Colis     = quantité / (quantité par colis de l'arrivage)
 --   Valeur    = montant réel d'entrée au prorata du stock, sinon stock x PR
@@ -86,7 +88,7 @@ base AS (
            COALESCE(s.stock_qty, 0)                       AS stock_lot_qty
     FROM arrivages a
     FULL OUTER JOIN stock_lots s
-      ON s.tracking_number = a.tracking_number AND s.frigo = a.frigo AND a.is_flottant = false
+      ON s.tracking_number = a.tracking_number AND s.frigo = a.frigo
 ),
 calc AS (
     SELECT b.*,
@@ -97,9 +99,9 @@ calc AS (
            COALESCE(NULLIF(t.prix_revient_reel, 0), b.pr_ligne, 0)         AS prix_revient,
            COALESCE(t.date_arrivage, b.entry_date)                         AS arrival_date,
            COALESCE(b.supplier, t.supplier)                                AS supplier_id,
-           -- Stock : réel = ligne de lot ; flottant = quantité attendue
-           CASE WHEN b.is_flottant THEN b.entree_qty ELSE b.stock_lot_qty END AS stock_qty,
-           CASE WHEN b.is_flottant THEN 0 ELSE b.entree_qty - b.stock_lot_qty END AS sortie_qty,
+           -- Stock : réel = ligne de lot ; flottant = quantité en mer - sorties (ligne de lot = - sorties)
+           CASE WHEN b.is_flottant THEN b.entree_qty + b.stock_lot_qty ELSE b.stock_lot_qty END AS stock_qty,
+           CASE WHEN b.is_flottant THEN - b.stock_lot_qty ELSE b.entree_qty - b.stock_lot_qty END AS sortie_qty,
            COALESCE(c.cdes_qty, 0)                                         AS cdes_qty,
            -- Quantité par colis de l'arrivage
            CASE WHEN b.nb_colis_in > 0 AND b.entree_qty > 0 THEN b.entree_qty / b.nb_colis_in
@@ -107,7 +109,7 @@ calc AS (
                 ELSE NULL END                                              AS qty_per_colis
     FROM base b
     JOIN stock_tracking_number t ON t.id = b.tracking_number
-    LEFT JOIN commandes c ON c.tracking_number = b.tracking_number AND c.frigo = b.frigo AND b.is_flottant = false
+    LEFT JOIN commandes c ON c.tracking_number = b.tracking_number AND c.frigo = b.frigo
 )
 SELECT ((c.tracking_number * 1000000 + COALESCE(c.frigo, 0)) * 10 + CASE WHEN c.is_flottant THEN 2 ELSE 1 END)::bigint AS id,
        0                                 AS version,

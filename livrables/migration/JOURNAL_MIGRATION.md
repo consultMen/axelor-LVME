@@ -197,6 +197,17 @@ règle sur la commande).
 - Les sorties apparaissent donc dans Axelor (entrées − stock) sans reprendre tout de suite l'historique des BL.
 - 680 lots ont du stock, dont 26 en négatif (gardés). Valeur au prix de revient : **6 793 063 €, identique à GESCOM**.
 
+**Stock en mer (lots flottants), décision du 28/10/2026 :**
+- Comme dans GESCOM, le stock d'un lot flottant (marchandise partie, quel que soit le transport) = entrées − sorties.
+  Les sorties sont les ventes et réservations déjà faites sur le lot.
+- L'écran État des stocks (PROD_97) affiche le flottant ainsi, avec ses sorties et ses commandes.
+- La ligne de lot d'un flottant porte (entrées − sorties) − quantité de l'arrivage. À la réception dans Axelor, la
+  quantité reçue s'y ajoute et le stock en frigo devient entrées − sorties.
+- Les lignes d'arrivage sans frigo dans GESCOM vont dans FRIGO. Les lots sans ligne d'arrivage vont dans le frigo de
+  leur arrivage GESCOM.
+- **Contrôle lot par lot (essai local, annulé) :** 0 écart sur 19 591 lots entre l'écran et GESCOM (entrées −
+  sorties). Valeur au prix de revient : 6 790 986 € des deux côtés.
+
 **Articles :** ceux qui n'ont ni prix d'achat, ni prix de revient, ni poids colis sont complétés avec leur dernier
 arrivage réel. Les valeurs déjà présentes ne sont pas touchées.
 

@@ -11,10 +11,11 @@
 --     livraison), devise, taux flottant / réel / couvert, frais d'approche, mode de transport (type d'arrivage :
 --     camion / bateau / avion), bateau, containers,
 --     transitaire / gestionnaire en note, montant, colis, poids
---   - lignes (ARR_LIGNE) : article, lot, frigo, quantité (quantité entrée du lot, sinon colis x poids colis), colis,
+--   - lignes (ARR_LIGNE) : article, lot, frigo (FRIGO si GESCOM n'en a pas), quantité (quantité entrée du lot, sinon colis x poids colis), colis,
 --     poids colis, prix d'achat, prix de revient, montant, conditionnement, origine, zone de pêche, marque, mode de
 --     pêche, DLC, date de congélation, lot fournisseur
---   - stock : pour chaque lot, entrées - sorties GESCOM (QENT - QSOR) dans son frigo (négatif gardé) ; ligne de
+--   - stock : pour chaque lot, entrées - sorties GESCOM (QENT - QSOR) dans son frigo (négatif gardé) ; lot d'un
+--     arrivage flottant (en mer) : « moins les sorties », l'écran affiche entrées - sorties comme GESCOM ; ligne de
 --     stock par lot et par article / frigo
 --   - articles sans prix d'achat / de revient / poids colis : complétés avec leur dernier arrivage
 -- Relançable : ce qui existe déjà (même clé GESCOM) n'est pas recréé.
@@ -29,7 +30,8 @@ SELECT (SELECT id FROM base_company ORDER BY id LIMIT 1) AS societe,
          AS reception,
        (SELECT id FROM stock_shipment_mode WHERE upper(name) = 'CAMION' LIMIT 1) AS camion,
        (SELECT id FROM stock_shipment_mode WHERE upper(name) = 'BATEAU' LIMIT 1) AS mode_bateau,
-       (SELECT id FROM base_unit WHERE upper(name) = 'KG' ORDER BY id LIMIT 1) AS kg;
+       (SELECT id FROM base_unit WHERE upper(name) = 'KG' ORDER BY id LIMIT 1) AS kg,
+       (SELECT id FROM stock_stock_location WHERE type_select = 1 AND upper(name) = 'FRIGO' ORDER BY id LIMIT 1) AS frigo_defaut;
 
 -- mode de transport Avion (type d'arrivage GESCOM 381), la liste ne connaît que Bateau et Camion
 INSERT INTO stock_shipment_mode (id, version, created_on, name, has_carriage_paid_possibility, import_id, import_origin)
@@ -173,7 +175,7 @@ CREATE TEMP TABLE mig_ligne ON COMMIT DROP AS
 SELECT r.*, a.num, a.commande, a.arrivage_id, a.reel, art.id AS article,
   coalesce(u.id, art.unit, (SELECT kg FROM mig_def)) AS unite_id,
   lo.id AS lot_id, lo.stock AS stock_lot, NULLIF(gescom.num(lo.qent), 0) AS qent_lot,
-  fr.id AS frigo_id, co.id AS cond_id,
+  coalesce(fr.id, (SELECT frigo_defaut FROM mig_def)) AS frigo_id, co.id AS cond_id,
   CASE WHEN gescom.txt(r.lot_reel) IS NOT NULL THEN gescom.num(r.colis_reel) ELSE gescom.num(r.colis_fl) END AS colis,
   CASE WHEN gescom.txt(r.lot_reel) IS NOT NULL THEN gescom.num(r.poids_colis_r) ELSE gescom.num(r.poids_colis_fl) END AS poids_colis,
   coalesce(NULLIF(gescom.num(r.prix_ach_r), 0), gescom.num(r.prix_ach_fl), 0) AS prix_achat,
@@ -302,26 +304,78 @@ FROM (SELECT DISTINCT ON (lot_id) lot_id, ligne_arrivage, ligne_commande FROM mi
 WHERE t.id = x.lot_id AND t.origin_stock_move_line IS NULL;
 
 -- ---------- stock : entrées - sorties GESCOM par lot, dans le frigo de son arrivage ----------
+-- lot d'un arrivage flottant (marchandise en mer) : la ligne de lot porte (entrées - sorties GESCOM) - quantité de
+-- l'arrivage ; l'écran État des stocks (quantité en mer + ligne de lot) affiche ainsi entrées - sorties comme GESCOM,
+-- et la réception ajoutera la quantité reçue. Lot sans ligne d'arrivage : frigo de son arrivage GESCOM, sinon FRIGO
 CREATE TEMP TABLE mig_stock ON COMMIT DROP AS
-SELECT DISTINCT ON (lo.id) lo.id AS lot_id, lo.article, lo.stock, coalesce(l.frigo_id, (SELECT reception FROM mig_def)) AS frigo,
+SELECT DISTINCT ON (lo.id) lo.id AS lot_id, lo.article,
+  CASE WHEN l.lot_id IS NOT NULL AND NOT l.reel THEN lo.stock - coalesce(l.qte, 0) ELSE lo.stock END AS stock,
+  coalesce(l.frigo_id, (SELECT f.frigo FROM mig_arr_frigo f WHERE f.num = btrim(lo.num_arrivage)), d.frigo_defaut) AS frigo,
   coalesce(l.unite_id, lo.unite_article, (SELECT kg FROM mig_def)) AS unite
-FROM mig_lot lo LEFT JOIN mig_ligne l ON l.lot_id = lo.id
-WHERE lo.stock <> 0 AND lo.nouveau
+FROM mig_lot lo LEFT JOIN mig_ligne l ON l.lot_id = lo.id CROSS JOIN mig_def d
+WHERE lo.nouveau
 ORDER BY lo.id, l.ligne_arrivage;
+DELETE FROM mig_stock WHERE stock = 0;
 INSERT INTO stock_stock_location_line (id, version, created_on, import_id, import_origin, details_stock_location, product,
   tracking_number, unit, current_qty, future_qty, avg_price, last_inventory_real_qty, requested_reserved_qty, reserved_qty)
 SELECT nextval('stock_stock_location_line_seq'), 0, now(), 'GESCOM-STKL-' || s.lot_id, 'GESCOM', s.frigo, s.article,
   s.lot_id, s.unite, s.stock, s.stock, coalesce((SELECT prix_revient_reel FROM stock_tracking_number WHERE id = s.lot_id), 0),
   0, 0, 0
 FROM mig_stock s;
+
+-- correction des lignes déjà migrées sans frigo GESCOM (parties dans l'emplacement virtuel de réception) : FRIGO
+UPDATE stock_stock_move_line SET to_stock_location = (SELECT frigo_defaut FROM mig_def), version = version + 1
+WHERE import_id LIKE 'GESCOM-ARRL-%' AND to_stock_location = (SELECT reception FROM mig_def);
+UPDATE stock_stock_move SET to_stock_location = (SELECT frigo_defaut FROM mig_def), version = version + 1
+WHERE import_id LIKE 'GESCOM-ARR-%' AND to_stock_location = (SELECT reception FROM mig_def);
+UPDATE purchase_purchase_order_line SET stock_location = (SELECT frigo_defaut FROM mig_def), version = version + 1
+WHERE import_id LIKE 'GESCOM-ARRL-%' AND stock_location IS NULL;
+
+-- correction des lots déjà migrés : lots flottants (même règle) et lots sans ligne d'arrivage placés dans un emplacement
+-- virtuel (frigo de leur arrivage GESCOM, sinon FRIGO)
+UPDATE stock_stock_location_line l SET details_stock_location = coalesce(
+    (SELECT min(ml.to_stock_location) FROM stock_stock_move_line ml JOIN stock_stock_move m ON m.id = ml.stock_move
+      WHERE m.import_id = 'GESCOM-ARR-' || btrim(g.num_arrivage)), (SELECT frigo_defaut FROM mig_def)),
+  version = l.version + 1
+FROM stock_tracking_number t
+JOIN gescom.articles_lot g ON t.import_id = 'GESCOM-LOT-' || btrim(g.idarticles_lot)
+JOIN stock_stock_location v ON v.type_select <> 1
+WHERE l.import_id LIKE 'GESCOM-STKL-%' AND l.tracking_number = t.id AND l.details_stock_location = v.id;
+UPDATE stock_stock_location_line l SET current_qty = x.cible, future_qty = x.cible, version = l.version + 1
+FROM (SELECT t.id AS lot, (coalesce(gescom.num(g.qent), 0) - coalesce(gescom.num(g.qsor), 0))
+             - sum(ml.qty) AS cible
+      FROM stock_tracking_number t
+      JOIN gescom.articles_lot g ON t.import_id = 'GESCOM-LOT-' || btrim(g.idarticles_lot)
+      JOIN stock_stock_move_line ml ON ml.tracking_number = t.id
+      JOIN stock_stock_move m ON m.id = ml.stock_move AND m.type_select = 3 AND m.status_select = 2
+      WHERE t.import_id LIKE 'GESCOM-LOT-%'
+      GROUP BY t.id, g.qent, g.qsor) x
+WHERE l.import_id LIKE 'GESCOM-STKL-%' AND l.tracking_number = x.lot AND l.current_qty IS DISTINCT FROM x.cible;
+-- lots flottants sans ligne de lot (stock GESCOM nul) : ligne de lot « - quantité de l'arrivage » pour afficher 0
+INSERT INTO stock_stock_location_line (id, version, created_on, import_id, import_origin, details_stock_location, product,
+  tracking_number, unit, current_qty, future_qty, avg_price, last_inventory_real_qty, requested_reserved_qty, reserved_qty)
+SELECT nextval('stock_stock_location_line_seq'), 0, now(), 'GESCOM-STKL-' || x.lot, 'GESCOM', x.frigo, x.product, x.lot,
+  x.unit, x.cible, x.cible, 0, 0, 0, 0
+FROM (SELECT t.id AS lot, min(ml.to_stock_location) AS frigo, min(t.product) AS product, min(ml.unit) AS unit,
+             (coalesce(gescom.num(g.qent), 0) - coalesce(gescom.num(g.qsor), 0)) - sum(ml.qty) AS cible
+      FROM stock_tracking_number t
+      JOIN gescom.articles_lot g ON t.import_id = 'GESCOM-LOT-' || btrim(g.idarticles_lot)
+      JOIN stock_stock_move_line ml ON ml.tracking_number = t.id
+      JOIN stock_stock_move m ON m.id = ml.stock_move AND m.type_select = 3 AND m.status_select = 2
+      WHERE t.import_id LIKE 'GESCOM-LOT-%'
+      GROUP BY t.id, g.qent, g.qsor) x
+WHERE x.cible <> 0
+  AND NOT EXISTS (SELECT 1 FROM stock_stock_location_line l WHERE l.tracking_number = x.lot AND l.details_stock_location IS NOT NULL);
+-- lignes de stock par article / frigo = somme des lignes de lot
+DELETE FROM stock_stock_location_line WHERE import_id LIKE 'GESCOM-STK-%';
 INSERT INTO stock_stock_location_line (id, version, created_on, import_id, import_origin, stock_location, product, unit,
   current_qty, future_qty, avg_price, last_inventory_real_qty, requested_reserved_qty, reserved_qty)
-SELECT nextval('stock_stock_location_line_seq'), 0, now(), 'GESCOM-STK-' || s.frigo || '-' || s.article, 'GESCOM', s.frigo,
-  s.article, min(s.unite), sum(s.stock), sum(s.stock), 0, 0, 0, 0
-FROM mig_stock s
-WHERE NOT EXISTS (SELECT 1 FROM stock_stock_location_line x WHERE x.stock_location = s.frigo AND x.product = s.article
-                  AND x.tracking_number IS NULL)
-GROUP BY s.frigo, s.article;
+SELECT nextval('stock_stock_location_line_seq'), 0, now(), 'GESCOM-STK-' || x.frigo || '-' || x.product, 'GESCOM', x.frigo,
+  x.product, x.unit, x.qte, x.qte, 0, 0, 0, 0
+FROM (SELECT details_stock_location AS frigo, product, min(unit) AS unit, sum(current_qty) AS qte
+      FROM stock_stock_location_line WHERE import_id LIKE 'GESCOM-STKL-%' GROUP BY details_stock_location, product) x
+WHERE NOT EXISTS (SELECT 1 FROM stock_stock_location_line y WHERE y.stock_location = x.frigo AND y.product = x.product
+                  AND y.tracking_number IS NULL);
 
 -- ---------- articles sans prix / poids : dernier arrivage ----------
 UPDATE base_product p SET
