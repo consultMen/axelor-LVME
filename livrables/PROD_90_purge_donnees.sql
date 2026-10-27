@@ -8,7 +8,8 @@
 --   listées.
 -- Sécurité : tout se fait dans une seule transaction. Si une ligne du paramétrage pointe vers une donnée à
 --   supprimer, le script s'arrête AVANT toute suppression et affiche les tables en cause (rien n'est modifié).
--- Prérequis : pg_dump juste avant. Application arrêtée (ou personne connecté). NE PAS relancer après la migration.
+-- Prérequis : pg_dump juste avant. Application arrêtée (ou personne connecté). Relançable tant que la migration n'a pas
+-- commencé (NE PAS relancer après).
 -- =====================================================================
 \set ON_ERROR_STOP on
 SET client_min_messages = notice;
@@ -44,7 +45,10 @@ SELECT t FROM unnest(ARRAY[
   'account_accounting_situation', 'account_invoice_invoice_set', 'account_invoice_batch_set',
   -- liens des tiers et des articles
   'base_partner_company_set', 'base_company_partner_list', 'base_partner_link', 'base_product_company',
-  'base_price_list_line', 'base_partner_contact_set', 'base_bank_details', 'base_partner_partner_category_set'
+  'base_price_list_line', 'base_bank_details', 'base_partner_contact_partner_set', 'base_partner_batch_set',
+  'base_partner_corporate_partner_domain_set', 'base_partner_partner_role_set', 'base_partner_tag_set',
+  'base_partner_trading_name_set', 'base_partner_work_area_set', 'base_product_task_template_set',
+  'base_product_trading_name_buyer_set', 'base_product_trading_name_seller_set'
 ]) AS t
 WHERE to_regclass(t) IS NOT NULL;
 
