@@ -23,7 +23,9 @@
   <field name="poidsColis" title="Poids Colis" width="70"/>
   <field name="poidsEntrees" title="Poids Entrées" aggregate="sum" width="95"/>
   <field name="nbColisIn" title="Nb Colis Entrées" aggregate="sum" width="85"/>
-  <field name="nbColisStock" title="Nb colis Stock" aggregate="sum" width="85"/>
+  <field name="nbColisStock" title="Nb colis Stock" aggregate="sum" width="85">
+    <hilite background="yellow" if="true"/>
+  </field>
   <field name="poidsStock" title="Poids Stock" aggregate="sum" width="90"/>
   <field name="stockValue" aggregate="sum" width="100"/>
   <field name="stockDays" aggregate="max" width="80">

@@ -1318,3 +1318,23 @@
     grid-row: 2 !important;
   }
 }
+/* Rotation des stocks comme GESCOM : lignes blanches, lignes de totaux par produit jaunes en gras (lignes « Totaux »
+   de GESCOM), colonne Nb colis Stock jaune pâle, Nbre Jours Rotation orange (déjà dans la liste) */
+[class*="_formView_"]:has(.lvme-ges-rot) [class*="_main_"] > [class*="_container_"] [class*="_body_"] [class*="_row_"]:not([class*="_groupRow_"]):not([class*="_footerRow_"]) [class*="_column_"]:not([class*="_hilite-"]) {
+  background-color: #ffffff;
+}
+[class*="_formView_"]:has(.lvme-ges-rot) [class*="_main_"] > [class*="_container_"] [class*="_body_"] [class*="_footerRow_"],
+[class*="_formView_"]:has(.lvme-ges-rot) [class*="_main_"] > [class*="_container_"] [class*="_body_"] [class*="_footerRow_"] [class*="_column_"] {
+  background-color: #ffff99 !important;
+  font-weight: 700;
+}
+[class*="_formView_"]:has(.lvme-ges-rot) [class*="_main_"] > [class*="_container_"] [class*="_body_"] [class*="_groupRow_"],
+[class*="_formView_"]:has(.lvme-ges-rot) [class*="_main_"] > [class*="_container_"] [class*="_body_"] [class*="_groupRow_"] * {
+  background-color: #fffbd6 !important;
+  color: #10204a !important;
+  font-size: 12px !important;
+}
+[class*="_formView_"]:has(.lvme-ges-rot) [class*="_main_"] > [class*="_container_"] [class*="_hilite-yellow_"] {
+  background-color: #ffff99 !important;
+  color: #000000 !important;
+}
