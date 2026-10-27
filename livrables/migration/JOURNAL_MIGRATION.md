@@ -200,19 +200,32 @@ règle sur la commande).
 **Articles :** ceux qui n'ont ni prix d'achat, ni prix de revient, ni poids colis sont complétés avec leur dernier
 arrivage réel. Les valeurs déjà présentes ne sont pas touchées.
 
-**Écarts (données GESCOM) :**
-- L'article FILBROZZ160 (arrivage 140335, lot 1371205) n'existe plus dans ARTICLES. Sa ligne et son lot restent dans
-  l'archive.
-- Deux lots sont en double dans ARTICLES_LOT (SEIENESP402 lot 2510 ; COQTEL000 lot « 2978 NSF », dont un avec un
-  espace en trop). Chacun est repris une fois.
+**Cas particuliers GESCOM, tous repris (lots entièrement vendus, sans stock) :**
+- **Article FILBROZZ160** : il n'existe plus dans ARTICLES (arrivage 140335, lot 1371205). Il est créé archivé,
+  avec la mention « supprimé dans GESCOM ».
+- **Deux lots en double** dans ARTICLES_LOT : SEIENESP402 lot 2510 et COQTEL000 lot « 2978 NSF », dont un avec un
+  espace en trop. Les deux exemplaires sont gardés, le second avec « (2) » ajouté au n°.
+
+**Réel / Flottant :**
+- Dans GESCOM, une ligne n'a un lot réel (`LOT_REEL`) qu'après la réception. Avant, elle n'a qu'un lot flottant
+  (`LOT_FL`).
+- Les 7 255 arrivages avec au moins un lot réel sont donc « Réel », les 189 autres « Flottant ».
+- Les mettre tous en Flottant fausserait la Synthèse des Arrivages, l'État des stocks, l'Historique produit et la
+  Rotation (réceptions depuis 2014 vues comme jamais arrivées). C'est à confirmer avec le client.
+
+**Mode de transport :**
+- Il vient du type d'arrivage GESCOM (`typ_arrivage` : 379 = CAMION, 380 = BATEAU, 381 = AVION ; mode « Avion »
+  ajouté).
+- À défaut, il vient de la colonne bateau.
+- Résultat : 3 241 camion, 1 649 bateau, 1 avion, 2 553 anciens arrivages sans information.
 
 **Contrôle (essai local, annulé) :**
 
 | | GESCOM | Axelor |
 |---|---|---|
 | Arrivages | 7 444 | 7 444 (7 255 réels) |
-| Lignes | 19 586 | 19 585 |
-| Lots | 19 591 | 19 588 |
+| Lignes | 19 586 | 19 586 |
+| Lots | 19 591 | 19 591 |
 | Valeur du stock | 6 793 063 € | 6 793 063 € |
 
 Durée de l'essai : 1 min 30.

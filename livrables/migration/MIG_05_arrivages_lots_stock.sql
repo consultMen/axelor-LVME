@@ -5,9 +5,11 @@
 --   - lots fournisseur (fournisseur + article + n° de lot fournisseur) ;
 --   - lots (ARTICLES_LOT, clé « référence article,n° lot ») : n° interne, lot fournisseur, DLC, prix de revient,
 --     fournisseur, lot vérifié
+--   - articles qui n'existent plus dans ARTICLES (supprimés dans GESCOM) : créés archivés ;
 --   - arrivages (ARR_ENTETE) : une commande fournisseur (n° = n° d'arrivage GESCOM) et un arrivage ; Réel (réceptionné)
 --     si au moins une ligne a un lot réel, sinon Flottant (prévu) ; fournisseur, dates (départ, arrivée,
---     livraison), devise, taux flottant / réel / couvert, frais d'approche, bateau (camion ou navire), containers,
+--     livraison), devise, taux flottant / réel / couvert, frais d'approche, mode de transport (type d'arrivage :
+--     camion / bateau / avion), bateau, containers,
 --     transitaire / gestionnaire en note, montant, colis, poids
 --   - lignes (ARR_LIGNE) : article, lot, frigo, quantité (quantité entrée du lot, sinon colis x poids colis), colis,
 --     poids colis, prix d'achat, prix de revient, montant, conditionnement, origine, zone de pêche, marque, mode de
@@ -28,6 +30,36 @@ SELECT (SELECT id FROM base_company ORDER BY id LIMIT 1) AS societe,
        (SELECT id FROM stock_shipment_mode WHERE upper(name) = 'CAMION' LIMIT 1) AS camion,
        (SELECT id FROM stock_shipment_mode WHERE upper(name) = 'BATEAU' LIMIT 1) AS mode_bateau,
        (SELECT id FROM base_unit WHERE upper(name) = 'KG' ORDER BY id LIMIT 1) AS kg;
+
+-- mode de transport Avion (type d'arrivage GESCOM 381), la liste ne connaît que Bateau et Camion
+INSERT INTO stock_shipment_mode (id, version, created_on, name, has_carriage_paid_possibility, import_id, import_origin)
+SELECT nextval('stock_shipment_mode_seq'), 0, now(), 'Avion', false, 'GESCOM-TRANSPORT-AVION', 'GESCOM'
+WHERE NOT EXISTS (SELECT 1 FROM stock_shipment_mode WHERE upper(name) = 'AVION');
+
+-- articles des arrivages / lots qui n'existent plus dans ARTICLES (supprimés dans GESCOM) : créés archivés
+INSERT INTO base_product (id, version, created_on, dtype, import_id, import_origin, code, name, full_name, unit, sales_unit,
+  purchases_unit, product_type_select, product_sub_type_select, procurement_method_select, sellable, purchasable,
+  stock_managed, product_family, tracking_number_configuration, sale_currency, purchase_currency, sale_price, purchase_price,
+  cost_price, cost_type_select, manag_price_coef, real_or_estimated_price_select, sale_supply_select,
+  bom_comp_valu_method_select, manuf_order_comp_valu_method_select, avg_price, attrs, product_attrs,
+  allow_to_force_purchase_qty, allow_to_force_sale_qty, auto_update_sale_price, block_expense_tax, control_on_receipt,
+  deduct_lunch_voucher, def_ship_coef_by_partner, exclude_from_mrp, expense, in_ati, is_activity, is_analytic_capture,
+  is_model, is_prototype, is_shipping_costs_product, is_unrenewed, manage_variant_price, personal_expense,
+  unavailable_to_users, used_indeb, archived)
+SELECT nextval('base_product_seq'), 0, now(), 'Product', 'GESCOM-ART-SUPPR-' || x.ref, 'GESCOM', x.ref,
+  x.nom || ' (supprimé dans GESCOM)', '[' || x.ref || '] ' || x.nom || ' (supprimé dans GESCOM)', k.id, k.id, k.id,
+  'storable', 0, 'buy', true, true, true,
+  (SELECT id FROM base_product_family ORDER BY (code = 'PR-SURG') DESC, id LIMIT 1),
+  (SELECT id FROM stock_tracking_number_configuration WHERE generate_purchase_auto_tracking_nbr = true ORDER BY id LIMIT 1),
+  d.euro, d.euro, 0, 0, 0, 1, 1, 1, 1, 2, 1, 0, '{}'::jsonb, '{}'::jsonb,
+  false, false, false, false, false, false, false, false, false, false, false, false,
+  false, false, false, false, false, false, false, false, true
+FROM (SELECT upper(btrim(r.ref)) AS ref, coalesce(max(gescom.txt(r.desi)), upper(btrim(r.ref))) AS nom
+      FROM (SELECT ref, desi FROM gescom.arr_ligne UNION ALL SELECT ref, NULL FROM gescom.articles_lot) r
+      WHERE gescom.txt(r.ref) IS NOT NULL GROUP BY upper(btrim(r.ref))) x
+CROSS JOIN mig_def d
+LEFT JOIN base_unit k ON k.id = d.kg
+WHERE NOT EXISTS (SELECT 1 FROM base_product p WHERE upper(p.code) = x.ref);
 
 -- ---------- correspondances ----------
 CREATE TEMP TABLE mig_article ON COMMIT DROP AS
@@ -95,12 +127,13 @@ CREATE INDEX ON mig_arr (num);
 
 -- ---------- lots ----------
 CREATE TEMP TABLE mig_lot ON COMMIT DROP AS
-SELECT DISTINCT ON (upper(btrim(l.cle_artlot))) upper(btrim(l.cle_artlot)) AS cle, l.*, a.id AS article, a.unit AS unite_article,
+SELECT upper(btrim(l.cle_artlot)) AS cle,
+  row_number() OVER (PARTITION BY upper(btrim(l.cle_artlot)) ORDER BY gescom.num(l.idarticles_lot)) AS rang_lot,
+  l.*, a.id AS article, a.unit AS unite_article,
   coalesce(gescom.num(l.qent), 0) - coalesce(gescom.num(l.qsor), 0) AS stock,
   (SELECT t.id FROM stock_tracking_number t WHERE t.import_id = 'GESCOM-LOT-' || btrim(l.idarticles_lot)) AS id
 FROM gescom.articles_lot l JOIN mig_article a ON a.ref = upper(btrim(l.ref))
-WHERE gescom.txt(l.cle_artlot) IS NOT NULL AND gescom.txt(l.nlot_interne) IS NOT NULL
-ORDER BY upper(btrim(l.cle_artlot)), gescom.num(l.idarticles_lot) DESC;
+WHERE gescom.txt(l.cle_artlot) IS NOT NULL AND gescom.txt(l.nlot_interne) IS NOT NULL;
 CREATE INDEX ON mig_lot (cle);
 CREATE INDEX ON mig_lot (id);
 ALTER TABLE mig_lot ADD COLUMN nouveau boolean;
@@ -126,7 +159,8 @@ SELECT id, 0, now(), 'GESCOM-LOTF-' || id, 'GESCOM', fournisseur, article, numer
 INSERT INTO stock_tracking_number (id, version, created_on, import_id, import_origin, tracking_number_seq, lvme_numero_base,
   product, supplier, lot_fournisseur, perishable_expiration_date, is_perishable, prix_revient_reel, lot_verifie,
   origin_move_type_select, check_expiration_date_at_stock_move_realization, has_warranty)
-SELECT l.id, 0, now(), 'GESCOM-LOT-' || btrim(l.idarticles_lot), 'GESCOM', btrim(l.nlot_interne), btrim(l.nlot_interne),
+SELECT l.id, 0, now(), 'GESCOM-LOT-' || btrim(l.idarticles_lot), 'GESCOM',
+  btrim(l.nlot_interne) || CASE WHEN l.rang_lot > 1 THEN ' (' || l.rang_lot || ')' ELSE '' END, btrim(l.nlot_interne),
   l.article, fi.id, lf.id, gescom.dt(l.date_limite_conso), gescom.dt(l.date_limite_conso) IS NOT NULL,
   gescom.num(l.pxrevt), coalesce(btrim(l.verif), '') = '1', 4, false, false
 FROM mig_lot l LEFT JOIN mig_fournisseur_id fi ON fi.cle = btrim(split_part(l.focleunik, ',', 1))
@@ -155,7 +189,7 @@ FROM gescom.arr_ligne r
 JOIN mig_arr a ON a.num = btrim(r.arrivage)
 JOIN mig_article art ON art.ref = upper(btrim(r.ref))
 LEFT JOIN mig_unite u ON u.code = upper(btrim(r.unite))
-LEFT JOIN mig_lot lo ON lo.cle = upper(btrim(r.reflot))
+LEFT JOIN mig_lot lo ON lo.cle = upper(btrim(r.reflot)) AND lo.rang_lot = 1
 LEFT JOIN mig_frigo fr ON fr.code = upper(btrim(r.frigo))
 LEFT JOIN mig_cond co ON co.code = upper(btrim(r.cond));
 ALTER TABLE mig_ligne ADD COLUMN qte numeric;
@@ -183,8 +217,10 @@ SELECT a.commande, 0, now(), 'GESCOM-ARR-' || a.num, 'GESCOM', a.num,
   round(coalesce(gescom.num(a.mt_ht), 0) * 1.055, 2), gescom.num(a.colis), gescom.num(a.poids_total),
   CASE WHEN a.reel THEN 3 ELSE 2 END, gescom.num(a.taux_flot), gescom.num(a.taux_reel), gescom.num(a.taux_couv),
   (SELECT f.frigo FROM mig_arr_frigo f WHERE f.num = a.num), d.reception,
-  CASE WHEN upper(btrim(coalesce(a.bateau, ''))) IN ('CAMION', 'DIRECT') THEN d.camion
-       WHEN gescom.txt(a.bateau) IS NOT NULL THEN d.mode_bateau END,
+  CASE btrim(coalesce(a.typ_arrivage, '')) WHEN '379' THEN d.camion WHEN '380' THEN d.mode_bateau
+    WHEN '381' THEN (SELECT id FROM stock_shipment_mode WHERE upper(name) = 'AVION' LIMIT 1)
+    ELSE CASE WHEN upper(btrim(coalesce(a.bateau, ''))) IN ('CAMION', 'DIRECT') THEN d.camion
+              WHEN gescom.txt(a.bateau) IS NOT NULL THEN d.mode_bateau END END,
   NULLIF(concat_ws(E'\n', 'Transitaire : ' || gescom.txt(a.transitaire), 'Gestionnaire : ' || gescom.txt(a.gestionnaire),
     gescom.txt(a.comm1), gescom.txt(a.comm2)), ''),
   0, 0, 0, false, false, false, 0, false, false, false, false, false, 0
@@ -223,8 +259,10 @@ SELECT a.arrivage_id, 0, now(), 'GESCOM-ARR-' || a.num, 'GESCOM', a.num,
   coalesce(gescom.dt(a.date_arrivage), gescom.dt(a.date_liv)),
   CASE WHEN a.reel THEN coalesce(gescom.dt(a.date_liv), gescom.dt(a.date_arrivage)) END, gescom.dt(a.date_depart),
   d.reception, coalesce((SELECT f.frigo FROM mig_arr_frigo f WHERE f.num = a.num), d.reception),
-  CASE WHEN upper(btrim(coalesce(a.bateau, ''))) IN ('CAMION', 'DIRECT') THEN d.camion
-       WHEN gescom.txt(a.bateau) IS NOT NULL THEN d.mode_bateau END,
+  CASE btrim(coalesce(a.typ_arrivage, '')) WHEN '379' THEN d.camion WHEN '380' THEN d.mode_bateau
+    WHEN '381' THEN (SELECT id FROM stock_shipment_mode WHERE upper(name) = 'AVION' LIMIT 1)
+    ELSE CASE WHEN upper(btrim(coalesce(a.bateau, ''))) IN ('CAMION', 'DIRECT') THEN d.camion
+              WHEN gescom.txt(a.bateau) IS NOT NULL THEN d.mode_bateau END END,
   (SELECT id FROM stock_bateau WHERE upper(name) = upper(btrim(a.bateau)) LIMIT 1),
   coalesce(gescom.num(a.mt_ht), 0), gescom.num(a.colis), gescom.num(a.poids_total),
   gescom.num(a.taux_flot), gescom.num(a.taux_reel), gescom.num(a.taux_couv),
