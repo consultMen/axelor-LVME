@@ -58,10 +58,11 @@
       ref="com.axelor.apps.base.db.Partner"/>
     <many-to-one name="deliveredPartner" title="Delivery partner"
       ref="com.axelor.apps.base.db.Partner"/>
-    <!-- LVME : Kanban « Suivi des commandes clients » : ordre des cartes, étape (1 Devis, 2 En préparation, 3 Expédiée
-      = BL Flottant, 4 Livrée, 5 Facturée, 6 Annulée) et retard de livraison -->
+    <!-- LVME : Kanban « Suivi des commandes clients » : ordre des cartes, étape (1 Devis, 2 En préparation,
+      3 Expédiée = BL Flottant, 4 Livrée, 5 Facturée, 6 Annulée) et retard de livraison -->
     <integer name="lvmeKanbanSeq" title="Ordre Kanban"/>
-    <integer name="lvmeEtapeCde" title="Étape" selection="lvme.cde.client.etape.select" formula="true">
+    <integer name="lvmeEtapeCde" title="Étape" selection="lvme.cde.client.etape.select"
+      formula="true">
       <![CDATA[
       (CASE WHEN status_select = 5 THEN 6 WHEN status_select IN (1, 2) THEN 1 WHEN invoicing_state = 3 THEN 5
         WHEN status_select = 4 OR delivery_state = 3 THEN 4
@@ -77,6 +78,15 @@
       (estimated_delivery_date < date(now()) AND status_select = 3 AND delivery_state != 3)
       ]]>
     </boolean>
+    <!-- LVME : « N° BL » de la liste des commandes clients GESCOM : n° des livraisons (BL non annulés) de la commande -->
+    <string name="lvmeNumeroBl" title="N° BL" formula="true">
+      <![CDATA[
+      (SELECT string_agg(stock_stock_move.stock_move_seq, ', ') FROM stock_stock_move
+        WHERE stock_stock_move.type_select = 2 AND stock_stock_move.status_select <> 4
+          AND stock_stock_move.id IN (SELECT stock_stock_move_sale_order_set.stock_stock_move
+            FROM stock_stock_move_sale_order_set WHERE stock_stock_move_sale_order_set.sale_order_set = id))
+      ]]>
+    </string>
     <extra-code>
             <![CDATA[
                 // INVOICE

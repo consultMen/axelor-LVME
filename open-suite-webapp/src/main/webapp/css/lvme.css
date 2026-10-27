@@ -999,3 +999,42 @@
   text-overflow: clip !important;
   line-height: 1.15;
 }
+
+/*
+ * Liste « Commandes clients » aux couleurs GESCOM (écran reconnu au cadre des choix css="lvme-ges-cdes") : fond
+ * gris-bleu clair, cadre Recherche bordé, en-têtes de colonnes gris dégradé, lignes blanches séparées par des traits
+ * gris, ligne sélectionnée bleu nuit, ligne Somme grisée. Cartes KPI et lignes en alerte (rouge / jaune) gardées.
+ */
+[class*="_formView_"]:has(.lvme-ges-cdes) [class*="_main_"],
+[class*="_formView_"]:has(.lvme-ges-cdes) [class*="_main_"] > [class*="_panel_"],
+[class*="_formView_"]:has(.lvme-ges-cdes) [class*="_main_"] > [class*="_panel_"] [class*="_body_"],
+[class*="_formView_"]:has(.lvme-ges-cdes) [class*="_main_"] > [class*="_panel_"] > [class*="_header_"] {
+  background-color: #e9eef6 !important;
+}
+[class*="_formView_"]:has(.lvme-ges-cdes) [class*="_main_"] > [class*="_panel_"]:nth-child(2) {
+  border: 1px solid #a9b6c9 !important;
+}
+[class*="_formView_"]:has(.lvme-ges-cdes) [class*="_main_"] > :last-child [class*="_header_"] [class*="_column_"] {
+  background: linear-gradient(#f4f4f4, #cdcdcd) !important;
+  color: #222 !important;
+  font-size: 11.5px !important;
+  white-space: normal !important;
+  line-height: 1.1;
+}
+[class*="_formView_"]:has(.lvme-ges-cdes) [class*="_main_"] > :last-child [class*="_body_"] [class*="_row_"] [class*="_column_"] {
+  background-color: #ffffff;
+  border-right: 1px solid #d0d0d0;
+  border-bottom: 1px solid #e2e2e2;
+}
+[class*="_formView_"]:has(.lvme-ges-cdes) [class*="_main_"] > :last-child [class*="_body_"] [class*="_row_"]:not([class*="_hilite-"]) [class*="_column_"] {
+  color: #000000;
+}
+[class*="_formView_"]:has(.lvme-ges-cdes) [class*="_main_"] > :last-child [class*="_body_"] [class*="_row_"][class*="_selected_"] [class*="_column_"] {
+  background-color: #14234f !important;
+  color: #ffffff !important;
+}
+[class*="_formView_"]:has(.lvme-ges-cdes) [class*="_main_"] > :last-child [class*="_footer_"],
+[class*="_formView_"]:has(.lvme-ges-cdes) [class*="_main_"] > :last-child [class*="_footer_"] [class*="_column_"] {
+  background-color: #f0f0f0 !important;
+  font-weight: 600;
+}

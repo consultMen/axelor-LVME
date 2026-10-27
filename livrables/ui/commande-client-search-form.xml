@@ -75,7 +75,7 @@
     </panel>
   </panel>
   <panel name="rechercheCdePanel" title="Recherche" colSpan="12">
-    <panel name="filtreEtatPanel" colSpan="2" itemSpan="12">
+    <panel name="filtreEtatPanel" colSpan="2" itemSpan="12" css="lvme-ges-cdes">
       <field name="$etatCommande" showTitle="false" type="integer" widget="RadioSelect" selection="lvme.commande.client.etat.select"/>
     </panel>
     <panel name="filtreClientPanel" colSpan="3" itemSpan="12">
