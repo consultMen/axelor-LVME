@@ -684,7 +684,7 @@
 }
 /* filtres sur 4 colonnes : Article | Fournisseur | dates | options (plus large pour ses deux colonnes) */
 [class*="_formView_"]:has(.lvme-ges-dates-jaune) [class*="_grid_"]:has(> .lvme-ges-dates-jaune) {
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.05fr) minmax(0, 1.45fr) !important;
+  grid-template-columns: minmax(0, .9fr) minmax(0, .9fr) minmax(0, 1.25fr) minmax(0, 1.45fr) !important;
 }
 [class*="_formView_"]:has(.lvme-ges-dates-jaune) [class*="_grid_"]:has(> .lvme-ges-dates-jaune) > [class*="_gridItem_"] {
   grid-column: auto !important;
@@ -887,4 +887,22 @@
 [class*="_modal-content"]:has(.lvme-histo-filtres) [class*="_body_"] [class*="_row_"][class*="_selected_"] [class*="_column_"] {
   background-color: #14234f !important;
   color: #ffffff !important;
+}
+/* dates du cadre jaune lisibles en entier (01/10/2026) : colonnes des dates plus larges que la période ; choix
+   DLUO / Lots longs sur deux lignes plutôt que hors du cadre */
+[class*="_formView_"]:has(.lvme-ges-dates-jaune) .lvme-ges-dates-jaune [class*="_grid_"] {
+  grid-template-columns: minmax(0, 1.12fr) minmax(0, 1.12fr) minmax(0, .9fr) !important;
+}
+[class*="_formView_"]:has(.lvme-ges-dates-jaune) .lvme-ges-dates-jaune [class*="_grid_"] > [class*="_gridItem_"] {
+  grid-column: auto !important;
+}
+.lvme-ges-cadre [class*="_radio_"],
+.lvme-ges-cadre [class*="_radio_"] * {
+  white-space: normal !important;
+  overflow-wrap: break-word;
+}
+[class*="_formView_"]:has(.lvme-ges-dates-jaune) [class*="_main_"] > [class*="_panel_"] .lvme-ges-dates-jaune input:not([type="checkbox"]):not([type="radio"]) {
+  font-size: 12px !important;
+  padding-left: 2px !important;
+  padding-right: 2px !important;
 }
