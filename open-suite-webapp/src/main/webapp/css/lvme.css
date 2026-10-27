@@ -1662,3 +1662,33 @@
   background-color: #14234f !important;
   color: #ffffff !important;
 }
+/* boutons GESCOM (Listes Dossiers : Quitter, Nouveau BL, Nouveau retour, Suppression) : étroits, collés à droite de
+   la page, icône après le texte (croix / barre rouges), espace entre les groupes */
+[class*="_gridItem_"]:has(> .lvme-btn-ges),
+[class*="_gridItem_"]:has(> * > .lvme-btn-ges) {
+  display: flex !important;
+  justify-content: flex-end;
+}
+[class*="_formView_"] [class*="_main_"] button.lvme-btn-ges {
+  width: 150px !important;
+  flex-direction: row-reverse !important;
+  justify-content: space-between !important;
+  gap: 8px;
+  padding-left: 10px !important;
+  padding-right: 8px !important;
+}
+.lvme-btn-ges i,
+.lvme-btn-ges svg,
+.lvme-btn-ges [class*="icon"] {
+  color: #5b8fd6 !important;
+  fill: currentColor;
+}
+.lvme-btn-ges-rouge i,
+.lvme-btn-ges-rouge svg,
+.lvme-btn-ges-rouge [class*="icon"] {
+  color: #e01e2b !important;
+}
+[class*="_gridItem_"]:has(> .lvme-btn-ges-espace),
+[class*="_gridItem_"]:has(> * > .lvme-btn-ges-espace) {
+  margin-top: 12px !important;
+}

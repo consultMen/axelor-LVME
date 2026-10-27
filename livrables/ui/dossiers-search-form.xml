@@ -26,10 +26,11 @@
       </panel>
     </panel>
     <panel name="boutonsDossiersPanel" showTitle="false" colSpan="3" itemSpan="12">
-      <button name="quitterBtn" title="Quitter" icon="x-circle" onClick="close"/>
-      <button name="nouveauBlBtn" title="Nouveau BL" icon="file-earmark-plus" onClick="action-lvme-dossiers-nouveau-bl"/>
-      <button name="nouveauRetourBtn" title="Nouveau retour" icon="file-earmark-plus" onClick="action-lvme-dossiers-nouveau-retour"/>
-      <button name="suppressionBtn" title="Suppression" icon="dash-circle" onClick="action-lvme-dossiers-suppression"/>
+      <!-- boutons GESCOM à droite de la page, icône après le texte (css/lvme.css) ; F12 = Quitter (js/lvme.js) -->
+      <button name="quitterBtn" title="Quitter" icon="x-circle-fill" css="lvme-btn-ges lvme-btn-ges-rouge" onClick="close"/>
+      <button name="nouveauBlBtn" title="Nouveau BL" icon="file-earmark" css="lvme-btn-ges lvme-btn-ges-espace" onClick="action-lvme-dossiers-nouveau-bl"/>
+      <button name="nouveauRetourBtn" title="Nouveau retour" icon="file-earmark" css="lvme-btn-ges" onClick="action-lvme-dossiers-nouveau-retour"/>
+      <button name="suppressionBtn" title="Suppression" icon="dash-lg" css="lvme-btn-ges lvme-btn-ges-rouge lvme-btn-ges-espace" onClick="action-lvme-dossiers-suppression"/>
     </panel>
     <field name="$numero" title="Recherche direct par N°" type="string" colSpan="3" onChange="action-lvme-dossiers-refresh"/>
   </panel>

@@ -1,7 +1,7 @@
 /*
  * LVME : raccourcis clavier des écrans façon GESCOM (ajouté à la page Axelor par build.gradle, tâche copyWebapp).
  *   F1 : « F1 : Historique Prix » de la fenêtre Lignes Commandes ouverte, à la place de l'aide du navigateur.
- *   F12 : bouton « Fermer(F12) » affiché (Historique Produit).
+ *   F12 : bouton « Fermer », « Fermer(F12) » ou « Quitter » affiché (fenêtre ouverte d'abord, sinon l'écran).
  * Axelor n'écrit pas le nom du bouton dans la page : le bouton est retrouvé par son libellé.
  */
 (function () {
@@ -31,12 +31,31 @@
     }
   }, true);
 
-  // F12 : bouton « Fermer(F12) » affiché (Historique Produit), comme GESCOM ; sans ce bouton, F12 garde son effet
+  // bouton Fermer / Fermer(F12) / Quitter affiché : celui de la fenêtre ouverte (la dernière) en priorité, sinon celui
+  // de l'écran ; le libellé est la dernière ligne du bouton (l'icône peut écrire son nom avant)
+  var FERMER = /^(Fermer|Quitter)\s*(\(F12\))?$/i;
+  function boutonFermer() {
+    var fenetres = document.querySelectorAll('[class*="_modal-content"]');
+    var zones = fenetres.length ? [fenetres[fenetres.length - 1], document] : [document];
+    for (var z = 0; z < zones.length; z++) {
+      var boutons = zones[z].querySelectorAll('button');
+      for (var i = boutons.length - 1; i >= 0; i--) {
+        var b = boutons[i];
+        var lignes = (b.innerText || '').trim().split('\n');
+        if (b.offsetParent !== null && !b.disabled && FERMER.test(lignes[lignes.length - 1].trim())) {
+          return b;
+        }
+      }
+    }
+    return null;
+  }
+
+  // F12 : bouton Fermer / Quitter affiché, comme GESCOM ; sans ce bouton, F12 garde son effet
   window.addEventListener('keydown', function (e) {
     if (e.key !== 'F12' || e.ctrlKey || e.altKey || e.metaKey || e.shiftKey) {
       return;
     }
-    var b = boutonVisible('Fermer(F12)');
+    var b = boutonFermer();
     if (b) {
       e.preventDefault();
       e.stopPropagation();
