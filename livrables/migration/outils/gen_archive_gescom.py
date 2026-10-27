@@ -52,9 +52,16 @@ def main(dossier, sortie):
         out.write(r"""CREATE OR REPLACE FUNCTION gescom.num(v text) RETURNS numeric LANGUAGE sql IMMUTABLE AS $f$
   SELECT CASE WHEN btrim(coalesce(v, '')) = '' THEN NULL
     ELSE replace(regexp_replace(v, '[\s\u00a0\u202f]', '', 'g'), ',', '.')::numeric END $f$;
-CREATE OR REPLACE FUNCTION gescom.dt(v text) RETURNS date LANGUAGE sql IMMUTABLE AS $f$
-  SELECT CASE WHEN btrim(coalesce(v, '')) IN ('', '01/01/1900', '00/00/0000') THEN NULL
-    ELSE to_date(btrim(v), 'DD/MM/YYYY') END $f$;
+CREATE OR REPLACE FUNCTION gescom.dt(v text) RETURNS date LANGUAGE plpgsql IMMUTABLE AS $f$
+BEGIN
+  -- date GESCOM jj/mm/aaaa ; vide, 01/01/1900 ou illisible (ex. ##/##/####, 31/02/2020) = pas de date
+  IF btrim(coalesce(v, '')) !~ '^[0-9]{2}/[0-9]{2}/[0-9]{4}$' OR btrim(v) = '01/01/1900' THEN
+    RETURN NULL;
+  END IF;
+  RETURN to_date(btrim(v), 'DD/MM/YYYY');
+EXCEPTION WHEN OTHERS THEN
+  RETURN NULL;
+END $f$;
 CREATE OR REPLACE FUNCTION gescom.txt(v text) RETURNS text LANGUAGE sql IMMUTABLE AS $f$
   SELECT NULLIF(btrim(coalesce(v, '')), '') $f$;
 CREATE TABLE IF NOT EXISTS gescom.fichiers (nom_table text PRIMARY KEY, fichier text, lignes integer, colonnes integer,

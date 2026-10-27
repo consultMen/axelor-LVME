@@ -167,6 +167,56 @@ règle sur la commande).
 - **Frigo sans nom** (code X) : son code sert de nom. **Second « DIVERS »** (code XXXXXXX) : repris aussi.
 - **Contrôle (essai local, annulé) :** 87 frigos GESCOM → 87 emplacements reliés ; 94 emplacements au total.
 
+## 3 quinquies. Étape 05 : arrivages, lots et stock (`MIG_05_arrivages_lots_stock.sql`)
+
+**Fichiers :** ARR_ENTETE (7 444 arrivages), ARR_LIGNE (19 586 lignes), ARTICLES_LOT (19 591 lots). Décisions du
+27/10 : historique complet ; lots en stock négatif gardés négatifs.
+
+**Arrivages :**
+- Dans GESCOM, l'arrivage est aussi la commande fournisseur. Chaque arrivage donne dans Axelor une commande
+  fournisseur et un arrivage, avec le même n° que dans GESCOM.
+- Statut : « Réel » si une ligne a un lot réel (7 255 arrivages), sinon « Flottant ».
+- En-tête : fournisseur, dates (départ, arrivée, livraison), devise, taux flottant / réel / couvert, frais d'approche,
+  bateau (camion ou navire, liste des bateaux complétée), containers (liste complétée), montant, colis, poids.
+  Transitaire et gestionnaire sont mis en note.
+- 46 arrivages sans fournisseur dans GESCOM sont rattachés à « FOURNISSEUR INCONNU (GESCOM) ».
+
+**Lignes :**
+- article, lot, frigo ;
+- quantité : quantité entrée du lot, sinon colis × poids colis ;
+- colis, poids colis, prix d'achat, prix de revient, montant ;
+- conditionnement, origine, zone de pêche, marque, mode de pêche (libellés des listes de l'étape 03) ;
+- DLC, date de congélation, lot fournisseur.
+
+**Lots et lots fournisseur :**
+- les lots reprennent le n° interne, le lot fournisseur, la DLC, le prix de revient, le fournisseur et « lot vérifié » ;
+- les lots fournisseur sont créés par fournisseur + article + n° de lot fournisseur.
+
+**Stock :**
+- Pour chaque lot, entrées − sorties GESCOM (QENT − QSOR), dans le frigo de son arrivage.
+- Les sorties apparaissent donc dans Axelor (entrées − stock) sans reprendre tout de suite l'historique des BL.
+- 680 lots ont du stock, dont 26 en négatif (gardés). Valeur au prix de revient : **6 793 063 €, identique à GESCOM**.
+
+**Articles :** ceux qui n'ont ni prix d'achat, ni prix de revient, ni poids colis sont complétés avec leur dernier
+arrivage réel. Les valeurs déjà présentes ne sont pas touchées.
+
+**Écarts (données GESCOM) :**
+- L'article FILBROZZ160 (arrivage 140335, lot 1371205) n'existe plus dans ARTICLES. Sa ligne et son lot restent dans
+  l'archive.
+- Deux lots sont en double dans ARTICLES_LOT (SEIENESP402 lot 2510 ; COQTEL000 lot « 2978 NSF », dont un avec un
+  espace en trop). Chacun est repris une fois.
+
+**Contrôle (essai local, annulé) :**
+
+| | GESCOM | Axelor |
+|---|---|---|
+| Arrivages | 7 444 | 7 444 (7 255 réels) |
+| Lignes | 19 586 | 19 585 |
+| Lots | 19 591 | 19 588 |
+| Valeur du stock | 6 793 063 € | 6 793 063 € |
+
+Durée de l'essai : 1 min 30.
+
 ## 4. Points ouverts à faire préciser par le client
 
 - **cdv** (931 articles, ex. 100 403 ; 210 322) : signification inconnue. Pas trouvé dans `table_base`. Gardé dans
