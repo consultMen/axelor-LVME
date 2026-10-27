@@ -156,7 +156,16 @@ règle sur la commande).
   n'existaient pas.
 - La valeur enregistrée est le libellé GESCOM (VIETNAM, CHALUTS…), lisible dans les écrans et les impressions.
 - Les origines sont reprises telles quelles, y compris quelques valeurs à revoir avec le client (« - », « 990232 »).
-- **FRIGO** (87 dans GESCOM, 8 emplacements dans Axelor) : à décider avec le client.
+
+## 3 quater. Étape 04 : frigos (`MIG_04_frigos.sql`)
+
+- **Décision du 27/10 :** les 87 frigos GESCOM (chambres froides, entrepôts et transitaires comme CAPGEL ou
+  EUROFREEZE, et « états » comme A EMBARQUER ou FLOT-FRIPACK) deviennent des emplacements de stock internes de LVME.
+- **Réglages :** comme FRIPACK (valorisés, utilisables en achat et en vente) ; code GESCOM = n° de l'emplacement.
+- **Adresse :** reprise pour les 3 frigos qui en ont une.
+- **FRIPACK** existait déjà : il est réutilisé.
+- **Frigo sans nom** (code X) : son code sert de nom. **Second « DIVERS »** (code XXXXXXX) : repris aussi.
+- **Contrôle (essai local, annulé) :** 87 frigos GESCOM → 87 emplacements reliés ; 94 emplacements au total.
 
 ## 4. Points ouverts à faire préciser par le client
 
