@@ -18,16 +18,15 @@
   <field name="partnerSeq" title="Réf." width="110"/>
   <field name="name" title="Client" width="260"/>
   <field name="lvmeContact" title="Contact" width="150"/>
-  <field name="fixedPhone" title="Téléphone" widget="phone" x-placeholder-number-type="FIXED_LINE" width="120"/>
-  <field name="mobilePhone" title="Portable" widget="phone" width="120"/>
+  <field name="fixedPhone" title="Téléphone" width="120"/>
+  <field name="mobilePhone" title="Portable" width="120"/>
   <field name="emailAddress.address" title="Email" width="200"/>
   <field name="mainAddress.zip" title="Code Postal" width="90"/>
-  <field name="mainAddress.city" title="Ville" width="140"/>
+  <field name="mainAddress.townName" title="Ville" width="140"/>
   <field name="industrySector" title="Secteur" width="110"/>
   <field name="commercial" title="Vendeur" width="120"/>
   <field name="partnerCategory" title="Famille" form-view="partner-category-form" grid-view="partner-category-grid" width="120"/>
   <field name="groupement" title="Groupe" width="120"/>
-  <field if="__config__.app.getApp('base')?.getEnableMultiCompany()" name="companySet" widget="TagSelect"/>
   <button if="__config__.app.isApp('crm')" if-module="axelor-crm" name="scheduleEventBtn" title="Schedule Event" icon="fa-group" onClick="action-partner-view-schedule-event"/>
   <button if="__config__.app.isApp('crm')" if-module="axelor-crm" name="sendByEmailBtn" title="Send Email" icon="fa-envelope" onClick="action-send-by-email-with-template"/>
 </grid>

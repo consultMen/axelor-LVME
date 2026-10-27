@@ -18,13 +18,12 @@
   <field name="partnerSeq" title="Référence" width="110"/>
   <field name="name" title="Nom" width="260"/>
   <field name="lvmeContact" title="Contact" width="150"/>
-  <field name="fixedPhone" title="Téléphone" widget="phone" x-placeholder-number-type="FIXED_LINE" width="120"/>
-  <field name="mobilePhone" title="Portable" widget="phone" width="120"/>
+  <field name="fixedPhone" title="Téléphone" width="120"/>
+  <field name="mobilePhone" title="Portable" width="120"/>
   <field name="emailAddress.address" title="Email" width="200"/>
   <field name="mainAddress.zip" title="Code Postal" width="90"/>
-  <field name="mainAddress.city" title="Ville" width="140"/>
+  <field name="mainAddress.townName" title="Ville" width="140"/>
   <field name="mainAddress.country" title="Pays" width="110"/>
-  <field if="__config__.app.getApp('base')?.getEnableMultiCompany()" name="companySet" widget="TagSelect"/>
   <field if="__config__.app.isApp('account')" name="das2Activity" hidden="true"/>
   <button if="__config__.app.isApp('crm')" if-module="axelor-crm" name="scheduleEventBtn" title="Schedule Event" icon="fa-group" onClick="action-partner-view-schedule-event"/>
   <button if="__config__.app.isApp('crm')" if-module="axelor-crm" name="sendByEmailBtn" title="Send Email" icon="fa-envelope" onClick="action-send-by-email-with-template"/>

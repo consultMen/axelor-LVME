@@ -1392,7 +1392,7 @@
   min-height: 0 !important;
 }
 [class*="_formView_"]:has(.lvme-ges-art) [class*="_main_"] > [class*="_container_"] {
-  height: calc(100vh - 175px) !important;
+  height: calc(100vh - 200px) !important;
   min-height: 240px;
 }
 [class*="_formView_"]:has(.lvme-ges-art) [class*="_main_"] > [class*="_container_"] [class*="_header_"] [class*="_column_"] {

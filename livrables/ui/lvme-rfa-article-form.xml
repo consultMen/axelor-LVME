@@ -4,12 +4,16 @@
        article ou une famille, pendant une période -->
   <panel name="reglePanel" title="Règle RFA" colSpan="12">
     <field name="typeClient" widget="RadioSelect" colSpan="4"/>
-    <field name="client" colSpan="8" showIf="typeClient == 1" requiredIf="typeClient == 1" domain="self.isCustomer = true"
-      canNew="false"/>
-    <field name="groupement" colSpan="8" showIf="typeClient == 2" requiredIf="typeClient == 2" canNew="false"/>
+    <panel name="clientPanel" showTitle="false" colSpan="8" itemSpan="12">
+      <field name="client" showIf="typeClient == 1" requiredIf="typeClient == 1" domain="self.isCustomer = true"
+        canNew="false"/>
+      <field name="groupement" showIf="typeClient == 2" requiredIf="typeClient == 2" canNew="false"/>
+    </panel>
     <field name="typeArticle" widget="RadioSelect" colSpan="4"/>
-    <field name="product" colSpan="8" showIf="typeArticle == 1" requiredIf="typeArticle == 1" canNew="false"/>
-    <field name="famille" colSpan="8" showIf="typeArticle == 2" requiredIf="typeArticle == 2" canNew="false"/>
+    <panel name="articlePanel" showTitle="false" colSpan="8" itemSpan="12">
+      <field name="product" showIf="typeArticle == 1" requiredIf="typeArticle == 1" canNew="false"/>
+      <field name="famille" showIf="typeArticle == 2" requiredIf="typeArticle == 2" canNew="false"/>
+    </panel>
     <field name="dateDebut" colSpan="4"/>
     <field name="dateFin" colSpan="4"/>
     <field name="pourcRfa" colSpan="4"/>

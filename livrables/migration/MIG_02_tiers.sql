@@ -299,13 +299,16 @@ FROM base_address a
 WHERE a.import_origin = 'GESCOM' AND a.city IS NULL AND gescom.txt(a.town_name) IS NOT NULL;
 UPDATE mig_ville SET id = nextval('base_city_seq') WHERE id IS NULL AND NOT EXISTS (SELECT 1 FROM base_city c WHERE c.id = mig_ville.id);
 INSERT INTO base_city (id, version, created_on, name, zip, country, full_name, import_id, import_origin)
-SELECT v.id, 0, now(), v.nom, NULLIF(v.cp, ''), v.country, concat_ws(' ', NULLIF(v.cp, ''), v.nom),
+SELECT v.id, 0, now(), v.nom, NULLIF(v.cp, ''), v.country, v.nom,
   'GESCOM-VILLE-' || v.id, 'GESCOM'
 FROM mig_ville v WHERE NOT EXISTS (SELECT 1 FROM base_city c WHERE c.id = v.id);
 UPDATE base_address a SET city = v.id
 FROM mig_ville v
 WHERE a.import_origin = 'GESCOM' AND a.city IS NULL AND upper(btrim(a.town_name)) = v.nom
   AND coalesce(btrim(a.zip), '') = coalesce(v.cp, '') AND a.country = v.country;
+
+-- nom complet de la ville = son nom (sans le code postal, affiché à part dans les listes)
+UPDATE base_city SET full_name = name WHERE import_origin = 'GESCOM' AND full_name IS DISTINCT FROM name;
 
 -- ---------- contacts des fournisseurs (CONTACT, CONTACT_CIAL) ----------
 CREATE TEMP TABLE mig_contact_fou ON COMMIT DROP AS

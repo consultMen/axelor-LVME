@@ -6,10 +6,10 @@
   <!-- LVME : liste des transporteurs, mêmes colonnes que les listes Clients / Fournisseurs GESCOM -->
   <field name="name" title="Nom" width="280"/>
   <field name="lvmeContact" title="Contact" width="150"/>
-  <field name="fixedPhone" title="Téléphone" widget="phone" x-placeholder-number-type="FIXED_LINE" width="130"/>
-  <field name="mobilePhone" title="Portable" widget="phone" width="130"/>
+  <field name="fixedPhone" title="Téléphone" width="130"/>
+  <field name="mobilePhone" title="Portable" width="130"/>
   <field name="emailAddress.address" title="Email" width="220"/>
   <field name="mainAddress.zip" title="Code Postal" width="90"/>
-  <field name="mainAddress.city" title="Ville" width="160"/>
+  <field name="mainAddress.townName" title="Ville" width="160"/>
   <field name="mainAddress.country" title="Pays" width="110"/>
 </grid>
