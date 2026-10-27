@@ -1550,18 +1550,21 @@
   background-color: #f1f5fb !important;
 }
 /* cadre « Recherche » (Listes Dossiers), cadres Entrées et Sélection (Lots Vérifiés) bordés de gris */
-[class*="_formView_"]:has(.lvme-ges-dossiers) [class*="_main_"] > [class*="_panel_"]:first-child,
 .lvme-ges-cadre-gris,
-[class*="_formView_"]:has(.lvme-ges-lots-verif) [class*="_panel_"]:has(> [class*="_header_"]):not([class*="_main_"] > *) {
+[class*="_formView_"]:is(:has(.lvme-ges-dossiers), :has(.lvme-ges-lots-verif)) [class*="_main_"] [class*="_panel_"]:has(> [class*="_header_"]):not([class*="_main_"] > *) {
   border: 1px solid #8c96a8 !important;
   border-radius: 3px;
 }
-[class*="_formView_"]:is(:has(.lvme-ges-dossiers), :has(.lvme-ges-lots-verif)) [class*="_panel_"] > [class*="_header_"] {
+[class*="_formView_"]:is(:has(.lvme-ges-dossiers), :has(.lvme-ges-lots-verif)) [class*="_panel_"] > [class*="_header_"],
+[class*="_formView_"]:is(:has(.lvme-ges-dossiers), :has(.lvme-ges-lots-verif)) [class*="_panel_"] > [class*="_header_"] * {
   background: transparent !important;
-  padding: 0 6px !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
   min-height: 0 !important;
   font-size: 12px !important;
+  line-height: 18px !important;
   color: #10204a !important;
+  border: 0 !important;
 }
 [class*="_formView_"]:is(:has(.lvme-ges-dossiers), :has(.lvme-ges-lots-verif)) [class*="_main_"] > [class*="_panel_"] [class*="_container_"]:has(> [class*="_title_"]) {
   flex-direction: row !important;
@@ -1609,11 +1612,11 @@
 }
 /* Lots Vérifiés : « ou Lot n° » violet sur fond lavande ; N° Lot et Lot vérifié / non vérifié du bas encadrés
    d'orange */
-.lvme-lot-violet label,
-.lvme-lot-violet [class*="_labelText_"] {
+[class*="_formView_"]:has(.lvme-ges-lots-verif) [class*="_main_"] > [class*="_panel_"] .lvme-lot-violet label,
+[class*="_formView_"]:has(.lvme-ges-lots-verif) [class*="_main_"] > [class*="_panel_"] .lvme-lot-violet [class*="_labelText_"] {
   color: #7a2fc0 !important;
 }
-.lvme-lot-violet input {
+[class*="_formView_"]:has(.lvme-ges-lots-verif) [class*="_main_"] > [class*="_panel_"] .lvme-lot-violet input:not([type="checkbox"]):not([type="radio"]) {
   background-color: #d9c8ec !important;
 }
 .lvme-cadre-orange {
@@ -1627,7 +1630,7 @@
   min-height: 220px;
 }
 [class*="_formView_"]:has(.lvme-ges-lots-verif) [class*="_main_"] > [class*="_container_"] {
-  height: calc(100vh - 268px) !important;
+  height: calc(100vh - 278px) !important;
   min-height: 220px;
 }
 [class*="_formView_"]:is(:has(.lvme-ges-dossiers), :has(.lvme-ges-lots-verif)) [class*="_main_"] > [class*="_container_"] [class*="_header_"] [class*="_column_"] {
