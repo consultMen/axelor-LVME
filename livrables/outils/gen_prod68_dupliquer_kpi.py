@@ -63,7 +63,7 @@ KPI.append(('$alAucune', '[' + ', '.join('{ -> %s }' % e for k, e in KPI if k in
 
 
 def tuile(titre, degrade, icone, valeur, detail, extra=''):
-    """Carte KPI en dégradé de couleur, texte blanc, icône dans une pastille translucide, cercle décoratif.
+    """Carte KPI en dégradé de couleur, texte blanc, cercle décoratif (icône : plus affichée depuis PROD_80).
     degrade : expression JSX du fond (chaîne entre quotes, ou condition)."""
     return ("            <Box style={{ position: 'relative', overflow: 'hidden', background: %s, color: '#fff', "
             "borderRadius: 14, boxShadow: '0 6px 16px rgba(20,30,60,.25)', padding: '14px 16px', minHeight: 128 }}>\n"
@@ -74,13 +74,11 @@ def tuile(titre, degrade, icone, valeur, detail, extra=''):
             "              <Box d=\"flex\" style={{ justifyContent: 'space-between', alignItems: 'center', position: 'relative' }}>\n"
             "                <Box style={{ fontSize: 12, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', "
             "opacity: .9 }}>%s</Box>\n"
-            "                <Box style={{ width: 40, height: 40, borderRadius: 20, background: 'rgba(255,255,255,.25)', display: 'flex', "
-            "alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>%s</Box>\n"
             "              </Box>\n"
             "              <Box style={{ fontSize: 32, fontWeight: 800, lineHeight: 1.2, marginTop: 4, position: 'relative' }}>{%s}</Box>\n"
             "              <Box style={{ fontSize: 12, opacity: .9, position: 'relative' }}>{%s}</Box>\n"
             "%s"
-            "            </Box>\n") % (degrade, titre, icone, valeur, detail, extra)
+            "            </Box>\n") % (degrade, titre, valeur, detail, extra)
 
 
 def pastille(champ, fond, texte, icone):
@@ -99,11 +97,11 @@ panneau = ('  <!-- LVME : KPI et alertes des commandes clients (calculés à l\'
            '      <viewer depends="%s"><![CDATA[\n' % ','.join(k for k, _ in KPI)
            + '        <>\n'
            "          <Box d=\"grid\" style={{ gridTemplateColumns: 'repeat(4, 1fr)', gap: 14 }}>\n"
-           + tuile('Commandes en cours', "'linear-gradient(135deg, #1e6fe8, #0a3d91)'", '📦', '$kpiEnCours', '$kpiEnCoursDetail')
-           + tuile('CA HT du mois', "'linear-gradient(135deg, #22a565, #0d6b3d)'", '💶', '$kpiCaMois', '$kpiCaMoisDetail', EVOL)
+           + tuile('Commandes en cours', "'linear-gradient(135deg, #1e6fe8, #0a3d91)'", '', '$kpiEnCours', '$kpiEnCoursDetail')
+           + tuile('CA HT du mois', "'linear-gradient(135deg, #22a565, #0d6b3d)'", '', '$kpiCaMois', '$kpiCaMoisDetail', EVOL)
            + tuile('% Marge du mois', "$kpiMargeFaible ? 'linear-gradient(135deg, #e5484d, #9b1c22)' "
-                   ": 'linear-gradient(135deg, #8a5cf0, #4b2a9e)'", '📈', '$kpiMarge', '$kpiMargeDetail')
-           + tuile("À livrer aujourd'hui", "'linear-gradient(135deg, #ff9a3c, #d9580d)'", '🚚', '$kpiALivrer', '$kpiALivrerDetail')
+                   ": 'linear-gradient(135deg, #8a5cf0, #4b2a9e)'", '', '$kpiMarge', '$kpiMargeDetail')
+           + tuile("À livrer aujourd'hui", "'linear-gradient(135deg, #ff9a3c, #d9580d)'", '', '$kpiALivrer', '$kpiALivrerDetail')
            + '          </Box>\n'
            '        </>\n'
            '      ]]></viewer>\n'
@@ -112,8 +110,8 @@ panneau = ('  <!-- LVME : KPI et alertes des commandes clients (calculés à l\'
            '    <panel name="lvmeAlertesPanel" showTitle="false" colSpan="12">\n'
            + ''.join('      <button name="%s" title=" " css="%s" hidden="true" colSpan="3" onClick="%s"/>\n'
                      % (btn, css, 'action-lvme-cde-client-alerte-' + code) for k, btn, css, code in BOUTONS)
-           + '      <button name="lvmeAlAucuneBtn" title="✔ Aucune alerte" css="lvme-alerte-vert" hidden="true" readonly="true" colSpan="3" onClick="action-lvme-cde-client-alerte-aucune"/>\n'
-           '      <button name="lvmeAlRetirerBtn" title="✖ Retirer le filtre alerte" css="lvme-alerte-gris" showIf="$alerte" colSpan="3"'
+           + '      <button name="lvmeAlAucuneBtn" title="Aucune alerte" css="lvme-alerte-vert" hidden="true" readonly="true" colSpan="3" onClick="action-lvme-cde-client-alerte-aucune"/>\n'
+           '      <button name="lvmeAlRetirerBtn" title="Retirer le filtre alerte" css="lvme-alerte-gris" showIf="$alerte" colSpan="3"'
            ' onClick="action-lvme-cde-client-alerte-aucune"/>\n'
            '    </panel>\n'
            '  </panel>\n')
@@ -134,10 +132,10 @@ open(p, 'w', encoding='utf-8', newline='\n').write(f)
 EXPR = dict(KPI)
 # boutons d'alerte : titre = texte de l'alerte, caché s'il n'y a pas d'alerte
 ATTR_BTN = ''.join(
-    '  <attribute name="title" for="%s" expr="eval: \'%s \' + ({ -> %s }() ?: \'\')"/>\n'
+    '  <attribute name="title" for="%s" expr="eval: ({ -> %s }() ?: \'\')"/>\n'
     '  <attribute name="hidden" for="%s" expr="eval: { -> %s }() == null"/>\n'
-    % (btn, icone, EXPR[k], btn, EXPR[k])
-    for (k, btn, css, code), icone in zip(BOUTONS, ['⚠', '⚠', '⚠', '⏳']))
+    % (btn, EXPR[k], btn, EXPR[k])
+    for (k, btn, css, code) in BOUTONS)
 ATTR_BTN += '  <attribute name="hidden" for="lvmeAlAucuneBtn" expr="eval: { -> %s }() == null"/>\n' % EXPR['$alAucune']
 kpi_xml = ('<action-attrs name="action-lvme-cde-client-kpi">\n'
            + ''.join('  <attribute name="value" for="%s" expr="eval: %s"/>\n' % (k, e) for k, e in KPI)

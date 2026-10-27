@@ -19,13 +19,13 @@
         background: lvmeEnRetard ? '#fff1f1' : 'transparent' }}>
         <Box d="flex" style={{ justifyContent: 'space-between', alignItems: 'center', gap: 6 }}>
           <Box style={{ fontSize: 15, fontWeight: 800, color: '#0a3d91' }}>{purchaseOrderSeq}</Box>
-          {lvmeEnRetard && <Badge bg="danger">⏰ En retard</Badge>}
+          {lvmeEnRetard && <Badge bg="danger">En retard</Badge>}
         </Box>
         <Box style={{ fontWeight: 600, color: '#1b2a4a', margin: '2px 0 6px' }}>{$fmt('supplierPartner')}</Box>
         {shipmentMode && <Box style={{ display: 'inline-block', background: '#e7f1ff', color: '#0a3d91', borderRadius: 10,
-          padding: '1px 8px', fontSize: 12, fontWeight: 600, marginBottom: 6 }}>{(shipmentMode.name == 'Bateau' ? '🚢 ' : '🚚 ') + $fmt('shipmentMode')}</Box>}
-        <Box style={{ fontSize: 12, color: '#555' }}>📝 Commande : <b>{$fmt('orderDate')}</b></Box>
-        <Box style={{ fontSize: 12, color: '#555' }}>📅 Réception : <b>{$fmt('estimatedReceiptDate')}</b></Box>
+          padding: '1px 8px', fontSize: 12, fontWeight: 600, marginBottom: 6 }}>{$fmt('shipmentMode')}</Box>}
+        <Box style={{ fontSize: 12, color: '#555' }}>Commande : <b>{$fmt('orderDate')}</b></Box>
+        <Box style={{ fontSize: 12, color: '#555' }}>Réception : <b>{$fmt('estimatedReceiptDate')}</b></Box>
         <Box style={{ textAlign: 'right', marginTop: 6, fontWeight: 800, fontSize: 13, color: '#0d6b3d' }}>{$fmt('exTaxTotal')} {$fmt('currency')}</Box>
       </Box>
   

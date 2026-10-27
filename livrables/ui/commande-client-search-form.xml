@@ -28,7 +28,6 @@
               <Box style={{ position: 'absolute', right: 30, bottom: -40, width: 80, height: 80, borderRadius: 40, background: 'rgba(255,255,255,.08)' }}></Box>
               <Box d="flex" style={{ justifyContent: 'space-between', alignItems: 'center', position: 'relative' }}>
                 <Box style={{ fontSize: 12, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', opacity: .9 }}>Commandes en cours</Box>
-                <Box style={{ width: 40, height: 40, borderRadius: 20, background: 'rgba(255,255,255,.25)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>📦</Box>
               </Box>
               <Box style={{ fontSize: 32, fontWeight: 800, lineHeight: 1.2, marginTop: 4, position: 'relative' }}>{$kpiEnCours}</Box>
               <Box style={{ fontSize: 12, opacity: .9, position: 'relative' }}>{$kpiEnCoursDetail}</Box>
@@ -38,7 +37,6 @@
               <Box style={{ position: 'absolute', right: 30, bottom: -40, width: 80, height: 80, borderRadius: 40, background: 'rgba(255,255,255,.08)' }}></Box>
               <Box d="flex" style={{ justifyContent: 'space-between', alignItems: 'center', position: 'relative' }}>
                 <Box style={{ fontSize: 12, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', opacity: .9 }}>CA HT du mois</Box>
-                <Box style={{ width: 40, height: 40, borderRadius: 20, background: 'rgba(255,255,255,.25)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>💶</Box>
               </Box>
               <Box style={{ fontSize: 32, fontWeight: 800, lineHeight: 1.2, marginTop: 4, position: 'relative' }}>{$kpiCaMois}</Box>
               <Box style={{ fontSize: 12, opacity: .9, position: 'relative' }}>{$kpiCaMoisDetail}</Box>
@@ -49,7 +47,6 @@
               <Box style={{ position: 'absolute', right: 30, bottom: -40, width: 80, height: 80, borderRadius: 40, background: 'rgba(255,255,255,.08)' }}></Box>
               <Box d="flex" style={{ justifyContent: 'space-between', alignItems: 'center', position: 'relative' }}>
                 <Box style={{ fontSize: 12, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', opacity: .9 }}>% Marge du mois</Box>
-                <Box style={{ width: 40, height: 40, borderRadius: 20, background: 'rgba(255,255,255,.25)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>📈</Box>
               </Box>
               <Box style={{ fontSize: 32, fontWeight: 800, lineHeight: 1.2, marginTop: 4, position: 'relative' }}>{$kpiMarge}</Box>
               <Box style={{ fontSize: 12, opacity: .9, position: 'relative' }}>{$kpiMargeDetail}</Box>
@@ -59,7 +56,6 @@
               <Box style={{ position: 'absolute', right: 30, bottom: -40, width: 80, height: 80, borderRadius: 40, background: 'rgba(255,255,255,.08)' }}></Box>
               <Box d="flex" style={{ justifyContent: 'space-between', alignItems: 'center', position: 'relative' }}>
                 <Box style={{ fontSize: 12, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', opacity: .9 }}>À livrer aujourd'hui</Box>
-                <Box style={{ width: 40, height: 40, borderRadius: 20, background: 'rgba(255,255,255,.25)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>🚚</Box>
               </Box>
               <Box style={{ fontSize: 32, fontWeight: 800, lineHeight: 1.2, marginTop: 4, position: 'relative' }}>{$kpiALivrer}</Box>
               <Box style={{ fontSize: 12, opacity: .9, position: 'relative' }}>{$kpiALivrerDetail}</Box>
@@ -74,8 +70,8 @@
       <button name="lvmeAlMargeNegBtn" title=" " css="lvme-alerte-rouge" hidden="true" colSpan="3" onClick="action-lvme-cde-client-alerte-marge-negative"/>
       <button name="lvmeAlMargeFaibleBtn" title=" " css="lvme-alerte-jaune" hidden="true" colSpan="3" onClick="action-lvme-cde-client-alerte-marge-faible"/>
       <button name="lvmeAlDevisBtn" title=" " css="lvme-alerte-jaune" hidden="true" colSpan="3" onClick="action-lvme-cde-client-alerte-devis"/>
-      <button name="lvmeAlAucuneBtn" title="✔ Aucune alerte" css="lvme-alerte-vert" hidden="true" readonly="true" colSpan="3" onClick="action-lvme-cde-client-alerte-aucune"/>
-      <button name="lvmeAlRetirerBtn" title="✖ Retirer le filtre alerte" css="lvme-alerte-gris" showIf="$alerte" colSpan="3" onClick="action-lvme-cde-client-alerte-aucune"/>
+      <button name="lvmeAlAucuneBtn" title="Aucune alerte" css="lvme-alerte-vert" hidden="true" readonly="true" colSpan="3" onClick="action-lvme-cde-client-alerte-aucune"/>
+      <button name="lvmeAlRetirerBtn" title="Retirer le filtre alerte" css="lvme-alerte-gris" showIf="$alerte" colSpan="3" onClick="action-lvme-cde-client-alerte-aucune"/>
     </panel>
   </panel>
   <panel name="rechercheCdePanel" title="Recherche" colSpan="12">
