@@ -141,6 +141,23 @@ règle sur la commande).
   livraison, 266 clients comptant, 33 commerciaux ;
 - d'après GESCOM : 98 clients sans secteur, 22 sans groupement et 92 sans adresse.
 
+## 3 ter. Étape 03 : listes des lignes d'achat / d'arrivage (`MIG_03_listes_achat.sql`)
+
+| GESCOM | Axelor | Résultat (essai local) |
+|---|---|---|
+| CONDITIONNEMENT (626) | conditionnements (code, libellé), liste complétée | 626 (3 existaient) |
+| MARQUE (355) | liste de choix « Marque » des lignes | 351 (« ??? » et doublons écartés) |
+| ORIGINE (121) | listes de choix « Origine » des lignes et des filtres | 121 |
+| ZONE_PECHE (33) | liste de choix « Zone de pêche » | 30 (libellés en double) |
+| MODEPECHE (8) | liste de choix « Mode de pêche » | 8 |
+| NOMSCIENTIFIQUE (2 979) | nom scientifique des articles qui n'en avaient pas | 1 060 articles (487 avant) |
+
+- Avant cette étape, Marque, Origine, Zone et Mode de pêche étaient en texte libre dans Axelor : les listes
+  n'existaient pas.
+- La valeur enregistrée est le libellé GESCOM (VIETNAM, CHALUTS…), lisible dans les écrans et les impressions.
+- Les origines sont reprises telles quelles, y compris quelques valeurs à revoir avec le client (« - », « 990232 »).
+- **FRIGO** (87 dans GESCOM, 8 emplacements dans Axelor) : à décider avec le client.
+
 ## 4. Points ouverts à faire préciser par le client
 
 - **cdv** (931 articles, ex. 100 403 ; 210 322) : signification inconnue. Pas trouvé dans `table_base`. Gardé dans
