@@ -1703,3 +1703,7 @@
 [class*="_gridItem_"].lvme-radio-nowrap [class*="_radio_"] * {
   font-size: 11.5px !important;
 }
+[class*="_gridItem_"].lvme-radio-nowrap [class*="_radio_"]:has(input) ~ *,
+[class*="_gridItem_"].lvme-radio-nowrap label {
+  margin-right: 6px !important;
+}

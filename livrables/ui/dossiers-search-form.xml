@@ -10,10 +10,11 @@
         <!-- Secteur commercial (GMS…) = « Secteur d'activité » du client ; vide = TOUS -->
         <field name="$secteur" title="Secteur" type="many-to-one" target="com.axelor.apps.base.db.IndustrySector"
           canNew="false" canEdit="false" canView="false" onChange="action-lvme-dossiers-refresh"/>
+        <!-- Client en compte / Client comptant (côte à côte), puis le client choisi (vide = TOUS) -->
         <field name="$clientCompte" showTitle="false" type="integer" widget="RadioSelect" selection="lvme.dossier.client.compte.select"
-          colSpan="6" css="lvme-radio-nowrap" onChange="action-lvme-dossiers-refresh"/>
-        <field name="$client" title="Client" showTitle="false" type="many-to-one" target="com.axelor.apps.base.db.Partner"
-          domain="self.isCustomer = true" colSpan="6" canNew="false" canEdit="false" canView="false"/>
+          css="lvme-radio-nowrap" onChange="action-lvme-dossiers-refresh"/>
+        <field name="$client" title="Client" type="many-to-one" target="com.axelor.apps.base.db.Partner"
+          domain="self.isCustomer = true" canNew="false" canEdit="false" canView="false"/>
         <field name="$transporteur" title="Transporteur" type="many-to-one" target="com.axelor.apps.base.db.Partner"
           domain="self.isCarrier = true OR self.id IN (SELECT sm.carrierPartner.id FROM StockMove sm WHERE sm.carrierPartner IS NOT NULL)" canNew="false" canEdit="false" canView="false" showIf="$typeDoc != 2"/>
       </panel>
