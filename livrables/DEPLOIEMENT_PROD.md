@@ -1,3 +1,32 @@
+# Déploiement prod LVME — écrans GESCOM (PROD_91 à 93) puis purge des données (PROD_90) avant la migration
+
+Déjà en prod : jusqu'à PROD_89. Code à déployer : tout `main` (dernier commit affiché à l'étape 3).
+Code : impression Synthèse des Arrivages (Java + reports/LvmeSyntheseArrivages.rptdesign), case `lvmeClientComptant`
+sur le tiers, `css/lvme.css` et `js/lvme.js` (F12 sur tous les boutons Fermer / Quitter).
+
+| Script | Contenu |
+|---|---|
+| PROD_91 | Synthèse des Arrivages comme GESCOM sur un seul écran + bouton « Synthèse » (impression) |
+| PROD_92 | Listes Dossiers et Lots Vérifiés comme GESCOM sur un seul écran |
+| PROD_93 | Filtres Secteur et Client en compte / comptant de Listes Dossiers (+ colonne `lvme_client_comptant`) |
+| PROD_90 | **Purge de toutes les données** (commandes, arrivages, BL, lots, stock, factures de test, tiers, articles, familles) ; paramétrage gardé, compteurs remis à 1 |
+
+1. **PC** : `git push origin main`
+2. **Serveur — sauvegarde** : `pg_dump -U axelor -Fc axelor > ~/sauvegarde_avant_purge_$(date +%F_%H%M).dump`
+3. `cd ~/src && rm -rf axelor-LVME axelor-version_app axelor-version_app.war && git clone https://github.com/consultMen/axelor-LVME.git && cd axelor-LVME && git log --oneline -1`
+4. **Build** : `cd ~/src/axelor-LVME/open-suite-webapp && chmod +x gradlew && ./gradlew war -x test`
+5. **Répétition de la purge sur une copie** (la prod n'est pas touchée) :
+   `createdb -U axelor axelor_copie && pg_restore -U axelor -d axelor_copie --no-owner ~/sauvegarde_avant_purge_*.dump && cd ~/src/axelor-LVME && psql -U axelor -d axelor_copie -f livrables/PROD_90_purge_donnees.sql`
+   → fin attendue : tout à 0 sauf `tiers_gardes` = 1 ; si « Purge arrêtée », ne pas continuer, m'envoyer le message.
+   Puis `dropdb -U axelor axelor_copie`.
+6. **Arrêt** : `sudo systemctl stop axelor-tomcat`
+7. **Scripts, depuis `~/src/axelor-LVME`** :
+   `for n in 91 92 93 90; do psql -U axelor -d axelor -v ON_ERROR_STOP=1 -f $(ls livrables/PROD_${n}_*.sql) || break; done`
+8. **Bascule** : war de `open-suite-webapp/build/libs/`, dézippé, **`~/axelor-config.prod.properties` recopié**, ancien `ROOT` mis de côté (`mv`), nouveau `ROOT`, `sudo systemctl start axelor-tomcat && sudo systemctl restart nginx`.
+9. **Ctrl + F5** ; vérifier : listes vides (commandes, arrivages, articles, clients), Synthèse des Arrivages, Listes Dossiers, Lots Vérifiés, F12.
+
+---
+
 # Déploiement prod LVME — correctifs Kanban, filtres de suivi, corbeille des listes, rotation par transport (PROD_73 à PROD_89)
 
 Déjà en prod : PROD_63 à PROD_72. Code à déployer : tout `main` (Java : lecture de la colonne d'arrivée des Kanban,

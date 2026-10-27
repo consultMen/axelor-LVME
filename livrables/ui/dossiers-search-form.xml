@@ -11,9 +11,9 @@
         <field name="$secteur" title="Secteur" type="many-to-one" target="com.axelor.apps.base.db.IndustrySector"
           canNew="false" canEdit="false" canView="false" onChange="action-lvme-dossiers-refresh"/>
         <field name="$clientCompte" showTitle="false" type="integer" widget="RadioSelect" selection="lvme.dossier.client.compte.select"
-          colSpan="5" onChange="action-lvme-dossiers-refresh"/>
+          colSpan="6" css="lvme-radio-nowrap" onChange="action-lvme-dossiers-refresh"/>
         <field name="$client" title="Client" showTitle="false" type="many-to-one" target="com.axelor.apps.base.db.Partner"
-          domain="self.isCustomer = true" colSpan="7" canNew="false" canEdit="false" canView="false"/>
+          domain="self.isCustomer = true" colSpan="6" canNew="false" canEdit="false" canView="false"/>
         <field name="$transporteur" title="Transporteur" type="many-to-one" target="com.axelor.apps.base.db.Partner"
           domain="self.isCarrier = true OR self.id IN (SELECT sm.carrierPartner.id FROM StockMove sm WHERE sm.carrierPartner IS NOT NULL)" canNew="false" canEdit="false" canView="false" showIf="$typeDoc != 2"/>
       </panel>
