@@ -1,4 +1,4 @@
-# Déploiement prod LVME — correctifs Kanban, filtres de suivi, corbeille des listes, rotation par transport (PROD_73 à PROD_83)
+# Déploiement prod LVME — correctifs Kanban, filtres de suivi, corbeille des listes, rotation par transport (PROD_73 à PROD_84)
 
 Déjà en prod : PROD_63 à PROD_72. Code à déployer : tout `main` (Java : lecture de la colonne d'arrivée des Kanban,
 annulation d'une commande d'achat par sa fiche, suppression de plusieurs lignes cochées).
@@ -16,9 +16,10 @@ annulation d'une commande d'achat par sa fiche, suppression de plusieurs lignes 
 | PROD_81 | Liste « Commandes clients » sur un seul écran comme GESCOM : recherche sur une bande, boutons Suivi / Nouvelle commande à droite (resserrage dans css/lvme.css) |
 | PROD_82 | Liste « Commandes clients » : colonnes N° BL et Préparateur, couleurs GESCOM ; **prérequis : code** (SaleOrder.lvmeNumeroBl) |
 | PROD_83 | Écran « Historique Produit » aux couleurs et tailles GESCOM sur un seul écran (repère de l'écran ; présentation dans css/lvme.css) |
+| PROD_84 | Bouton « Imprimer » de l'écran Historique Produit : impression LVME avec logo, colonnes et totaux de l'écran ; **prérequis : code** (LvmeHistoriqueProduitController.imprimer, reports/LvmeHistoriqueProduit.rptdesign) |
 
-Même procédure que ci-dessous (sauvegarde, clone, build, **scripts PROD_73 à 83**, bascule, redémarrage) :
-`for n in 73 74 75 76 77 78 79 80 81 82 83; do psql -U axelor -d axelor -v ON_ERROR_STOP=1 -f $(ls livrables/PROD_${n}_*.sql) || break; done`
+Même procédure que ci-dessous (sauvegarde, clone, build, **scripts PROD_73 à 84**, bascule, redémarrage) :
+`for n in 73 74 75 76 77 78 79 80 81 82 83 84; do psql -U axelor -d axelor -v ON_ERROR_STOP=1 -f $(ls livrables/PROD_${n}_*.sql) || break; done`
 
 ---
 

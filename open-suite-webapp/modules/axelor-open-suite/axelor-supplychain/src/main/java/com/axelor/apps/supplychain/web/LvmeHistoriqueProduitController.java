@@ -1,8 +1,11 @@
 package com.axelor.apps.supplychain.web;
 
+import com.axelor.apps.ReportFactory;
 import com.axelor.apps.base.service.exception.TraceBackService;
+import com.axelor.apps.report.engine.ReportSettings;
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
+import com.axelor.meta.schema.actions.ActionView;
 import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
 import java.math.BigDecimal;
@@ -10,7 +13,7 @@ import java.time.LocalDate;
 import java.util.Map;
 import javax.persistence.Query;
 
-/** LVME : écran « Historique Produit » (GESCOM) — totaux du bas de l'écran et rafraîchissement. */
+/** LVME : écran « Historique Produit » (GESCOM) — totaux du bas de l'écran, rafraîchissement et impression. */
 public class LvmeHistoriqueProduitController {
 
   public void valider(ActionRequest request, ActionResponse response) {
@@ -46,6 +49,38 @@ public class LvmeHistoriqueProduitController {
       response.setValue("$poidsSorties", sorties);
       response.setValue("$stockPeriode", entrees.subtract(sorties));
       response.setAttr("historiqueDashlet", "refresh", true);
+    } catch (Exception e) {
+      TraceBackService.trace(response, e);
+    }
+  }
+
+  /** Bouton « Imprimer » : impression LVME de l'historique (LvmeHistoriqueProduit.rptdesign), mêmes filtres. */
+  public void imprimer(ActionRequest request, ActionResponse response) {
+    try {
+      Map<String, Object> context = request.getContext();
+      Object produit = context.get("produit");
+      Long produitId =
+          produit instanceof Map && ((Map<?, ?>) produit).get("id") != null
+              ? Long.valueOf(((Map<?, ?>) produit).get("id").toString())
+              : produit instanceof Model && ((Model) produit).getId() != null
+                  ? ((Model) produit).getId()
+                  : 0L;
+      if (produitId == 0L) {
+        response.setInfo("Choisissez un produit avant d'imprimer.");
+        return;
+      }
+      LocalDate du = toDate(context.get("entreeDu"), LocalDate.of(1900, 1, 1));
+      LocalDate au = toDate(context.get("entreeAu"), LocalDate.of(2999, 12, 31));
+      String lien =
+          ReportFactory.createReport("LvmeHistoriqueProduit.rptdesign", "Historique produit-${date}")
+              .addParam("ProduitId", produitId)
+              .addParam("DateDu", du.toString())
+              .addParam("DateAu", au.toString())
+              .addParam("__locale", ReportSettings.getPrintingLocale(null))
+              .addFormat("pdf")
+              .generate()
+              .getFileLink();
+      response.setView(ActionView.define("Historique produit").add("html", lien).map());
     } catch (Exception e) {
       TraceBackService.trace(response, e);
     }
