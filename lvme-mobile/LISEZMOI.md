@@ -44,3 +44,15 @@ d'une nouvelle APK : l'application affiche toujours la version du serveur.
 Une nouvelle APK s'installe par-dessus l'ancienne seulement si elle est construite **sur le même PC** (elle est
 signée avec la clé de débogage d'Android Studio de ce PC, `~/.android/debug.keystore`). Garder ce fichier : sans
 lui, il faudrait désinstaller LVME des téléphones avant d'installer la nouvelle version.
+
+## Tester sur la version locale (téléphone sur le même Wi-Fi que le PC)
+
+1. Adresse Wi-Fi du PC : `ipconfig` (ligne « Adresse IPv4 » de la carte Wi-Fi).
+2. Faire pointer l'application sur le PC : `node serveur.js local <adresse IP du PC>`
+3. Autoriser le port 8080 dans le pare-feu Windows (PowerShell **en administrateur**) :
+   `New-NetFirewallRule -DisplayName "LVME test 8080" -Direction Inbound -Protocol TCP -LocalPort 8080 -Action Allow`
+   (à retirer après le test : `Remove-NetFirewallRule -DisplayName "LVME test 8080"`)
+4. Le serveur Axelor local doit tourner ; reconstruire l'APK et l'installer sur le téléphone.
+
+**Avant de distribuer l'application** : revenir sur la prod avec `node serveur.js prod`, puis reconstruire l'APK
+(la version locale utilise http et l'adresse du PC : elle ne marche que chez toi).
