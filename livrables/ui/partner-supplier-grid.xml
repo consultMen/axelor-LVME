@@ -3,7 +3,8 @@
     <button name="lvmeArchiverSelBtn" title="Archiver" icon="archive" prompt="Archiver les lignes cochées ? Elles n'apparaîtront plus dans la liste (case « Archivés » pour les retrouver)." onClick="action-lvme-archiver-selection"/>
     <button name="lvmeDesarchiverSelBtn" title="Désarchiver" icon="arrow-counterclockwise" onClick="action-lvme-desarchiver-selection"/>
   </toolbar>
-  <!-- LVME : colonnes de la liste « Fournisseurs » GESCOM -->
+  <!-- LVME : colonnes de la liste « Fournisseurs » GESCOM (Référence, Nom, Contact, Téléphone, Portable, Code Postal,
+       Ville ; + Email et Pays) -->
   <menubar>
     <menu name="partnerReportsMenu" title="Reports" showTitle="true" icon="fa-files-o">
       <item name="contactPhoneBookItem" title="Contact PhoneBook" action="action-print-phonebook"/>
@@ -16,9 +17,9 @@
   </menubar>
   <field name="partnerSeq" title="Référence" width="110"/>
   <field name="name" title="Nom" width="260"/>
-  <field name="commercial" title="Commercial" width="130"/>
-  <field name="fixedPhone" title="tel" widget="phone" x-placeholder-number-type="FIXED_LINE" width="120"/>
-  <field name="mobilePhone" title="portable" widget="phone" width="120"/>
+  <field name="lvmeContact" title="Contact" width="150"/>
+  <field name="fixedPhone" title="Téléphone" widget="phone" x-placeholder-number-type="FIXED_LINE" width="120"/>
+  <field name="mobilePhone" title="Portable" widget="phone" width="120"/>
   <field name="emailAddress.address" title="Email" width="200"/>
   <field name="mainAddress.zip" title="Code Postal" width="90"/>
   <field name="mainAddress.city" title="Ville" width="140"/>

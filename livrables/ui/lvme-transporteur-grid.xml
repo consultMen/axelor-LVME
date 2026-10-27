@@ -1,0 +1,15 @@
+<grid name="lvme-transporteur-grid" title="Transporteurs" model="com.axelor.apps.base.db.Partner" orderBy="name" edit-icon="true">
+  <toolbar>
+    <button name="lvmeArchiverSelBtn" title="Archiver" icon="archive" prompt="Archiver les lignes cochées ? Elles n'apparaîtront plus dans la liste (case « Archivés » pour les retrouver)." onClick="action-lvme-archiver-selection"/>
+    <button name="lvmeDesarchiverSelBtn" title="Désarchiver" icon="arrow-counterclockwise" onClick="action-lvme-desarchiver-selection"/>
+  </toolbar>
+  <!-- LVME : liste des transporteurs, mêmes colonnes que les listes Clients / Fournisseurs GESCOM -->
+  <field name="name" title="Nom" width="280"/>
+  <field name="lvmeContact" title="Contact" width="150"/>
+  <field name="fixedPhone" title="Téléphone" widget="phone" x-placeholder-number-type="FIXED_LINE" width="130"/>
+  <field name="mobilePhone" title="Portable" widget="phone" width="130"/>
+  <field name="emailAddress.address" title="Email" width="220"/>
+  <field name="mainAddress.zip" title="Code Postal" width="90"/>
+  <field name="mainAddress.city" title="Ville" width="160"/>
+  <field name="mainAddress.country" title="Pays" width="110"/>
+</grid>

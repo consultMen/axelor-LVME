@@ -288,6 +288,43 @@ SELECT nextval('base_partner_address_seq'), 0, now(), a.tiers, a.id, NOT a.livra
 FROM mig_adresse a;
 UPDATE base_partner p SET main_address = a.id FROM mig_adresse a WHERE a.tiers = p.id AND NOT a.livraison_seule;
 
+-- ---------- villes : la liste Axelor des villes est complétée et reliée aux adresses GESCOM (listes Clients /
+-- Fournisseurs, recherche par ville, impressions) ----------
+CREATE TEMP TABLE mig_ville ON COMMIT DROP AS
+SELECT DISTINCT ON (upper(btrim(a.town_name)), coalesce(btrim(a.zip), ''), a.country)
+  upper(btrim(a.town_name)) AS nom, btrim(a.zip) AS cp, a.country,
+  (SELECT c.id FROM base_city c WHERE upper(btrim(c.name)) = upper(btrim(a.town_name)) AND c.country = a.country
+     AND (c.zip IS NULL OR c.zip = btrim(a.zip)) ORDER BY (c.zip = btrim(a.zip)) DESC NULLS LAST, c.id LIMIT 1) AS id
+FROM base_address a
+WHERE a.import_origin = 'GESCOM' AND a.city IS NULL AND gescom.txt(a.town_name) IS NOT NULL;
+UPDATE mig_ville SET id = nextval('base_city_seq') WHERE id IS NULL AND NOT EXISTS (SELECT 1 FROM base_city c WHERE c.id = mig_ville.id);
+INSERT INTO base_city (id, version, created_on, name, zip, country, full_name, import_id, import_origin)
+SELECT v.id, 0, now(), v.nom, NULLIF(v.cp, ''), v.country, concat_ws(' ', NULLIF(v.cp, ''), v.nom),
+  'GESCOM-VILLE-' || v.id, 'GESCOM'
+FROM mig_ville v WHERE NOT EXISTS (SELECT 1 FROM base_city c WHERE c.id = v.id);
+UPDATE base_address a SET city = v.id
+FROM mig_ville v
+WHERE a.import_origin = 'GESCOM' AND a.city IS NULL AND upper(btrim(a.town_name)) = v.nom
+  AND coalesce(btrim(a.zip), '') = coalesce(v.cp, '') AND a.country = v.country;
+
+-- ---------- contacts des fournisseurs (CONTACT, CONTACT_CIAL) ----------
+CREATE TEMP TABLE mig_contact_fou ON COMMIT DROP AS
+SELECT t.id AS fournisseur, x.nom, x.cle, x.tel, x.portable, x.email, nextval('base_partner_seq') AS id
+FROM mig_tiers t JOIN gescom.fou f ON t.genre = 'FOU' AND btrim(f.focleunik) = t.ref
+JOIN LATERAL (SELECT gescom.txt(f.contact) AS nom, 'GESCOM-CTF-' || t.ref AS cle, gescom.txt(f.tel) AS tel,
+                     gescom.txt(f.portable) AS portable, NULL::text AS email
+              UNION ALL
+              SELECT gescom.txt(f.contact_cial), 'GESCOM-CTFC-' || t.ref, gescom.txt(f.tel_cial),
+                     gescom.txt(f.portable_cial), gescom.txt(f.email_cial)) x ON x.nom IS NOT NULL
+WHERE NOT EXISTS (SELECT 1 FROM base_partner p WHERE p.import_id = x.cle);
+INSERT INTO base_partner (id, version, created_on, import_id, import_origin, partner_type_select, name, full_name,
+  simple_full_name, is_contact, is_customer, is_supplier, is_carrier, is_prospect, is_employee, main_partner,
+  fixed_phone, mobile_phone, localization)
+SELECT k.id, 0, now(), k.cle, 'GESCOM', 2, k.nom, k.nom, k.nom, true, false, false, false, false, false, k.fournisseur,
+  k.tel, k.portable, d.langue
+FROM mig_contact_fou k CROSS JOIN mig_def d;
+INSERT INTO base_partner_contact_partner_set (base_partner, contact_partner_set) SELECT fournisseur, id FROM mig_contact_fou;
+
 -- ---------- société et comptes client / fournisseur ----------
 INSERT INTO base_partner_company_set (base_partner, company_set)
 SELECT m.id, d.societe FROM mig_tiers m CROSS JOIN mig_def d WHERE m.nouveau AND d.societe IS NOT NULL;
@@ -313,6 +350,9 @@ SELECT (SELECT count(*) FROM gescom.clients) AS clients_gescom,
        (SELECT count(*) FROM gescom.transporteur) AS transporteurs_gescom,
        (SELECT count(*) FROM base_partner WHERE import_id LIKE 'GESCOM-TRA-%') AS transporteurs_axelor,
        (SELECT count(*) FROM base_partner WHERE import_id LIKE 'GESCOM-CTC-%') AS contacts,
+       (SELECT count(*) FROM base_partner WHERE import_id LIKE 'GESCOM-CTF%') AS contacts_fournisseurs,
+       (SELECT count(*) FROM base_address WHERE import_origin = 'GESCOM' AND town_name IS NOT NULL AND city IS NULL)
+         AS adresses_sans_ville,
        (SELECT count(*) FROM base_partner_address WHERE import_id LIKE 'GESCOM-ADRL-%') AS adresses_livraison,
        (SELECT count(*) FROM base_partner WHERE import_id LIKE 'GESCOM-CLI-%' AND lvme_client_comptant) AS clients_comptant,
        (SELECT count(*) FROM auth_user WHERE import_id LIKE 'GESCOM-COM-%') AS commerciaux,

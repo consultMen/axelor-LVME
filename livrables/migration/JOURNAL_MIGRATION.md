@@ -123,6 +123,12 @@ condition / mode de paiement, devise, SIRET, TVA.
 **Transporteurs :** nom, adresse, téléphones, e-mail, contact. EN_ACTIVITE vaut 0 pour les 50 transporteurs GESCOM
 (champ non utilisé : GXO sert à 557 clients) ; il n'est donc pas repris, aucun transporteur n'est archivé.
 
+**Villes :** la liste des villes Axelor est complétée avec 1 214 villes (nom, code postal, pays) et reliée aux
+adresses migrées (listes Clients / Fournisseurs, recherche par ville, impressions).
+
+**Contacts des fournisseurs :** CONTACT et CONTACT_CIAL de FOU deviennent des contacts. Il n'y en a que 2 : ces
+colonnes sont presque vides dans GESCOM.
+
 **Chaque client et fournisseur** est rattaché à la société LVME, avec les comptes client / fournisseur par défaut de
 la configuration comptable.
 

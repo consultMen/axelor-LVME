@@ -19,9 +19,17 @@
     <decimal name="remiseFacture" title="Remise/Fact. (%)" precision="5" scale="2" min="0"
       max="100"/>
     <decimal name="tauxRFA" title="RFA (%)" precision="5" scale="2" min="0" max="100"/>
-    <!-- LVME : client « comptant » de GESCOM (paie à la commande, sans facilité de paiement) : filtre Client en compte /
-      Client comptant de Listes Dossiers ; repris de GESCOM à la migration -->
+    <!-- LVME : client « comptant » de GESCOM (paie à la commande, sans facilité de paiement) : filtre
+      Client en compte / Client comptant de Listes Dossiers ; repris de GESCOM à la migration -->
     <boolean name="lvmeClientComptant" title="Client comptant"/>
+    <!-- LVME : colonne « Contact » des listes Clients / Fournisseurs / Transporteurs GESCOM : premier contact du tiers -->
+    <string name="lvmeContact" title="Contact" formula="true">
+      <![CDATA[
+      (SELECT min(base_partner.name) FROM base_partner WHERE base_partner.id IN (
+        SELECT base_partner_contact_partner_set.contact_partner_set FROM base_partner_contact_partner_set
+        WHERE base_partner_contact_partner_set.base_partner = id))
+      ]]>
+    </string>
     <!-- M3 - Frais de Commission -->
     <decimal name="tauxCommission" title="Taux Commission (%)" precision="5" scale="2"
       min="0" max="100"/>
