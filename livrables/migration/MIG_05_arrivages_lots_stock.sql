@@ -294,7 +294,7 @@ SELECT l.ligne_arrivage, 0, now(), 'GESCOM-ARRL-' || btrim(l.idarr_ligne), 'GESC
   l.lot_id, d.reception, coalesce(l.frigo_id, d.reception), l.ligne_commande, l.origine_lib, l.zone_lib, l.marque_lib,
   l.mode_lib, gescom.dt(l.dlc), gescom.dt(l.dat_cong), (SELECT t.lot_fournisseur FROM stock_tracking_number t WHERE t.id = l.lot_id),
   gescom.num(a.frais_appr),
-  0, false, false, 1, 0, 0, 0, 0
+  0, false, false, 0, 0, 0, 0, 0
 FROM mig_ligne l JOIN mig_arr a ON a.num = l.num CROSS JOIN mig_def d;
 
 -- origine des lots (première ligne d'arrivage du lot)
@@ -393,6 +393,18 @@ FROM (SELECT details_stock_location AS frigo, product, min(unit) AS unit, sum(cu
       FROM stock_stock_location_line WHERE import_id LIKE 'GESCOM-STKL-%' GROUP BY details_stock_location, product) x
 WHERE NOT EXISTS (SELECT 1 FROM stock_stock_location_line y WHERE y.stock_location = x.frigo AND y.product = x.product
                   AND y.tracking_number IS NULL);
+
+-- champs lus par l'écran des lignes d'arrivage : ligne standard (0 ; 1 = ligne de titre), prix de revient au kg
+-- (colonne « Prix Revient »), nb d'unités ou poids par colis ; corrige aussi les lignes déjà migrées
+UPDATE stock_stock_move_line SET line_type_select = 0, pr_kg = coalesce(pr_kg, prix_revient_reel),
+  nb_unites_par_colis = coalesce(nb_unites_par_colis, poids_par_colis), version = version + 1
+WHERE import_id LIKE 'GESCOM-ARRL-%'
+  AND (line_type_select IS DISTINCT FROM 0 OR (pr_kg IS NULL AND prix_revient_reel IS NOT NULL)
+       OR (nb_unites_par_colis IS NULL AND poids_par_colis IS NOT NULL));
+UPDATE purchase_purchase_order_line SET pr_kg = coalesce(pr_kg, prix_revient_reel),
+  nb_unites_par_colis = coalesce(nb_unites_par_colis, poids_par_colis), version = version + 1
+WHERE import_id LIKE 'GESCOM-ARRL-%'
+  AND ((pr_kg IS NULL AND prix_revient_reel IS NOT NULL) OR (nb_unites_par_colis IS NULL AND poids_par_colis IS NOT NULL));
 
 -- ---------- articles sans prix / poids : dernier arrivage ----------
 UPDATE base_product p SET

@@ -232,6 +232,11 @@ arrivage réel. Les valeurs déjà présentes ne sont pas touchées.
   flottant : ils sont calculés à partir des lignes (colis, poids, montant HT), comme Axelor à l'enregistrement. Les
   totaux GESCOM non nuls restent prioritaires.
 
+**Écran des lignes d'arrivage (vérifié le 28/10) :**
+- Les lignes sont de type « Standard » : une première version les avait mises en « Titre » et elles s'ouvraient comme
+  un simple libellé.
+- La colonne « Prix Revient » (prix de revient au kg) et « Nb unt ou Poids / Colis » sont remplies.
+
 **Mode de transport :**
 - Il vient du type d'arrivage GESCOM (`typ_arrivage` : 379 = CAMION, 380 = BATEAU, 381 = AVION ; mode « Avion »
   ajouté).
