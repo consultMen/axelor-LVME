@@ -14,10 +14,11 @@ import java.util.Map;
 /**
  * Boutons d'impression des listes, comme GESCOM : « Imprimer » (achats fournisseurs, commandes
  * clients, historique prix, état des stocks par lots, RFA par produit / facture), « Synthèse »
- * (synthèse des arrivages), « Editer » (arrivages), « Liste des Rotations » (rotation des stocks par
- * lot). Chaque impression reprend les filtres de l'écran (mêmes règles que la liste affichée) ;
+ * (synthèse des arrivages), « Editer » (arrivages), « Liste des Rotations » (rotation des stocks
+ * par lot). Chaque impression reprend les filtres de l'écran (mêmes règles que la liste affichée) ;
  * modèles LvmeListeAchats / LvmeListeCommandesClients / LvmeListeArrivages / LvmeListeRotations /
- * LvmeHistoriquePrix / LvmeEtatStockLots / LvmeSyntheseArrivages / LvmeListeRfa.rptdesign.
+ * LvmeHistoriquePrix / LvmeEtatStockLots / LvmeSyntheseArrivages / LvmeListeRfa /
+ * LvmePalmaresClientsProduits.rptdesign.
  */
 public class LvmeImpressionListesController {
 
@@ -310,11 +311,78 @@ public class LvmeImpressionListesController {
           ReportFactory.createReport("LvmeListeRfa.rptdesign", "Liste des RFA-${date}")
               .addParam("Du", date(c.get("factureDu"), DEBUT))
               .addParam("Au", date(c.get("factureAu"), FIN))
-              .addParam("Filtres", filtres.length() == 0 ? "Toutes les factures" : filtres.toString()),
+              .addParam(
+                  "Filtres", filtres.length() == 0 ? "Toutes les factures" : filtres.toString()),
           "Liste des RFA par produit / facture");
     } catch (Exception e) {
       TraceBackService.trace(response, e);
     }
+  }
+
+  /**
+   * « Valider » de l'écran Palmarès Client / Produits par tonnage : impression « Palmarès Clients
+   * par Produits », avec la phrase des filtres de GESCOM (« Pour le client … pour toutes les familles
+   * … »).
+   */
+  public void imprimerPalmaresClients(ActionRequest request, ActionResponse response) {
+    try {
+      Map<String, Object> c = request.getContext();
+      Partner client = JPA.find(Partner.class, id(c.get("client")));
+      Product produit = JPA.find(Product.class, id(c.get("produit")));
+      Partner fournisseur = JPA.find(Partner.class, id(c.get("fournisseur")));
+      com.axelor.auth.db.User comDu = JPA.find(com.axelor.auth.db.User.class, id(c.get("commercialDu")));
+      com.axelor.auth.db.User comAu = JPA.find(com.axelor.auth.db.User.class, id(c.get("commercialAu")));
+      com.axelor.apps.purchase.db.Conditionnement cond =
+          JPA.find(com.axelor.apps.purchase.db.Conditionnement.class, id(c.get("conditionnement")));
+      String comDuCode = comDu != null ? comDu.getCode() : "";
+      String comAuCode = comAu != null ? comAu.getCode() : comDuCode;
+      String origine = texte(c.get("origine")).trim();
+      String filtres =
+          String.join(
+              " ",
+              client != null ? "Pour le client " + client.getName() : "Pour tous les clients",
+              nomOuTous(c.get("familleClient"), "pour la famille clients ", "pour toutes les familles clients"),
+              comDu != null
+                  ? "pour les commerciaux de " + comDu.getName() + " à " + (comAu != null ? comAu.getName() : comDu.getName())
+                  : "pour tous les commerciaux",
+              nomOuTous(c.get("groupement"), "pour le groupement ", "pour tous les groupements"),
+              nomOuTous(c.get("pays"), "pour le pays ", "pour tous les pays"),
+              produit != null ? "pour le produit " + produit.getCode() : "pour tous les produits",
+              nomOuTous(c.get("familleProduit"), "pour la famille produits ", "pour toutes les familles produits"),
+              fournisseur != null ? "pour le fournisseur " + fournisseur.getName() : "pour tous les fournisseurs",
+              origine.isEmpty() ? "" : "origine " + origine,
+              cond != null ? "conditionnement " + cond.getCode() : "",
+              "sur le Tonnage");
+      ouvrir(
+          response,
+          ReportFactory.createReport(
+                  "LvmePalmaresClientsProduits.rptdesign", "Palmares clients par produits-${date}")
+              .addParam("Client", String.valueOf(client != null ? client.getId() : 0L))
+              .addParam("FamilleClient", String.valueOf(id(c.get("familleClient"))))
+              .addParam("ComDu", comDuCode)
+              .addParam("ComAu", comAuCode)
+              .addParam("Pays", String.valueOf(id(c.get("pays"))))
+              .addParam("Groupement", String.valueOf(id(c.get("groupement"))))
+              .addParam("Produit", String.valueOf(produit != null ? produit.getId() : 0L))
+              .addParam("FamilleProduit", String.valueOf(id(c.get("familleProduit"))))
+              .addParam("Fournisseur", String.valueOf(fournisseur != null ? fournisseur.getId() : 0L))
+              .addParam("Origine", origine)
+              .addParam("Conditionnement", cond != null ? cond.getCode() : "")
+              .addParam("Du", date(c.get("dateDu"), DEBUT))
+              .addParam("Au", date(c.get("dateAu"), FIN))
+              .addParam("Filtres", filtres.replaceAll("\\s+", " ").trim()),
+          "Palmarès Clients par Produits");
+    } catch (Exception e) {
+      TraceBackService.trace(response, e);
+    }
+  }
+
+  /** Nom d'un choix many-to-one du contexte (Map avec « name ») précédé de son libellé, sinon « tous ». */
+  private static String nomOuTous(Object valeur, String libelle, String tous) {
+    if (valeur instanceof Map && ((Map<?, ?>) valeur).get("name") != null) {
+      return libelle + ((Map<?, ?>) valeur).get("name");
+    }
+    return valeur instanceof Map && ((Map<?, ?>) valeur).get("id") != null ? libelle.trim() : tous;
   }
 
   private static void ouvrir(ActionResponse response, ReportSettings rapport, String titre)

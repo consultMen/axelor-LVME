@@ -1,0 +1,45 @@
+<form name="lvme-palmares-clients-form" title="Palmarès Client / Produits par Tonnage pour établissement Prix"
+  model="com.axelor.utils.db.Wizard" width="large" canNew="false" canSave="false" canCopy="false" canDelete="false"
+  onNew="action-lvme-palmares-clients-defaults">
+  <!-- LVME : écran « Palmarès Client / Produits par Tonnage pour établissement Prix » de GESCOM (diapo 50) : dates à
+       gauche, cadre Client (champs bleus), cadre Produit (champs cyan), Valider = impression « Palmarès Clients par
+       Produits » (diapo 51) ; repère css="lvme-ges-palm". Groupement secondaire et région fournisseurs : données
+       GESCOM pas encore reprises. -->
+  <panel name="palmaresPanel" showTitle="false" colSpan="12">
+    <panel name="datesPanel" colSpan="2" itemSpan="12" css="lvme-ges-palm">
+      <field name="$dateDu" title="Date du" type="date"/>
+      <field name="$dateAu" title="au" type="date"/>
+      <field name="$datePeriode" title="Période prédéfinie" showTitle="false" type="integer"
+        selection="lvme.etat.stock.periode.select" placeholder="Période prédéfinie" onChange="action-lvme-palmares-clients-periode"/>
+    </panel>
+    <panel name="clientPanel" colSpan="5" itemSpan="12" css="lvme-palm-client">
+      <field name="$client" title="Client" type="many-to-one" target="com.axelor.apps.base.db.Partner"
+        domain="self.isCustomer = true AND self.isContact = false" canNew="false" canEdit="false" canView="false" placeholder="TOUS"/>
+      <field name="$familleClient" title="Famille" type="many-to-one" target="com.axelor.apps.base.db.PartnerCategory"
+        canNew="false" canEdit="false" canView="false" placeholder="TOUS"/>
+      <field name="$commercialDu" title="Commercial du" type="many-to-one" target="com.axelor.auth.db.User"
+        target-name="name" canNew="false" canEdit="false" canView="false" placeholder="TOUS"/>
+      <field name="$commercialAu" title="au" type="many-to-one" target="com.axelor.auth.db.User"
+        target-name="name" canNew="false" canEdit="false" canView="false"/>
+      <field name="$pays" title="Pays" type="many-to-one" target="com.axelor.apps.base.db.Country"
+        canNew="false" canEdit="false" canView="false" placeholder="TOUS"/>
+      <field name="$groupement" title="Groupement principal" type="many-to-one" target="com.axelor.apps.sale.db.Groupement"
+        canNew="false" canEdit="false" canView="false" placeholder="TOUS"/>
+    </panel>
+    <panel name="produitPanel" colSpan="5" itemSpan="12" css="lvme-palm-produit">
+      <field name="$produit" title="Produit" type="many-to-one" target="com.axelor.apps.base.db.Product"
+        canNew="false" canEdit="false" canView="false" placeholder="TOUS"/>
+      <field name="$familleProduit" title="Famille Produit" type="many-to-one" target="com.axelor.apps.base.db.ProductCategory"
+        canNew="false" canEdit="false" canView="false" placeholder="TOUS"/>
+      <field name="$fournisseur" title="Fournisseur" type="many-to-one" target="com.axelor.apps.base.db.Partner"
+        domain="self.isSupplier = true AND self.isContact = false" canNew="false" canEdit="false" canView="false" placeholder="TOUS"/>
+      <field name="$origine" title="Origine" type="string"/>
+      <field name="$conditionnement" title="Conditionnement" type="many-to-one" target="com.axelor.apps.purchase.db.Conditionnement"
+        canNew="false" canEdit="false" canView="false"/>
+    </panel>
+    <panel name="validerPanel" showTitle="false" colSpan="12">
+      <spacer colSpan="10"/>
+      <button name="validerBtn" title="Valider" icon="check_circle" colSpan="2" onClick="action-lvme-palmares-clients-imprimer"/>
+    </panel>
+  </panel>
+</form>

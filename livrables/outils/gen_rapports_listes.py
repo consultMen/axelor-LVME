@@ -363,3 +363,72 @@ rapport('LvmeListeRfa.rptdesign', p_f | {'Filtres'}, [jeu_f],
         entete('Liste des RFA par produit / facture', FILTRES)
         + tableau('RfaDS', COLS_RFA, LIGNES_RFA, ('#FFFFFF', '#EEF4FC'),
                   prop('backgroundColor', '#CFE3FB'), sommes=('montant_ht', 'montant_rfa')))
+
+# ---------- palmarès clients par produits (par tonnage, écran « Palmarès Client / Produits » de GESCOM) ----------
+SQL_PALMARES = '''WITH lignes AS (
+  SELECT so.client_partner AS client, sol.product, sol.nb_colis, sol.qty, sol.unit, sol.poids_total_net AS poids,
+         sol.ex_tax_total AS ca,
+         COALESCE((SELECT COALESCE(sm.real_date, sm.estimated_date) FROM stock_stock_move sm
+                   WHERE sm.id = (SELECT max(sml.stock_move) FROM stock_stock_move_line sml
+                                  WHERE sml.sale_order_line = sol.id AND sml.stock_move IN (
+                                    SELECT s.id FROM stock_stock_move s WHERE s.status_select <> 4))),
+                  so.order_date, so.creation_date) AS dt
+  FROM sale_sale_order_line sol
+  JOIN sale_sale_order so ON so.id = sol.sale_order
+  JOIN base_partner cli ON cli.id = so.client_partner
+  JOIN base_product pr ON pr.id = sol.product
+  LEFT JOIN base_address adr ON adr.id = cli.main_address
+  LEFT JOIN auth_user com ON com.id = cli.commercial
+  WHERE so.template = false AND so.status_select IN (3, 4)
+    AND (CAST(:Client AS bigint) = 0 OR so.client_partner = CAST(:Client AS bigint))
+    AND (CAST(:FamilleClient AS bigint) = 0 OR cli.partner_category = CAST(:FamilleClient AS bigint))
+    AND (:ComDu = '' OR coalesce(com.code, '') >= :ComDu) AND (:ComAu = '' OR coalesce(com.code, '') <= :ComAu)
+    AND (CAST(:Pays AS bigint) = 0 OR adr.country = CAST(:Pays AS bigint))
+    AND (CAST(:Groupement AS bigint) = 0 OR cli.groupement = CAST(:Groupement AS bigint))
+    AND (CAST(:Produit AS bigint) = 0 OR sol.product = CAST(:Produit AS bigint))
+    AND (CAST(:FamilleProduit AS bigint) = 0 OR pr.product_category = CAST(:FamilleProduit AS bigint))
+    AND (CAST(:Fournisseur AS bigint) = 0 OR pr.default_supplier_partner = CAST(:Fournisseur AS bigint))
+    AND (:Conditionnement = '' OR EXISTS (SELECT 1 FROM purchase_conditionnement pc WHERE pc.id = sol.conditionnement
+           AND lower(coalesce(pc.code, '') || ' ' || coalesce(pc.label, '')) LIKE '%' || lower(:Conditionnement) || '%'))
+    AND (:Origine = '' OR EXISTS (SELECT 1 FROM supplychain_sale_order_line_lot x
+           JOIN stock_tracking_number tn ON tn.id = x.tracking_number
+           JOIN stock_stock_move_line oml ON oml.id = tn.origin_stock_move_line
+           WHERE x.sale_order_line = sol.id AND oml.origine = :Origine))),
+agg AS (
+  SELECT client, product, sum(nb_colis) AS nb_colis, sum(qty) AS qte_uv, max(unit) AS unite, sum(poids) AS poids,
+         sum(ca) AS ca, max(dt) AS derniere_date
+  FROM lignes WHERE dt BETWEEN CAST(:Du AS date) AND CAST(:Au AS date) GROUP BY client, product),
+tot AS (SELECT client, sum(poids) AS poids_client FROM agg GROUP BY client)
+SELECT cli.partner_seq AS client_code, cli.name AS client_nom, pr.code AS produit, pr.name AS designation,
+       a.nb_colis, a.qte_uv, u.name AS unite, a.poids, a.ca, a.derniere_date,
+       round(a.ca / NULLIF(a.qte_uv, 0), 2) AS prix_uv,
+       rank() OVER (PARTITION BY a.client ORDER BY a.poids DESC NULLS LAST, a.ca DESC) AS rang_produit,
+       dense_rank() OVER (ORDER BY t.poids_client DESC NULLS LAST, a.client) AS rang_client,
+       lpad(dense_rank() OVER (ORDER BY t.poids_client DESC NULLS LAST, a.client)::text, 6, '0') AS cle_client
+FROM agg a
+JOIN tot t ON t.client = a.client
+JOIN base_partner cli ON cli.id = a.client
+JOIN base_product pr ON pr.id = a.product
+LEFT JOIN base_unit u ON u.id = a.unite
+ORDER BY rang_client, rang_produit'''
+COLS_PALMARES = [('client_code', 'string'), ('client_nom', 'string'), ('produit', 'string'), ('designation', 'string'),
+                 ('nb_colis', 'decimal'), ('qte_uv', 'decimal'), ('unite', 'string'), ('poids', 'decimal'),
+                 ('ca', 'decimal'), ('derniere_date', 'date'), ('prix_uv', 'decimal'), ('rang_produit', 'integer'),
+                 ('rang_client', 'integer'), ('cle_client', 'string')]
+LIGNES_PALMARES = [
+    ('Client', 'client_code', 1.6, None, None), ('Nom', 'client_nom', 3.4, None, None),
+    ('Produit', 'produit', 1.8, None, None), ('Désignation', 'designation', 4.6, None, None),
+    ('Nb colis', 'nb_colis', 1.0, '#,##0', None), ('Qtés en UV', 'qte_uv', 1.1, '#,##0', None),
+    ('Unité', 'unite', 0.8, None, None), ('Poids KG', 'poids', 1.2, '#,##0', None),
+    ('C.A. HT', 'ca', 1.4, '#,##0', None), ('Dern. Date', 'derniere_date', 1.3, 'date', None),
+    ('Prix à U.V', 'prix_uv', 1.0, '#,##0.00', None), ('Rang', 'rang_produit', 0.7, '#,##0', None),
+    ('Rang', 'rang_client', 0.7, '#,##0', None),
+]
+SOMMES_PALM = ('nb_colis', 'qte_uv', 'poids', 'ca')
+jeu_m, p_m = jeu('PalmaresDS', SQL_PALMARES, COLS_PALMARES)
+rapport('LvmePalmaresClientsProduits.rptdesign', p_m | {'Filtres'}, [jeu_m],
+        entete('Palmarès Clients par Produits', FILTRES)
+        + tableau('PalmaresDS', COLS_PALMARES, LIGNES_PALMARES, ('#FFFFFF', '#FFFFFF'),
+                  prop('backgroundColor', '#DCDCDC'), sommes=SOMMES_PALM,
+                  groupe=('cle_client', 'Total client', '#F0F0F0', SOMMES_PALM,
+                          ('client_code', 'client_nom', 'rang_client'))))

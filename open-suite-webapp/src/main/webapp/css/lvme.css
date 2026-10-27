@@ -1796,3 +1796,75 @@
   background-color: #14234f !important;
   color: #ffffff !important;
 }
+
+/*
+ * « Palmarès Client / Produits par Tonnage » copié sur GESCOM (repère css="lvme-ges-palm" sur les dates) : fond
+ * gris-bleu, cadres Client et Produit bordés de bleu, champs Client bleus, champs Produit cyan, dates cyan, libellés
+ * à gauche, bouton Valider gris en bas à droite.
+ */
+[class*="_formView_"]:has(.lvme-ges-palm) [class*="_main_"],
+[class*="_formView_"]:has(.lvme-ges-palm) [class*="_main_"] [class*="_panel_"],
+[class*="_formView_"]:has(.lvme-ges-palm) [class*="_main_"] [class*="_panel_"] [class*="_body_"] {
+  background-color: #c5cde0 !important;
+}
+[class*="_formView_"]:has(.lvme-ges-palm) .lvme-palm-client,
+[class*="_formView_"]:has(.lvme-ges-palm) .lvme-palm-produit {
+  border: 1px solid #2b3fd0 !important;
+  border-radius: 0 !important;
+  padding: 6px 8px !important;
+}
+[class*="_formView_"]:has(.lvme-ges-palm) [class*="_main_"] [class*="_container_"]:has(> [class*="_title_"]) {
+  flex-direction: row !important;
+  align-items: center;
+  gap: 8px;
+}
+[class*="_formView_"]:has(.lvme-ges-palm) [class*="_main_"] [class*="_container_"]:has(> [class*="_title_"]) > [class*="_title_"] {
+  flex: 0 0 auto;
+  min-width: 120px;
+  justify-content: flex-end;
+  text-align: right;
+}
+[class*="_formView_"]:has(.lvme-ges-palm) .lvme-ges-palm [class*="_container_"]:has(> [class*="_title_"]) > [class*="_title_"] {
+  min-width: 55px;
+}
+[class*="_formView_"]:has(.lvme-ges-palm) [class*="_main_"] [class*="_container_"]:has(> [class*="_title_"]) > :not([class*="_title_"]) {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+[class*="_formView_"]:has(.lvme-ges-palm) [class*="_main_"] label,
+[class*="_formView_"]:has(.lvme-ges-palm) [class*="_main_"] [class*="_labelText_"] {
+  font-size: 13px !important;
+  color: #10204a !important;
+  white-space: nowrap !important;
+}
+[class*="_formView_"]:has(.lvme-ges-palm) .lvme-palm-client input,
+[class*="_formView_"]:has(.lvme-ges-palm) .lvme-palm-client select {
+  background-color: #99c8f6 !important;
+}
+[class*="_formView_"]:has(.lvme-ges-palm) .lvme-palm-produit input,
+[class*="_formView_"]:has(.lvme-ges-palm) .lvme-palm-produit select {
+  background-color: #c8f8f8 !important;
+}
+[class*="_formView_"]:has(.lvme-ges-palm) .lvme-ges-palm input[type="text"],
+[class*="_formView_"]:has(.lvme-ges-palm) .lvme-ges-palm input:not([type]) {
+  background-color: #36e3e3 !important;
+}
+[class*="_formView_"]:has(.lvme-ges-palm) [class*="_main_"] input,
+[class*="_formView_"]:has(.lvme-ges-palm) [class*="_main_"] select {
+  font-size: 13px !important;
+  height: 24px;
+  min-height: 0 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+[class*="_formView_"]:has(.lvme-ges-palm) [class*="_main_"] button {
+  background: linear-gradient(#ffffff, #dfe4ec) !important;
+  color: #10204a !important;
+  border: 1px solid #8c96a8 !important;
+  border-radius: 4px !important;
+  font-size: 13px !important;
+  min-height: 0 !important;
+}
+[class*="_formView_"]:has(.lvme-ges-palm) [class*="_main_"] button [class*="_icon_"] {
+  color: #1aa33a !important;
+}
