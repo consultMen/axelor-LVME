@@ -76,8 +76,8 @@
     <one-to-many name="saleOrderLineLotList"
       ref="com.axelor.apps.supplychain.db.SaleOrderLineLot" mappedBy="saleOrderLine"
       title="Lots sélectionnés"/>
-    <!-- LVME : colonnes du tableau « Fiche Commande client » GESCOM, calculées depuis le lot pris sur la ligne
-      (son arrivage d'origine) et depuis l'état des stocks par lots -->
+    <!-- LVME : colonnes du tableau « Fiche Commande client » GESCOM, calculées depuis le lot pris sur
+      la ligne (son arrivage d'origine) et depuis l'état des stocks par lots -->
     <string name="lvmeFournisseur" title="Fourn." formula="true">
       <![CDATA[
       (SELECT string_agg(DISTINCT base_partner.partner_seq, ', ') FROM base_partner WHERE base_partner.id IN (SELECT stock_stock_move.partner FROM stock_stock_move WHERE stock_stock_move.id IN (SELECT stock_stock_move_line.stock_move FROM stock_stock_move_line WHERE stock_stock_move_line.id IN (SELECT stock_tracking_number.origin_stock_move_line FROM stock_tracking_number WHERE stock_tracking_number.id IN (SELECT supplychain_sale_order_line_lot.tracking_number FROM supplychain_sale_order_line_lot WHERE supplychain_sale_order_line_lot.sale_order_line = id)))))
@@ -108,7 +108,8 @@
       (SELECT ROUND(COALESCE(sum(lvme_etat_stock_lot.nb_colis_cdes), 0), 3) FROM lvme_etat_stock_lot WHERE lvme_etat_stock_lot.tracking_number_id IN (SELECT supplychain_sale_order_line_lot.tracking_number FROM supplychain_sale_order_line_lot WHERE supplychain_sale_order_line_lot.sale_order_line = id))
       ]]>
     </decimal>
-    <decimal name="lvmeColisDispo" title="Colis Dispo" precision="20" scale="3" formula="true">
+    <decimal name="lvmeColisDispo" title="Colis Dispo" precision="20" scale="3"
+      formula="true">
       <![CDATA[
       (SELECT ROUND(COALESCE(sum(lvme_etat_stock_lot.nb_colis_stock - lvme_etat_stock_lot.nb_colis_cdes), 0), 3) FROM lvme_etat_stock_lot WHERE lvme_etat_stock_lot.tracking_number_id IN (SELECT supplychain_sale_order_line_lot.tracking_number FROM supplychain_sale_order_line_lot WHERE supplychain_sale_order_line_lot.sale_order_line = id))
       ]]>
@@ -163,6 +164,36 @@
               FROM supplychain_sale_order_line_lot WHERE supplychain_sale_order_line_lot.sale_order_line = id))))
       ]]>
     </string>
+    <!-- LVME : écran « Historique prix » GESCOM : pièce de la ligne « B.L. N° … Du AAAAMMJJ/client » (dernier BL non
+      annulé), sinon « Cde N° … Du AAAAMMJJ/client » si la commande n'est pas encore livrée, et sa date -->
+    <string name="lvmeHistoPiece" title="Désignation" formula="true">
+      <![CDATA[
+      (COALESCE(
+        (SELECT 'B.L. N° ' || stock_stock_move.stock_move_seq || ' Du '
+            || to_char(COALESCE(stock_stock_move.real_date, stock_stock_move.estimated_date), 'YYYYMMDD')
+          FROM stock_stock_move WHERE stock_stock_move.id = (SELECT max(stock_stock_move_line.stock_move)
+            FROM stock_stock_move_line WHERE stock_stock_move_line.sale_order_line = id
+              AND stock_stock_move_line.stock_move IN (SELECT stock_stock_move.id FROM stock_stock_move
+                WHERE stock_stock_move.status_select <> 4))),
+        (SELECT 'Cde N° ' || COALESCE(sale_sale_order.sale_order_seq, '') || ' Du '
+            || to_char(COALESCE(sale_sale_order.order_date, sale_sale_order.creation_date), 'YYYYMMDD')
+          FROM sale_sale_order WHERE sale_sale_order.id = sale_order))
+        || '/' || COALESCE((SELECT base_partner.partner_seq FROM base_partner WHERE base_partner.id = (
+          SELECT sale_sale_order.client_partner FROM sale_sale_order WHERE sale_sale_order.id = sale_order)), ''))
+      ]]>
+    </string>
+    <date name="lvmeHistoDate" title="Date" formula="true">
+      <![CDATA[
+      COALESCE(
+        (SELECT COALESCE(stock_stock_move.real_date, stock_stock_move.estimated_date)
+          FROM stock_stock_move WHERE stock_stock_move.id = (SELECT max(stock_stock_move_line.stock_move)
+            FROM stock_stock_move_line WHERE stock_stock_move_line.sale_order_line = id
+              AND stock_stock_move_line.stock_move IN (SELECT stock_stock_move.id FROM stock_stock_move
+                WHERE stock_stock_move.status_select <> 4))),
+        (SELECT COALESCE(sale_sale_order.order_date, sale_sale_order.creation_date)
+          FROM sale_sale_order WHERE sale_sale_order.id = sale_order))
+      ]]>
+    </date>
 
     <extra-code>
   		<![CDATA[

@@ -802,3 +802,89 @@
   min-width: 0;
   max-width: 100%;
 }
+
+/*
+ * Fenêtre « Historique prix » (F1 de la ligne de commande client) copiée sur GESCOM (panneaux css="lvme-histo-filtres") :
+ * fond gris-bleu clair, filtres sur une ligne avec libellés à gauche, en-têtes gris, lignes blanc / bleu-vert,
+ * police serrée, liste sur toute la hauteur de la fenêtre (elle défile seule).
+ */
+[class*="_modal-content"]:has(.lvme-histo-filtres),
+[class*="_modal-content"]:has(.lvme-histo-filtres) [class*="_modal-header"],
+[class*="_modal-content"]:has(.lvme-histo-filtres) [class*="_modal-body"],
+[class*="_modal-content"]:has(.lvme-histo-filtres) [class*="_modal-footer"],
+[class*="_modal-content"]:has(.lvme-histo-filtres) [class*="_panel"],
+[class*="_modal-content"]:has(.lvme-histo-filtres) [class*="_content_"] {
+  background-color: #e9eef6 !important;
+}
+[class*="_modal-content"]:has(.lvme-histo-filtres),
+[class*="_modal-content"]:has(.lvme-histo-filtres) * {
+  --ax-form-row-gap: .1rem !important;
+  --ax-theme-form-row-gap: .1rem !important;
+  --ax-form-padding: .25rem !important;
+  --ax-panel-body-padding: .25rem !important;
+  --ax-input-padding: 0 .35rem !important;
+}
+.lvme-histo-filtres [class*="_container_"]:has(> [class*="_title_"]) {
+  flex-direction: row !important;
+  align-items: center;
+  gap: 6px;
+}
+.lvme-histo-filtres [class*="_container_"]:has(> [class*="_title_"]) > [class*="_title_"] {
+  flex: 0 0 auto;
+}
+.lvme-histo-filtres [class*="_container_"]:has(> [class*="_title_"]) > :not([class*="_title_"]) {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.lvme-histo-filtres label,
+.lvme-histo-filtres [class*="_labelText_"] {
+  font-size: 12px !important;
+  color: #10204a !important;
+  white-space: nowrap !important;
+  margin-bottom: 0 !important;
+}
+.lvme-histo-filtres input:not([type="checkbox"]):not([type="radio"]),
+.lvme-histo-filtres select {
+  font-size: 12.5px !important;
+  min-height: 0 !important;
+  height: 22px;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  background-color: #ffffff !important;
+}
+.lvme-histo-filtres button {
+  background: linear-gradient(#ffffff, #dfe4ec) !important;
+  color: #10204a !important;
+  border: 1px solid #8c96a8 !important;
+  border-radius: 4px !important;
+  font-size: 12px !important;
+}
+[class*="_modal-content"]:has(.lvme-histo-filtres) [class*="_main_"] > :last-child {
+  height: calc(100vh - 210px) !important;
+  min-height: 220px;
+}
+[class*="_modal-content"]:has(.lvme-histo-filtres) [class*="_header_"] [class*="_column_"] {
+  background: linear-gradient(#f4f4f4, #cdcdcd) !important;
+  color: #222 !important;
+  font-size: 11.5px !important;
+  white-space: normal !important;
+  line-height: 1.1;
+}
+[class*="_modal-content"]:has(.lvme-histo-filtres) [class*="_body_"] [class*="_row_6j3fy"] {
+  height: 20px !important;
+  min-height: 0 !important;
+}
+[class*="_modal-content"]:has(.lvme-histo-filtres) [class*="_body_"] [class*="_row_"] [class*="_column_"] {
+  background-color: #ffffff;
+  color: #000000;
+  font-size: 11.5px !important;
+  padding-top: 1px !important;
+  padding-bottom: 1px !important;
+}
+[class*="_modal-content"]:has(.lvme-histo-filtres) [class*="_body_"] [class*="_row_"]:nth-child(even) [class*="_column_"] {
+  background-color: #9fd0d0;
+}
+[class*="_modal-content"]:has(.lvme-histo-filtres) [class*="_body_"] [class*="_row_"][class*="_selected_"] [class*="_column_"] {
+  background-color: #14234f !important;
+  color: #ffffff !important;
+}
