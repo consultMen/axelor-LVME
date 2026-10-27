@@ -1338,3 +1338,8 @@
   background-color: #ffff99 !important;
   color: #000000 !important;
 }
+/* liste des achats : un bouton de plus (Imprimer) sous les choix de nature, liste un peu moins haute pour garder
+   l'écran sur une page */
+[class*="_formView_"]:has(.lvme-ges-dates-lavande):has(.lvme-btn-kanban) [class*="_main_"] > :last-child {
+  height: calc(100vh - 384px) !important;
+}

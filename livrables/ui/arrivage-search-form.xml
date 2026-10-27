@@ -29,6 +29,7 @@
       <button name="lvmeKanbanBtn" title="Suivi des arrivages" icon="view_kanban" css="lvme-btn-kanban" onClick="action-lvme-arrivage-kanban"/>
       <button name="lvmeArchivageBtn" title="Archiver / Désarchiver" icon="archive" onClick="action-lvme-arrivage-dashlet"/>
       <button name="nouvelArrivageBtn" title="Nouveau Arrivage" icon="plus" onClick="action-lvme-arrivage-new"/>
+      <button name="editerListeBtn" title="Editer" icon="printer" onClick="action-lvme-arrivage-imprimer-liste"/>
     </panel>
   </panel>
   <panel-dashlet canDelete="true" name="arrivagesDashlet" title="Arrivages" colSpan="12" height="600" action="action-lvme-arrivage-dashlet"/>
