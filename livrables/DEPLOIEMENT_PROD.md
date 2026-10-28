@@ -1,3 +1,19 @@
+# Déploiement prod LVME — commandes clients GESCOM (MIG_06) et PROD_102 du 28/10/2026
+
+Déjà en prod : PROD_94 à 101, MIG_00 à MIG_05. Pas de code à recompiler (scripts SQL seulement).
+
+1. **PC** : `git push origin main` ; envoyer la nouvelle archive `MIG_00_archive_gescom.sql` (134 Mo, 34 tables avec
+   CCE, CCD, CLIENT_RESERV) dans `/home/axelor/` (remplace l'ancienne).
+2. **Serveur** : `pg_dump -U axelor -Fc axelor > ~/sauvegarde_avant_mig06_$(date +%F_%H%M).dump`
+3. `cd ~/src/axelor-LVME && git pull && git log --oneline -1`
+4. `sudo systemctl stop axelor-tomcat`
+5. `psql -U axelor -d axelor -v ON_ERROR_STOP=1 -f ~/MIG_00_archive_gescom.sql && psql -U axelor -d axelor -v ON_ERROR_STOP=1 -f livrables/migration/MIG_06_commandes_clients.sql && psql -U axelor -d axelor -v ON_ERROR_STOP=1 -f livrables/PROD_102_incoherences_hors_gescom.sql`
+   (≈ 5 min, ne pas interrompre) → commandes 27 732 / 27 732, lignes 183 166 / 183 166, ca_gescom = ca_axelor =
+   114 557 356 ; MIG_00 ne recharge que l'archive (MIG_01 à 05 ne sont pas à relancer).
+6. `sudo systemctl start axelor-tomcat && sudo systemctl restart nginx`
+
+---
+
 # Déploiement prod LVME — écrans PROD_94 à 101 puis migration GESCOM (MIG_00 à MIG_05) du 28/10/2026
 
 Déjà en prod : jusqu'à PROD_93 + purge PROD_90. Code à déployer : tout `main` (commit 1b03686 ou plus récent).

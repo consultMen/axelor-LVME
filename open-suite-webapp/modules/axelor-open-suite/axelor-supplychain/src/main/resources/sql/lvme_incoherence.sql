@@ -113,6 +113,8 @@ ecarts AS (
     WHERE so.status_select IN (3, 4) AND sol.product IS NOT NULL
       AND COALESCE(sol.delivered_qty, 0) > 0
       AND COALESCE(fc.qty, 0) <> sol.delivered_qty
+      -- historique repris de GESCOM : factures restées dans GESCOM (n° sur la commande, décision du 28/10/2026)
+      AND COALESCE(so.import_origin, '') <> 'GESCOM'
 
     UNION ALL
     -- 3. Cde fournisseur : qté ou colis commandés ≠ reçus
@@ -174,6 +176,8 @@ ecarts AS (
     WHERE po.status_select IN (3, 4) AND pol.product IS NOT NULL
       AND COALESCE(pol.received_qty, 0) > 0
       AND COALESCE(ff.qty, 0) <> pol.received_qty
+      -- arrivages repris de GESCOM : factures fournisseur restées dans GESCOM
+      AND COALESCE(po.import_origin, '') <> 'GESCOM'
 
     UNION ALL
     -- 5. Prix facturé ≠ prix de la commande (client)

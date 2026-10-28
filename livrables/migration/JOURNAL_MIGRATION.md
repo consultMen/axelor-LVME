@@ -289,6 +289,39 @@ l'archive `gescom` garde les dates d'origine.
   - congélation 12/07/2027 (arrivage 190532, DLC 01/07/2029) et 21/04/2028 (arrivage 260121) ;
   - congélation 01/10/1962 (arrivage 210638, lots 11140595B et 2691).
 
+## 3 septies. Étape 06 : commandes clients (`MIG_06_commandes_clients.sql`, 28/10/2026)
+
+Fichiers : CCE (en-têtes, 55 304, exporté en 4 morceaux), CCD (lignes, 366 395, exporté en 9 morceaux par année),
+CLIENT_RESERV (239). Les morceaux sont regroupés en une table dans l'archive (`gescom.cce`, `gescom.ccd`).
+
+- **Structure GESCOM** : chaque vente est enregistrée deux fois.
+  - TYPE_FACTURE 2 = la commande / le BL (27 730, + 2 de type 1). Le n° de BL est le n° de commande.
+  - TYPE_FACTURE 3 = la facture (27 572) : n° de facture, date, échéance ; elle regroupe les lignes d'une ou
+    plusieurs commandes (champ IDPOSITION de la commande).
+  - POSITION n'est pas un état mais une zone de clientèle : 1 France, 2 Corse, 5 étranger, 0 cas isolés.
+  - Lignes : P produit, T texte (« Cde n° … du … »), M correction manuelle (prix, avoir), D (6 lignes).
+- **Décisions** : tout l'historique ; factures **non recréées** en factures Axelor (option b, pas d'écritures
+  comptables en double) : n° de facture, date et échéance notés sur la commande ; le détail reste dans l'archive.
+- **Reprise** :
+
+  | Élément | GESCOM | LVME |
+  |---|---|---|
+  | Commandes (état Terminée) | 27 732 | 27 732 (27 727 avec n° de facture) |
+  | Lignes | 183 166 | 183 166, dont 154 554 avec leur lot |
+  | BL réalisés (n° « BL » + n° de commande) | — | 25 771, 154 575 lignes |
+  | Chiffre d'affaires HT | 114 557 356 € | 114 557 356 € |
+
+  - Les BL repris ne modifient pas le stock (déjà celui de GESCOM : 6 790 986 € inchangé) ; ils donnent les
+    sorties de l'Historique Produit et le n° de BL de la liste des commandes.
+  - Ventes à montant négatif : commande marquée « Avoir ».
+  - Rapport d'incohérences : les écarts « livré ≠ facturé » et « reçu ≠ facturé » ne portent plus sur l'historique
+    GESCOM (factures restées dans GESCOM) ; ils signalaient 19 436 faux écarts (`PROD_102`).
+- **Gardés dans l'archive seulement** : les factures (type 3) et CLIENT_RESERV (client livré → client de
+  réservation : pas de champ équivalent dans LVME pour l'instant).
+- **À noter** : 133 numéros de CCE n'ont aucune ligne dans CCD ; 1 fournisseur créé par l'étape 05 pour un
+  arrivage dont le fournisseur manque dans FOU (1 372 fournisseurs pour 1 371 dans FOU) ; dernière commande
+  GESCOM le 17/09/2026.
+
 ## 4. Points ouverts à faire préciser par le client
 
 - **cdv** (931 articles, ex. 100 403 ; 210 322) : signification inconnue. Pas trouvé dans `table_base`. Gardé dans
