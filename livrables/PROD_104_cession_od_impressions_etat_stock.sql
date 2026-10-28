@@ -82,6 +82,20 @@ INSERT INTO meta_action (id, version, created_on, name, type, model, xml, home, 
   <field name="poidsKg" expr="eval: _odPoids" if="_odPoids"/>
 </action-record>', false, false, 0);
 
+-- valeurs par défaut de la cession : libellé CESSION / Sortie sans apostrophes ; société de l'utilisateur, sinon la
+-- société LVME (le n° de cession en dépend)
+UPDATE meta_action SET xml = '<action-record name="action-cession-stock-record-default-values"
+  model="com.axelor.apps.stock.db.CessionStock">
+  <field name="libelleMvts" expr="CESSION"/>
+  <field name="entreeSortie" expr="Sortie"/>
+  <field name="cessionRealisee" expr="eval: false"/>
+  <field name="cessionDate" expr="eval: __date__"/>
+  <field name="company" expr="eval: __user__.activeCompany ?: __repo__(com.axelor.apps.base.db.Company).all().order(&apos;id&apos;).fetchOne()"/>
+  <field name="cessionSeq"
+    expr="call: com.axelor.apps.base.service.administration.SequenceService:getSequenceNumber(&apos;cessionStock&apos;, __user__.activeCompany ?: __repo__(com.axelor.apps.base.db.Company).all().order(&apos;id&apos;).fetchOne(), com.axelor.apps.stock.db.CessionStock.class, &apos;cessionSeq&apos;)"/>
+</action-record>', updated_on = now(), version = COALESCE(version, 0) + 1
+WHERE name = 'action-cession-stock-record-default-values' AND module IS NULL;
+
 UPDATE meta_view SET xml = current_setting('lvme.fEtat'), updated_on = now(), version = COALESCE(version, 0) + 1
 WHERE name = 'lvme-etat-stock-lot-search-form' AND module IS NULL;
 UPDATE meta_view SET xml = current_setting('lvme.fCession'), updated_on = now(), version = COALESCE(version, 0) + 1
