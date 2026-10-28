@@ -262,6 +262,33 @@ arrivage réel. Les valeurs déjà présentes ne sont pas touchées.
 
 Durée de l'essai : 1 min 30.
 
+## 3 sexies. Années mal saisies dans GESCOM (corrigées le 28/10/2026, `MIG_05`)
+
+Des dates des fichiers GESCOM ont une année impossible (faute de frappe). Décision : corriger les années évidentes ;
+l'archive `gescom` garde les dates d'origine.
+
+- **Règle 1, année 21xx** (siècle mal tapé) : moins 90 ans. Exemple : congélation 11/02/2103 → 11/02/2013, DLC
+  31/01/2105 → 31/01/2015.
+  - Concerne 23 lots des arrivages 131218 à 150627 (DLC et congélation) et le lot 190777A (entrée 22/07/2109 →
+    22/07/2019, DLC 12/07/2111 → 12/07/2021).
+- **Règle 2, date d'arrivage, de départ, de livraison ou de congélation en 2030 ou après** : année de l'arrivage
+  (deux premiers chiffres de son numéro).
+
+  | Arrivage / lot | Date GESCOM | Date reprise |
+  |---|---|---|
+  | 260822, livraison | 18/08/2260 | 18/08/2026 |
+  | 260643, départ | 19/06/2260 | 19/06/2026 |
+  | 251101, départ | 25/01/2062 | 25/01/2025 |
+  | 250553, livraison | 30/08/2050 | 30/08/2025 |
+  | 240659, départ | 28/06/2040 | 28/06/2024 |
+  | 240234 (lot 4039/240234), congélation | 24/02/2040 | 24/02/2024 |
+  | lot 250531, entrée | 25/05/2031 | non reprise (la date d'entrée vient de l'arrivage 250531) |
+
+- **Non corrigées, à vérifier par le client** (la bonne valeur n'est pas évidente) :
+  - DLC 15/02/2060 (lot 4094/240219, congelé le 15/02/2024) et 01/10/2040 (lot 3930/240421) ;
+  - congélation 12/07/2027 (arrivage 190532, DLC 01/07/2029) et 21/04/2028 (arrivage 260121) ;
+  - congélation 01/10/1962 (arrivage 210638, lots 11140595B et 2691).
+
 ## 4. Points ouverts à faire préciser par le client
 
 - **cdv** (931 articles, ex. 100 403 ; 210 322) : signification inconnue. Pas trouvé dans `table_base`. Gardé dans

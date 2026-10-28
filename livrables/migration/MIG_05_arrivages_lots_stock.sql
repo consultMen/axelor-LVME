@@ -457,6 +457,54 @@ FROM mig_compl g
 WHERE g.cle = l.import_id AND ((l.gencode IS NULL AND gescom.txt(g.gencode) IS NOT NULL)
   OR (l.obs IS NULL AND gescom.txt(g.com) IS NOT NULL));
 
+-- ---------- années mal saisies dans GESCOM (décision du 28/10/2026, liste dans le journal) ----------
+-- année 21xx : siècle mal tapé, - 90 ans (11/02/2103 -> 11/02/2013, 22/07/2109 -> 22/07/2019) ; date d'arrivage,
+-- de départ, de livraison, d'entrée ou de congélation en 2030 ou après : année de l'arrivage (2 premiers chiffres
+-- de son numéro, 18/08/2260 de l'arrivage 260822 -> 18/08/2026). DLC en 20xx douteuses, congélations 2027 / 2028
+-- ou 1962 : non corrigées (valeur juste inconnue). L'archive gescom garde les dates d'origine. Relançable.
+CREATE FUNCTION pg_temp.lvme_annee(d date, num text, est_dlc boolean) RETURNS date LANGUAGE sql IMMUTABLE AS $f$
+  SELECT CASE
+    WHEN d IS NULL THEN NULL
+    WHEN extract(year FROM d) BETWEEN 2100 AND 2199 THEN (d - interval '90 years')::date
+    WHEN NOT est_dlc AND extract(year FROM d) >= 2030 AND btrim(coalesce(num, '')) ~ '^[0-9]{6}'
+      THEN (d - make_interval(years => extract(year FROM d)::int - (2000 + left(btrim(num), 2)::int)))::date
+    ELSE d END $f$;
+UPDATE stock_stock_move m SET estimated_date = pg_temp.lvme_annee(m.estimated_date, m.stock_move_seq, false),
+  real_date = pg_temp.lvme_annee(m.real_date, m.stock_move_seq, false),
+  supplier_shipment_date = pg_temp.lvme_annee(m.supplier_shipment_date, m.stock_move_seq, false),
+  version = m.version + 1
+WHERE m.import_id LIKE 'GESCOM-ARR-%'
+  AND (extract(year FROM m.estimated_date) >= 2030 OR extract(year FROM m.real_date) >= 2030
+       OR extract(year FROM m.supplier_shipment_date) >= 2030);
+UPDATE purchase_purchase_order o SET order_date = pg_temp.lvme_annee(o.order_date, o.purchase_order_seq, false),
+  estimated_receipt_date = pg_temp.lvme_annee(o.estimated_receipt_date, o.purchase_order_seq, false),
+  supplier_shipment_date = pg_temp.lvme_annee(o.supplier_shipment_date, o.purchase_order_seq, false),
+  validation_date_time = pg_temp.lvme_annee(o.validation_date_time::date, o.purchase_order_seq, false)::timestamp,
+  version = o.version + 1
+WHERE o.import_id LIKE 'GESCOM-ARR-%'
+  AND (extract(year FROM o.order_date) >= 2030 OR extract(year FROM o.estimated_receipt_date) >= 2030
+       OR extract(year FROM o.supplier_shipment_date) >= 2030 OR extract(year FROM o.validation_date_time) >= 2030);
+UPDATE purchase_purchase_order_line l SET dluo = pg_temp.lvme_annee(l.dluo, o.purchase_order_seq, true),
+  date_congelation = pg_temp.lvme_annee(l.date_congelation, o.purchase_order_seq, false),
+  desired_receipt_date = pg_temp.lvme_annee(l.desired_receipt_date, o.purchase_order_seq, false),
+  estimated_receipt_date = pg_temp.lvme_annee(l.estimated_receipt_date, o.purchase_order_seq, false),
+  version = l.version + 1
+FROM purchase_purchase_order o
+WHERE o.id = l.purchase_order AND l.import_id LIKE 'GESCOM-ARRL-%'
+  AND (extract(year FROM l.dluo) >= 2100 OR extract(year FROM l.date_congelation) >= 2030
+       OR extract(year FROM l.desired_receipt_date) >= 2030 OR extract(year FROM l.estimated_receipt_date) >= 2030);
+UPDATE stock_stock_move_line l SET dluo = pg_temp.lvme_annee(l.dluo, m.stock_move_seq, true),
+  date_congelation = pg_temp.lvme_annee(l.date_congelation, m.stock_move_seq, false), version = l.version + 1
+FROM stock_stock_move m
+WHERE m.id = l.stock_move AND l.import_id LIKE 'GESCOM-ARRL-%'
+  AND (extract(year FROM l.dluo) >= 2100 OR extract(year FROM l.date_congelation) >= 2030);
+UPDATE stock_tracking_number t SET
+  perishable_expiration_date = pg_temp.lvme_annee(t.perishable_expiration_date, g.num_arrivage, true),
+  date_arrivage = pg_temp.lvme_annee(t.date_arrivage, g.num_arrivage, false), version = t.version + 1
+FROM gescom.articles_lot g
+WHERE t.import_id = 'GESCOM-LOT-' || btrim(g.idarticles_lot)
+  AND (extract(year FROM t.perishable_expiration_date) >= 2100 OR extract(year FROM t.date_arrivage) >= 2030);
+
 -- ---------- articles sans prix / poids : dernier arrivage ----------
 UPDATE base_product p SET
   purchase_price = CASE WHEN coalesce(p.purchase_price, 0) = 0 THEN coalesce(x.prix_achat, 0) ELSE p.purchase_price END,
