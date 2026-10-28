@@ -45,20 +45,32 @@ sorties AS (
       AND sm.real_date IS NOT NULL
     GROUP BY sml.tracking_number, COALESCE(sml.from_stock_location, sm.from_stock_location), sm.real_date
 ),
+-- lots réels de l'état des stocks, calculés une seule fois
+etat AS MATERIALIZED (
+    SELECT * FROM lvme_etat_stock_lot WHERE nature_arrivage = 1
+),
+-- dernière vente et rotation par lot / frigo : sorties lues une seule fois (et non lot par lot : trop lent depuis la
+-- reprise des BL GESCOM, 28/10/2026) ; même calcul qu'avant
+rotation AS (
+    SELECT e.tracking_number_id, e.stock_location_id,
+           MAX(s.real_date) AS last_sale_date,
+           SUM(s.qty * (s.real_date - e.arrival_date)) FILTER (WHERE s.real_date >= e.arrival_date)
+             / NULLIF(SUM(s.qty) FILTER (WHERE s.real_date >= e.arrival_date), 0) AS rotation_days
+    FROM etat e
+    JOIN sorties s ON s.tracking_number = e.tracking_number_id AND s.frigo = e.stock_location_id
+    GROUP BY e.tracking_number_id, e.stock_location_id
+),
 base AS (
     SELECT e.*,
            en.marque,
            COALESCE(en.poids_colis, 0)                                     AS poids_colis,
            CASE WHEN COALESCE(en.poids_net, 0) > 0 THEN en.poids_net
                 ELSE e.nb_colis_in * COALESCE(en.poids_colis, 0) END       AS poids_entrees,
-           (SELECT MAX(s.real_date) FROM sorties s
-             WHERE s.tracking_number = e.tracking_number_id AND s.frigo = e.stock_location_id) AS last_sale_date,
-           (SELECT SUM(s.qty * (s.real_date - e.arrival_date)) / NULLIF(SUM(s.qty), 0) FROM sorties s
-             WHERE s.tracking_number = e.tracking_number_id AND s.frigo = e.stock_location_id
-               AND s.real_date >= e.arrival_date)                            AS rotation_days
-    FROM lvme_etat_stock_lot e
+           r.last_sale_date,
+           r.rotation_days
+    FROM etat e
     LEFT JOIN entrees en ON en.tracking_number = e.tracking_number_id AND en.frigo = e.stock_location_id
-    WHERE e.nature_arrivage = 1
+    LEFT JOIN rotation r ON r.tracking_number_id = e.tracking_number_id AND r.stock_location_id = e.stock_location_id
 )
 SELECT b.id,
        0                                 AS version,
