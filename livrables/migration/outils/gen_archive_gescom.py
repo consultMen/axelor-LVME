@@ -7,6 +7,7 @@ Le .sql produit est autonome (données comprises) : psql -U axelor -d <base> -v 
 Relançable : chaque table de l'archive est recréée.
 """
 import csv
+import io
 import os
 import re
 import sys
@@ -26,7 +27,19 @@ def nom_table(fichier):
     base = os.path.splitext(os.path.basename(fichier))[0].lower()
     base = re.sub(r'oct$', '', base).strip('_ ')
     base = re.sub(r'[^a-z0-9_]+', '_', base)
+    # gros fichiers exportés en morceaux (CCE1..CCE4, CCD1..CCD7, CCD5a…) : une seule table
+    base = re.sub(r'^(cce|ccd)_?[0-9]+[a-z]?$', r'\1', base)
     return NOMS.get(base, base)
+
+
+def lire_csv(chemin):
+    """Exports du Centre de Contrôle HFSQL : UTF-8, sinon encodage Windows (cp1252) selon l'export."""
+    brut = open(chemin, 'rb').read()
+    try:
+        texte = brut.decode('utf-8-sig')
+    except UnicodeDecodeError:
+        texte = brut.decode('cp1252')
+    return list(csv.reader(io.StringIO(texte, newline=''), delimiter=';'))
 
 
 def nom_colonne(titre, vus):
@@ -67,27 +80,39 @@ CREATE OR REPLACE FUNCTION gescom.txt(v text) RETURNS text LANGUAGE sql IMMUTABL
 CREATE TABLE IF NOT EXISTS gescom.fichiers (nom_table text PRIMARY KEY, fichier text, lignes integer, colonnes integer,
   charge_le timestamp);
 """)
+        # fichiers regroupés par table (morceaux d'un même fichier GESCOM : mêmes colonnes)
+        tables = {}
         for f in fichiers:
-            chemin = os.path.join(dossier, f)
-            with open(chemin, encoding='utf-8-sig', newline='') as fh:
-                lignes = list(csv.reader(fh, delimiter=';'))
-            if not lignes:
+            tables.setdefault(nom_table(f), []).append(f)
+        for table, morceaux in sorted(tables.items()):
+            lignes = []
+            entete = None
+            for f in morceaux:
+                contenu = lire_csv(os.path.join(dossier, f))
+                if not contenu:
+                    continue
+                if entete is None:
+                    entete = contenu[0]
+                elif contenu[0] != entete:
+                    raise SystemExit('colonnes différentes entre les morceaux de %s : %s' % (table, f))
+                lignes.extend(contenu[1:])
+            if entete is None:
                 continue
             vus = set()
-            cols = [nom_colonne(t, vus) for t in lignes[0]]
-            table = nom_table(f)
-            out.write("\n-- %s (%d lignes)\nDROP TABLE IF EXISTS gescom.%s;\n" % (f, len(lignes) - 1, table))
+            cols = [nom_colonne(t, vus) for t in entete]
+            noms = ', '.join(morceaux)
+            out.write("\n-- %s (%d lignes)\nDROP TABLE IF EXISTS gescom.%s;\n" % (noms, len(lignes), table))
             out.write("CREATE TABLE gescom.%s (%s);\n" % (table, ', '.join('"%s" text' % c for c in cols)))
             out.write("COPY gescom.%s FROM STDIN WITH (FORMAT csv, DELIMITER ';', NULL '\\N');\n" % table)
             w = csv.writer(out, delimiter=';', lineterminator='\n')
-            for r in lignes[1:]:
+            for r in lignes:
                 r = (r + [''] * len(cols))[:len(cols)]
                 w.writerow(r)
             out.write("\\.\n")
             out.write("INSERT INTO gescom.fichiers VALUES ('%s', '%s', %d, %d, now()) ON CONFLICT (nom_table) DO UPDATE "
                       "SET fichier = EXCLUDED.fichier, lignes = EXCLUDED.lignes, colonnes = EXCLUDED.colonnes, "
-                      "charge_le = now();\n" % (table, f.replace("'", "''"), len(lignes) - 1, len(cols)))
-            print('ok %-32s -> gescom.%-22s %7d lignes %4d colonnes' % (f, table, len(lignes) - 1, len(cols)))
+                      "charge_le = now();\n" % (table, noms.replace("'", "''"), len(lignes), len(cols)))
+            print('ok %-40s -> gescom.%-22s %7d lignes %4d colonnes' % (noms[:40], table, len(lignes), len(cols)))
         out.write("\nCOMMIT;\nSELECT nom_table, lignes, colonnes, fichier FROM gescom.fichiers ORDER BY nom_table;\n")
 
 
