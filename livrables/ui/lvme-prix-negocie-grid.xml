@@ -1,0 +1,29 @@
+<grid name="lvme-prix-negocie-grid" title="Prix négociés" model="com.axelor.apps.supplychain.db.PrixNegocie"
+  orderBy="client.partnerSeq,-dateFinStats,rangPalmares" canNew="true" canEdit="false" canDelete="true">
+  <!-- LVME : colonnes des prix négociés GESCOM (PRIX_NEGOC / PRIX_NEGOCE_COUT) ; prix négocié en gras sur fond jaune
+       (lignes blanc / gris : css/lvme.css) -->
+  <field name="client.partnerSeq" title="Client" width="85"/>
+  <field name="client.name" title="Nom" width="170"/>
+  <field name="product.code" title="Produit" width="100"/>
+  <field name="designation" title="Désignation" width="190"/>
+  <field name="dateDebStats" title="Période du" width="80"/>
+  <field name="dateFinStats" title="au" width="80"/>
+  <field name="nbColis" title="Nb Colis" aggregate="sum" x-scale="0" width="65"/>
+  <field name="poidsKg" title="Poids Kg" aggregate="sum" x-scale="0" width="75"/>
+  <field name="unite" title="Unité" width="45"/>
+  <field name="montantHt" title="C.A. HT" aggregate="sum" x-scale="0" width="80"/>
+  <field name="rangPalmares" title="Rang" width="45"/>
+  <field name="dernDateVente" title="Dern. Date" width="80"/>
+  <field name="dernPrixKg" title="Dern. Prix / Kg" x-scale="2" width="65"/>
+  <field name="dernConditionnement" title="Dern. Condt" width="60"/>
+  <field name="prixNegocie" title="Prix négocié" x-scale="2" width="70">
+    <hilite background="warning" strong="true" if="true"/>
+  </field>
+  <field name="dateDebNeg" title="Négocié du" width="80"/>
+  <field name="dateFinNeg" title="au" width="80"/>
+  <field name="pourcRfa" title="% RFA" x-scale="2" width="50"/>
+  <field name="pourcComm" title="% Comm." x-scale="2" width="55"/>
+  <field name="fraisCongel" title="Congél." x-scale="2" width="55"/>
+  <field name="coutPortKg" title="Port / Kg" x-scale="2" width="55"/>
+  <field name="remise" title="% Remise" x-scale="2" width="55"/>
+</grid>

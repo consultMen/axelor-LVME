@@ -1,0 +1,31 @@
+<form name="lvme-prix-negocie-search-form" title="Prix négociés" model="com.axelor.utils.db.Wizard" width="large"
+  canNew="false" canSave="false" canCopy="false" canDelete="false" onNew="action-lvme-prix-negocie-defaults">
+  <!-- LVME : prix négociés de GESCOM (PRIX_NEGOC / PRIX_NEGOCE_COUT), sur un seul écran comme les écrans GESCOM
+       (repère css="lvme-ges-lots-verif") : client, produit, prix en vigueur à une date, période étudiée ; Lancer la
+       recherche, Imprimer, Fermer(F12) ; liste modifiable (fiche en fenêtre) -->
+  <panel name="filtresPrixNegociePanel" showTitle="false" colSpan="12">
+    <panel name="filtreClientPanel" colSpan="4" itemSpan="12" css="lvme-ges-lots-verif lvme-ges-cadre-gris">
+      <field name="$client" title="Client" type="many-to-one" target="com.axelor.apps.base.db.Partner"
+        domain="self.isCustomer = true AND self.isContact = false" canNew="false" canEdit="false" canView="false"
+        placeholder="TOUS" onChange="action-lvme-prix-negocie-refresh"/>
+      <field name="$produit" title="Produit" type="many-to-one" target="com.axelor.apps.base.db.Product"
+        canNew="false" canEdit="false" canView="false" placeholder="TOUS" onChange="action-lvme-prix-negocie-refresh"/>
+    </panel>
+    <panel name="filtreVigueurPanel" colSpan="3" itemSpan="12" css="lvme-ges-cadre-gris">
+      <field name="$enVigueur" title="Seulement les prix en vigueur le" type="boolean"
+        onChange="action-lvme-prix-negocie-refresh"/>
+      <field name="$dateVigueur" title="Date" type="date" onChange="action-lvme-prix-negocie-refresh"/>
+    </panel>
+    <panel name="filtrePeriodePanel" colSpan="3" itemSpan="12" css="lvme-ges-cadre-gris">
+      <field name="$statsDu" title="Période étudiée du" type="date"/>
+      <field name="$statsAu" title="au" type="date"/>
+    </panel>
+    <panel name="boutonsPrixNegociePanel" colSpan="2" itemSpan="12">
+      <button name="lancerRechercheBtn" title="Lancer la recherche" icon="search" onClick="action-lvme-prix-negocie-refresh"/>
+      <button name="imprimerBtn" title="Imprimer" icon="printer" onClick="action-lvme-prix-negocie-imprimer"/>
+      <button name="fermerBtn" title="Fermer(F12)" icon="cancel" css="lvme-btn-ges-rouge" onClick="close"/>
+    </panel>
+  </panel>
+  <panel-dashlet name="prixNegocieDashlet" title="Prix négociés" showTitle="false" colSpan="12" height="500"
+    action="action-lvme-prix-negocie-dashlet"/>
+</form>

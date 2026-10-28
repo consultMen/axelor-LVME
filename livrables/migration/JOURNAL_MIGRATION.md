@@ -335,6 +335,17 @@ CLIENT_RESERV (239). Les morceaux sont regroupés en une table dans l'archive (`
 - La « Liste des RFA par produit / facture » se calcule sur les factures LVME : vide pour l'historique (factures
   GESCOM non recréées, option b) ; elle se remplira avec les factures faites dans LVME.
 
+## 3 nonies. Étape 08 : prix négociés (`MIG_08_prix_negocies.sql`, 28/10/2026)
+
+- PRIX_NEGOC : suivi des prix négociés par client et article (suite du palmarès « pour établissement prix ») : ventes
+  de la période étudiée (2023 à 2025 : colis, quantité, poids, CA, dernière vente, dernier prix au kg, rang, dernier
+  conditionnement), prix négocié et sa période de validité. 2 193 lignes reprises sur 2 194 (1 ligne vide dans
+  GESCOM : ni client ni article), dont 1 558 avec un prix négocié ; 162 en vigueur au 28/10/2026 (8 clients).
+- PRIX_NEGOCE_COUT : % RFA, % commission, congélation, coût du port, remise, par client, article et période de validité
+  du prix : 83 rattachés à leur prix, 8 repris en ligne à part ; 1 non repris (client « 8.6 » inconnu dans GESCOM).
+- Écran Ventes > Prix négociés (liste, fiche, impression). Décision : le prix négocié n'est pas encore proposé
+  automatiquement sur la ligne de commande client (à décider plus tard).
+
 ## 4. Points ouverts à faire préciser par le client
 
 - **cdv** (931 articles, ex. 100 403 ; 210 322) : signification inconnue. Pas trouvé dans `table_base`. Gardé dans

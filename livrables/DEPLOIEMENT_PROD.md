@@ -1,3 +1,20 @@
+# Déploiement prod LVME — RFA par produit (MIG_07) et prix négociés (MIG_08, PROD_105) du 28/10/2026
+
+Déjà en prod : jusqu'à PROD_104 et MIG_06. Code à déployer (recompiler) : modèle PrixNegocie, impression « Prix
+négociés » (Java + LvmePrixNegocies.rptdesign).
+
+1. **PC** : `git push origin main`
+2. **Serveur** : `pg_dump -U axelor -Fc axelor > ~/sauvegarde_avant_mig08_$(date +%F_%H%M).dump`
+3. Re-clone et build comme d'habitude (`git clone …`, `./gradlew war -x test`) ; `git log --oneline -1`.
+4. `sudo systemctl stop axelor-tomcat`
+5. Depuis `~/src/axelor-LVME` :
+   `for f in livrables/migration/MIG_07_rfa_articles.sql livrables/migration/MIG_08_prix_negocies.sql livrables/PROD_105_prix_negocies.sql; do psql -U axelor -d axelor -v ON_ERROR_STOP=1 -f $f || break; done`
+   → `rfa_gescom = rfa_axelor = 50` ; `prix_gescom 2194 / prix_axelor 2193`, `avec_prix_negocie 1558` ; PROD_105 :
+   `vues 3, menu 1, actions 5`. (L'archive MIG_00 sur le serveur contient déjà RFA_ART et PRIX_NEGOC.)
+6. Bascule du war (avec `~/axelor-config.prod.properties`), `sudo systemctl start axelor-tomcat && sudo systemctl restart nginx`.
+
+---
+
 # Déploiement prod LVME — commandes clients GESCOM (MIG_06), PROD_102 à PROD_104 du 28/10/2026
 
 Déjà en prod : PROD_94 à 101, MIG_00 à MIG_05. Code à déployer (recompiler) : impressions État des stocks / Fournisseur

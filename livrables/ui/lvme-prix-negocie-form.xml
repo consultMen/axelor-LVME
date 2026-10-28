@@ -1,0 +1,33 @@
+<form name="lvme-prix-negocie-form" title="Prix négocié" model="com.axelor.apps.supplychain.db.PrixNegocie"
+  width="large">
+  <!-- LVME : fiche d'un prix négocié (ventes de la période étudiée, prix négocié et sa période, éléments de coût) -->
+  <panel name="prixNegociePanel" title="Prix négocié" colSpan="12">
+    <field name="client" colSpan="4" domain="self.isCustomer = true AND self.isContact = false" canNew="false"/>
+    <field name="product" colSpan="3" canNew="false"/>
+    <field name="designation" colSpan="5"/>
+    <field name="prixNegocie" colSpan="3"/>
+    <field name="dateDebNeg" colSpan="3"/>
+    <field name="dateFinNeg" colSpan="3"/>
+    <field name="dernConditionnement" colSpan="3"/>
+  </panel>
+  <panel name="ventesPanel" title="Ventes de la période étudiée" colSpan="12">
+    <field name="dateDebStats" colSpan="2"/>
+    <field name="dateFinStats" colSpan="2"/>
+    <field name="nbColis" colSpan="2"/>
+    <field name="qtesUv" colSpan="2"/>
+    <field name="unite" colSpan="1"/>
+    <field name="poidsKg" colSpan="2"/>
+    <field name="rangPalmares" colSpan="1"/>
+    <field name="montantHt" colSpan="3"/>
+    <field name="dernDateVente" colSpan="3"/>
+    <field name="dernPrixVente" colSpan="3"/>
+    <field name="dernPrixKg" colSpan="3"/>
+  </panel>
+  <panel name="coutsPanel" title="Éléments de coût" colSpan="12">
+    <field name="pourcRfa" colSpan="2"/>
+    <field name="pourcComm" colSpan="2"/>
+    <field name="fraisCongel" colSpan="2"/>
+    <field name="coutPortKg" colSpan="3"/>
+    <field name="remise" colSpan="3"/>
+  </panel>
+</form>

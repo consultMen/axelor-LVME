@@ -412,6 +412,36 @@ public class LvmeImpressionListesController {
     }
   }
 
+  /** « Imprimer » de l'écran Prix négociés (PRIX_NEGOC de GESCOM) : par client, filtres de l'écran. */
+  public void imprimerPrixNegocies(ActionRequest request, ActionResponse response) {
+    try {
+      Map<String, Object> c = request.getContext();
+      Partner client = JPA.find(Partner.class, id(c.get("client")));
+      Product produit = JPA.find(Product.class, id(c.get("produit")));
+      boolean enVigueur = Boolean.TRUE.equals(c.get("enVigueur"));
+      String dateVigueur = date(c.get("dateVigueur"), java.time.LocalDate.now().toString());
+      StringBuilder filtres = new StringBuilder();
+      ajouter(filtres, client != null ? "Client " + client.getName() : "Tous les clients");
+      ajouter(filtres, produit != null ? "Produit " + produit.getCode() : "");
+      ajouter(filtres, enVigueur ? "Prix en vigueur le " + jour(dateVigueur) : "");
+      ajouterPeriode(filtres, "Période étudiée", c.get("statsDu"), c.get("statsAu"));
+      ouvrir(
+          response,
+          ReportFactory.createReport("LvmePrixNegocies.rptdesign", "Prix negocies-${date}")
+              .addParam("Client", String.valueOf(client != null ? client.getId() : 0L))
+              .addParam("Produit", String.valueOf(produit != null ? produit.getId() : 0L))
+              .addParam("Vigueur", enVigueur ? "1" : "0")
+              .addParam("DateVigueur", dateVigueur)
+              .addParam("StatsFiltre", filtre(c.get("statsDu"), c.get("statsAu")))
+              .addParam("StatsDu", date(c.get("statsDu"), DEBUT))
+              .addParam("StatsAu", date(c.get("statsAu"), FIN))
+              .addParam("Filtres", filtres.toString()),
+          "Prix négociés");
+    } catch (Exception e) {
+      TraceBackService.trace(response, e);
+    }
+  }
+
   /**
    * Filtres client / produit des écrans Palmarès et État des besoins (paramètres du rapport et
    * phrase de GESCOM « Pour le client … pour toutes les familles … »).

@@ -565,3 +565,42 @@ rapport('LvmeEtatBesoins.rptdesign', p_b | {'Filtres', 'Periodes'}, [jeu_b],
         + tableau('BesoinsDS', COLS_BESOINS, LIGNES_BESOINS, ('#FFFFFF', '#FFFFFF'),
                   prop('backgroundColor', '#FFFFFF'),
                   groupe=('produit', '', '#A0A0A0', SOMMES_BESOINS, (), ('designation',), ('rang',))))
+
+# ---------- prix négociés (PRIX_NEGOC / PRIX_NEGOCE_COUT de GESCOM), par client, mêmes filtres que l'écran ----------
+SQL_PRIX_NEGOCIES = '''SELECT c.partner_seq || ' - ' || c.name AS client, a.code AS produit, n.designation,
+  n.date_deb_stats, n.date_fin_stats, n.nb_colis, n.poids_kg, n.montant_ht, n.rang_palmares, n.dern_date_vente,
+  n.dern_prix_kg, n.prix_negocie, n.date_deb_neg, n.date_fin_neg, n.pourc_rfa, n.pourc_comm, n.cout_port_kg, n.remise
+FROM lvme_prix_negocie n
+JOIN base_partner c ON c.id = n.client
+LEFT JOIN base_product a ON a.id = n.product
+WHERE (CAST(:Client AS bigint) = 0 OR n.client = CAST(:Client AS bigint))
+  AND (CAST(:Produit AS bigint) = 0 OR n.product = CAST(:Produit AS bigint))
+  AND (:Vigueur = '0' OR (n.prix_negocie IS NOT NULL
+       AND coalesce(n.date_deb_neg, DATE '1900-01-01') <= CAST(:DateVigueur AS date)
+       AND coalesce(n.date_fin_neg, DATE '2999-12-31') >= CAST(:DateVigueur AS date)))
+  AND (:StatsFiltre = '0' OR (n.date_fin_stats >= CAST(:StatsDu AS date) AND n.date_deb_stats <= CAST(:StatsAu AS date)))
+ORDER BY c.partner_seq, n.date_fin_stats DESC, n.rang_palmares, a.code'''
+COLS_PRIX_NEGOCIES = [('client', 'string'), ('produit', 'string'), ('designation', 'string'), ('date_deb_stats', 'date'),
+                      ('date_fin_stats', 'date'), ('nb_colis', 'decimal'), ('poids_kg', 'decimal'),
+                      ('montant_ht', 'decimal'), ('rang_palmares', 'integer'), ('dern_date_vente', 'date'),
+                      ('dern_prix_kg', 'decimal'), ('prix_negocie', 'decimal'), ('date_deb_neg', 'date'),
+                      ('date_fin_neg', 'date'), ('pourc_rfa', 'decimal'), ('pourc_comm', 'decimal'),
+                      ('cout_port_kg', 'decimal'), ('remise', 'decimal')]
+LIGNES_PRIX_NEGOCIES = [
+    ('Client', 'client', 3.0, None, None), ('Produit', 'produit', 1.7, None, None),
+    ('Désignation', 'designation', 3.6, None, None), ('Période du', 'date_deb_stats', 1.3, 'date', None),
+    ('au', 'date_fin_stats', 1.3, 'date', None), ('Nb Colis', 'nb_colis', 0.9, '#,##0', None),
+    ('Poids Kg', 'poids_kg', 1.1, '#,##0', None), ('C.A. HT', 'montant_ht', 1.3, '#,##0', None),
+    ('Rang', 'rang_palmares', 0.6, '#,##0', None), ('Dern. Date', 'dern_date_vente', 1.3, 'date', None),
+    ('Dern. Prix / Kg', 'dern_prix_kg', 1.0, '#,##0.00', None),
+    ('Prix négocié', 'prix_negocie', 1.0, '#,##0.00', '#FFFF99'),
+    ('Négocié du', 'date_deb_neg', 1.3, 'date', None), ('au', 'date_fin_neg', 1.3, 'date', None),
+    ('% RFA', 'pourc_rfa', 0.7, '#,##0.00', None), ('% Comm.', 'pourc_comm', 0.7, '#,##0.00', None),
+    ('Port / Kg', 'cout_port_kg', 0.7, '#,##0.00', None), ('% Remise', 'remise', 0.7, '#,##0.00', None),
+]
+jeu_pn, p_pn = jeu('PrixNegociesDS', SQL_PRIX_NEGOCIES, COLS_PRIX_NEGOCIES)
+rapport('LvmePrixNegocies.rptdesign', p_pn | {'Filtres'}, [jeu_pn],
+        entete('Prix négociés', FILTRES)
+        + tableau('PrixNegociesDS', COLS_PRIX_NEGOCIES, LIGNES_PRIX_NEGOCIES, ('#FFFFFF', '#F4F4F4'),
+                  prop('backgroundColor', '#DCDCDC'), sommes=('nb_colis', 'poids_kg', 'montant_ht'),
+                  groupe=('client', 'Total client', '#E6E6E6', ('nb_colis', 'poids_kg', 'montant_ht'), ('client',))))

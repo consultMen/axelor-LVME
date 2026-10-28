@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<domain-models xmlns="http://axelor.com/xml/ns/domain-models"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://axelor.com/xml/ns/domain-models http://axelor.com/xml/ns/domain-models/domain-models_7.4.xsd">
+
+  <module name="supplychain" package="com.axelor.apps.supplychain.db"/>
+
+  <!-- LVME : prix négociés de GESCOM (PRIX_NEGOC et PRIX_NEGOCE_COUT) : pour un client et un article, les ventes de la
+    période étudiée (palmarès « pour établissement prix »), le prix négocié et sa période de validité, et les éléments
+    de coût retenus (RFA, commission, congélation, port, remise). Écran « Prix négociés » (menu Ventes). -->
+  <entity name="PrixNegocie" table="lvme_prix_negocie" cacheable="false">
+    <many-to-one name="client" ref="com.axelor.apps.base.db.Partner" title="Client"/>
+    <many-to-one name="product" ref="com.axelor.apps.base.db.Product" title="Produit"/>
+    <string name="designation" title="Désignation"/>
+    <date name="dateDebStats" title="Période du"/>
+    <date name="dateFinStats" title="au"/>
+    <decimal name="nbColis" title="Nb Colis" precision="20" scale="3"/>
+    <decimal name="qtesUv" title="Qtés en UV" precision="20" scale="3"/>
+    <string name="unite" title="Unité"/>
+    <decimal name="poidsKg" title="Poids Kg" precision="20" scale="3"/>
+    <decimal name="montantHt" title="C.A. HT" precision="20" scale="2"/>
+    <date name="dernDateVente" title="Dern. Date"/>
+    <decimal name="dernPrixVente" title="Dern. Prix" precision="20" scale="4"/>
+    <decimal name="dernPrixKg" title="Dern. Prix / Kg" precision="20" scale="4"/>
+    <integer name="rangPalmares" title="Rang"/>
+    <string name="dernConditionnement" title="Dern. Condt"/>
+    <decimal name="prixNegocie" title="Prix négocié" precision="20" scale="4"/>
+    <date name="dateDebNeg" title="Négocié du"/>
+    <date name="dateFinNeg" title="au"/>
+    <decimal name="pourcRfa" title="% RFA" precision="10" scale="2"/>
+    <decimal name="pourcComm" title="% Comm." precision="10" scale="2"/>
+    <decimal name="fraisCongel" title="Congél." precision="10" scale="4"/>
+    <decimal name="coutPortKg" title="Coût port / Kg" precision="10" scale="4"/>
+    <decimal name="remise" title="% Remise" precision="10" scale="2"/>
+  </entity>
+
+</domain-models>
