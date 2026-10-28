@@ -1,9 +1,12 @@
 -- =====================================================================
 -- PROD étape 101 : « Historique Produit » sans produit choisi = tous les produits de la période (ex. les 3 derniers
 -- mois) ; avec un produit, inchangé. Totaux du bas : LvmeHistoriqueProduitController.valider (recompiler).
--- L'impression reste par produit. Relançable.
+-- L'impression reste par produit. Opérations diverses : type GESCOM (PE, CA, ED…) et libellé saisi au lieu de
+-- « IN / ISM… » (vue lvme_historique_produit, mêmes colonnes). À lancer depuis la racine du dépôt. Relançable.
 -- =====================================================================
 BEGIN;
+
+\i open-suite-webapp/modules/axelor-open-suite/axelor-supplychain/src/main/resources/sql/lvme_historique_produit.sql
 
 UPDATE meta_action SET xml = replace(xml, '<domain>self.product.id = :_prod AND',
                                           '<domain>(:_prod = 0 OR self.product.id = :_prod) AND'),

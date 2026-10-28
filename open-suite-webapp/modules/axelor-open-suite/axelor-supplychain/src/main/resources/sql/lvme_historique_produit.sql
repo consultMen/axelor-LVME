@@ -7,7 +7,8 @@
 --   un transfert entre deux frigos donne donc deux lignes (comme GESCOM).
 --
 -- Type : AR arrivage fournisseur, BL livraison client, RC retour client,
---        RF retour fournisseur, CE transfert interne, IN inventaire / correction
+--        RF retour fournisseur, CE transfert interne, IN inventaire / correction,
+--        code GESCOM de l'opération diverse (PE perte, CA casse, ED entrée diverse…)
 -- Arrivage : N° du BR fournisseur d'origine du lot
 -- Date    : date réelle du mouvement, sinon date prévue (les arrivages repris de GESCOM n'ont que la date prévue)
 -- Poids   : quantité réelle de la ligne
@@ -25,6 +26,8 @@ WITH mvts AS (
            sm.id                                                 AS stock_move_id,
            COALESCE(sm.real_date, sm.estimated_date) AS real_date,
            sm.stock_move_seq,
+           sm.origin,
+           COALESCE(NULLIF(sml.description, ''), sml.name) AS libelle_ligne,
            sm.type_select,
            COALESCE(sm.is_reversion, false)                      AS is_reversion,
            sm.partner,
@@ -57,6 +60,8 @@ typed AS (
              WHEN s.type_select = 3 THEN 'RC'
              WHEN s.type_select = 2 AND NOT s.is_reversion THEN 'BL'
              WHEN s.type_select = 2 THEN 'RF'
+             -- opération diverse (écran OD) : code du type GESCOM (PE, CA, ED…)
+             WHEN s.origin LIKE 'OD %' THEN substr(s.origin, 4)
              WHEN s.from_type = 3 OR s.to_type = 3 THEN 'IN'
              ELSE 'CE'
            END AS type_mvt,
@@ -96,6 +101,7 @@ SELECT (t.sml_id * 10 + CASE WHEN t.sens = 'E' THEN 1 ELSE 2 END)::bigint AS id,
        CASE
          WHEN t.type_mvt = 'AR' THEN 'Arrivage ' || t.stock_move_seq || '/' || COALESCE(p.code, '')
                                      || COALESCE('/' || t.tracking_number_seq, '')
+         WHEN t.origin LIKE 'OD %' THEN COALESCE(NULLIF(t.libelle_ligne, ''), t.origin) || ' / ' || t.stock_move_seq
          ELSE COALESCE('FACT ' || t.facture, t.stock_move_seq) || COALESCE(' / ' || pa.partner_seq, '')
        END                               AS libelle,
        t.type_mvt                        AS type_mvt,
