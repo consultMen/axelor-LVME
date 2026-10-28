@@ -1,0 +1,44 @@
+<form name="lvme-od-stock-form" title="Opérations Diverses sur les Stocks / Lots" model="com.axelor.utils.db.Wizard" width="large"
+  canNew="false" canSave="false" canCopy="false" canDelete="false" onNew="action-lvme-od-stock-defaults">
+  <!-- LVME : écran « Opérations Diverses sur les Stocks / Lots » de GESCOM, même haut que « Lots Vérifiés » (repère
+       css="lvme-ges-lots-verif") : Référence produit ou Lot n°, cadre Entrées, cadre Sélection, Afficher Lots /
+       Fermer ; en bas N° Lot, Type Mouvement, Libellé Mvts, Entrée/Sortie, Date OD, Unité, Poids (Kg),
+       Valider / Annuler (mouvement de stock réalisé, LvmeOperationDiverseController) -->
+  <panel name="filtresLotsPanel" showTitle="false" colSpan="12">
+    <panel name="filtreProduitPanel" colSpan="4" itemSpan="12" css="lvme-ges-lots-verif">
+      <field name="$produit" title="Référence Produit" type="many-to-one" target="com.axelor.apps.base.db.Product"
+        canNew="false" canEdit="false" canView="false"/>
+      <field name="$numeroLot" title="ou Lot n°" type="string" css="lvme-lot-violet"/>
+    </panel>
+    <panel name="filtreEntreePanel" colSpan="3" itemSpan="12" css="lvme-ges-cadre-gris">
+      <field name="$entreeDu" title="Entrées du" type="date"/>
+      <field name="$entreeAu" title="au" type="date"/>
+      <field name="$entreePeriode" title="Période prédéfinie" type="integer" selection="lvme.etat.stock.periode.select"
+        onChange="action-lvme-lots-verifies-periode"/>
+    </panel>
+    <panel name="filtreSelectionPanel" title="Sélection" colSpan="3" itemSpan="12">
+      <field name="$selectionLots" showTitle="false" type="integer" widget="RadioSelect" selection="lvme.lots.selection.select"/>
+    </panel>
+    <panel name="filtreBoutonPanel" colSpan="2" itemSpan="12">
+      <button name="afficherLotsBtn" title="Afficher Lots" icon="check-circle" onClick="action-lvme-od-stock-refresh"/>
+      <button name="fermerBtn" title="Fermer" icon="x-circle" onClick="close"/>
+    </panel>
+  </panel>
+  <panel-dashlet name="lotsDashlet" title="Lots" showTitle="false" colSpan="12" height="500" action="action-lvme-od-stock-dashlet"/>
+  <panel name="odPanel" showTitle="false" colSpan="12">
+    <field name="$lotOd" title="N° Lot" type="many-to-one" target="com.axelor.apps.stock.db.TrackingNumber"
+      colSpan="2" canNew="false" canEdit="false" canView="false" onChange="action-lvme-od-stock-lot"
+      domain="(:produit IS NULL OR self.product = :produit)"/>
+    <field name="$typeMouvement" title="Type Mouvement" type="string" selection="lvme.od.type.select" colSpan="2"
+      onChange="action-lvme-od-stock-type"/>
+    <field name="$libelleMvt" title="Libellé Mvts" type="string" colSpan="3"/>
+    <field name="$sensMvt" title="Entrée/Sortie" type="string" readonly="true" colSpan="1"/>
+    <field name="$dateOd" title="Date OD" type="date" colSpan="1"/>
+    <field name="$uniteOd" title="Unité" type="string" readonly="true" colSpan="1"/>
+    <field name="$poidsOd" title="Poids (Kg)" type="decimal" colSpan="1"/>
+    <panel name="odBoutonsPanel" showTitle="false" colSpan="1" itemSpan="12">
+      <button name="validerOdBtn" title="Valider" icon="check-circle" onClick="action-lvme-od-stock-valider"/>
+      <button name="annulerOdBtn" title="Annuler" icon="slash-circle" onClick="action-lvme-od-stock-annuler"/>
+    </panel>
+  </panel>
+</form>

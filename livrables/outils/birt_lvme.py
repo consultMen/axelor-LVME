@@ -141,12 +141,19 @@ def tableau(dataset, cols_ds, colonnes, couleurs, entete_style, sommes=(), group
     """colonnes : (titre, colonne, largeur cm, format, fond de cellule ou None) ; couleurs : (fond ligne paire,
     fond ligne impaire) ; groupe : (colonne de groupe, libellé de la ligne de totaux, couleur, sommes du groupe[,
     colonnes de la ligne d'en-tête du groupe]) : avec ces colonnes, chaque groupe commence par une ligne d'en-tête
-    (comme les arrivages de la Synthèse GESCOM) et elles restent vides sur les lignes de détail."""
+    (comme les arrivages de la Synthèse GESCOM) et elles restent vides sur les lignes de détail[, colonnes reprises
+    telles quelles sur la ligne de totaux[, colonnes reprises sur la ligne de totaux et vides sur les lignes de
+    détail (ex. rang du produit)]]."""
     tete_g = groupe[4] if groupe and len(groupe) > 4 else ()
+    vals_g = groupe[5] if groupe and len(groupe) > 5 else ()
+    seul_total_g = groupe[6] if groupe and len(groupe) > 6 else ()
+    vals_g = tuple(vals_g) + tuple(seul_total_g)
+    tete_g = tuple(tete_g)
+    vide_detail = tete_g + tuple(seul_total_g)
     cell = bordure('#C8C8C8') + padding()
     tete = ''.join(cellule(label(t, taille='6.5pt', gras=True, couleur='#10204A', align='center'),
                            entete_style + cell + prop('verticalAlign', 'bottom')) for t, _, _, _, _ in colonnes)
-    detail = ''.join(cellule('' if c in tete_g else data(c, f, taille='6.5pt',
+    detail = ''.join(cellule('' if c in vide_detail else data(c, f, taille='6.5pt',
                                                           align='right' if f and f != 'date' else None),
                              cell + (prop('backgroundColor', fond) if fond else '')) for _, c, _, f, fond in colonnes)
     regles = ('<list-property name="highlightRules">' + ''.join(
@@ -161,7 +168,9 @@ def tableau(dataset, cols_ds, colonnes, couleurs, entete_style, sommes=(), group
         agg += agregats(sommes_g, prefixe='grp_', groupe='groupe')
         pied_g = ''
         for i, (_, c, _, f, _) in enumerate(colonnes):
-            if i == 0 and not tete_g:
+            if c in vals_g:
+                contenu = data(c, f, taille='6.5pt', gras=True, align='right' if f and f != 'date' else None)
+            elif i == 0 and not tete_g:
                 contenu = data(col_g, taille='6.5pt', gras=True)
             elif i == (0 if tete_g else 1):
                 contenu = label(lib_g, taille='6.5pt', gras=True)

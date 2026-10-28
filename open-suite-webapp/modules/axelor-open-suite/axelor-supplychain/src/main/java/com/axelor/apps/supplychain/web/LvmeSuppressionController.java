@@ -41,7 +41,8 @@ public class LvmeSuppressionController {
     supprimer(request, response, "arrivage(s)", this::supprimerArrivage);
   }
 
-  // ---------- corbeille native (en-tête de la liste) : contrôle avant la suppression par Axelor ----------
+  // ---------- corbeille native (en-tête de la liste) : contrôle avant la suppression par Axelor
+  // ----------
 
   public void verifierSuppressionCommandeClient(ActionRequest request, ActionResponse response) {
     verifier(request, response, this::refusCommandeClient, false);
@@ -56,9 +57,10 @@ public class LvmeSuppressionController {
   }
 
   /**
-   * Action onDelete de la liste, lancée par Axelor avant sa suppression native : si une ligne cochée
-   * n'est ni brouillon ni annulée, erreur (rien n'est supprimé) avec la liste des pièces à annuler
-   * d'abord. Arrivages : les lots créés pour leurs lignes en sont détachés (sinon la base refuse).
+   * Action onDelete de la liste, lancée par Axelor avant sa suppression native : si une ligne
+   * cochée n'est ni brouillon ni annulée, erreur (rien n'est supprimé) avec la liste des pièces à
+   * annuler d'abord. Arrivages : les lots créés pour leurs lignes en sont détachés (sinon la base
+   * refuse).
    */
   protected void verifier(
       ActionRequest request,
@@ -122,7 +124,9 @@ public class LvmeSuppressionController {
             || status == PurchaseOrderRepository.STATUS_REQUESTED
             || status == PurchaseOrderRepository.STATUS_CANCELED
         ? null
-        : "Commande " + commande.getPurchaseOrderSeq() + " validée : l'annuler d'abord dans sa fiche";
+        : "Commande "
+            + commande.getPurchaseOrderSeq()
+            + " validée : l'annuler d'abord dans sa fiche";
   }
 
   protected String refusArrivage(Long id) {
@@ -131,7 +135,8 @@ public class LvmeSuppressionController {
       return null;
     }
     int status = arrivage.getStatusSelect();
-    if (status == StockMoveRepository.STATUS_DRAFT || status == StockMoveRepository.STATUS_CANCELED) {
+    if (status == StockMoveRepository.STATUS_DRAFT
+        || status == StockMoveRepository.STATUS_CANCELED) {
       return null;
     }
     return "Arrivage "

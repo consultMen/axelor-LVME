@@ -20,8 +20,8 @@ import java.time.LocalDate;
 
 /**
  * LVME : une ligne dupliquée ne garde pas le lot de la ligne d'origine (la copie diffère en général
- * par un détail, ex. le conditionnement). Si l'article génère ses lots à l'achat, un nouveau lot
- * « AE » + numéro est créé pour la copie, comme au choix de l'article ; sinon le lot de la copie
+ * par un détail, ex. le conditionnement). Si l'article génère ses lots à l'achat, un nouveau lot «
+ * AE » + numéro est créé pour la copie, comme au choix de l'article ; sinon le lot de la copie
  * reste vide et l'utilisateur le choisit ou le crée.
  */
 public class PurchaseOrderLineDuplicateServiceSupplychainImpl

@@ -204,8 +204,8 @@
     <string name="refFournisseur" title="Référence Fournisseur"/>
     <!-- LVME : nom scientifique de l'espèce (écran « Lignes Arrivages » GESCOM) -->
     <string name="nomScientifique" title="Nom scientifique"/>
-    <!-- LVME : réf. douanière saisie librement comme dans GESCOM (ex. 03048990) ; le « Code douanier »
-      Axelor (table de nomenclature, DEB) reste à part -->
+    <!-- LVME : réf. douanière saisie librement comme dans GESCOM (ex. 03048990) ; le « Code douanier
+      » Axelor (table de nomenclature, DEB) reste à part -->
     <string name="refDouaniere" title="Réf. douanière"/>
     <decimal name="poidsColis" title="Poids Colis" precision="20" scale="3"/>
     <decimal name="salePriceTtc" title="P.Vente TTC" precision="20" scale="4"

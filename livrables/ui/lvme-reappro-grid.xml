@@ -1,0 +1,24 @@
+<grid name="lvme-reappro-grid" title="Aides aux Réapprovisionnements" model="com.axelor.apps.supplychain.db.ReapproLigne"
+  orderBy="fournisseurName,productCode" canNew="false" canEdit="false" canDelete="false">
+  <!-- LVME : colonnes de l'écran « Aides aux Réapprovisionnements » GESCOM (lignes blanc / gris, couleurs dans
+       css/lvme.css) -->
+  <field name="fournisseurName" title="Fournisseur" width="160"/>
+  <field name="refFournisseur" title="Réf.du Fourn" width="80"/>
+  <field name="productCode" title="Produit" width="90"/>
+  <field name="productName" title="Désignation" width="210"/>
+  <field name="unite" title="Unité" width="40"/>
+  <field name="qteVendues" title="Qtes vendues période stats" x-scale="0" width="55"/>
+  <field name="qteCdes" title="Qtes Cdes Clients" x-scale="0" width="50"/>
+  <field name="qteVtesCdes" title="Qtes Vtes Art.en Cdes" x-scale="0" width="50"/>
+  <field name="qteArrReels" title="Qtes Arr. Réels" x-scale="0" width="50"/>
+  <field name="qteDlcCourte" title="Stock DLC Courte" x-scale="0" width="50"/>
+  <field name="qteArrFlottants" title="Qtes Arr. Flottants" x-scale="0" width="50"/>
+  <field name="poidsVendus" title="Poids vendus Stats" x-scale="0" width="55"/>
+  <field name="poidsCdes" title="Poids Cdes Clients" x-scale="0" width="50"/>
+  <field name="poidsVtesCdes" title="Poids Vtes Art en cdes" x-scale="0" width="50"/>
+  <field name="poidsArrReels" title="Poids arr. Réels" x-scale="0" width="50"/>
+  <field name="poidsDlcCourte" title="Poids stock DLC courte" x-scale="0" width="50"/>
+  <field name="poidsArrFlottants" title="Poids Arr. Flottants" x-scale="0" width="50"/>
+  <field name="qteCommander" title="Qtes à commander" x-scale="0" width="55"/>
+  <field name="poidsCommander" title="Poids à Commander" x-scale="0" width="60"/>
+</grid>

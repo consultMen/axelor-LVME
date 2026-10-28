@@ -1868,3 +1868,53 @@
 [class*="_formView_"]:has(.lvme-ges-palm) [class*="_main_"] button [class*="_icon_"] {
   color: #1aa33a !important;
 }
+
+/*
+ * « Interrogation Produit » copié sur GESCOM (repère css="lvme-ges-interro", avec "lvme-ges-lots-verif" pour la mise
+ * en page serrée) : fond gris-bleu, lignes blanc / cyan (texte violet sur les lignes cyan), Nb colis Stock et Nb colis
+ * Dispo en jaune, ligne sélectionnée bleu nuit, liste sur la hauteur restante.
+ */
+[class*="_formView_"]:has(.lvme-ges-interro) [class*="_main_"],
+[class*="_formView_"]:has(.lvme-ges-interro) [class*="_main_"] > [class*="_panel_"],
+[class*="_formView_"]:has(.lvme-ges-interro) [class*="_main_"] > [class*="_panel_"] [class*="_body_"] {
+  background-color: #c5cde0 !important;
+}
+[class*="_formView_"]:has(.lvme-ges-interro) [class*="_main_"] > [class*="_container_"] {
+  height: calc(100vh - 250px) !important;
+  min-height: 200px;
+}
+[class*="_formView_"]:has(.lvme-ges-interro) [class*="_main_"] > [class*="_container_"] [class*="_body_"] [class*="_row_"]:nth-child(even) [class*="_column_"] {
+  background-color: #8ff7f7;
+  color: #b01fd8;
+}
+[class*="_formView_"]:has(.lvme-ges-interro) [class*="_main_"] > [class*="_container_"] .bg-warning,
+[class*="_formView_"]:has(.lvme-ges-interro) [class*="_main_"] > [class*="_container_"] [class*="_row_"] [class*="_column_"].bg-warning {
+  background-color: #ffff99 !important;
+}
+[class*="_formView_"]:has(.lvme-ges-interro) [class*="_main_"] > [class*="_container_"] [class*="_body_"] [class*="_row_"][class*="_selected_"] [class*="_column_"] {
+  background-color: #14234f !important;
+  color: #ffffff !important;
+}
+
+/*
+ * « Etat des besoins » (GESCOM) : cadres de dates Année N / Année N-1 bordés d'orange, Année N-1 période réappro
+ * bordé de vert, titres des cadres en violet au-dessus.
+ */
+[class*="_formView_"] .lvme-besoins-orange {
+  border: 1px solid #e8742c !important;
+  border-radius: 0 !important;
+}
+[class*="_formView_"] .lvme-besoins-vert {
+  border: 1px solid #2e9e3a !important;
+  border-radius: 0 !important;
+}
+[class*="_formView_"] :is(.lvme-besoins-orange, .lvme-besoins-vert) > [class*="_header_"],
+[class*="_formView_"] :is(.lvme-besoins-orange, .lvme-besoins-vert) > [class*="_header_"] * {
+  background: transparent !important;
+  border: 0 !important;
+  color: #a020f0 !important;
+  font-weight: 700 !important;
+  font-size: 12px !important;
+  text-align: center;
+  justify-content: center;
+}

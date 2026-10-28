@@ -78,8 +78,10 @@
       min="0" max="100"/>
     <many-to-one name="commercial" ref="com.axelor.auth.db.User" title="Commercial"/>
     <!-- LVME : champs de la « Fiche Commande client » GESCOM -->
-    <many-to-one name="lvmePreparateur" ref="com.axelor.auth.db.User" title="Préparateur"/>
-    <decimal name="lvmeFraisCongelation" title="% Frais Cong." precision="5" scale="2" nullable="true"/>
+    <many-to-one name="lvmePreparateur" ref="com.axelor.auth.db.User"
+      title="Préparateur"/>
+    <decimal name="lvmeFraisCongelation" title="% Frais Cong." precision="5" scale="2"
+      nullable="true"/>
     <boolean name="portPaye" title="Port Payé"/>
     <decimal name="coutPortKg" title="Coût port/kg (€/kg)" precision="10" scale="4"/>
     <!-- LVME REC-009 : commande de réservation (stock bloqué, convertible en commande ferme) -->

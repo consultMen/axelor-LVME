@@ -78,7 +78,8 @@
       (estimated_delivery_date < date(now()) AND status_select = 3 AND delivery_state != 3)
       ]]>
     </boolean>
-    <!-- LVME : « N° BL » de la liste des commandes clients GESCOM : n° des livraisons (BL non annulés) de la commande -->
+    <!-- LVME : « N° BL » de la liste des commandes clients GESCOM : n° des livraisons (BL non annulés)
+      de la commande -->
     <string name="lvmeNumeroBl" title="N° BL" formula="true">
       <![CDATA[
       (SELECT string_agg(stock_stock_move.stock_move_seq, ', ') FROM stock_stock_move

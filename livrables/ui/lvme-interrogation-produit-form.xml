@@ -1,0 +1,35 @@
+<form name="lvme-interrogation-produit-form" title="Interrogation Produit" model="com.axelor.utils.db.Wizard" width="large"
+  canNew="false" canSave="false" canCopy="false" canDelete="false" onNew="action-lvme-interrogation-produit-defaults">
+  <!-- LVME : écran « Interrogation Produit » de GESCOM sur un seul écran (repères css="lvme-ges-lots-verif" pour la
+       mise en page serrée et "lvme-ges-interro" pour les couleurs) : Article du + désignation, OU Lot n°, Lot
+       Fournisseur n° (violets), Origine, Sélection, Lancer la recherche, Fermer(F12) ; en bas Historique produit et
+       Cdes client / produit du produit choisi -->
+  <panel name="filtresInterroPanel" showTitle="false" colSpan="12">
+    <panel name="filtreArticlePanel" colSpan="6" css="lvme-ges-lots-verif lvme-ges-interro">
+      <field name="$produit" title="Article du" type="many-to-one" target="com.axelor.apps.base.db.Product"
+        target-name="code" colSpan="5" canNew="false" canEdit="false" canView="false"
+        onChange="action-lvme-interrogation-produit-designation"/>
+      <field name="$designation" showTitle="false" type="string" readonly="true" colSpan="7"/>
+      <field name="$numeroLot" title="OU Lot n°" type="string" colSpan="5" css="lvme-lot-violet"/>
+      <field name="$origine" title="Origine" type="string" selection="lvme.origine.select" colSpan="7"/>
+      <field name="$lotFournisseur" title="Lot Fournisseur n°" type="string" colSpan="5" css="lvme-lot-violet"/>
+    </panel>
+    <panel name="filtreSelectionPanel" title="Sélection" colSpan="2" itemSpan="12">
+      <field name="$selectionLots" showTitle="false" type="integer" widget="RadioSelect" selection="lvme.lots.selection.select"/>
+    </panel>
+    <panel name="filtreBoutonPanel" colSpan="2" itemSpan="12">
+      <button name="lancerRechercheBtn" title="Lancer la recherche" icon="search" onClick="action-lvme-interrogation-produit-refresh"/>
+    </panel>
+    <panel name="filtreFermerPanel" colSpan="2" itemSpan="12">
+      <button name="fermerBtn" title="Fermer(F12)" icon="cancel" css="lvme-btn-ges lvme-btn-ges-rouge" onClick="close"/>
+    </panel>
+  </panel>
+  <panel-dashlet name="lotsDashlet" title="Lots" showTitle="false" colSpan="12" height="480"
+    action="action-lvme-interrogation-produit-dashlet"/>
+  <panel name="boutonsBasPanel" showTitle="false" colSpan="12">
+    <button name="historiqueProduitBtn" title="Historique produit" icon="description" colSpan="2"
+      onClick="action-lvme-interrogation-produit-historique"/>
+    <button name="cdesClientProduitBtn" title="Cdes client/produit" icon="description" colSpan="2"
+      onClick="action-lvme-interrogation-produit-cdes"/>
+  </panel>
+</form>

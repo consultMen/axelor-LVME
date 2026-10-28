@@ -1,0 +1,38 @@
+<grid name="lvme-interrogation-produit-grid" title="Interrogation Produit" model="com.axelor.apps.supplychain.db.InterrogationProduit"
+  orderBy="productCode,arrivalDate" canNew="false" canEdit="false" canDelete="false">
+  <!-- LVME : colonnes et ordre de l'écran « Interrogation Produit » GESCOM ; lignes blanc / cyan (texte violet sur les
+       lignes cyan), Nb colis Stock et Nb colis Dispo en jaune (couleurs dans css/lvme.css), sommes en bas -->
+  <field name="productCode" title="Produit" width="95"/>
+  <field name="productName" title="Désignation" width="190"/>
+  <field name="supplierName" title="Fournisseur" width="160"/>
+  <field name="stockLocation" title="Frigo" width="75"/>
+  <field name="lotNumber" title="N° Lot" width="100"/>
+  <field name="arrivalNumber" title="N°Arrivage" width="70"/>
+  <field name="origine" title="Origine" selection="lvme.origine.select" width="70"/>
+  <field name="arrivalDate" title="Livrée le" width="80"/>
+  <field name="dluo" title="D. L. C." width="80"/>
+  <field name="prixRevient" title="Prix Revient" width="60"/>
+  <field name="qtyPerColis" title="Poids Colis" x-scale="0" width="50"/>
+  <field name="nbColisIn" title="Nb Colis Entrées" x-scale="0" width="60"/>
+  <field name="nbColisOut" title="Nb Colis Sorties" x-scale="0" width="60"/>
+  <field name="conditionnement" title="Conditionnement" width="110"/>
+  <field name="nbColisCdes" title="Nb colis Cdes" x-scale="0" width="55"/>
+  <field name="nbColisStock" title="Nb colis Stock" aggregate="sum" x-scale="0" width="55">
+    <hilite background="warning" if="true"/>
+  </field>
+  <field name="stockQty" title="Poids Stock" aggregate="sum" x-scale="0" width="65"/>
+  <field name="nbColisDispo" title="Nb colis Dispo" aggregate="sum" x-scale="1" width="55">
+    <hilite background="warning" if="true"/>
+  </field>
+  <field name="stockValue" title="Montant ht Stock" aggregate="sum" width="80"/>
+  <field name="dispoQty" title="Poids Dispo" aggregate="sum" x-scale="0" width="65"/>
+  <field name="dateCongelation" title="Date Congélation" width="80"/>
+  <field name="productCategory" title="Fam. Article" width="80"/>
+  <field name="marque" title="Marque" width="80"/>
+  <field name="gencode" title="Gencode" width="100"/>
+  <field name="devise" title="Devise" width="45"/>
+  <field name="coursDevise" title="Cours Devise" width="55"/>
+  <field name="obs" title="Obs" width="70"/>
+  <field name="joursStock" title="Jours de Stock" width="50"/>
+  <field name="product" hidden="true"/>
+</grid>

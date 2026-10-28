@@ -13,9 +13,10 @@ import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
 
 /**
- * Bouton « Imprimer commande » de la fiche Commande client : imprime directement le modèle interne LVME
- * (LvmeCommandeClient.rptdesign, copie de la fiche avec ses lignes, PR et marges). Ce modèle n'est pas celui de la
- * configuration des ventes, pour qu'il ne parte jamais en pièce jointe chez le client.
+ * Bouton « Imprimer commande » de la fiche Commande client : imprime directement le modèle interne
+ * LVME (LvmeCommandeClient.rptdesign, copie de la fiche avec ses lignes, PR et marges). Ce modèle
+ * n'est pas celui de la configuration des ventes, pour qu'il ne parte jamais en pièce jointe chez
+ * le client.
  */
 public class LvmeImpressionController {
 

@@ -1,0 +1,40 @@
+<form name="lvme-reappro-form" title="Aides aux Réapprovisionnements" model="com.axelor.utils.db.Wizard" width="large"
+  canNew="false" canSave="false" canCopy="false" canDelete="false" onNew="action-lvme-reappro-defaults">
+  <!-- LVME : écran « Aides aux Réapprovisionnements » de GESCOM sur un seul écran (repère css="lvme-ges-lots-verif"
+       pour la mise en page serrée) : période de réappro, période de statistiques, Fournisseur / Produit / Famille,
+       cases « Tenir Compte », Lancer Traitement (LvmeReapproController) ; liste d'une ligne par produit -->
+  <panel name="filtresReapproPanel" showTitle="false" colSpan="12">
+    <panel name="reapproPeriodePanel" colSpan="3" itemSpan="12" css="lvme-ges-lots-verif lvme-ges-cadre-gris">
+      <field name="$reapproDu" title="Réapprovisionnements du" type="date"/>
+      <field name="$reapproAu" title="au" type="date"/>
+      <field name="$reapproPeriode" title="Période prédéfinie" type="integer" selection="lvme.etat.stock.periode.select"
+        onChange="action-lvme-reappro-periode-reappro"/>
+    </panel>
+    <panel name="statsPeriodePanel" colSpan="3" itemSpan="12" css="lvme-ges-cadre-gris">
+      <field name="$statsDu" title="Pour la période de statistiques du" type="date"/>
+      <field name="$statsAu" title="au" type="date"/>
+      <field name="$statsPeriode" title="Période prédéfinie" type="integer" selection="lvme.etat.stock.periode.select"
+        onChange="action-lvme-reappro-periode-stats"/>
+    </panel>
+    <panel name="reapproArticlePanel" colSpan="3" itemSpan="12">
+      <field name="$fournisseur" title="Fournisseur" type="many-to-one" target="com.axelor.apps.base.db.Partner"
+        domain="self.isSupplier = true AND self.isContact = false" canNew="false" canEdit="false" canView="false"
+        placeholder="TOUS"/>
+      <field name="$produit" title="Produit" type="many-to-one" target="com.axelor.apps.base.db.Product"
+        canNew="false" canEdit="false" canView="false" placeholder="TOUS"/>
+      <field name="$familleProduit" title="Famille Produit" type="many-to-one"
+        target="com.axelor.apps.base.db.ProductCategory" canNew="false" canEdit="false" canView="false" placeholder="TOUS"/>
+    </panel>
+    <panel name="tenirComptePanel" title="Tenir Compte" colSpan="2" itemSpan="12">
+      <field name="$tenirReels" title="Arrivages Réels" type="boolean"/>
+      <field name="$tenirFlottants" title="Arrivages Flottants" type="boolean"/>
+      <field name="$tenirCdes" title="Commandes Clients en cours" type="boolean"/>
+      <field name="$afficherNegatif" title="Affichage des A commander négatif" type="boolean"/>
+    </panel>
+    <panel name="reapproBoutonPanel" colSpan="1" itemSpan="12">
+      <button name="lancerTraitementBtn" title="Lancer Traitement" icon="flag" onClick="action-lvme-reappro-lancer"/>
+    </panel>
+  </panel>
+  <panel-dashlet name="reapproDashlet" title="Réapprovisionnements" showTitle="false" colSpan="12" height="500"
+    action="action-lvme-reappro-dashlet"/>
+</form>

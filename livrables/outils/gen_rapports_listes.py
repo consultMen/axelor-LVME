@@ -432,3 +432,91 @@ rapport('LvmePalmaresClientsProduits.rptdesign', p_m | {'Filtres'}, [jeu_m],
                   prop('backgroundColor', '#DCDCDC'), sommes=SOMMES_PALM,
                   groupe=('cle_client', 'Total client', '#F0F0F0', SOMMES_PALM,
                           ('client_code', 'client_nom', 'rang_client'))))
+
+# ---------- État des besoins : « Aides aux Réapprovisionnements » (GESCOM Etat_besoins_art) ----------
+# ventes = lignes des commandes clients confirmées ou terminées, à la date du BL (sinon de la commande), avec les
+# filtres client / produit du Palmarès ; une ligne par produit et conditionnement, ligne grise de total par produit
+# (rang = n° du produit) ; % évol. = poids N / poids N-1 ; à commander = poids période 2 x (1 + % évol.) - stock
+SQL_BESOINS = '''WITH lignes AS (
+  SELECT sol.product, sol.conditionnement AS cond, sol.nb_colis, sol.poids_total_net AS poids,
+         COALESCE((SELECT COALESCE(sm.real_date, sm.estimated_date) FROM stock_stock_move sm
+                   WHERE sm.id = (SELECT max(sml.stock_move) FROM stock_stock_move_line sml
+                                  WHERE sml.sale_order_line = sol.id AND sml.stock_move IN (
+                                    SELECT s.id FROM stock_stock_move s WHERE s.status_select <> 4))),
+                  so.order_date, so.creation_date) AS dt
+  FROM sale_sale_order_line sol
+  JOIN sale_sale_order so ON so.id = sol.sale_order
+  JOIN base_partner cli ON cli.id = so.client_partner
+  JOIN base_product pr ON pr.id = sol.product
+  LEFT JOIN base_address adr ON adr.id = cli.main_address
+  LEFT JOIN auth_user com ON com.id = cli.commercial
+  WHERE so.template = false AND so.status_select IN (3, 4)
+    AND (CAST(:Client AS bigint) = 0 OR so.client_partner = CAST(:Client AS bigint))
+    AND (CAST(:FamilleClient AS bigint) = 0 OR cli.partner_category = CAST(:FamilleClient AS bigint))
+    AND (:ComDu = '' OR coalesce(com.code, '') >= :ComDu) AND (:ComAu = '' OR coalesce(com.code, '') <= :ComAu)
+    AND (CAST(:Pays AS bigint) = 0 OR adr.country = CAST(:Pays AS bigint))
+    AND (CAST(:Groupement AS bigint) = 0 OR cli.groupement = CAST(:Groupement AS bigint))
+    AND (CAST(:Produit AS bigint) = 0 OR sol.product = CAST(:Produit AS bigint))
+    AND (CAST(:FamilleProduit AS bigint) = 0 OR pr.product_category = CAST(:FamilleProduit AS bigint))
+    AND (CAST(:Fournisseur AS bigint) = 0 OR pr.default_supplier_partner = CAST(:Fournisseur AS bigint))
+    AND (:Conditionnement = '' OR EXISTS (SELECT 1 FROM purchase_conditionnement pc WHERE pc.id = sol.conditionnement
+           AND lower(coalesce(pc.code, '') || ' ' || coalesce(pc.label, '')) LIKE '%' || lower(:Conditionnement) || '%'))
+    AND (:Origine = '' OR EXISTS (SELECT 1 FROM supplychain_sale_order_line_lot x
+           JOIN stock_tracking_number tn ON tn.id = x.tracking_number
+           JOIN stock_stock_move_line oml ON oml.id = tn.origin_stock_move_line
+           WHERE x.sale_order_line = sol.id AND oml.origine = :Origine))),
+v AS (
+  SELECT l.product, coalesce(pc.label, pc.code, '') AS cond_label, min(pc.code) AS cond_code,
+         sum(l.nb_colis) FILTER (WHERE l.dt BETWEEN CAST(:NDu AS date) AND CAST(:NAu AS date)) AS colis_n,
+         sum(l.nb_colis) FILTER (WHERE l.dt BETWEEN CAST(:NunDu AS date) AND CAST(:NunAu AS date)) AS colis_n1,
+         sum(l.poids) FILTER (WHERE l.dt BETWEEN CAST(:NDu AS date) AND CAST(:NAu AS date)) AS poids_n,
+         sum(l.poids) FILTER (WHERE l.dt BETWEEN CAST(:NunDu AS date) AND CAST(:NunAu AS date)) AS poids_n1,
+         sum(l.poids) FILTER (WHERE l.dt BETWEEN CAST(:RDu AS date) AND CAST(:RAu AS date)) AS poids_p2
+  FROM lignes l LEFT JOIN purchase_conditionnement pc ON pc.id = l.cond
+  GROUP BY l.product, coalesce(pc.label, pc.code, '')),
+vl AS (SELECT * FROM v WHERE coalesce(colis_n, 0) <> 0 OR coalesce(poids_n, 0) <> 0 OR coalesce(colis_n1, 0) <> 0
+         OR coalesce(poids_n1, 0) <> 0 OR coalesce(poids_p2, 0) <> 0),
+st AS (
+  SELECT e.product_id AS product, coalesce(e.conditionnement, '') AS cond_label, sum(e.stock_qty) AS stock
+  FROM lvme_etat_stock_lot e
+  WHERE e.stock_qty <> 0 AND e.product_id IN (SELECT product FROM vl)
+    AND (:Conditionnement = '' OR lower(coalesce(e.conditionnement, '')) LIKE '%' || lower(:Conditionnement) || '%')
+  GROUP BY e.product_id, coalesce(e.conditionnement, '')),
+k AS (SELECT product, cond_label FROM vl UNION SELECT product, cond_label FROM st),
+r AS (
+  SELECT pr.code AS produit, pr.name AS designation,
+         coalesce(vl.cond_code, (SELECT min(pc.code) FROM purchase_conditionnement pc WHERE pc.label = k.cond_label))
+           AS condt,
+         NULLIF(k.cond_label, '') AS conditionnement, vl.colis_n, vl.colis_n1, vl.poids_n, vl.poids_n1,
+         CASE WHEN vl.poids_n1 > 0 THEN round((coalesce(vl.poids_n, 0) - vl.poids_n1) * 100 / vl.poids_n1, 1) END
+           AS evolution,
+         vl.poids_p2, st.stock
+  FROM k
+  JOIN base_product pr ON pr.id = k.product
+  LEFT JOIN vl ON vl.product = k.product AND vl.cond_label = k.cond_label
+  LEFT JOIN st ON st.product = k.product AND st.cond_label = k.cond_label)
+SELECT produit, designation, condt, conditionnement, colis_n, colis_n1, poids_n, poids_n1, evolution, poids_p2, stock,
+       round(coalesce(poids_p2, 0) * (1 + coalesce(evolution, 0) / 100) - coalesce(stock, 0), 3) AS a_commander,
+       dense_rank() OVER (ORDER BY produit) AS rang, NULL::text AS vide
+FROM r
+ORDER BY produit, condt, conditionnement'''
+COLS_BESOINS = [('produit', 'string'), ('designation', 'string'), ('condt', 'string'), ('conditionnement', 'string'),
+                ('colis_n', 'decimal'), ('colis_n1', 'decimal'), ('poids_n', 'decimal'), ('poids_n1', 'decimal'),
+                ('evolution', 'decimal'), ('poids_p2', 'decimal'), ('stock', 'decimal'), ('a_commander', 'decimal'),
+                ('rang', 'integer'), ('vide', 'string')]
+LIGNES_BESOINS = [
+    ('Produit', 'produit', 2.0, None, None), ('Désignation', 'designation', 5.2, None, None),
+    ('Condt', 'condt', 0.9, None, None), ('Conditionnement', 'conditionnement', 2.6, None, None),
+    ('Période N Nb colis', 'colis_n', 1.2, '#,##0', None), ('Période N-1 Nb colis', 'colis_n1', 1.2, '#,##0', None),
+    ('Période N Poids (kg)', 'poids_n', 1.3, '#,##0', None), ('Période N-1 Poids (kg)', 'poids_n1', 1.3, '#,##0', None),
+    ('% Evolut.', 'evolution', 1.0, '#,##0.0', None), ('Période2 Poids(kg)', 'poids_p2', 1.3, '#,##0', None),
+    ('Stock (kg)', 'stock', 1.3, '#,##0', None), ('A command. Poids (kg)', 'a_commander', 1.4, '#,##0', None),
+    ('', 'vide', 1.0, None, None), ('Rang', 'rang', 0.8, '#,##0', None),
+]
+SOMMES_BESOINS = ('colis_n', 'colis_n1', 'poids_n', 'poids_n1', 'poids_p2', 'stock', 'a_commander')
+jeu_b, p_b = jeu('BesoinsDS', SQL_BESOINS, COLS_BESOINS)
+rapport('LvmeEtatBesoins.rptdesign', p_b | {'Filtres', 'Periodes'}, [jeu_b],
+        entete('Aides aux Réapprovisionnements', 'params["Periodes"].value + "\\n" + ' + FILTRES)
+        + tableau('BesoinsDS', COLS_BESOINS, LIGNES_BESOINS, ('#FFFFFF', '#FFFFFF'),
+                  prop('backgroundColor', '#FFFFFF'),
+                  groupe=('produit', '', '#A0A0A0', SOMMES_BESOINS, (), ('designation',), ('rang',))))

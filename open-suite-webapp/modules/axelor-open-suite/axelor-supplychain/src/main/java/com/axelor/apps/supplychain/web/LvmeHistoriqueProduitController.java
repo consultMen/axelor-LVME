@@ -13,7 +13,10 @@ import java.time.LocalDate;
 import java.util.Map;
 import javax.persistence.Query;
 
-/** LVME : écran « Historique Produit » (GESCOM) — totaux du bas de l'écran, rafraîchissement et impression. */
+/**
+ * LVME : écran « Historique Produit » (GESCOM) — totaux du bas de l'écran, rafraîchissement et
+ * impression.
+ */
 public class LvmeHistoriqueProduitController {
 
   public void valider(ActionRequest request, ActionResponse response) {
@@ -35,7 +38,7 @@ public class LvmeHistoriqueProduitController {
               .createQuery(
                   "SELECT SUM(self.nbColis), SUM(self.poidsEntree), SUM(self.poidsSortie)"
                       + " FROM HistoriqueProduit self"
-                      + " WHERE self.product.id = :prod"
+                      + " WHERE (:prod = 0 OR self.product.id = :prod)"
                       + " AND self.dateMvt BETWEEN :du AND :au");
       query.setParameter("prod", produitId);
       query.setParameter("du", du);
@@ -54,7 +57,10 @@ public class LvmeHistoriqueProduitController {
     }
   }
 
-  /** Bouton « Imprimer » : impression LVME de l'historique (LvmeHistoriqueProduit.rptdesign), mêmes filtres. */
+  /**
+   * Bouton « Imprimer » : impression LVME de l'historique (LvmeHistoriqueProduit.rptdesign), mêmes
+   * filtres.
+   */
   public void imprimer(ActionRequest request, ActionResponse response) {
     try {
       Map<String, Object> context = request.getContext();
@@ -72,7 +78,8 @@ public class LvmeHistoriqueProduitController {
       LocalDate du = toDate(context.get("entreeDu"), LocalDate.of(1900, 1, 1));
       LocalDate au = toDate(context.get("entreeAu"), LocalDate.of(2999, 12, 31));
       String lien =
-          ReportFactory.createReport("LvmeHistoriqueProduit.rptdesign", "Historique produit-${date}")
+          ReportFactory.createReport(
+                  "LvmeHistoriqueProduit.rptdesign", "Historique produit-${date}")
               .addParam("ProduitId", produitId)
               .addParam("DateDu", du.toString())
               .addParam("DateAu", au.toString())

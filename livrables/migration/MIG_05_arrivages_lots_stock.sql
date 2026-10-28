@@ -448,6 +448,14 @@ UPDATE stock_tracking_number t SET lot_fournisseur = l.lot_fournisseur, version 
 FROM stock_stock_move_line l
 WHERE l.id = t.origin_stock_move_line AND t.lot_fournisseur IS NULL AND l.lot_fournisseur IS NOT NULL
   AND t.import_id LIKE 'GESCOM-LOT-%';
+-- gencode et observation de la ligne GESCOM (GENCODE, COM : colonnes Gencode / Obs d'« Interrogation Produit »)
+ALTER TABLE stock_stock_move_line ADD COLUMN IF NOT EXISTS gencode varchar(255);
+ALTER TABLE stock_stock_move_line ADD COLUMN IF NOT EXISTS obs varchar(255);
+UPDATE stock_stock_move_line l SET gencode = coalesce(l.gencode, gescom.txt(g.gencode)), obs = coalesce(l.obs, left(gescom.txt(g.com), 255)),
+  version = l.version + 1
+FROM mig_compl g
+WHERE g.cle = l.import_id AND ((l.gencode IS NULL AND gescom.txt(g.gencode) IS NOT NULL)
+  OR (l.obs IS NULL AND gescom.txt(g.com) IS NOT NULL));
 
 -- ---------- articles sans prix / poids : dernier arrivage ----------
 UPDATE base_product p SET
@@ -473,4 +481,9 @@ SELECT (SELECT count(*) FROM gescom.arr_entete) AS arrivages_gescom,
        (SELECT count(*) FROM stock_stock_location_line WHERE import_id LIKE 'GESCOM-STKL-%' AND current_qty < 0) AS lots_negatifs,
        (SELECT round(sum(l.current_qty * coalesce(t.prix_revient_reel, 0))) FROM stock_stock_location_line l
          JOIN stock_tracking_number t ON t.id = l.tracking_number WHERE l.import_id LIKE 'GESCOM-STKL-%' AND l.current_qty > 0)
-         AS valeur_stock;
+         AS valeur_stock_reel,
+       -- valeur totale comme GESCOM (réel + flottant, règles de l'état des stocks par lots) : à comparer à
+       -- sum((QENT - QSOR) x PXREVT) de ARTICLES_LOT
+       (SELECT round(sum(stock_qty * prix_revient)) FROM lvme_etat_stock_lot WHERE stock_qty <> 0) AS valeur_stock_totale,
+       (SELECT round(sum((gescom.num(qent) - gescom.num(qsor)) * gescom.num(pxrevt))) FROM gescom.articles_lot)
+         AS valeur_stock_gescom;

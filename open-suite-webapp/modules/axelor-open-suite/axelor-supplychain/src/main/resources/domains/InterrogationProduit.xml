@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<domain-models xmlns="http://axelor.com/xml/ns/domain-models"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://axelor.com/xml/ns/domain-models http://axelor.com/xml/ns/domain-models/domain-models_7.4.xsd">
+
+  <module name="supplychain" package="com.axelor.apps.supplychain.db"/>
+
+  <!-- LVME : écran « Interrogation Produit » de GESCOM (une ligne par lot et par frigo). Modèle en lecture
+    seule adossé à la vue SQL lvme_interrogation_produit (sql/lvme_interrogation_produit.sql). -->
+  <entity name="InterrogationProduit" table="lvme_interrogation_produit" cacheable="false">
+    <many-to-one name="product" ref="com.axelor.apps.base.db.Product"
+      column="product_id" title="Produit"/>
+    <string name="productCode" column="product_code" title="Produit"/>
+    <string name="productName" column="product_name" title="Désignation"/>
+    <many-to-one name="productCategory" ref="com.axelor.apps.base.db.ProductCategory"
+      column="product_category_id" title="Fam. Article"/>
+    <many-to-one name="supplier" ref="com.axelor.apps.base.db.Partner"
+      column="supplier_id" title="Fournisseur"/>
+    <string name="supplierName" column="supplier_name" title="Fournisseur"/>
+    <many-to-one name="stockLocation" ref="com.axelor.apps.stock.db.StockLocation"
+      column="stock_location_id" title="Frigo"/>
+    <many-to-one name="trackingNumber" ref="com.axelor.apps.stock.db.TrackingNumber"
+      column="tracking_number_id" title="N° Lot"/>
+    <string name="lotNumber" column="lot_number" title="N° Lot"/>
+    <string name="arrivalNumber" column="arrival_number" title="N°Arrivage"/>
+    <string name="origine" column="origine" title="Origine"/>
+    <date name="arrivalDate" column="arrival_date" title="Livrée le"/>
+    <string name="conditionnement" column="conditionnement" title="Conditionnement"/>
+    <date name="dluo" column="dluo" title="D.L.C."/>
+    <decimal name="prixRevient" column="prix_revient" title="Prix Revient" precision="20"
+      scale="2"/>
+    <!-- 1 = arrivage réel, 2 = arrivage flottant -->
+    <integer name="natureArrivage" column="nature_arrivage" title="Code arrivage"/>
+    <decimal name="qtyPerColis" column="qty_per_colis" title="Poids Colis" precision="20"
+      scale="3"/>
+    <decimal name="nbColisIn" column="nb_colis_in" title="Nb Colis Entrées" precision="20"
+      scale="3"/>
+    <decimal name="nbColisOut" column="nb_colis_out" title="Nb Colis Sorties" precision="20"
+      scale="3"/>
+    <decimal name="nbColisCdes" column="nb_colis_cdes" title="Nb colis Cdes" precision="20"
+      scale="3"/>
+    <decimal name="nbColisStock" column="nb_colis_stock" title="Nb colis Stock"
+      precision="20" scale="3"/>
+    <decimal name="nbColisDispo" column="nb_colis_dispo" title="Nb colis Dispo"
+      precision="20" scale="3"/>
+    <decimal name="stockQty" column="stock_qty" title="Poids Stock" precision="20" scale="3"/>
+    <decimal name="dispoQty" column="dispo_qty" title="Poids Dispo" precision="20" scale="3"/>
+    <decimal name="stockValue" column="stock_value" title="Montant ht Stock" precision="20"
+      scale="2"/>
+    <date name="dateCongelation" column="date_congelation" title="Date Congélation"/>
+    <string name="marque" column="marque" title="Marque"/>
+    <string name="gencode" column="gencode" title="Gencode"/>
+    <string name="obs" column="obs" title="Obs"/>
+    <string name="devise" column="devise" title="Devise"/>
+    <decimal name="coursDevise" column="cours_devise" title="Cours Devise" precision="20"
+      scale="4"/>
+    <string name="lotFournisseur" column="lot_fournisseur" title="Lot Fournisseur n°"/>
+    <integer name="joursStock" column="jours_stock" title="Jours de Stock"/>
+  </entity>
+
+</domain-models>

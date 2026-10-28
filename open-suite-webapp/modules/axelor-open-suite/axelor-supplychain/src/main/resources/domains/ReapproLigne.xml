@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<domain-models xmlns="http://axelor.com/xml/ns/domain-models"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://axelor.com/xml/ns/domain-models http://axelor.com/xml/ns/domain-models/domain-models_7.4.xsd">
+
+  <module name="supplychain" package="com.axelor.apps.supplychain.db"/>
+
+  <!-- LVME : résultat de l'écran « Aides aux Réapprovisionnements » de GESCOM. Une ligne par produit,
+    recalculée par « Lancer Traitement » pour l'utilisateur qui la lance (LvmeReapproController). -->
+  <entity name="ReapproLigne" table="lvme_reappro_ligne" cacheable="false">
+    <many-to-one name="utilisateur" ref="com.axelor.auth.db.User" title="Utilisateur"/>
+    <string name="fournisseurName" title="Fournisseur"/>
+    <string name="refFournisseur" title="Réf.du Fourn"/>
+    <many-to-one name="product" ref="com.axelor.apps.base.db.Product" title="Produit"/>
+    <string name="productCode" title="Produit"/>
+    <string name="productName" title="Désignation"/>
+    <string name="unite" title="Unité"/>
+    <decimal name="qteVendues" title="Qtes vendues période stats" precision="20" scale="3"/>
+    <decimal name="qteCdes" title="Qtes Cdes Clients" precision="20" scale="3"/>
+    <decimal name="qteVtesCdes" title="Qtes Vtes Art.en Cdes" precision="20" scale="3"/>
+    <decimal name="qteArrReels" title="Qtes Arr. Réels" precision="20" scale="3"/>
+    <decimal name="qteDlcCourte" title="Stock DLC Courte" precision="20" scale="3"/>
+    <decimal name="qteArrFlottants" title="Qtes Arr. Flottants" precision="20" scale="3"/>
+    <decimal name="poidsVendus" title="Poids vendus Stats" precision="20" scale="3"/>
+    <decimal name="poidsCdes" title="Poids Cdes Clients" precision="20" scale="3"/>
+    <decimal name="poidsVtesCdes" title="Poids Vtes Art en cdes" precision="20" scale="3"/>
+    <decimal name="poidsArrReels" title="Poids arr. Réels" precision="20" scale="3"/>
+    <decimal name="poidsDlcCourte" title="Poids stock DLC courte" precision="20" scale="3"/>
+    <decimal name="poidsArrFlottants" title="Poids Arr. Flottants" precision="20" scale="3"/>
+    <decimal name="qteCommander" title="Qtes à commander" precision="20" scale="3"/>
+    <decimal name="poidsCommander" title="Poids à Commander" precision="20" scale="3"/>
+  </entity>
+
+</domain-models>

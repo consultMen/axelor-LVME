@@ -63,15 +63,20 @@
     <many-to-one name="conditionnement"
       ref="com.axelor.apps.purchase.db.Conditionnement" title="Conditionnement"/>
     <decimal name="nbColis" title="Nb colis" precision="20" scale="3" nullable="true"/>
-    <decimal name="poidsParColis" title="Poids/colis (Kg)" precision="20" scale="3" nullable="true"/>
+    <decimal name="poidsParColis" title="Poids/colis (Kg)" precision="20" scale="3"
+      nullable="true"/>
     <decimal name="coefPoidsNet" title="Coefficient poids net" precision="10" scale="4"
       default="1"/>
-    <decimal name="poidsParColisNet" title="Poids/colis-NET (Kg)" precision="20" scale="3" nullable="true"/>
+    <decimal name="poidsParColisNet" title="Poids/colis-NET (Kg)" precision="20" scale="3"
+      nullable="true"/>
 
-    <decimal name="poidsTotalNet" title="Poids total net (Kg)" precision="20" scale="3" nullable="true"/>
-    <decimal name="nbUnitesParColis" title="Nb unités/colis" precision="20" scale="3" nullable="true"/>
+    <decimal name="poidsTotalNet" title="Poids total net (Kg)" precision="20" scale="3"
+      nullable="true"/>
+    <decimal name="nbUnitesParColis" title="Nb unités/colis" precision="20" scale="3"
+      nullable="true"/>
     <!-- Frais et prix de revient -->
-    <decimal name="fraisApprocheKg" title="Frais d'approche au kg" precision="20" scale="10" nullable="true"/>
+    <decimal name="fraisApprocheKg" title="Frais d'approche au kg" precision="20" scale="10"
+      nullable="true"/>
     <decimal name="prKg" title="PR/Kg" precision="20" scale="10" nullable="true"/>
     <decimal name="paDevise" title="PA devise" precision="20" scale="10" nullable="true"/>
     <decimal name="prixRevientReel" title="PR réel (€/kg)" precision="20" scale="10"

@@ -48,8 +48,8 @@
     <date name="lastSaleDate" column="last_sale_date" title="Date dernière sortie"/>
     <integer name="rotationDays" column="rotation_days" title="Nbre jours rotation"/>
     <integer name="stockDays" column="stock_days" title="Jours en stock" nullable="true"/>
-    <!-- LVME : type de transport du lot (Camion = Europe, Bateau = International) : celui de son arrivage, sinon
-      celui de la commande d'achat de l'arrivage -->
+    <!-- LVME : type de transport du lot (Camion = Europe, Bateau = International) : celui de son arrivage,
+      sinon celui de la commande d'achat de l'arrivage -->
     <string name="lvmeTransport" title="Transport" formula="true">
       <![CDATA[
       (SELECT stock_shipment_mode.name FROM stock_shipment_mode WHERE stock_shipment_mode.id = (

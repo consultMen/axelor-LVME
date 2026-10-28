@@ -1,0 +1,62 @@
+<form name="lvme-etat-besoins-form" title="Etat des besoins" model="com.axelor.utils.db.Wizard" width="large"
+  canNew="false" canSave="false" canCopy="false" canDelete="false" onNew="action-lvme-etat-besoins-defaults">
+  <!-- LVME : écran « Etat des besoins » de GESCOM : à gauche Année N et Année N-1 (calcul du % d'évolution, cadres
+       orange) et Année N-1 période réappro (cadre vert), Valider ; cadre Client (champs bleus) et cadre Produit
+       (champs cyan) comme le Palmarès (repère css="lvme-ges-palm") ; Valider = impression « Aides aux
+       Réapprovisionnements ». Groupement secondaire, région fournisseurs et sous-famille : données GESCOM pas
+       encore reprises. -->
+  <panel name="besoinsPanel" showTitle="false" colSpan="12">
+    <panel name="datesPanel" colSpan="2" itemSpan="12">
+      <panel name="anneeNPanel" title="Année N Calcul % Evolution" colSpan="12" itemSpan="12"
+        css="lvme-ges-palm lvme-besoins-orange">
+        <field name="$dateDu" title="Date du" type="date"/>
+        <field name="$dateAu" title="au" type="date"/>
+        <field name="$datePeriode" title="Période prédéfinie" showTitle="false" type="integer"
+          selection="lvme.etat.stock.periode.select" placeholder="Période prédéfinie"
+          onChange="action-lvme-etat-besoins-periode-n"/>
+      </panel>
+      <panel name="anneeN1Panel" title="Année N-1 Calcul % Evolution" colSpan="12" itemSpan="12"
+        css="lvme-ges-palm lvme-besoins-orange">
+        <field name="$dateDuN1" title="Date du" type="date"/>
+        <field name="$dateAuN1" title="au" type="date"/>
+        <field name="$periodeN1" title="Période prédéfinie" showTitle="false" type="integer"
+          selection="lvme.etat.stock.periode.select" placeholder="Période prédéfinie"
+          onChange="action-lvme-etat-besoins-periode-n1"/>
+      </panel>
+      <panel name="reapproN1Panel" title="Année N-1 Période Réappro." colSpan="12" itemSpan="12"
+        css="lvme-ges-palm lvme-besoins-vert">
+        <field name="$dateDuReappro" title="Date du" type="date"/>
+        <field name="$dateAuReappro" title="au" type="date"/>
+        <field name="$periodeReappro" title="Période prédéfinie" showTitle="false" type="integer"
+          selection="lvme.etat.stock.periode.select" placeholder="Période prédéfinie"
+          onChange="action-lvme-etat-besoins-periode-reappro"/>
+      </panel>
+      <button name="validerBtn" title="Valider" icon="check_circle" onClick="action-lvme-etat-besoins-imprimer"/>
+    </panel>
+    <panel name="clientPanel" colSpan="5" itemSpan="12" css="lvme-palm-client">
+      <field name="$client" title="Client" type="many-to-one" target="com.axelor.apps.base.db.Partner"
+        domain="self.isCustomer = true AND self.isContact = false" canNew="false" canEdit="false" canView="false" placeholder="TOUS"/>
+      <field name="$familleClient" title="Famille" type="many-to-one" target="com.axelor.apps.base.db.PartnerCategory"
+        canNew="false" canEdit="false" canView="false" placeholder="TOUS"/>
+      <field name="$commercialDu" title="Commercial du" type="many-to-one" target="com.axelor.auth.db.User"
+        target-name="name" canNew="false" canEdit="false" canView="false" placeholder="TOUS"/>
+      <field name="$commercialAu" title="au" type="many-to-one" target="com.axelor.auth.db.User"
+        target-name="name" canNew="false" canEdit="false" canView="false"/>
+      <field name="$pays" title="Pays" type="many-to-one" target="com.axelor.apps.base.db.Country"
+        canNew="false" canEdit="false" canView="false" placeholder="TOUS"/>
+      <field name="$groupement" title="Groupement principal" type="many-to-one" target="com.axelor.apps.sale.db.Groupement"
+        canNew="false" canEdit="false" canView="false" placeholder="TOUS"/>
+    </panel>
+    <panel name="produitPanel" colSpan="5" itemSpan="12" css="lvme-palm-produit">
+      <field name="$produit" title="Produit" type="many-to-one" target="com.axelor.apps.base.db.Product"
+        canNew="false" canEdit="false" canView="false" placeholder="TOUS"/>
+      <field name="$familleProduit" title="Famille Produit" type="many-to-one" target="com.axelor.apps.base.db.ProductCategory"
+        canNew="false" canEdit="false" canView="false" placeholder="TOUS"/>
+      <field name="$fournisseur" title="Fournisseur" type="many-to-one" target="com.axelor.apps.base.db.Partner"
+        domain="self.isSupplier = true AND self.isContact = false" canNew="false" canEdit="false" canView="false" placeholder="TOUS"/>
+      <field name="$origine" title="Origine" type="string" selection="lvme.origine.select"/>
+      <field name="$conditionnement" title="Conditionnement" type="many-to-one" target="com.axelor.apps.purchase.db.Conditionnement"
+        canNew="false" canEdit="false" canView="false"/>
+    </panel>
+  </panel>
+</form>

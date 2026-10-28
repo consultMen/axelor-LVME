@@ -44,9 +44,9 @@ public class LvmeKanbanController {
   protected static final int ACH_ANNULEE = 5;
 
   /**
-   * Kanban : après l'action, Axelor enregistre la carte (colonne, ordre) avec la version qu'elle avait au
-   * moment du déplacement. Si l'action a modifié la fiche (étape, validation…), on lui renvoie la version
-   * à jour, sinon Axelor affiche « Modification concurrente détectée ».
+   * Kanban : après l'action, Axelor enregistre la carte (colonne, ordre) avec la version qu'elle
+   * avait au moment du déplacement. Si l'action a modifié la fiche (étape, validation…), on lui
+   * renvoie la version à jour, sinon Axelor affiche « Modification concurrente détectée ».
    */
   protected void versionAJour(ActionResponse response, Class<? extends Model> classe, Long id) {
     JPA.flush();

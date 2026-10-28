@@ -48,6 +48,10 @@
 
     <string name="marque" title="Marque"
       selection="purchase.purchase.order.line.marque.select"/>
+    <!-- LVME : gencode et observation de la ligne d'arrivage GESCOM (colonnes Gencode / Obs d'« Interrogation
+      Produit ») -->
+    <string name="gencode" title="Gencode"/>
+    <string name="obs" title="Obs"/>
 
 
 
@@ -84,28 +88,33 @@
         FROM stock_stock_move WHERE stock_stock_move.id = stock_move) = 3 THEN real_qty ELSE qty END, 0), 2)
       ]]>
     </decimal>
-    <!-- LVME : colonnes Colis Entrés / Colis Sortis / Qtes Entrées / Qtes Sorties de la « Liste des Mouvements de
-      Stock » GESCOM (bouton Historique Lot de la ligne de commande client) : entrée = mouvement de réception,
-      sortie = mouvement d'expédition ; quantité prévue tant que le mouvement n'est pas réalisé, réelle ensuite -->
-    <decimal name="lvmeColisEntres" title="Colis Entrés" precision="20" scale="3" formula="true">
+    <!-- LVME : colonnes Colis Entrés / Colis Sortis / Qtes Entrées / Qtes Sorties de la « Liste des
+      Mouvements de Stock » GESCOM (bouton Historique Lot de la ligne de commande client) : entrée = mouvement
+      de réception, sortie = mouvement d'expédition ; quantité prévue tant que le mouvement n'est pas réalisé,
+      réelle ensuite -->
+    <decimal name="lvmeColisEntres" title="Colis Entrés" precision="20" scale="3"
+      formula="true">
       <![CDATA[
       (SELECT CASE WHEN stock_stock_move.type_select = 3 THEN ROUND(nb_colis, 3) END
         FROM stock_stock_move WHERE stock_stock_move.id = stock_move)
       ]]>
     </decimal>
-    <decimal name="lvmeColisSortis" title="Colis Sortis" precision="20" scale="3" formula="true">
+    <decimal name="lvmeColisSortis" title="Colis Sortis" precision="20" scale="3"
+      formula="true">
       <![CDATA[
       (SELECT CASE WHEN stock_stock_move.type_select = 2 THEN ROUND(nb_colis, 3) END
         FROM stock_stock_move WHERE stock_stock_move.id = stock_move)
       ]]>
     </decimal>
-    <decimal name="lvmeQteEntrees" title="Qtes Entrées" precision="20" scale="3" formula="true">
+    <decimal name="lvmeQteEntrees" title="Qtes Entrées" precision="20" scale="3"
+      formula="true">
       <![CDATA[
       (SELECT CASE WHEN stock_stock_move.type_select = 3 THEN ROUND(CASE WHEN stock_stock_move.status_select = 3
         THEN real_qty ELSE qty END, 3) END FROM stock_stock_move WHERE stock_stock_move.id = stock_move)
       ]]>
     </decimal>
-    <decimal name="lvmeQteSorties" title="Qtes Sorties" precision="20" scale="3" formula="true">
+    <decimal name="lvmeQteSorties" title="Qtes Sorties" precision="20" scale="3"
+      formula="true">
       <![CDATA[
       (SELECT CASE WHEN stock_stock_move.type_select = 2 THEN ROUND(CASE WHEN stock_stock_move.status_select = 3
         THEN real_qty ELSE qty END, 3) END FROM stock_stock_move WHERE stock_stock_move.id = stock_move)

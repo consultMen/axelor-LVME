@@ -164,8 +164,9 @@
               FROM supplychain_sale_order_line_lot WHERE supplychain_sale_order_line_lot.sale_order_line = id))))
       ]]>
     </string>
-    <!-- LVME : écran « Historique prix » GESCOM : pièce de la ligne « B.L. N° … Du AAAAMMJJ/client » (dernier BL non
-      annulé), sinon « Cde N° … Du AAAAMMJJ/client » si la commande n'est pas encore livrée, et sa date -->
+    <!-- LVME : écran « Historique prix » GESCOM : pièce de la ligne « B.L. N° … Du AAAAMMJJ/client »
+      (dernier BL non annulé), sinon « Cde N° … Du AAAAMMJJ/client » si la commande n'est pas encore livrée,
+      et sa date -->
     <string name="lvmeHistoPiece" title="Désignation" formula="true">
       <![CDATA[
       (COALESCE(

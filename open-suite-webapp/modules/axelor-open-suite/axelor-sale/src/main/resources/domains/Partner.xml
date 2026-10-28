@@ -22,7 +22,8 @@
     <!-- LVME : client « comptant » de GESCOM (paie à la commande, sans facilité de paiement) : filtre
       Client en compte / Client comptant de Listes Dossiers ; repris de GESCOM à la migration -->
     <boolean name="lvmeClientComptant" title="Client comptant"/>
-    <!-- LVME : colonne « Contact » des listes Clients / Fournisseurs / Transporteurs GESCOM : premier contact du tiers -->
+    <!-- LVME : colonne « Contact » des listes Clients / Fournisseurs / Transporteurs GESCOM : premier
+      contact du tiers -->
     <string name="lvmeContact" title="Contact" formula="true">
       <![CDATA[
       (SELECT min(base_partner.name) FROM base_partner WHERE base_partner.id IN (

@@ -38,7 +38,8 @@
       nature = 1
       ]]>
     </boolean>
-    <!-- LVME : « Numéro Arrivage » de la liste des achats GESCOM : n° des arrivages (réceptions) de la commande -->
+    <!-- LVME : « Numéro Arrivage » de la liste des achats GESCOM : n° des arrivages (réceptions) de
+      la commande -->
     <string name="lvmeNumeroArrivage" title="Numéro Arrivage" formula="true">
       <![CDATA[
       (SELECT string_agg(stock_stock_move.stock_move_seq, ', ') FROM stock_stock_move
