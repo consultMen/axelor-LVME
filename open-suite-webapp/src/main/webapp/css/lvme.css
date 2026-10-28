@@ -1908,15 +1908,15 @@
   border: 1px solid #2e9e3a !important;
   border-radius: 0 !important;
 }
-[class*="_formView_"] :is(.lvme-besoins-orange, .lvme-besoins-vert) > [class*="_header_"],
-[class*="_formView_"] :is(.lvme-besoins-orange, .lvme-besoins-vert) > [class*="_header_"] * {
+[class*="_formView_"]:has(.lvme-ges-palm) [class*="_main_"] :is(.lvme-besoins-orange, .lvme-besoins-vert) > [class*="_panel_"] > [class*="_header_"],
+[class*="_formView_"]:has(.lvme-ges-palm) [class*="_main_"] :is(.lvme-besoins-orange, .lvme-besoins-vert) > [class*="_panel_"] > [class*="_header_"] * {
   background: transparent !important;
   border: 0 !important;
   color: #a020f0 !important;
   font-weight: 700 !important;
   font-size: 12px !important;
-  text-align: center;
-  justify-content: center;
+  text-align: center !important;
+  justify-content: center !important;
 }
 
 /* « Opérations Diverses sur les Stocks / Lots » : bas de l'écran comme GESCOM, libellés au-dessus des cases
