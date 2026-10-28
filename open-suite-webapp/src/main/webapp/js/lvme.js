@@ -1,6 +1,7 @@
 /*
  * LVME : raccourcis clavier des écrans façon GESCOM (ajouté à la page Axelor par build.gradle, tâche copyWebapp).
  *   F1 : « F1 : Historique Prix » de la fenêtre Lignes Commandes ouverte, à la place de l'aide du navigateur.
+ *   F2 : nouvelle ligne (bouton « + » de la liste des lignes) de la fiche ou de la fenêtre ouverte.
  *   F12 : bouton « Fermer », « Fermer(F12) » ou « Quitter » affiché (fenêtre ouverte d'abord, sinon l'écran).
  * Axelor n'écrit pas le nom du bouton dans la page : le bouton est retrouvé par son libellé.
  */
@@ -56,6 +57,52 @@
       return;
     }
     var b = boutonFermer();
+    if (b) {
+      e.preventDefault();
+      e.stopPropagation();
+      b.click();
+    }
+  }, true);
+
+  // F2 : nouvelle ligne (bouton « + » de la liste des lignes) de la fiche affichée, ou de la fenêtre ouverte : commande
+  // client, commande d'achat, arrivage, et toute fiche avec une liste de lignes. La liste dont le titre parle de
+  // « ligne » passe en premier (ex. « Lignes d'arrivage »), sinon la première liste de la fiche.
+  var NOUVEAU = /^(add|New|Nouveau|Nouvelle ligne|Ajouter)$/i;
+  function boutonNouvelleLigne() {
+    var fenetres = document.querySelectorAll('[class*="_modal-content"]');
+    var zone = fenetres.length ? fenetres[fenetres.length - 1] : document;
+    var boutons = zone.querySelectorAll('button');
+    var premier = null;
+    for (var i = 0; i < boutons.length; i++) {
+      var b = boutons[i];
+      if (b.offsetParent === null || b.disabled) {
+        continue;
+      }
+      var texte = (b.innerText || '').trim();
+      if (!NOUVEAU.test(texte) && !NOUVEAU.test(b.title || '') && !NOUVEAU.test(b.getAttribute('aria-label') || '')) {
+        continue;
+      }
+      // le bouton doit appartenir à un panneau qui contient une liste (lignes), pas à la barre d'outils de la fiche
+      var panneau = b.closest('[class*="_panel"]');
+      if (!panneau || !panneau.querySelector('[class*="_grid"], [role="grid"], table')) {
+        continue;
+      }
+      var titre = panneau.querySelector('[class*="_title"]');
+      if (titre && /ligne/i.test(titre.textContent || '')) {
+        return b;
+      }
+      if (!premier) {
+        premier = b;
+      }
+    }
+    return premier;
+  }
+
+  window.addEventListener('keydown', function (e) {
+    if (e.key !== 'F2' || e.ctrlKey || e.altKey || e.metaKey || e.shiftKey) {
+      return;
+    }
+    var b = boutonNouvelleLigne();
     if (b) {
       e.preventDefault();
       e.stopPropagation();
