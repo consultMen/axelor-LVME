@@ -1918,3 +1918,18 @@
   text-align: center;
   justify-content: center;
 }
+
+/* « Opérations Diverses sur les Stocks / Lots » : bas de l'écran comme GESCOM, libellés au-dessus des cases
+   (N° Lot, Type Mouvement, Libellé Mvts, Entrée/Sortie, Date OD, Unité, Poids) ; css="lvme-od-champ" des champs */
+[class*="_formView_"]:has(.lvme-od-champ) [class*="_main_"] [class*="_gridItem_"].lvme-od-champ [class*="_container_"]:has(> [class*="_title_"]) {
+  flex-direction: column !important;
+  align-items: stretch !important;
+  gap: 1px !important;
+}
+[class*="_formView_"]:has(.lvme-od-champ) [class*="_main_"] [class*="_gridItem_"].lvme-od-champ [class*="_container_"]:has(> [class*="_title_"]) > [class*="_title_"] {
+  min-width: 0 !important;
+  justify-content: center;
+}
+[class*="_formView_"]:has(.lvme-od-champ) [class*="_main_"] [class*="_gridItem_"].lvme-od-champ [class*="_container_"]:has(> [class*="_title_"]) > :not([class*="_title_"]) {
+  width: 100% !important;
+}

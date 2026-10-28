@@ -26,16 +26,16 @@
   </panel>
   <panel-dashlet name="lotsDashlet" title="Lots" showTitle="false" colSpan="12" height="500" action="action-lvme-od-stock-dashlet"/>
   <panel name="odPanel" showTitle="false" colSpan="12">
-    <field name="$lotOd" title="N° Lot" type="many-to-one" target="com.axelor.apps.stock.db.TrackingNumber"
+    <field name="$lotOd" css="lvme-od-champ" title="N° Lot" type="many-to-one" target="com.axelor.apps.stock.db.TrackingNumber"
       colSpan="2" canNew="false" canEdit="false" canView="false" onChange="action-lvme-od-stock-lot"
       domain="(:produit IS NULL OR self.product = :produit)"/>
-    <field name="$typeMouvement" title="Type Mouvement" type="string" selection="lvme.od.type.select" colSpan="2"
+    <field name="$typeMouvement" css="lvme-od-champ" title="Type Mouvement" type="string" selection="lvme.od.type.select" colSpan="2"
       onChange="action-lvme-od-stock-type"/>
-    <field name="$libelleMvt" title="Libellé Mvts" type="string" colSpan="3"/>
-    <field name="$sensMvt" title="Entrée/Sortie" type="string" readonly="true" colSpan="1"/>
-    <field name="$dateOd" title="Date OD" type="date" colSpan="1"/>
-    <field name="$uniteOd" title="Unité" type="string" readonly="true" colSpan="1"/>
-    <field name="$poidsOd" title="Poids (Kg)" type="decimal" colSpan="1"/>
+    <field name="$libelleMvt" css="lvme-od-champ" title="Libellé Mvts" type="string" colSpan="3"/>
+    <field name="$sensMvt" css="lvme-od-champ" title="Entrée/Sortie" type="string" readonly="true" colSpan="1"/>
+    <field name="$dateOd" css="lvme-od-champ" title="Date OD" type="date" colSpan="1"/>
+    <field name="$uniteOd" css="lvme-od-champ" title="Unité" type="string" readonly="true" colSpan="1"/>
+    <field name="$poidsOd" css="lvme-od-champ" title="Poids (Kg)" type="decimal" colSpan="1"/>
     <panel name="odBoutonsPanel" showTitle="false" colSpan="1" itemSpan="12">
       <button name="validerOdBtn" title="Valider" icon="check-circle" onClick="action-lvme-od-stock-valider"/>
       <button name="annulerOdBtn" title="Annuler" icon="slash-circle" onClick="action-lvme-od-stock-annuler"/>
