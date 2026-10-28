@@ -18,6 +18,8 @@
 --   - un BL réalisé par commande (n° « BL » + n° de commande GESCOM : les n° d'arrivage occupent déjà les mêmes numéros) avec ses lignes de produit et leur lot, du frigo du lot
 --     vers LIVRAISON CLIENT : historique produit (sorties), n° BL de la liste des commandes. Le stock N'EST PAS
 --     modifié (il est déjà celui de GESCOM, MIG_05).
+--   - marge (non enregistrée par GESCOM) calculée avec la formule LVME inchangée : montant HT - P.R. x qté, P.R. =
+--     prix de revient enregistré par GESCOM à la vente ; ville de la liste : adresse principale du client ;
 --   Les factures (type 3) et CLIENT_RESERV restent dans l'archive gescom.
 -- Relançable : ce qui existe déjà (même clé GESCOM) n'est pas recréé.
 -- =====================================================================
@@ -288,6 +290,32 @@ UPDATE sale_sale_order_line l SET supplier_partner = fo.id, coef_poids_net = NUL
 FROM gescom.ccd c LEFT JOIN mig_fournisseur fo ON fo.code = upper(btrim(c.fou_cod))
 WHERE l.import_id = 'GESCOM-CDL-' || btrim(c.cdcleunik) AND l.supplier_partner IS NULL AND l.coef_poids_net IS NULL
   AND (fo.id IS NOT NULL OR NULLIF(gescom.num(c.coeff_cond), 0) IS NOT NULL);
+
+-- ---------- marge des commandes reprises : formule LVME inchangée (MarginComputeServiceLVMEImpl,
+-- SaleOrderMarginServiceLVMEImpl) : marge ligne = total HT - P.R. Net x qté ; P.R. Net = prix de revient enregistré
+-- par GESCOM à la vente (PRIX), sinon celui de l'arrivage ; commande = somme des lignes ----------
+UPDATE sale_sale_order_line l SET prix_revient_net = coalesce(NULLIF(gescom.num(c.prix), 0), NULLIF(gescom.num(c.pr_arr), 0)),
+  version = l.version + 1
+FROM gescom.ccd c
+WHERE l.import_id = 'GESCOM-CDL-' || btrim(c.cdcleunik) AND l.prix_revient_net IS NULL AND l.product IS NOT NULL
+  AND coalesce(NULLIF(gescom.num(c.prix), 0), NULLIF(gescom.num(c.pr_arr), 0)) IS NOT NULL;
+UPDATE sale_sale_order_line l SET sub_total_cost_price = x.cout, sub_total_gross_margin = x.marge,
+  sub_margin_rate = CASE WHEN coalesce(l.ex_tax_total, 0) <> 0 THEN round(x.marge * 100 / l.ex_tax_total, 2) ELSE 0 END,
+  sub_total_markup = CASE WHEN x.cout <> 0 THEN round(x.marge * 100 / x.cout, 2) ELSE 0 END
+FROM (SELECT id, round(coalesce(prix_revient_net, 0) * coalesce(qty, 0), 2) AS cout,
+             round(coalesce(ex_tax_total, 0) - round(coalesce(prix_revient_net, 0) * coalesce(qty, 0), 2), 2) AS marge
+      FROM sale_sale_order_line WHERE import_id LIKE 'GESCOM-CDL-%') x
+WHERE l.id = x.id AND l.sub_total_gross_margin IS DISTINCT FROM x.marge;
+UPDATE sale_sale_order s SET accounted_revenue = x.ca, total_cost_price = x.cout, total_gross_margin = x.marge,
+  margin_rate = CASE WHEN x.ca <> 0 THEN round(x.marge * 100 / x.ca, 2) ELSE 0 END,
+  markup = CASE WHEN x.cout <> 0 THEN round(x.marge * 100 / x.cout, 2) ELSE 0 END,
+  main_invoicing_address = coalesce(s.main_invoicing_address, (SELECT main_address FROM base_partner WHERE id = s.client_partner))
+FROM (SELECT sale_order, sum(coalesce(company_ex_tax_total, 0)) AS ca,
+             sum(round(coalesce(prix_revient_net, 0) * coalesce(qty, 0), 2)) AS cout,
+             sum(coalesce(sub_total_gross_margin, 0)) AS marge
+      FROM sale_sale_order_line WHERE import_id LIKE 'GESCOM-CDL-%' GROUP BY sale_order) x
+WHERE s.id = x.sale_order AND s.import_id LIKE 'GESCOM-CDE-%'
+  AND (s.total_gross_margin IS DISTINCT FROM x.marge OR s.main_invoicing_address IS NULL);
 
 COMMIT;
 

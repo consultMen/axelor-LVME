@@ -314,6 +314,12 @@ CLIENT_RESERV (239). Les morceaux sont regroupés en une table dans l'archive (`
   - Les BL repris ne modifient pas le stock (déjà celui de GESCOM : 6 790 986 € inchangé) ; ils donnent les
     sorties de l'Historique Produit et le n° de BL de la liste des commandes.
   - Ventes à montant négatif : commande marquée « Avoir ».
+  - **Marge** : GESCOM ne l'enregistre pas. Elle est calculée par LVME avec sa formule habituelle (montant HT −
+    P.R. × quantité), le P.R. étant le prix de revient enregistré par GESCOM au moment de la vente (décision du
+    28/10/2026). Historique : 16,0 M€ de marge, soit 13,97 % du CA.
+  - Paiement, transporteur, % RFA / commission, coût du port, remise et une note (contact, téléphone, e-mail, zone,
+    saisi par, affacturage, colis, poids) sont repris sur la commande ; fournisseur et coefficient de poids net sur
+    les lignes. 146 commandes de clients sans adresse dans GESCOM n'ont pas de ville.
   - Rapport d'incohérences : les écarts « livré ≠ facturé » et « reçu ≠ facturé » ne portent plus sur l'historique
     GESCOM (factures restées dans GESCOM) ; ils signalaient 19 436 faux écarts (`PROD_102`).
 - **Gardés dans l'archive seulement** : les factures (type 3) et CLIENT_RESERV (client livré → client de
