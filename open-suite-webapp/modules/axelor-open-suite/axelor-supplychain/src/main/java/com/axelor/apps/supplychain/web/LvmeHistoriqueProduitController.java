@@ -38,9 +38,12 @@ public class LvmeHistoriqueProduitController {
               .createQuery(
                   "SELECT SUM(self.nbColis), SUM(self.poidsEntree), SUM(self.poidsSortie)"
                       + " FROM HistoriqueProduit self"
-                      + " WHERE (:prod = 0 OR self.product.id = :prod)"
-                      + " AND self.dateMvt BETWEEN :du AND :au");
-      query.setParameter("prod", produitId);
+                      + " WHERE self.dateMvt BETWEEN :du AND :au"
+                      // sans produit choisi : tous les produits de la période
+                      + (produitId != 0L ? " AND self.product.id = :prod" : ""));
+      if (produitId != 0L) {
+        query.setParameter("prod", produitId);
+      }
       query.setParameter("du", du);
       query.setParameter("au", au);
       Object[] row = (Object[]) query.getSingleResult();
