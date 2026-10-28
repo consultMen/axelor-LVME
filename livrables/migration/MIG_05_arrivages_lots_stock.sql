@@ -170,6 +170,11 @@ LEFT JOIN mig_lotf lf ON lf.article = l.article AND lf.fournisseur IS NOT DISTIN
   AND lf.cle = upper(btrim(l.nlot_fournisseur))
 WHERE l.nouveau;
 
+-- statistiques à jour : sur une base purgée, PostgreSQL croit ces tables vides et vérifie chaque lien en relisant
+-- toute la table (MIG_05 bloqué en prod le 28/10/2026)
+ANALYZE stock_tracking_number;
+ANALYZE stock_lot_fournisseur;
+
 -- ---------- lignes ----------
 CREATE TEMP TABLE mig_ligne ON COMMIT DROP AS
 SELECT r.*, a.num, a.commande, a.arrivage_id, a.reel, art.id AS article,
@@ -228,6 +233,7 @@ SELECT a.commande, 0, now(), 'GESCOM-ARR-' || a.num, 'GESCOM', a.num,
   0, 0, 0, false, false, false, 0, false, false, false, false, false, 0
 FROM mig_arr a CROSS JOIN mig_def d;
 
+ANALYZE purchase_purchase_order;
 INSERT INTO purchase_purchase_order_line (id, version, created_on, import_id, import_origin, purchase_order, sequence, product,
   product_name, product_code, unit, qty, received_qty, price, price_discounted, ex_tax_total, company_ex_tax_total,
   in_tax_price, in_tax_total, company_in_tax_total, nb_colis, poids_par_colis, poids_total_net, pa_devise, prix_revient_reel,
@@ -272,6 +278,8 @@ SELECT a.arrivage_id, 0, now(), 'GESCOM-ARR-' || a.num, 'GESCOM', a.num,
     gescom.txt(a.comm1), gescom.txt(a.comm2)), ''),
   true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false
 FROM mig_arr a CROSS JOIN mig_def d;
+ANALYZE purchase_purchase_order_line;
+ANALYZE stock_stock_move;
 INSERT INTO stock_stock_move_purchase_order_set (stock_stock_move, purchase_order_set)
 SELECT arrivage_id, commande FROM mig_arr;
 INSERT INTO stock_stock_move_container_set (stock_stock_move, container_set)
@@ -302,6 +310,8 @@ UPDATE stock_tracking_number t SET origin_stock_move_line = x.ligne_arrivage, or
 FROM (SELECT DISTINCT ON (lot_id) lot_id, ligne_arrivage, ligne_commande FROM mig_ligne WHERE lot_id IS NOT NULL
       ORDER BY lot_id, ligne_arrivage) x
 WHERE t.id = x.lot_id AND t.origin_stock_move_line IS NULL;
+
+ANALYZE stock_stock_move_line;
 
 -- ---------- stock : entrées - sorties GESCOM par lot, dans le frigo de son arrivage ----------
 -- lot d'un arrivage flottant (marchandise en mer) : la ligne de lot porte (entrées - sorties GESCOM) - quantité de
