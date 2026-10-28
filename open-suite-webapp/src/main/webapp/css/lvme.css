@@ -1897,14 +1897,20 @@
 }
 
 /*
- * « Etat des besoins » (GESCOM) : cadres de dates Année N / Année N-1 bordés d'orange, Année N-1 période réappro
- * bordé de vert, titres des cadres en violet au-dessus.
+ * « Etat des besoins » (GESCOM) : dates Année N / Année N-1 encadrées d'orange, Année N-1 période réappro encadrée
+ * de vert, titres violets au-dessus du cadre (hors du cadre).
  */
-[class*="_formView_"] .lvme-besoins-orange {
+[class*="_formView_"] :is(.lvme-besoins-orange, .lvme-besoins-vert),
+[class*="_formView_"] :is(.lvme-besoins-orange, .lvme-besoins-vert) > [class*="_panel_"] {
+  border: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+[class*="_formView_"] .lvme-besoins-orange > [class*="_panel_"] > [class*="_bodyWrapper_"] {
   border: 1px solid #e8742c !important;
   border-radius: 0 !important;
 }
-[class*="_formView_"] .lvme-besoins-vert {
+[class*="_formView_"] .lvme-besoins-vert > [class*="_panel_"] > [class*="_bodyWrapper_"] {
   border: 1px solid #2e9e3a !important;
   border-radius: 0 !important;
 }
