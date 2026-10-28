@@ -1,3 +1,48 @@
+# Déploiement prod LVME — écrans PROD_94 à 101 puis migration GESCOM (MIG_00 à MIG_05) du 28/10/2026
+
+Déjà en prod : jusqu'à PROD_93 + purge PROD_90. Code à déployer : tout `main` (commit 1b03686 ou plus récent).
+
+| Script | Contenu |
+|---|---|
+| PROD_94 | Listes Clients / Fournisseurs / Transporteurs comme GESCOM |
+| PROD_95 | RFA par produit (règles) et liste des RFA par produit / facture |
+| PROD_96 | Palmarès Client / Produits (impression) |
+| PROD_97 | État des stocks : lots flottants comme GESCOM |
+| PROD_98 | Interrogation Produit |
+| PROD_99 | Opérations Diverses sur les Stocks / Lots (+ emplacement OPERATIONS DIVERSES) |
+| PROD_100 | Aides aux Réapprovisionnements, Etat des besoins (impression) |
+| PROD_101 | Historique Produit sans produit = tous les produits |
+| MIG_00 | Archive GESCOM (schéma `gescom`) : **fichier hors dépôt**, `MIG_00_archive_gescom.sql` (18,5 Mo, données clients) |
+| MIG_01 à 05 | Articles, tiers, listes d'achat, frigos, arrivages / lots / stock |
+
+Ordre : les écrans d'abord (les vues SQL doivent exister avant le 1er démarrage du nouveau code), un démarrage pour
+qu'Axelor ajoute les nouvelles colonnes, puis la migration Tomcat arrêté.
+
+1. **PC** : `git push origin main` ; envoyer `C:\Users\zakar\Documents\migration_lvme\sql\MIG_00_archive_gescom.sql`
+   sur le serveur dans `/home/axelor/` (fenêtre SSH : ⚙ « Importer un fichier », ou `scp`).
+2. **Serveur — sauvegarde** : `pg_dump -U axelor -Fc axelor > ~/sauvegarde_avant_migration_$(date +%F_%H%M).dump`
+3. **Base vide ?** `psql -U axelor -d axelor -c "SELECT (SELECT count(*) FROM base_product) produits, (SELECT count(*) FROM base_partner) tiers, (SELECT count(*) FROM purchase_purchase_order) achats, (SELECT count(*) FROM sale_sale_order) ventes"`
+   → presque tout à 0 (purge) ; sinon s'arrêter et m'envoyer le résultat.
+4. `cd ~/src && rm -rf axelor-LVME axelor-version_app axelor-version_app.war && git clone https://github.com/consultMen/axelor-LVME.git && cd axelor-LVME && git log --oneline -1`
+5. **Build** : `cd ~/src/axelor-LVME/open-suite-webapp && chmod +x gradlew && ./gradlew war -x test`
+6. **Arrêt** : `sudo systemctl stop axelor-tomcat`
+7. **Écrans, depuis `~/src/axelor-LVME`** :
+   `for n in 94 95 96 97 98 99 100 101; do psql -U axelor -d axelor -v ON_ERROR_STOP=1 -f $(ls livrables/PROD_${n}_*.sql) || break; done`
+8. **Bascule** (comme d'habitude) : war dézippé, **`~/axelor-config.prod.properties` recopié**, ancien `ROOT` mis de côté,
+   nouveau `ROOT`, `sudo systemctl start axelor-tomcat` ; attendre que le site réponde (Axelor ajoute les colonnes).
+9. **Arrêt pour la migration** : `sudo systemctl stop axelor-tomcat`
+10. **Migration, depuis `~/src/axelor-LVME`** (≈ 5 min) :
+    `psql -U axelor -d axelor -v ON_ERROR_STOP=1 -f ~/MIG_00_archive_gescom.sql && for n in 01 02 03 04 05; do psql -U axelor -d axelor -v ON_ERROR_STOP=1 -f $(ls livrables/migration/MIG_${n}_*.sql) || break; done`
+    → fin de MIG_05 attendue : arrivages 7444 / 7444, lignes 19586 / 19586, lots 19591 / 19591,
+    `valeur_stock_totale` = `valeur_stock_gescom` = 6 790 986. Toute erreur : s'arrêter et m'envoyer la sortie.
+11. **Démarrage** : `sudo systemctl start axelor-tomcat && sudo systemctl restart nginx` ; Ctrl + F5.
+12. **Vérifier** : Clients 2 186, Fournisseurs 1 371, Transporteurs 50, Articles 1 872, État des stocks par lots,
+    Interrogation Produit, Historique Produit, Synthèse des Arrivages.
+
+Retour arrière : `sudo systemctl stop axelor-tomcat`, `dropdb -U axelor axelor && createdb -U axelor axelor && pg_restore -U axelor -d axelor --no-owner ~/sauvegarde_avant_migration_*.dump`, remettre l'ancien `ROOT`, redémarrer.
+
+---
+
 # Déploiement prod LVME — écrans GESCOM (PROD_91 à 93) puis purge des données (PROD_90) avant la migration
 
 Déjà en prod : jusqu'à PROD_89. Code à déployer : tout `main` (dernier commit affiché à l'étape 3).
