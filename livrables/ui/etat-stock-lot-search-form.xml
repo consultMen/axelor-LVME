@@ -91,7 +91,6 @@
       <field name="$dispoNegatif" title="Seulement les dispo négatifs" type="boolean"/>
       <button name="lancerRechercheBtn" title="Lancer la recherche" icon="search" css="btn-primary" onClick="action-lvme-etat-stock-lot-refresh"/>
       <button name="lvmeArchivageBtn" title="Archiver / Désarchiver" icon="archive" onClick="action-lvme-etat-stock-lot-dashlet"/>
-      <button name="imprimerEtatBtn" title="Imprimer" icon="printer" onClick="action-lvme-etat-stock-lot-imprimer"/>
     </panel>
 
   </panel>
@@ -99,6 +98,18 @@
   <panel-dashlet name="lotsDashlet" title="Lots" colSpan="12" height="600"
 
     action="action-lvme-etat-stock-lot-dashlet"/>
+
+  <!-- boutons d'impression en bas, comme GESCOM : « Etat des Stocks sur une ligne », « Etat des Stocks / Fournisseur »,
+       « Etat des Stocks » (mêmes filtres que la liste) -->
+  <panel name="impressionsPanel" showTitle="false" colSpan="12" css="lvme-ges-etat">
+    <spacer colSpan="3"/>
+    <button name="imprimerEtatLigneBtn" title="Etat des Stocks sur une ligne" icon="printer" colSpan="3"
+      onClick="action-lvme-etat-stock-lot-imprimer-ligne"/>
+    <button name="imprimerEtatFournisseurBtn" title="Etat des Stocks / Fournisseur" icon="printer" colSpan="3"
+      onClick="action-lvme-etat-stock-lot-imprimer-fournisseur"/>
+    <button name="imprimerEtatBtn" title="Etat des Stocks" icon="printer" colSpan="3"
+      onClick="action-lvme-etat-stock-lot-imprimer"/>
+  </panel>
 
 </form>
 

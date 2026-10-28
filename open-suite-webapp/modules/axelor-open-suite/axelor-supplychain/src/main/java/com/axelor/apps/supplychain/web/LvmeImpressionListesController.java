@@ -195,8 +195,39 @@ public class LvmeImpressionListesController {
     }
   }
 
-  /** « Imprimer » de l'écran État des stocks par lots. */
+  /** « Etat des Stocks » de l'écran État des stocks par lots : une ligne par lot. */
   public void imprimerEtatStock(ActionRequest request, ActionResponse response) {
+    imprimerEtatStock(
+        request,
+        response,
+        "LvmeEtatStockLots.rptdesign",
+        "Etat des stocks par lots-${date}",
+        "État des stocks par lots");
+  }
+
+  /** « Etat des Stocks / Fournisseur » : les lots regroupés par fournisseur, sous-totaux. */
+  public void imprimerEtatStockFournisseur(ActionRequest request, ActionResponse response) {
+    imprimerEtatStock(
+        request,
+        response,
+        "LvmeEtatStockFournisseur.rptdesign",
+        "Etat des stocks par fournisseur-${date}",
+        "État des stocks par fournisseur");
+  }
+
+  /** « Etat des Stocks sur une ligne » : une ligne par article. */
+  public void imprimerEtatStockLigne(ActionRequest request, ActionResponse response) {
+    imprimerEtatStock(
+        request,
+        response,
+        "LvmeEtatStockLigne.rptdesign",
+        "Etat des stocks sur une ligne-${date}",
+        "État des stocks sur une ligne");
+  }
+
+  /** Impressions de l'État des stocks par lots, avec les filtres de l'écran. */
+  private void imprimerEtatStock(
+      ActionRequest request, ActionResponse response, String modele, String fichier, String titre) {
     try {
       Map<String, Object> c = request.getContext();
       Product artDu = JPA.find(Product.class, id(c.get("articleDu")));
@@ -238,8 +269,7 @@ public class LvmeImpressionListesController {
       Object nature = c.get("natureArrivage");
       ouvrir(
           response,
-          ReportFactory.createReport(
-                  "LvmeEtatStockLots.rptdesign", "Etat des stocks par lots-${date}")
+          ReportFactory.createReport(modele, fichier)
               .addParam("ArtDu", artDuCode)
               .addParam("ArtAu", artAuCode)
               .addParam("FouDu", fouDuNom)
@@ -262,7 +292,7 @@ public class LvmeImpressionListesController {
               .addParam("DispoNeg", dispoNegatif ? "1" : "0")
               .addParam("Dluo", dluo.isEmpty() ? "0" : dluo)
               .addParam("Filtres", filtres.toString()),
-          "État des stocks par lots");
+          titre);
     } catch (Exception e) {
       TraceBackService.trace(response, e);
     }

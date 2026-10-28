@@ -1,16 +1,25 @@
-# Déploiement prod LVME — commandes clients GESCOM (MIG_06), PROD_102 et PROD_103 (rapport d'incohérences) du 28/10/2026
+# Déploiement prod LVME — commandes clients GESCOM (MIG_06), PROD_102 à PROD_104 du 28/10/2026
 
-Déjà en prod : PROD_94 à 101, MIG_00 à MIG_05. Pas de code à recompiler (scripts SQL seulement).
+Déjà en prod : PROD_94 à 101, MIG_00 à MIG_05. Code à déployer (recompiler) : impressions État des stocks / Fournisseur
+et sur une ligne (Java + 2 modèles BIRT), corrections Historique Produit et Aides aux Réapprovisionnements.
 
-1. **PC** : `git push origin main` ; envoyer la nouvelle archive `MIG_00_archive_gescom.sql` (134 Mo, 34 tables avec
-   CCE, CCD, CLIENT_RESERV) dans `/home/axelor/` (remplace l'ancienne).
+| Script | Contenu |
+|---|---|
+| MIG_00 | Nouvelle archive GESCOM (134 Mo, 34 tables avec CCE, CCD, CLIENT_RESERV) |
+| MIG_06 | Commandes clients GESCOM : 27 732 commandes, 183 166 lignes, 25 771 BL, marge, n° de facture (≈ 15 min) |
+| PROD_102 | Rapport d'incohérences sans l'historique GESCOM |
+| PROD_103 | Rapport d'incohérences présenté comme les écrans GESCOM |
+| PROD_104 | Cession depuis Opérations Diverses + fenêtre CESSION de Stock comme GESCOM ; 3 impressions en bas de l'État des stocks |
+
+1. **PC** : `git push origin main` ; envoyer `MIG_00_archive_gescom.sql` dans `/home/axelor/` (remplace l'ancienne).
 2. **Serveur** : `pg_dump -U axelor -Fc axelor > ~/sauvegarde_avant_mig06_$(date +%F_%H%M).dump`
-3. `cd ~/src/axelor-LVME && git pull && git log --oneline -1`
+3. Re-clone et build comme d'habitude (`git clone …`, `./gradlew war -x test`) ; `git log --oneline -1`.
 4. `sudo systemctl stop axelor-tomcat`
-5. `psql -U axelor -d axelor -v ON_ERROR_STOP=1 -f ~/MIG_00_archive_gescom.sql && psql -U axelor -d axelor -v ON_ERROR_STOP=1 -f livrables/migration/MIG_06_commandes_clients.sql && psql -U axelor -d axelor -v ON_ERROR_STOP=1 -f livrables/PROD_102_incoherences_hors_gescom.sql && psql -U axelor -d axelor -v ON_ERROR_STOP=1 -f livrables/PROD_103_incoherences_ecran_gescom.sql`
-   (≈ 5 min, ne pas interrompre) → commandes 27 732 / 27 732, lignes 183 166 / 183 166, ca_gescom = ca_axelor =
-   114 557 356 ; MIG_00 ne recharge que l'archive (MIG_01 à 05 ne sont pas à relancer).
-6. `sudo systemctl start axelor-tomcat && sudo systemctl restart nginx`
+5. Depuis `~/src/axelor-LVME` :
+   `psql -U axelor -d axelor -v ON_ERROR_STOP=1 -f ~/MIG_00_archive_gescom.sql && for f in livrables/migration/MIG_06_commandes_clients.sql livrables/PROD_102_incoherences_hors_gescom.sql livrables/PROD_103_incoherences_ecran_gescom.sql livrables/PROD_104_cession_od_impressions_etat_stock.sql; do psql -U axelor -d axelor -v ON_ERROR_STOP=1 -f $f || break; done`
+   (≈ 15 min, ne pas interrompre) → commandes 27 732 / 27 732, lignes 183 166 / 183 166, ca_gescom = ca_axelor =
+   114 557 356. MIG_01 à 05 ne sont pas à relancer.
+6. Bascule du war (avec `~/axelor-config.prod.properties`), `sudo systemctl start axelor-tomcat && sudo systemctl restart nginx`.
 
 ---
 

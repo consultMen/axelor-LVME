@@ -310,6 +310,51 @@ rapport('LvmeEtatStockLots.rptdesign', p_e | {'Filtres'}, [jeu_e],
                   sommes=('colis_entrees', 'colis_sorties', 'colis_cdes', 'colis_stock', 'poids_stock',
                           'valeur_stock', 'colis_dispo', 'poids_dispo')))
 
+# ---------- boutons du bas de l'État des stocks par lots (GESCOM : « Etat des Stocks / Fournisseur », « Etat des
+# Stocks sur une ligne ») : mêmes filtres que l'écran ; tableau en attendant les modèles GESCOM ----------
+SQL_ETAT_STOCK_SANS_TRI = SQL_ETAT_STOCK[:SQL_ETAT_STOCK.index('ORDER BY')]
+SQL_ETAT_STOCK_FOU = (SQL_ETAT_STOCK_SANS_TRI.replace('SELECT e.product_code AS produit,',
+                                                      "SELECT COALESCE(e.supplier_name, '(sans fournisseur)') AS cle_fournisseur, "
+                                                      'e.product_code AS produit,', 1)
+                      + 'ORDER BY 1, e.product_code, e.arrival_date, e.lot_number')
+COLS_ETAT_STOCK_FOU = [('cle_fournisseur', 'string')] + COLS_ETAT_STOCK
+LIGNES_ETAT_STOCK_FOU = [('Fournisseur', 'cle_fournisseur', 2.2, None, None)] + [
+    c for c in LIGNES_ETAT_STOCK if c[1] not in ('fournisseur', 'nature')]
+SOMMES_ETAT_STOCK = ('colis_entrees', 'colis_sorties', 'colis_cdes', 'colis_stock', 'poids_stock', 'valeur_stock',
+                     'colis_dispo', 'poids_dispo')
+jeu_ef, p_ef = jeu('EtatStockFouDS', SQL_ETAT_STOCK_FOU, COLS_ETAT_STOCK_FOU)
+rapport('LvmeEtatStockFournisseur.rptdesign', p_ef | {'Filtres'}, [jeu_ef],
+        entete('État des stocks par fournisseur', FILTRES)
+        + tableau('EtatStockFouDS', COLS_ETAT_STOCK_FOU, LIGNES_ETAT_STOCK_FOU, ('#FFFFFF', '#F4F4F4'),
+                  prop('backgroundColor', '#DCDCDC'), sommes=SOMMES_ETAT_STOCK,
+                  groupe=('cle_fournisseur', 'Total fournisseur', '#E6E6E6', SOMMES_ETAT_STOCK, ('cle_fournisseur',))))
+
+# une ligne par article (tous lots et frigos confondus)
+SQL_ETAT_STOCK_LIGNE = ('SELECT x.produit, x.designation, count(*) AS nb_lots, sum(x.colis_cdes) AS colis_cdes, '
+                        'sum(x.colis_stock) AS colis_stock, sum(x.poids_stock) AS poids_stock, '
+                        'sum(x.valeur_stock) AS valeur_stock, '
+                        'round(sum(x.valeur_stock) / NULLIF(sum(x.poids_stock), 0), 2) AS pr_moyen, '
+                        'sum(x.colis_dispo) AS colis_dispo, sum(x.poids_dispo) AS poids_dispo FROM ('
+                        + SQL_ETAT_STOCK_SANS_TRI + ') x GROUP BY x.produit, x.designation ORDER BY x.produit')
+COLS_ETAT_STOCK_LIGNE = [('produit', 'string'), ('designation', 'string'), ('nb_lots', 'decimal'),
+                         ('colis_cdes', 'decimal'), ('colis_stock', 'decimal'), ('poids_stock', 'decimal'),
+                         ('valeur_stock', 'decimal'), ('pr_moyen', 'decimal'), ('colis_dispo', 'decimal'),
+                         ('poids_dispo', 'decimal')]
+LIGNES_ETAT_STOCK_LIGNE = [
+    ('Produit', 'produit', 2.4, None, None), ('Désignation', 'designation', 7.0, None, None),
+    ('Nb Lots', 'nb_lots', 1.2, '#,##0', None), ('Nb colis Cdes', 'colis_cdes', 1.6, '#,##0', None),
+    ('Nb colis Stock', 'colis_stock', 1.6, '#,##0', '#FFFF99'), ('Poids Stock', 'poids_stock', 2.0, '#,##0.000', None),
+    ('Montant ht Stock', 'valeur_stock', 2.2, '#,##0.00', None), ('P.R. moyen', 'pr_moyen', 1.5, '#,##0.00', None),
+    ('Nb colis Dispo', 'colis_dispo', 1.6, '#,##0', '#FFFF99'), ('Poids Dispo', 'poids_dispo', 2.0, '#,##0.000', None),
+]
+jeu_el, p_el = jeu('EtatStockLigneDS', SQL_ETAT_STOCK_LIGNE, COLS_ETAT_STOCK_LIGNE)
+rapport('LvmeEtatStockLigne.rptdesign', p_el | {'Filtres'}, [jeu_el],
+        entete('État des stocks sur une ligne', FILTRES)
+        + tableau('EtatStockLigneDS', COLS_ETAT_STOCK_LIGNE, LIGNES_ETAT_STOCK_LIGNE, ('#FFFFFF', '#F4F4F4'),
+                  prop('backgroundColor', '#DCDCDC'),
+                  sommes=('nb_lots', 'colis_cdes', 'colis_stock', 'poids_stock', 'valeur_stock', 'colis_dispo',
+                          'poids_dispo')))
+
 # ---------- synthèse des arrivages (bouton « Synthèse » GESCOM : en-tête par arrivage, lignes cyan, totaux) ----------
 SQL_SYNTHESE = '''SELECT s.arrivage, s.fournisseur, s.code_fournisseur, s.date_embarquement, s.date_arrivee,
   s.product_code AS produit, s.designation, s.origine, s.conditionnement, s.frigo, s.lot_number AS lot, s.dlc,

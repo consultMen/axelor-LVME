@@ -1,0 +1,113 @@
+<form name="cession-stock-form" title="CESSION de Stock"
+  model="com.axelor.apps.stock.db.CessionStock"
+  onNew="action-cession-stock-record-default-values,action-cession-stock-method-sync-frais-congelation,action-cession-stock-group-depuis-od">
+  <!-- LVME : fenêtre « CESSION de Stock » de GESCOM (ouverte depuis Opérations Diverses, type CESSION, ou depuis le
+       menu Cessions de Stock) : fond jaune ; en haut le lot cédé (produit, n° lot, libellé, Sortie, unité, prix de
+       revient, poids en magenta) ; en dessous le nouveau lot (article, n° lot, dates, conditionnement, frigo,
+       origine, marque, zone de pêche, gencode, colis, poids, PA / PR) ; Valider / Annuler à droite (repère
+       css="lvme-cession-ges"). Mêmes champs et mêmes calculs qu'avant : seule la présentation change. Les types
+       Modification du PR et Frais de stockage gardent leur présentation. -->
+  <panel name="cessionPanel" showTitle="false" colSpan="12">
+
+    <!-- en-tête -->
+    <panel name="entetePanel" showTitle="false" colSpan="12" css="lvme-cession-ges">
+      <field name="cessionSeq" readonly="true" colSpan="2"/>
+      <field name="cessionDate" colSpan="2"/>
+      <field name="typeCession" colSpan="3" required="true"
+        onChange="action-cession-stock-method-sync-frais-congelation"/>
+      <field name="company" colSpan="3"/>
+      <field name="cessionRealisee" readonly="true" colSpan="1"/>
+      <field name="dateRealisation" readonly="true" colSpan="1"/>
+    </panel>
+
+    <!-- lot cédé (bande du haut GESCOM) -->
+    <panel name="sourcePanel" showTitle="false" colSpan="12" css="lvme-cession-source"
+      showIf="typeCession == 'RECONDITIONNEMENT'">
+      <field name="product" title="Produit" colSpan="2" required="true"
+        onChange="action-cession-stock-method-load-from-product"
+        domain="self.dtype = 'Product' AND self.isModel = false"
+        form-view="product-form" grid-view="product-grid"/>
+      <field name="designation" title="Désignation" readonly="true" colSpan="3"/>
+      <field name="lotSource" title="N° Lot" colSpan="2"
+        requiredIf="typeCession == 'RECONDITIONNEMENT'" domain="self.product = :product"
+        form-view="tracking-number-form" grid-view="tracking-number-grid"/>
+      <field name="libelleMvts" title="Libellé Mvts" readonly="true" colSpan="1"/>
+      <field name="entreeSortie" title="Entrée/Sortie" readonly="true" colSpan="1"/>
+      <field name="uniteVente" title="Unité" colSpan="1"/>
+      <field name="prixRevient" title="Prix Revient" readonly="true" colSpan="1"/>
+      <field name="poidsKg" title="Poids (Kg)" colSpan="1" required="true" css="lvme-cession-magenta"
+        onChange="action-cession-stock-method-copy-poids-to-dest"/>
+      <field name="conditionnement" title="Conditionnement" readonly="true" colSpan="3"/>
+      <field name="nbColis" title="Nb Colis" colSpan="2" onChange="action-cession-stock-method-compute-calculs"/>
+      <field name="pdsColis" title="Pds Colis" colSpan="2" onChange="action-cession-stock-method-compute-calculs"/>
+      <field name="pdsTotal" title="Pds Total" readonly="true" colSpan="2"/>
+    </panel>
+
+    <!-- nouveau lot (bloc du bas GESCOM) -->
+    <panel name="nouveauLotPanel" showTitle="false" colSpan="10" css="lvme-cession-ges"
+      showIf="typeCession == 'RECONDITIONNEMENT'">
+      <field name="productDest" title="Article" colSpan="4" required="true"
+        domain="self.dtype = 'Product' AND self.isModel = false"
+        form-view="product-form" grid-view="product-grid"/>
+      <field name="nomScientifique" title="Nom Scientifique" readonly="true" colSpan="8"/>
+      <field name="nouveauLot" title="N° Lot" colSpan="3" required="true" canNew="false"
+        form-view="tracking-number-form" grid-view="tracking-number-grid"/>
+      <field name="dateCongelation" title="Date Congélation" readonly="true" colSpan="3"/>
+      <field name="articleCode" title="Code" readonly="true" colSpan="3"/>
+      <field name="origine" title="Origine" readonly="true" colSpan="3"/>
+      <field name="dluo" title="D.L.C. / D.L.U.O" readonly="true" colSpan="3"/>
+      <field name="conditionnementDest" title="Conditionnement" colSpan="3"/>
+      <field name="marque" title="Marque" readonly="true" colSpan="3"/>
+      <field name="emplacement" title="Emplacement" readonly="true" colSpan="3"/>
+      <field name="frigo" title="Frigo" readonly="true" colSpan="3"/>
+      <field name="tauxTVA" title="Taux TVA" readonly="true" colSpan="3"/>
+      <field name="zonePeche" title="Zone Pêche" readonly="true" colSpan="3"/>
+      <field name="nbColisParCouche" title="Nb Colis / Couche" colSpan="3"/>
+      <field name="gencode" title="Gencode" readonly="true" colSpan="3"/>
+      <field name="refFourn" title="Réf.Fourn" readonly="true" colSpan="3"/>
+      <field name="poidsKgDest" title="Poids (Kg)" readonly="true" colSpan="3"/>
+      <field name="nbColisParPalette" title="Nb Colis / Palette" colSpan="3"/>
+      <field name="nbColisDest" title="Nb Colis" colSpan="2" css="lvme-cession-jaune"
+        onChange="action-cession-stock-method-compute-dest"/>
+      <field name="pdsColisDest" title="Pds Colis" colSpan="2" onChange="action-cession-stock-method-compute-dest"/>
+      <field name="pdsTotalDest" title="Pds Total" readonly="true" colSpan="2" css="lvme-cession-jaune"/>
+      <field name="paKg" title="PA / Kg" colSpan="2"/>
+      <field name="prDevise" title="PR devise" colSpan="1"/>
+      <field name="prKg" title="PR / Kg" colSpan="1"/>
+      <field name="montantHT" title="Montant HT" readonly="true" colSpan="2"/>
+    </panel>
+    <panel name="boutonsCessionPanel" showTitle="false" colSpan="2" itemSpan="12" css="lvme-cession-ges"
+      showIf="typeCession == 'RECONDITIONNEMENT'">
+      <button name="annulerCessionBtn" title="Annuler" icon="cancel" css="lvme-btn-ges lvme-btn-ges-rouge"
+        onClick="close"/>
+      <button name="btnValiderCession" title="Valider" icon="check_circle" css="lvme-btn-ges"
+        onClick="save,action-cession-stock-method-execute-split" showIf="!cessionRealisee"/>
+    </panel>
+
+    <!-- modification du prix de revient (type 2) : inchangé -->
+    <panel name="modifPrPanel" title="Modification du prix de revient" colSpan="12"
+      showIf="typeCession == 'MODIF_PR'">
+      <field name="lotSource" colSpan="12" requiredIf="typeCession == 'MODIF_PR'"
+        onChange="action-cession-stock-record-load-ancien-pr"
+        form-view="tracking-number-form" grid-view="tracking-number-grid"
+        help="Sélectionner le lot dont on modifie le PR"/>
+      <field name="ancienPR" colSpan="6" title="Ancien PR (€/kg)" readonly="true"
+        help="PR actuel du lot (auto-rempli à la sélection)"/>
+      <field name="prKg" colSpan="6" title="Nouveau PR (€/kg)" requiredIf="typeCession == 'MODIF_PR'"
+        readonlyIf="cessionRealisee" help="Nouveau prix de revient à appliquer"/>
+      <field name="motif" colSpan="12" requiredIf="typeCession == 'MODIF_PR'"
+        help="Raison de la modification (ex : rabais rétroactif, correction)"/>
+      <button name="btnAppliquerModifPR" title="Appliquer la modification" colSpan="3"
+        onClick="save,action-modif-pr-method-appliquer" showIf="!cessionRealisee"/>
+    </panel>
+
+    <!-- frais de stockage (type 3) : inchangé -->
+    <panel name="fraisStockagePanel" title="Frais de stockage" colSpan="12"
+      showIf="typeCession == 'FRAIS_STOCKAGE'">
+      <field name="motif" colSpan="12" required="true" help="Raison du recalcul (ex: mise à jour taux mensuel)"/>
+      <field name="prKg" title="Taux appliqué (€/kg)" readonly="true"/>
+      <button name="btnAppliquerFraisStockage" title="Appliquer le recalcul" colSpan="3"
+        onClick="save,action-frais-stockage-method-appliquer" showIf="!cessionRealisee"/>
+    </panel>
+  </panel>
+</form>

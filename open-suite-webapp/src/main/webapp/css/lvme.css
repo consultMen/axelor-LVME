@@ -1939,3 +1939,58 @@
 [class*="_formView_"]:has(.lvme-od-champ) [class*="_main_"] [class*="_gridItem_"].lvme-od-champ [class*="_container_"]:has(> [class*="_title_"]) > :not([class*="_title_"]) {
   width: 100% !important;
 }
+
+/*
+ * « CESSION de Stock » comme GESCOM (repères css="lvme-cession-ges" / "lvme-cession-source") : fond jaune, libellés
+ * bleus au-dessus des cases, lot cédé en haut (cases rose / violet), poids cédé magenta, Nb Colis et Pds Total du
+ * nouveau lot en jaune, Valider / Annuler à droite.
+ */
+[class*="_formView_"]:has(.lvme-cession-ges) [class*="_main_"],
+[class*="_formView_"]:has(.lvme-cession-ges) [class*="_main_"] [class*="_panel_"],
+[class*="_formView_"]:has(.lvme-cession-ges) [class*="_main_"] [class*="_panel_"] [class*="_body_"] {
+  background-color: #f0f39a !important;
+}
+[class*="_formView_"]:has(.lvme-cession-ges),
+[class*="_formView_"]:has(.lvme-cession-ges) * {
+  --ax-form-row-gap: .15rem !important;
+  --ax-theme-form-row-gap: .15rem !important;
+  --ax-panel-body-padding: .35rem !important;
+}
+[class*="_formView_"]:has(.lvme-cession-ges) [class*="_main_"] label,
+[class*="_formView_"]:has(.lvme-cession-ges) [class*="_main_"] [class*="_labelText_"] {
+  font-size: 12px !important;
+  color: #1a3a8c !important;
+  white-space: nowrap !important;
+  margin-bottom: 0 !important;
+}
+[class*="_formView_"]:has(.lvme-cession-ges) [class*="_main_"] input:not([type="checkbox"]):not([type="radio"]) {
+  font-size: 12.5px !important;
+  min-height: 0 !important;
+  height: 24px;
+  background-color: #ffffff !important;
+}
+.lvme-cession-source {
+  border-bottom: 2px solid #9aa04a !important;
+  margin-bottom: 4px;
+}
+[class*="_formView_"]:has(.lvme-cession-ges) .lvme-cession-source input:not([type="checkbox"]):not([type="radio"]) {
+  background-color: #f9e3f4 !important;
+  color: #a020a0 !important;
+}
+[class*="_formView_"]:has(.lvme-cession-ges) [class*="_gridItem_"].lvme-cession-magenta input {
+  background-color: #f07ce8 !important;
+  color: #000000 !important;
+  font-weight: 700;
+  text-align: right;
+}
+[class*="_formView_"]:has(.lvme-cession-ges) [class*="_gridItem_"].lvme-cession-jaune input {
+  background-color: #ffff33 !important;
+  font-weight: 700;
+  text-align: right;
+}
+[class*="_formView_"]:has(.lvme-cession-ges) [class*="_main_"] button {
+  background: linear-gradient(#ffffff, #dfe4ec) !important;
+  color: #10204a !important;
+  border: 1px solid #8c96a8 !important;
+  border-radius: 4px !important;
+}
