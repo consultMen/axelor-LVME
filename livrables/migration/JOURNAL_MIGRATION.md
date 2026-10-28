@@ -328,6 +328,13 @@ CLIENT_RESERV (239). Les morceaux sont regroupés en une table dans l'archive (`
   arrivage dont le fournisseur manque dans FOU (1 372 fournisseurs pour 1 371 dans FOU) ; dernière commande
   GESCOM le 17/09/2026.
 
+## 3 octies. Étape 07 : règles de RFA par produit (`MIG_07_rfa_articles.sql`, 28/10/2026)
+
+- RFA_ART : 50 règles reprises sur 50, écran « Règles RFA par produit ». Toutes de type client + article, à 2,5 %, du
+  01/04/2026 au 30/06/2026 : SOBRAG1 (Relais d'Or Côte d'Azur) 26 articles, LJM13 16, RPDA26 8.
+- La « Liste des RFA par produit / facture » se calcule sur les factures LVME : vide pour l'historique (factures
+  GESCOM non recréées, option b) ; elle se remplira avec les factures faites dans LVME.
+
 ## 4. Points ouverts à faire préciser par le client
 
 - **cdv** (931 articles, ex. 100 403 ; 210 322) : signification inconnue. Pas trouvé dans `table_base`. Gardé dans
