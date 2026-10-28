@@ -1,26 +1,29 @@
 <form name="lvme-incoherence-search-form" title="Rapport d'incohérences" model="com.axelor.utils.db.Wizard" width="large"
   canNew="false" canSave="false" canCopy="false" canDelete="false" onNew="action-lvme-incoherence-group-onnew">
-  <!-- LVME REC-012 : rapport d'incohérences Commandes VS Réceptions VS BL VS Facturé -->
-  <panel name="rechercheIncoherencePanel" title="Recherche" colSpan="12">
-    <panel name="filtreTypePanel" colSpan="3" itemSpan="12">
+  <!-- LVME REC-012 : rapport d'incohérences Commandes VS Réceptions VS BL VS Facturé, présenté comme les écrans
+       GESCOM sur un seul écran (repère css="lvme-ges-lots-verif" : bande de filtres, cadres gris, liste serrée) :
+       type d'écart et tiers, dates, Lancer la recherche, Fermer(F12) à droite -->
+  <panel name="filtresIncoherencePanel" showTitle="false" colSpan="12">
+    <panel name="filtreTypePanel" colSpan="4" itemSpan="12" css="lvme-ges-lots-verif lvme-ges-cadre-gris">
       <field name="$typeEcart" title="Type d'écart" type="integer" selection="lvme.incoherence.type.select"
         placeholder="Tous" onChange="action-lvme-incoherence-refresh"/>
       <field name="$tiers" title="Tiers" type="many-to-one" target="com.axelor.apps.base.db.Partner"
-        domain="self.isCustomer = true OR self.isSupplier = true" canNew="false" canEdit="false" canView="false"/>
+        domain="self.isCustomer = true OR self.isSupplier = true" canNew="false" canEdit="false" canView="false"
+        placeholder="Tous"/>
     </panel>
-    <panel name="filtreDatePanel" colSpan="3" itemSpan="12">
+    <panel name="filtreDatePanel" colSpan="3" itemSpan="12" css="lvme-ges-cadre-gris">
       <field name="$dateDu" title="Date du" type="date"/>
       <field name="$dateAu" title="au" type="date"/>
       <field name="$datePeriode" title="Période prédéfinie" type="integer" selection="lvme.etat.stock.periode.select"
         onChange="action-lvme-incoherence-group-periode"/>
     </panel>
-    <panel name="filtreActionPanel" colSpan="3" itemSpan="12">
-      <button name="lancerRechercheBtn" title="Lancer la recherche" icon="search" css="btn-primary" onClick="action-lvme-incoherence-refresh"/>
+    <panel name="filtreActionPanel" colSpan="2" itemSpan="12">
+      <button name="lancerRechercheBtn" title="Lancer la recherche" icon="search" onClick="action-lvme-incoherence-refresh"/>
     </panel>
     <panel name="boutonsPanel" colSpan="3" itemSpan="12">
-      <button name="quitterBtn" title="Quitter" icon="x-circle" css="btn-danger" onClick="close"/>
+      <button name="quitterBtn" title="Fermer(F12)" icon="cancel" css="lvme-btn-ges lvme-btn-ges-rouge" onClick="close"/>
     </panel>
   </panel>
-  <panel-dashlet name="incoherencesDashlet" title="Incohérences" colSpan="12" height="600"
+  <panel-dashlet name="incoherencesDashlet" title="Incohérences" showTitle="false" colSpan="12" height="520"
     action="action-lvme-incoherence-dashlet"/>
 </form>

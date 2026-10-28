@@ -1,4 +1,4 @@
-# Déploiement prod LVME — commandes clients GESCOM (MIG_06) et PROD_102 du 28/10/2026
+# Déploiement prod LVME — commandes clients GESCOM (MIG_06), PROD_102 et PROD_103 (rapport d'incohérences) du 28/10/2026
 
 Déjà en prod : PROD_94 à 101, MIG_00 à MIG_05. Pas de code à recompiler (scripts SQL seulement).
 
@@ -7,7 +7,7 @@ Déjà en prod : PROD_94 à 101, MIG_00 à MIG_05. Pas de code à recompiler (sc
 2. **Serveur** : `pg_dump -U axelor -Fc axelor > ~/sauvegarde_avant_mig06_$(date +%F_%H%M).dump`
 3. `cd ~/src/axelor-LVME && git pull && git log --oneline -1`
 4. `sudo systemctl stop axelor-tomcat`
-5. `psql -U axelor -d axelor -v ON_ERROR_STOP=1 -f ~/MIG_00_archive_gescom.sql && psql -U axelor -d axelor -v ON_ERROR_STOP=1 -f livrables/migration/MIG_06_commandes_clients.sql && psql -U axelor -d axelor -v ON_ERROR_STOP=1 -f livrables/PROD_102_incoherences_hors_gescom.sql`
+5. `psql -U axelor -d axelor -v ON_ERROR_STOP=1 -f ~/MIG_00_archive_gescom.sql && psql -U axelor -d axelor -v ON_ERROR_STOP=1 -f livrables/migration/MIG_06_commandes_clients.sql && psql -U axelor -d axelor -v ON_ERROR_STOP=1 -f livrables/PROD_102_incoherences_hors_gescom.sql && psql -U axelor -d axelor -v ON_ERROR_STOP=1 -f livrables/PROD_103_incoherences_ecran_gescom.sql`
    (≈ 5 min, ne pas interrompre) → commandes 27 732 / 27 732, lignes 183 166 / 183 166, ca_gescom = ca_axelor =
    114 557 356 ; MIG_00 ne recharge que l'archive (MIG_01 à 05 ne sont pas à relancer).
 6. `sudo systemctl start axelor-tomcat && sudo systemctl restart nginx`

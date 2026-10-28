@@ -9,8 +9,12 @@
 --   - une commande client Axelor « Terminée » par commande GESCOM (type 2, et les 2 de type 1) : n° GESCOM, client,
 --     commercial, dates, référence client (REFCDE), montant HT, adresse de livraison ; « Avoir » si montant négatif ;
 --     n° / date / échéance de la facture GESCOM dans les commentaires de facturation ;
+--   - conditions et mode de paiement, transporteur, % RFA, % commission, coût du port au kg, % frais de congélation,
+--     remise ; note interne : contact, téléphone, e-mail, zone (France / Corse / étranger), saisie par, affacturage,
+--     bordereau, colis, poids brut, escompte, acompte, port ;
 --   - ses lignes : produit (P, D), texte (T, ligne de titre), correction manuelle (M, sans produit) ; quantité, colis,
---     poids colis, prix, prix net, remise, montant, TVA, prix de revient, taux commission / RFA ; lot vendu ;
+--     poids colis, prix, prix net, remise, montant HT et TTC, TVA, prix de revient, taux commission / RFA,
+--     fournisseur, coefficient de poids net ; lot vendu ;
 --   - un BL réalisé par commande (n° « BL » + n° de commande GESCOM : les n° d'arrivage occupent déjà les mêmes numéros) avec ses lignes de produit et leur lot, du frigo du lot
 --     vers LIVRAISON CLIENT : historique produit (sorties), n° BL de la liste des commandes. Le stock N'EST PAS
 --     modifié (il est déjà celui de GESCOM, MIG_05).
@@ -45,6 +49,25 @@ SELECT DISTINCT ON (upper(partner_seq)) upper(partner_seq) AS code, id FROM base
 WHERE is_customer AND partner_seq IS NOT NULL ORDER BY upper(partner_seq), id;
 CREATE TEMP TABLE mig_commercial ON COMMIT DROP AS
 SELECT substr(import_id, 12) AS code, id FROM auth_user WHERE import_id LIKE 'GESCOM-COM-%';
+-- conditions (MODREGT) et modes (REGL1) de paiement, transporteur, fournisseur des lignes : comme MIG_02 / MIG_05
+CREATE TEMP TABLE mig_condition ON COMMIT DROP AS
+SELECT btrim(t.idtable) AS idtable, c.id
+FROM gescom.table_base t JOIN account_payment_condition c ON c.code = btrim(t.codtab)
+WHERE btrim(t.codtab) ~ '^RGT';
+CREATE TEMP TABLE mig_mode ON COMMIT DROP AS
+SELECT btrim(t.idtable) AS idtable,
+  (SELECT id FROM account_payment_mode WHERE code = 'ENC_' || CASE btrim(t.codtab) WHEN 'MODRGTVIR' THEN 'VIR'
+     WHEN 'MODRGTCHQ' THEN 'CHQ' WHEN 'MODRGTESP' THEN 'ESP' WHEN 'MODRGTCB' THEN 'CB' WHEN 'MODRGTTRT' THEN 'LCR'
+     WHEN 'MODRGTTRD' THEN 'LCR' WHEN 'MODRGTBO' THEN 'LCR' ELSE 'OTH' END) AS encaissement
+FROM gescom.table_base t
+WHERE btrim(t.codtab) ~ '^MODRGT';
+CREATE TEMP TABLE mig_transporteur ON COMMIT DROP AS
+SELECT substr(import_id, 12) AS cle, id FROM base_partner WHERE import_id LIKE 'GESCOM-TRA-%';
+CREATE TEMP TABLE mig_fournisseur ON COMMIT DROP AS
+SELECT DISTINCT ON (upper(btrim(f.refcpt))) upper(btrim(f.refcpt)) AS code, p.id
+FROM gescom.fou f JOIN base_partner p ON p.import_id = 'GESCOM-FOU-' || btrim(f.focleunik)
+WHERE gescom.txt(f.refcpt) IS NOT NULL ORDER BY upper(btrim(f.refcpt)), p.id;
+CREATE INDEX ON mig_fournisseur (code);
 -- lots : n° de lot GESCOM + n° de l'arrivage d'origine
 CREATE TEMP TABLE mig_lot ON COMMIT DROP AS
 SELECT t.id, upper(btrim(t.lvme_numero_base)) AS lot, t.product, m.stock_move_seq AS arrivage, t.lot_fournisseur,
@@ -61,7 +84,18 @@ CREATE INDEX ON mig_lot (lot, product);
 -- ---------- commandes (type 2) et leur facture (type 3) ----------
 CREATE TEMP TABLE mig_cde ON COMMIT DROP AS
 SELECT btrim(c.ncde) AS num, c.*,
-  coalesce(cl.id, cc.id) AS client, co.id AS commercial_id,
+  coalesce(cl.id, cc.id) AS client, co.id AS commercial_id, cnd.id AS condition_id, md.encaissement AS mode_id,
+  tr.id AS transporteur_id,
+  -- autres informations GESCOM de la commande (note interne)
+  NULLIF(concat_ws(E'\n',
+    'Contact : ' || gescom.txt(c.nomresp), 'Tél. : ' || gescom.txt(c.tel), 'E-mail : ' || gescom.txt(c.ademail),
+    'Zone : ' || CASE btrim(c.position) WHEN '1' THEN 'France' WHEN '2' THEN 'Corse' WHEN '5' THEN 'Étranger' END,
+    'Saisie par : ' || gescom.txt(c.codp_a),
+    CASE WHEN btrim(c.affacturage) = '1' THEN 'Affacturage' END,
+    'Bordereau : ' || gescom.txt(c.bordereau),
+    'Colis : ' || NULLIF(gescom.num(c.nb_colis), 0), 'Poids brut : ' || NULLIF(gescom.num(c.poidsb), 0),
+    'Escompte : ' || NULLIF(gescom.num(c.escompte), 0) || ' %', 'Acompte : ' || NULLIF(gescom.num(c.acompte), 0),
+    'Port : ' || NULLIF(gescom.num(c.port), 0)), '') AS note_interne,
   coalesce(gescom.dt(c.dcre), DATE '2021-01-01') AS date_cde,
   coalesce(gescom.num(c.montht), 0) AS montant,
   gescom.txt(f.numfacture) AS facture, gescom.dt(f.dcre) AS date_facture, gescom.dt(f.deche) AS echeance,
@@ -73,6 +107,9 @@ LEFT JOIN gescom.cce f ON btrim(f.ncde) = btrim(c.idposition) AND btrim(f.type_f
 LEFT JOIN mig_client cl ON cl.cle = btrim(c.clcleunik)
 LEFT JOIN mig_client_code cc ON cc.code = upper(btrim(c.refcpt))
 LEFT JOIN mig_commercial co ON co.code = btrim(c.comm)
+LEFT JOIN mig_condition cnd ON cnd.idtable = btrim(c.modregt)
+LEFT JOIN mig_mode md ON md.idtable = btrim(c.regl1)
+LEFT JOIN mig_transporteur tr ON tr.cle = btrim(c.notransporteur)
 WHERE btrim(coalesce(c.type_facture, '')) <> '3';
 CREATE INDEX ON mig_cde (num);
 ALTER TABLE mig_cde ADD COLUMN nouveau boolean;
@@ -104,13 +141,14 @@ SELECT l.*, m.id AS commande, m.date_cde, m.nouveau,
   coalesce(gescom.num(l.prixvte), 0) AS prix_brut,
   coalesce(NULLIF(gescom.num(l.pedi), 0), gescom.num(l.prixvte), 0) AS prix_net,
   coalesce(gescom.num(l.montv), 0) AS montant,
-  coalesce(gescom.num(l.ttvad), 0) AS taux_tva,
+  coalesce(gescom.num(l.ttvad), 0) AS taux_tva, fo.id AS fournisseur_id,
   row_number() OVER (PARTITION BY m.id ORDER BY gescom.num(l.no_ligne), gescom.num(l.cdcleunik)) AS rang,
   nextval('sale_sale_order_line_seq') AS ligne_id
 FROM gescom.ccd l
 JOIN mig_cde m ON m.num = btrim(l.ncde)
 LEFT JOIN mig_article a ON a.ref = upper(btrim(l.ref))
 LEFT JOIN mig_unite u ON u.code = upper(btrim(l.unite))
+LEFT JOIN mig_fournisseur fo ON fo.code = upper(btrim(l.fou_cod))
 WHERE m.nouveau;
 CREATE INDEX ON mig_ligne (commande);
 -- lot vendu : n° de lot + article, l'arrivage d'origine départage les lots du même nom
@@ -132,7 +170,8 @@ INSERT INTO sale_sale_order (id, version, created_on, import_id, import_origin, 
   order_date, confirmation_date_time, estimated_delivery_date, ex_tax_total, company_ex_tax_total, tax_total,
   in_tax_total, external_reference, invoice_comments, description, delivery_address_str, commercial, delivery_state,
   invoicing_state, template, in_ati, version_number, amount_invoiced, advance_total, discount_amount,
-  price_before_global_discount, oneoff_sale, order_being_edited, manual_unblock)
+  price_before_global_discount, oneoff_sale, order_being_edited, manual_unblock, payment_condition, payment_mode,
+  carrier_partner, tauxrfa, taux_commission, cout_port_kg, lvme_frais_congelation, remise_facture, internal_note)
 SELECT m.id, 0, now(), 'GESCOM-CDE-' || m.num, 'GESCOM', m.num, m.num || ' - ' || coalesce(gescom.txt(m.nom), ''),
   d.societe, m.client, m.client, m.client, d.euro, 4, 1, m.date_cde, m.date_cde, m.date_cde::timestamp, m.date_cde,
   m.montant, m.montant,
@@ -146,7 +185,10 @@ SELECT m.id, 0, now(), 'GESCOM-CDE-' || m.num, 'GESCOM', m.num, m.num || ' - ' |
   NULLIF(concat_ws(E'\n', gescom.txt(m.nom), gescom.txt(m.adr1), gescom.txt(m.adr2), gescom.txt(m.adr3),
     NULLIF(concat_ws(' ', gescom.txt(m.codp), gescom.txt(m.vil)), ''), gescom.txt(m.pays)), ''),
   m.commercial_id, 3, CASE WHEN m.facture IS NOT NULL THEN 3 ELSE 1 END, false, false, 1,
-  CASE WHEN m.facture IS NOT NULL THEN m.montant ELSE 0 END, 0, 0, m.montant, false, false, false
+  CASE WHEN m.facture IS NOT NULL THEN m.montant ELSE 0 END, 0, 0, m.montant, false, false, false,
+  m.condition_id, m.mode_id, m.transporteur_id, NULLIF(gescom.num(m.rfa), 0), NULLIF(gescom.num(m.pourc_comm), 0),
+  NULLIF(gescom.num(m.cout_port), 0), NULLIF(gescom.num(m.pourc_cong), 0), NULLIF(gescom.num(m.remmax), 0),
+  m.note_interne
 FROM mig_cde m CROSS JOIN mig_def d
 WHERE m.nouveau;
 
@@ -155,19 +197,23 @@ INSERT INTO sale_sale_order_line (id, version, created_on, import_id, import_ori
   product, product_name, unit, qty, delivered_qty, price, price_discounted, in_tax_price, ex_tax_total,
   company_ex_tax_total, in_tax_total, company_in_tax_total, discount_type_select, discount_amount, nb_colis,
   poids_par_colis, poids_total_net, prix_revient, taux_commission, tauxrfa, delivery_state, invoicing_state, invoiced,
-  amount_invoiced, estimated_delivery_date, full_name)
+  amount_invoiced, estimated_delivery_date, full_name, supplier_partner, coef_poids_net)
 SELECT g.ligne_id, 0, now(), 'GESCOM-CDL-' || btrim(g.cdcleunik), 'GESCOM', g.commande, g.rang,
   CASE WHEN g.genre = 'T' THEN 1 ELSE 0 END, g.article,
   coalesce(gescom.txt(g.tit), (SELECT name FROM base_product WHERE id = g.article), gescom.txt(g.ref), 'Ligne'),
   g.unite_id, g.qte, CASE WHEN g.article IS NOT NULL THEN g.qte ELSE 0 END, g.prix_brut, g.prix_net,
-  round(g.prix_net * (1 + g.taux_tva / 100), 4), g.montant, g.montant, round(g.montant * (1 + g.taux_tva / 100), 2),
-  round(g.montant * (1 + g.taux_tva / 100), 2),
+  coalesce(NULLIF(gescom.num(g.pedi_ttc), 0), round(g.prix_net * (1 + g.taux_tva / 100), 4)), g.montant, g.montant,
+  coalesce(NULLIF(gescom.num(g.montv_ttc), 0), round(g.montant * (1 + g.taux_tva / 100), 2)),
+  coalesce(NULLIF(gescom.num(g.montv_ttc), 0), round(g.montant * (1 + g.taux_tva / 100), 2)),
   CASE WHEN coalesce(gescom.num(g.remmax), 0) <> 0 THEN 1 ELSE 0 END, coalesce(gescom.num(g.remmax), 0),
-  gescom.num(g.nbcolis), gescom.num(g.pdscolis), gescom.num(g.poidsb), gescom.num(g.pr_arr),
+  gescom.num(g.nbcolis), gescom.num(g.pdscolis), gescom.num(g.poidsb),
+  -- prix de revient : celui de l'arrivage, sinon PRIX (prix de revient du lot au moment de la vente)
+  coalesce(NULLIF(gescom.num(g.pr_arr), 0), NULLIF(gescom.num(g.prix), 0)),
   gescom.num(g.taux_comm), gescom.num(g.remise_rfa), CASE WHEN g.article IS NOT NULL THEN 3 END,
   CASE WHEN g.article IS NOT NULL THEN 3 END, g.article IS NOT NULL,
   CASE WHEN g.article IS NOT NULL THEN g.montant ELSE 0 END, g.date_cde,
-  left(g.rang || ' - ' || coalesce(gescom.txt(g.tit), gescom.txt(g.ref), ''), 255)
+  left(g.rang || ' - ' || coalesce(gescom.txt(g.tit), gescom.txt(g.ref), ''), 255), g.fournisseur_id,
+  NULLIF(gescom.num(g.coeff_cond), 0)
 FROM mig_ligne g;
 
 INSERT INTO sale_sale_order_line_tax_line_set (sale_sale_order_line, tax_line_set)
@@ -223,6 +269,25 @@ SELECT nextval('stock_stock_move_line_seq'), 0, now(), 'GESCOM-BLL-' || btrim(g.
   gescom.num(g.poidsb), 0, false, false, 0, 0, 0, 0, 0
 FROM mig_ligne g JOIN mig_cde m ON m.id = g.commande CROSS JOIN mig_def d
 WHERE m.bl_id IS NOT NULL AND g.article IS NOT NULL AND g.qte <> 0;
+
+-- ---------- commandes déjà reprises : informations ajoutées ensuite (paiement, transporteur, taux, note ; lignes :
+-- TTC GESCOM, fournisseur, coefficient de poids net, prix de revient) ----------
+UPDATE sale_sale_order s SET payment_condition = m.condition_id, payment_mode = m.mode_id,
+  carrier_partner = m.transporteur_id, tauxrfa = NULLIF(gescom.num(m.rfa), 0),
+  taux_commission = NULLIF(gescom.num(m.pourc_comm), 0), cout_port_kg = NULLIF(gescom.num(m.cout_port), 0),
+  lvme_frais_congelation = NULLIF(gescom.num(m.pourc_cong), 0), remise_facture = NULLIF(gescom.num(m.remmax), 0),
+  internal_note = m.note_interne, version = s.version + 1
+FROM mig_cde m
+WHERE s.id = m.id AND NOT m.nouveau AND s.internal_note IS NULL AND s.payment_condition IS NULL
+  AND s.carrier_partner IS NULL;
+UPDATE sale_sale_order_line l SET supplier_partner = fo.id, coef_poids_net = NULLIF(gescom.num(c.coeff_cond), 0),
+  in_tax_price = coalesce(NULLIF(gescom.num(c.pedi_ttc), 0), l.in_tax_price),
+  in_tax_total = coalesce(NULLIF(gescom.num(c.montv_ttc), 0), l.in_tax_total),
+  company_in_tax_total = coalesce(NULLIF(gescom.num(c.montv_ttc), 0), l.company_in_tax_total),
+  prix_revient = coalesce(NULLIF(gescom.num(c.pr_arr), 0), NULLIF(gescom.num(c.prix), 0)), version = l.version + 1
+FROM gescom.ccd c LEFT JOIN mig_fournisseur fo ON fo.code = upper(btrim(c.fou_cod))
+WHERE l.import_id = 'GESCOM-CDL-' || btrim(c.cdcleunik) AND l.supplier_partner IS NULL AND l.coef_poids_net IS NULL
+  AND (fo.id IS NOT NULL OR NULLIF(gescom.num(c.coeff_cond), 0) IS NOT NULL);
 
 COMMIT;
 
