@@ -208,6 +208,10 @@ def rapport(fichier, params, jeux, corps):
     logo_b64 = base64.b64encode(open(LOGO, 'rb').read()).decode('ascii')
     xml = ('<?xml version="1.0" encoding="UTF-8"?>\n'
            '<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.23" id="1">'
+           # export Excel sur une seule feuille (sinon une feuille par saut de page)
+           + '<list-property name="userProperties"><structure><property name="name">ExcelEmitter.SingleSheet'
+           + '</property><property name="type">boolean</property><property name="isVisible">true</property>'
+           + '</structure></list-property><property name="ExcelEmitter.SingleSheet">true</property>'
            + '<list-property name="propertyBindings">' + liaisons + '</list-property>'
            + prop('units', 'cm') + prop('layoutPreference', 'auto layout')
            + '<parameters>' + ''.join(param(p) for p in sorted(params))
