@@ -4,7 +4,7 @@
 --   - Liste des achats fournisseurs : Date du = aujourd'hui - 2 mois, au = aujourd'hui
 --   - Arrivages : Arrivée du = aujourd'hui - 2 mois, sans date de fin (arrivages des 2 derniers mois et flottants à
 --     venir) ; « Date du » des arrivages est la date de création dans LVME (jour de la migration pour l'historique)
---   L'utilisateur change ou vide les dates pour filtrer autrement. Pas de redémarrage nécessaire. Relançable.
+--   L'utilisateur change ou vide les dates pour filtrer autrement. Redémarrer Tomcat après (actions en cache). Relançable.
 -- =====================================================================
 BEGIN;
 
