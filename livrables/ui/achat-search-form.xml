@@ -85,9 +85,9 @@
         onChange="action-lvme-achat-periode-arrivee"/>
     </panel>
     <panel name="filtreFournisseurPanel" colSpan="3" itemSpan="12">
-      <field name="$fournisseurDu" title="Fournisseur du" type="many-to-one" target="com.axelor.apps.base.db.Partner"
+      <field name="$fournisseurDu" grid-view="lvme-fournisseur-selection-grid" title="Fournisseur du" type="many-to-one" target="com.axelor.apps.base.db.Partner"
         domain="self.isSupplier = true" canNew="false" canEdit="false" canView="false"/>
-      <field name="$fournisseurAu" title="au" type="many-to-one" target="com.axelor.apps.base.db.Partner"
+      <field name="$fournisseurAu" grid-view="lvme-fournisseur-selection-grid" title="au" type="many-to-one" target="com.axelor.apps.base.db.Partner"
         domain="self.isSupplier = true" canNew="false" canEdit="false" canView="false"/>
       <field name="$typeTransport" title="Type transport" type="many-to-one" target="com.axelor.apps.stock.db.ShipmentMode"
         canNew="false" canEdit="false" canView="false"/>

@@ -10,7 +10,7 @@
         onChange="action-lvme-cde-client-periode-date"/>
     </panel>
     <panel name="filtreClientPanel" colSpan="4" itemSpan="12">
-      <field name="$client" title="Client" type="many-to-one" target="com.axelor.apps.base.db.Partner"
+      <field name="$client" grid-view="lvme-client-selection-grid" title="Client" type="many-to-one" target="com.axelor.apps.base.db.Partner"
         domain="self.isCustomer = true" canNew="false" canEdit="false" canView="false"/>
       <field name="$produit" title="Produit" type="many-to-one" target="com.axelor.apps.base.db.Product"
         canNew="false" canEdit="false" canView="false"/>

@@ -17,7 +17,7 @@
         onChange="action-lvme-reappro-periode-stats"/>
     </panel>
     <panel name="reapproArticlePanel" colSpan="3" itemSpan="12">
-      <field name="$fournisseur" title="Fournisseur" type="many-to-one" target="com.axelor.apps.base.db.Partner"
+      <field name="$fournisseur" grid-view="lvme-fournisseur-selection-grid" title="Fournisseur" type="many-to-one" target="com.axelor.apps.base.db.Partner"
         domain="self.isSupplier = true AND self.isContact = false" canNew="false" canEdit="false" canView="false"
         placeholder="TOUS"/>
       <field name="$produit" title="Produit" type="many-to-one" target="com.axelor.apps.base.db.Product"

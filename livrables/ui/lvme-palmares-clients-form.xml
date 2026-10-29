@@ -13,7 +13,7 @@
         selection="lvme.etat.stock.periode.select" placeholder="Période prédéfinie" onChange="action-lvme-palmares-clients-periode"/>
     </panel>
     <panel name="clientPanel" colSpan="5" itemSpan="12" css="lvme-palm-client">
-      <field name="$client" title="Client" type="many-to-one" target="com.axelor.apps.base.db.Partner"
+      <field name="$client" grid-view="lvme-client-selection-grid" title="Client" type="many-to-one" target="com.axelor.apps.base.db.Partner"
         domain="self.isCustomer = true AND self.isContact = false" canNew="false" canEdit="false" canView="false" placeholder="TOUS"/>
       <field name="$familleClient" title="Famille" type="many-to-one" target="com.axelor.apps.base.db.PartnerCategory"
         canNew="false" canEdit="false" canView="false" placeholder="TOUS"/>
@@ -31,7 +31,7 @@
         canNew="false" canEdit="false" canView="false" placeholder="TOUS"/>
       <field name="$familleProduit" title="Famille Produit" type="many-to-one" target="com.axelor.apps.base.db.ProductCategory"
         canNew="false" canEdit="false" canView="false" placeholder="TOUS"/>
-      <field name="$fournisseur" title="Fournisseur" type="many-to-one" target="com.axelor.apps.base.db.Partner"
+      <field name="$fournisseur" grid-view="lvme-fournisseur-selection-grid" title="Fournisseur" type="many-to-one" target="com.axelor.apps.base.db.Partner"
         domain="self.isSupplier = true AND self.isContact = false" canNew="false" canEdit="false" canView="false" placeholder="TOUS"/>
       <field name="$origine" title="Origine" type="string"/>
       <field name="$conditionnement" title="Conditionnement" type="many-to-one" target="com.axelor.apps.purchase.db.Conditionnement"

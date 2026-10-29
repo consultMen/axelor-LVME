@@ -1,0 +1,16 @@
+<grid name="lvme-client-selection-grid" title="Clients" model="com.axelor.apps.base.db.Partner" orderBy="name"
+  canNew="false" canEdit="false" canDelete="false">
+  <!-- LVME : liste « Clients » de GESCOM ouverte par la loupe des champs client (écrans de recherche, commande
+       client) au lieu de la liste Axelor ; mêmes colonnes que la liste du menu Clients -->
+  <field name="partnerSeq" title="Réf." width="110"/>
+  <field name="name" title="Client" width="260"/>
+  <field name="lvmeContact" title="Contact" width="150"/>
+  <field name="fixedPhone" title="Téléphone" width="120"/>
+  <field name="mobilePhone" title="Portable" width="120"/>
+  <field name="mainAddress.zip" title="Code Postal" width="90"/>
+  <field name="mainAddress.townName" title="Ville" width="140"/>
+  <field name="industrySector" title="Secteur" width="110"/>
+  <field name="commercial" title="Vendeur" width="120"/>
+  <field name="partnerCategory" title="Famille" width="120"/>
+  <field name="groupement" title="Groupe" width="120"/>
+</grid>

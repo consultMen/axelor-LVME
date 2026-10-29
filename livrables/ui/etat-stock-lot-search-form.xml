@@ -54,9 +54,9 @@
 
     <panel name="filtreFournisseurPanel" colSpan="3" itemSpan="12">
 
-      <field name="$fournisseurDu" title="Fournisseur du" type="many-to-one" target="com.axelor.apps.base.db.Partner" domain="self.isSupplier = true" canNew="false" canEdit="false" canView="false"/>
+      <field name="$fournisseurDu" grid-view="lvme-fournisseur-selection-grid" title="Fournisseur du" type="many-to-one" target="com.axelor.apps.base.db.Partner" domain="self.isSupplier = true" canNew="false" canEdit="false" canView="false"/>
 
-      <field name="$fournisseurAu" title="au" type="many-to-one" target="com.axelor.apps.base.db.Partner" domain="self.isSupplier = true" canNew="false" canEdit="false" canView="false"/>
+      <field name="$fournisseurAu" grid-view="lvme-fournisseur-selection-grid" title="au" type="many-to-one" target="com.axelor.apps.base.db.Partner" domain="self.isSupplier = true" canNew="false" canEdit="false" canView="false"/>
 
       <field name="$origine" title="Origine" type="string" selection="lvme.origine.select"/>
 

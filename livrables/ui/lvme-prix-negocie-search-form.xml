@@ -5,7 +5,7 @@
        recherche, Imprimer, Fermer(F12) ; liste modifiable (fiche en fenêtre) -->
   <panel name="filtresPrixNegociePanel" showTitle="false" colSpan="12">
     <panel name="filtreClientPanel" colSpan="4" itemSpan="12" css="lvme-ges-lots-verif lvme-ges-cadre-gris">
-      <field name="$client" title="Client" type="many-to-one" target="com.axelor.apps.base.db.Partner"
+      <field name="$client" grid-view="lvme-client-selection-grid" title="Client" type="many-to-one" target="com.axelor.apps.base.db.Partner"
         domain="self.isCustomer = true AND self.isContact = false" canNew="false" canEdit="false" canView="false"
         placeholder="TOUS" onChange="action-lvme-prix-negocie-refresh"/>
       <field name="$produit" title="Produit" type="many-to-one" target="com.axelor.apps.base.db.Product"

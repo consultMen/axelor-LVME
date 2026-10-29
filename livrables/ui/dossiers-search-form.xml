@@ -13,7 +13,7 @@
         <!-- Client en compte / Client comptant (côte à côte), puis le client choisi (vide = TOUS) -->
         <field name="$clientCompte" showTitle="false" type="integer" widget="RadioSelect" selection="lvme.dossier.client.compte.select"
           css="lvme-radio-nowrap" onChange="action-lvme-dossiers-refresh"/>
-        <field name="$client" title="Client" type="many-to-one" target="com.axelor.apps.base.db.Partner"
+        <field name="$client" grid-view="lvme-client-selection-grid" title="Client" type="many-to-one" target="com.axelor.apps.base.db.Partner"
           domain="self.isCustomer = true" canNew="false" canEdit="false" canView="false"/>
         <field name="$transporteur" title="Transporteur" type="many-to-one" target="com.axelor.apps.base.db.Partner"
           domain="self.isCarrier = true OR self.id IN (SELECT sm.carrierPartner.id FROM StockMove sm WHERE sm.carrierPartner IS NOT NULL)" canNew="false" canEdit="false" canView="false" showIf="$typeDoc != 2"/>

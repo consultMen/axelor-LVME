@@ -27,7 +27,7 @@
   </panel>
   <panel name="mainPanel" colSpan="12" css="lvme-gescom">
     <panel name="lvmeFournisseurPanel" colSpan="4" itemSpan="6" css="lvme-gescom lvme-gescom-box">
-      <field name="partner" title="Fournisseur" colSpan="8" readonlyIf="statusSelect != 1" canEdit="false" onChange="action-stock-move-group-partner-onchange" domain="self.isContact = false AND :company member of self.companySet" form-view="partner-form" grid-view="partner-grid" x-image-field="picture"/>
+      <field name="partner" title="Fournisseur" colSpan="8" readonlyIf="statusSelect != 1" canEdit="false" onChange="action-stock-move-group-partner-onchange" domain="self.isContact = false AND :company member of self.companySet" form-view="partner-form" grid-view="lvme-fournisseur-selection-grid" x-image-field="picture"/>
       <field name="partner.partnerSeq" title="Code" readonly="true" colSpan="4"/>
       <!-- adresse complète du fournisseur sur une ligne (remplie au choix du fournisseur) -->
       <field name="fromAddressStr" title="Adresse" readonly="true" colSpan="12">
