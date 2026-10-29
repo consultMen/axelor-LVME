@@ -1,6 +1,7 @@
 /*
  * LVME : raccourcis clavier des écrans façon GESCOM (ajouté à la page Axelor par build.gradle, tâche copyWebapp).
  *   F1 : « F1 : Historique Prix » de la fenêtre Lignes Commandes ouverte, à la place de l'aide du navigateur.
+ *   Liste « Articles » (loupe Article des lignes) : un clic choisit l'article et ferme la liste.
  *   F2 : nouvelle ligne (bouton « + » de la liste des lignes) de la fiche ou de la fenêtre ouverte.
  *   F12 : bouton « Fermer », « Fermer(F12) » ou « Quitter » affiché (fenêtre ouverte d'abord, sinon l'écran).
  * Axelor n'écrit pas le nom du bouton dans la page : le bouton est retrouvé par son libellé.
@@ -155,6 +156,38 @@
     }
   }
   new MutationObserver(marquerFenetres).observe(document.documentElement, { childList: true, subtree: true });
+
+  // liste « Articles » ouverte par la loupe Article (lignes de commande client, d'achat, d'arrivage) : présentée comme
+  // GESCOM (classe lvme-fenetre-articles, lvme.css) et un clic sur un article le choisit et ferme la liste, comme un
+  // double-clic (la case à cocher garde son effet)
+  function fenetreArticles(el) {
+    var f = el && el.closest ? el.closest('[class*="_modal-content"]') : null;
+    if (!f) {
+      return null;
+    }
+    var entete = f.querySelector('[class*="_modal-header"]') || f;
+    return (entete.textContent || '').trim().indexOf('Articles') === 0 ? f : null;
+  }
+  new MutationObserver(function () {
+    var fenetres = document.querySelectorAll('[class*="_modal-content"]:not(.lvme-fenetre-articles)');
+    for (var i = 0; i < fenetres.length; i++) {
+      if (fenetreArticles(fenetres[i])) {
+        fenetres[i].classList.add('lvme-fenetre-articles');
+      }
+    }
+  }).observe(document.documentElement, { childList: true, subtree: true });
+  document.addEventListener('click', function (e) {
+    var t = e.target;
+    if (!t || !t.closest || t.closest('input, button, [role="checkbox"]') || !fenetreArticles(t)) {
+      return;
+    }
+    var ligne = t.closest('[class*="_body_"] [class*="_row_"]');
+    if (!ligne) {
+      return;
+    }
+    var cellule = t.closest('[class*="_column_"]') || t;
+    cellule.dispatchEvent(new MouseEvent('dblclick', { bubbles: true, cancelable: true, view: window }));
+  }, true);
 
   // certains navigateurs ouvrent l'aide sur l'évènement « help » : bloqué aussi
   window.addEventListener('help', function (e) {

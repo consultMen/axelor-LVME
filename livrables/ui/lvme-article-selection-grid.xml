@@ -1,0 +1,18 @@
+<grid name="lvme-article-selection-grid" title="Articles" model="com.axelor.apps.base.db.Product" orderBy="code,name"
+  canNew="false" canEdit="false" canDelete="false">
+  <!-- LVME : liste « Articles » de GESCOM ouverte par la loupe Article des lignes de commande client, de commande
+       d'achat et d'arrivage : un clic sur un article le choisit et ferme la liste (js/lvme.js) ; lignes serrées
+       blanc / gris (css/lvme.css, fenêtre « Articles ») -->
+  <field name="code" title="Référence" width="115"/>
+  <field name="name" title="Désignation article" width="260"/>
+  <field name="defaultSupplierPartner" title="Fournisseur" width="170"/>
+  <field name="refFournisseur" title="Référence Fournisseur" width="95"/>
+  <field name="gencode" title="Gencode" width="110"/>
+  <field name="unit" title="Unité" width="65"/>
+  <field name="netMass" title="Poids Unitaire" x-scale="2" width="65"/>
+  <field name="poidsColis" title="Poids Colis" x-scale="2" width="65"/>
+  <field name="salePrice" title="P.Vente HT" x-scale="3" width="75"/>
+  <field name="salePriceTtc" title="P.Vente TTC" x-scale="3" width="75"/>
+  <field name="internalDescription" title="Commentaires" width="200"/>
+  <field name="productTypeSelect" hidden="true"/>
+</grid>

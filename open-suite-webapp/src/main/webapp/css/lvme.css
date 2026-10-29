@@ -1994,3 +1994,36 @@
   border: 1px solid #8c96a8 !important;
   border-radius: 4px !important;
 }
+
+/*
+ * Liste « Articles » de GESCOM ouverte par la loupe Article des lignes (classe lvme-fenetre-articles posée par
+ * lvme.js) : en-têtes gris dégradé, lignes serrées blanc / gris, ligne survolée et sélectionnée bleu nuit.
+ */
+.lvme-fenetre-articles [class*="_header_"] [class*="_column_"] {
+  background: linear-gradient(#f4f4f4, #cdcdcd) !important;
+  color: #222222 !important;
+  font-size: 11.5px !important;
+  white-space: normal !important;
+  line-height: 1.1;
+}
+.lvme-fenetre-articles [class*="_body_"] [class*="_row_6j3fy"] {
+  height: 20px !important;
+  min-height: 0 !important;
+  cursor: pointer;
+}
+.lvme-fenetre-articles [class*="_body_"] [class*="_row_"] [class*="_column_"] {
+  background-color: #ffffff;
+  color: #000000;
+  font-size: 11.5px !important;
+  padding-top: 1px !important;
+  padding-bottom: 1px !important;
+  border-right: 1px solid #d6dbe3;
+}
+.lvme-fenetre-articles [class*="_body_"] [class*="_row_"]:nth-child(even) [class*="_column_"] {
+  background-color: #e3e3e3;
+}
+.lvme-fenetre-articles [class*="_body_"] [class*="_row_"]:hover [class*="_column_"],
+.lvme-fenetre-articles [class*="_body_"] [class*="_row_"][class*="_selected_"] [class*="_column_"] {
+  background-color: #14234f !important;
+  color: #ffffff !important;
+}
