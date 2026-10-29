@@ -157,16 +157,18 @@
   }
   new MutationObserver(marquerFenetres).observe(document.documentElement, { childList: true, subtree: true });
 
-  // liste « Articles » ouverte par la loupe Article (lignes de commande client, d'achat, d'arrivage) : présentée comme
-  // GESCOM (classe lvme-fenetre-articles, lvme.css) et un clic sur un article le choisit et ferme la liste, comme un
-  // double-clic (la case à cocher garde son effet)
+  // listes « Articles », « Fournisseurs » et « Clients » ouvertes par la loupe (lignes de commande, champs fournisseur
+  // et client des écrans) : présentées comme GESCOM (classe lvme-fenetre-articles, lvme.css) et un clic sur une ligne
+  // la choisit et ferme la liste, comme un double-clic (la case à cocher garde son effet). Titre seul, suivi du
+  // compteur « 1 à 40 sur … » : pas les autres fenêtres dont le titre commence par ces mots.
+  var LISTES_GESCOM = /^(Articles|Fournisseurs|Clients)(?![A-Za-zÀ-ÿ '’])/;
   function fenetreArticles(el) {
     var f = el && el.closest ? el.closest('[class*="_modal-content"]') : null;
     if (!f) {
       return null;
     }
     var entete = f.querySelector('[class*="_modal-header"]') || f;
-    return (entete.textContent || '').trim().indexOf('Articles') === 0 ? f : null;
+    return LISTES_GESCOM.test((entete.textContent || '').trim()) ? f : null;
   }
   new MutationObserver(function () {
     var fenetres = document.querySelectorAll('[class*="_modal-content"]:not(.lvme-fenetre-articles)');
