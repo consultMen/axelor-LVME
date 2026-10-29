@@ -52,8 +52,8 @@ public class LvmeDuplicationService {
   public SaleOrder dupliquerCommandeClient(SaleOrder saleOrder) {
     SaleOrder copie = saleOrderRepository.copy(saleOrder, true);
     copie.setStatusSelect(SaleOrderRepository.STATUS_DRAFT_QUOTATION);
-    // commandes reprises de GESCOM : durée de période vide (lue 0, refusée à l'enregistrement : « doit
-    // être supérieur ou égal à 1 ») ; la copie est une commande LVME, sans la facture GESCOM d'origine
+    // commandes reprises de GESCOM : durée de période vide, lue 0 et refusée à l'enregistrement
+    // (minimum 1) ; la copie est une commande LVME, sans la facture GESCOM d'origine
     if (copie.getNumberOfPeriods() < 1) {
       copie.setNumberOfPeriods(1);
     }

@@ -5,9 +5,10 @@
 
   <module name="supplychain" package="com.axelor.apps.supplychain.db"/>
 
-  <!-- LVME : prix négociés de GESCOM (PRIX_NEGOC et PRIX_NEGOCE_COUT) : pour un client et un article, les ventes de la
-    période étudiée (palmarès « pour établissement prix »), le prix négocié et sa période de validité, et les éléments
-    de coût retenus (RFA, commission, congélation, port, remise). Écran « Prix négociés » (menu Ventes). -->
+  <!-- LVME : prix négociés de GESCOM (PRIX_NEGOC et PRIX_NEGOCE_COUT) : pour un client et un article,
+    les ventes de la période étudiée (palmarès « pour établissement prix »), le prix négocié et sa période
+    de validité, et les éléments de coût retenus (RFA, commission, congélation, port, remise). Écran « Prix
+    négociés » (menu Ventes). -->
   <entity name="PrixNegocie" table="lvme_prix_negocie" cacheable="false">
     <many-to-one name="client" ref="com.axelor.apps.base.db.Partner" title="Client"/>
     <many-to-one name="product" ref="com.axelor.apps.base.db.Product" title="Produit"/>

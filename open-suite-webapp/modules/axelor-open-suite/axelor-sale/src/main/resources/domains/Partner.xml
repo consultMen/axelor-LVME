@@ -22,8 +22,8 @@
     <!-- LVME : client « comptant » de GESCOM (paie à la commande, sans facilité de paiement) : filtre
       Client en compte / Client comptant de Listes Dossiers ; repris de GESCOM à la migration -->
     <boolean name="lvmeClientComptant" title="Client comptant"/>
-    <!-- LVME : fournisseur Europe ou International (colonne « Type » de la liste Fournisseurs), saisi par le
-      client sur la fiche ; liste lvme.partner.zone.select (PROD_112) -->
+    <!-- LVME : fournisseur Europe ou International (colonne « Type » de la liste Fournisseurs), saisi
+      par le client sur la fiche ; liste lvme.partner.zone.select (PROD_112) -->
     <string name="lvmeZoneFournisseur" title="Type" selection="lvme.partner.zone.select"/>
     <!-- LVME : colonne « Contact » des listes Clients / Fournisseurs / Transporteurs GESCOM : premier
       contact du tiers -->
