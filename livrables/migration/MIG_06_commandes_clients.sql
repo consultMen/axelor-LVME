@@ -173,7 +173,8 @@ INSERT INTO sale_sale_order (id, version, created_on, import_id, import_origin, 
   in_tax_total, external_reference, invoice_comments, description, delivery_address_str, commercial, delivery_state,
   invoicing_state, template, in_ati, version_number, amount_invoiced, advance_total, discount_amount,
   price_before_global_discount, oneoff_sale, order_being_edited, manual_unblock, payment_condition, payment_mode,
-  carrier_partner, tauxrfa, taux_commission, cout_port_kg, lvme_frais_congelation, remise_facture, internal_note)
+  carrier_partner, tauxrfa, taux_commission, cout_port_kg, lvme_frais_congelation, remise_facture, internal_note,
+  number_of_periods)
 SELECT m.id, 0, now(), 'GESCOM-CDE-' || m.num, 'GESCOM', m.num, m.num || ' - ' || coalesce(gescom.txt(m.nom), ''),
   d.societe, m.client, m.client, m.client, d.euro, 4, 1, m.date_cde, m.date_cde, m.date_cde::timestamp, m.date_cde,
   m.montant, m.montant,
@@ -190,9 +191,12 @@ SELECT m.id, 0, now(), 'GESCOM-CDE-' || m.num, 'GESCOM', m.num, m.num || ' - ' |
   CASE WHEN m.facture IS NOT NULL THEN m.montant ELSE 0 END, 0, 0, m.montant, false, false, false,
   m.condition_id, m.mode_id, m.transporteur_id, NULLIF(gescom.num(m.rfa), 0), NULLIF(gescom.num(m.pourc_comm), 0),
   NULLIF(gescom.num(m.cout_port), 0), NULLIF(gescom.num(m.pourc_cong), 0), NULLIF(gescom.num(m.remmax), 0),
-  m.note_interne
+  m.note_interne, 1
 FROM mig_cde m CROSS JOIN mig_def d
 WHERE m.nouveau;
+-- durée de période à 1 (valeur Axelor par défaut ; vide = commande impossible à enregistrer ou à dupliquer)
+UPDATE sale_sale_order SET number_of_periods = 1
+WHERE import_id LIKE 'GESCOM-CDE-%' AND (number_of_periods IS NULL OR number_of_periods < 1);
 
 ANALYZE sale_sale_order;
 INSERT INTO sale_sale_order_line (id, version, created_on, import_id, import_origin, sale_order, sequence, type_select,

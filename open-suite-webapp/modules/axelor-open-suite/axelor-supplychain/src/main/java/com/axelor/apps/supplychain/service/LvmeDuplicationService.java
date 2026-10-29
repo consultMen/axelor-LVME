@@ -52,8 +52,19 @@ public class LvmeDuplicationService {
   public SaleOrder dupliquerCommandeClient(SaleOrder saleOrder) {
     SaleOrder copie = saleOrderRepository.copy(saleOrder, true);
     copie.setStatusSelect(SaleOrderRepository.STATUS_DRAFT_QUOTATION);
+    // commandes reprises de GESCOM : durée de période vide (lue 0, refusée à l'enregistrement : « doit
+    // être supérieur ou égal à 1 ») ; la copie est une commande LVME, sans la facture GESCOM d'origine
+    if (copie.getNumberOfPeriods() < 1) {
+      copie.setNumberOfPeriods(1);
+    }
+    copie.setImportOrigin(null);
+    if ("GESCOM".equals(saleOrder.getImportOrigin())) {
+      copie.setInvoiceComments(null);
+    }
     if (copie.getSaleOrderLineList() != null) {
       for (SaleOrderLine line : copie.getSaleOrderLineList()) {
+        line.setImportId(null);
+        line.setImportOrigin(null);
         if (line.getSaleOrderLineLotList() != null) {
           line.getSaleOrderLineLotList().clear();
         }
@@ -71,10 +82,15 @@ public class LvmeDuplicationService {
     copie.setStatusSelect(PurchaseOrderRepository.STATUS_DRAFT);
     // l'étape de la commande suit la nature de son arrivage : la copie n'a pas encore d'arrivage
     copie.setNature(null);
+    // la copie est une pièce LVME, pas la commande reprise de GESCOM (re-migration par import_id)
+    copie.setImportId(null);
+    copie.setImportOrigin(null);
     copie = purchaseOrderRepository.save(copie);
     if (copie.getPurchaseOrderLineList() != null) {
       LocalDate date = copie.getOrderDate() != null ? copie.getOrderDate() : LocalDate.now();
       for (PurchaseOrderLine line : copie.getPurchaseOrderLineList()) {
+        line.setImportId(null);
+        line.setImportOrigin(null);
         if (line.getTrackingNumber() != null) {
           line.setTrackingNumber(
               nouveauLot(
@@ -99,11 +115,16 @@ public class LvmeDuplicationService {
     if (copie.getPurchaseOrderSet() != null) {
       copie.getPurchaseOrderSet().clear();
     }
+    // la copie est une pièce LVME, pas l'arrivage repris de GESCOM (re-migration par import_id)
+    copie.setImportId(null);
+    copie.setImportOrigin(null);
     copie = stockMoveRepository.save(copie);
     if (copie.getStockMoveLineList() != null) {
       LocalDate date = LocalDate.now();
       for (StockMoveLine line : copie.getStockMoveLineList()) {
         line.setPurchaseOrderLine(null);
+        line.setImportId(null);
+        line.setImportOrigin(null);
         if (line.getTrackingNumber() != null) {
           TrackingNumber lot =
               nouveauLot(
