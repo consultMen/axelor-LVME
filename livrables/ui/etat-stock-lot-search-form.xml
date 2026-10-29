@@ -34,6 +34,8 @@
 
   <button name="voirPerimesBtn" title="Voir les lots périmés" css="btn-danger" colSpan="3" icon="exclamation-triangle" showIf="$nbDluoDepassee &gt; 0" onClick="action-lvme-etat-stock-lot-group-dluo-perimes"/>
     <button name="voirDluoProcheBtn" title="Voir les lots à DLUO proche" css="btn-warning" colSpan="3" icon="clock" showIf="$nbDluoProche &gt; 0" onClick="action-lvme-etat-stock-lot-group-dluo-proche"/>
+    <!-- les deux à la fois : périmés (rouge) + DLUO dans moins de 30 jours (orange) -->
+    <button name="voirDluoTousBtn" title="Voir périmés + DLUO proche" css="btn-secondary" colSpan="3" icon="exclamation-diamond" showIf="$nbDluoDepassee &gt; 0 &amp;&amp; $nbDluoProche &gt; 0" onClick="action-lvme-etat-stock-lot-group-dluo-tous"/>
   </panel>
 
   <panel name="filtresPanel" showTitle="false" colSpan="12" css="lvme-ges-etat">
