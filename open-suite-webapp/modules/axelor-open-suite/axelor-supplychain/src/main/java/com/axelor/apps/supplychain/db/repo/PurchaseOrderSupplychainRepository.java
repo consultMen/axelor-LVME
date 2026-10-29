@@ -71,6 +71,17 @@ public class PurchaseOrderSupplychainRepository extends PurchaseOrderManagementR
       TraceBackService.traceExceptionFromSaveMethod(e);
       throw new PersistenceException(e.getMessage(), e);
     }
-    return super.save(purchaseOrder);
+    purchaseOrder = super.save(purchaseOrder);
+    // LVME : Kanban « Suivi des commandes d'achat » classé par n° de dossier, le plus récent en haut
+    // (Axelor ne trie le Kanban que sur l'ordre des cartes) ; recalculé après la numérotation et
+    // après chaque déplacement de carte
+    purchaseOrder.setLvmeKanbanSeq(ordreKanban(purchaseOrder.getPurchaseOrderSeq()));
+    return purchaseOrder;
+  }
+
+  /** Ordre de carte = - n° de dossier (chiffres du numéro, « #52174 » d'un brouillon compris). */
+  public static Integer ordreKanban(String numero) {
+    String chiffres = numero == null ? "" : numero.replaceAll("\\D", "");
+    return chiffres.isEmpty() || chiffres.length() > 9 ? null : -Integer.parseInt(chiffres);
   }
 }
