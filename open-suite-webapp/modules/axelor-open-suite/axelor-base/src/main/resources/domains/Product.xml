@@ -95,7 +95,10 @@
       ref="com.axelor.apps.base.db.BarcodeTypeConfig"/>
     <one-to-many name="alternativeBarcodeList" title="Alternative barcodes"
       ref="com.axelor.apps.base.db.AlternativeBarcode" mappedBy="product"/>
-    <string name="fullName" title="Full name" namecolumn="true" translatable="true"/>
+    <!-- LVME : saisie rapide du champ Article (lignes de commande, d'achat, d'arrivage…) par code, désignation,
+      référence fournisseur ou gencode, comme la recherche de GESCOM -->
+    <string name="fullName" title="Full name" namecolumn="true" translatable="true"
+      search="code,name,refFournisseur,gencode"/>
 
 
     <many-to-one name="massUnit" ref="com.axelor.apps.base.db.Unit" title="Unit of mass"/>
