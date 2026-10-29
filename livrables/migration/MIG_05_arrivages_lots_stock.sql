@@ -86,12 +86,12 @@ UNION ALL SELECT 'MAR', upper(btrim(code)), btrim(desi) FROM gescom.marque WHERE
 UNION ALL SELECT 'MOD', upper(btrim(code)), btrim(libelle) FROM gescom.modepeche WHERE gescom.txt(code) IS NOT NULL;
 CREATE INDEX ON mig_libelle (liste, code);
 
--- fournisseur des arrivages sans fournisseur connu
+-- fournisseur des arrivages sans fournisseur connu (archivé : absent des listes et des choix de fournisseur)
 INSERT INTO base_partner (id, version, created_on, import_id, import_origin, partner_type_select, partner_seq, name, full_name,
-  simple_full_name, is_supplier, is_customer, is_carrier, is_contact, is_prospect, is_employee, currency)
+  simple_full_name, is_supplier, is_customer, is_carrier, is_contact, is_prospect, is_employee, currency, archived)
 SELECT nextval('base_partner_seq'), 0, now(), 'GESCOM-FOU-INCONNU', 'GESCOM', 1, 'GESCOM-INCONNU',
   'FOURNISSEUR INCONNU (GESCOM)', 'GESCOM-INCONNU - FOURNISSEUR INCONNU (GESCOM)', 'FOURNISSEUR INCONNU (GESCOM)',
-  true, false, false, false, false, false, d.euro
+  true, false, false, false, false, false, d.euro, true
 FROM mig_def d WHERE NOT EXISTS (SELECT 1 FROM base_partner WHERE import_id = 'GESCOM-FOU-INCONNU');
 
 -- ---------- bateaux et containers ----------

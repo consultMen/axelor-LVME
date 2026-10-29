@@ -12,10 +12,10 @@ LvmeDuplicationService + PROD_110 (peut être lancé seul tout de suite, sans re
 3. Re-clone et build comme d'habitude (`git clone …`, `./gradlew war -x test`) ; `git log --oneline -1`.
 4. `sudo systemctl stop axelor-tomcat`
 5. Depuis `~/src/axelor-LVME` :
-   `for f in livrables/migration/MIG_07_rfa_articles.sql livrables/migration/MIG_08_prix_negocies.sql livrables/PROD_105_prix_negocies.sql livrables/PROD_107_liste_articles_gescom.sql livrables/PROD_108_listes_periode_2_mois.sql livrables/PROD_109_etat_stock_totaux_excel.sql livrables/PROD_110_commandes_gescom_duree_periode.sql; do psql -U axelor -d axelor -v ON_ERROR_STOP=1 -f $f || break; done`
+   `for f in livrables/migration/MIG_07_rfa_articles.sql livrables/migration/MIG_08_prix_negocies.sql livrables/PROD_105_prix_negocies.sql livrables/PROD_107_liste_articles_gescom.sql livrables/PROD_108_listes_periode_2_mois.sql livrables/PROD_109_etat_stock_totaux_excel.sql livrables/PROD_110_commandes_gescom_duree_periode.sql livrables/PROD_111_article_designation_fournisseur_inconnu.sql; do psql -U axelor -d axelor -v ON_ERROR_STOP=1 -f $f || break; done`
    → `rfa_gescom = rfa_axelor = 50` ; `prix_gescom 2194 / prix_axelor 2193`, `avec_prix_negocie 1558` ; PROD_105 :
    `vues 3, menu 1, actions 5` ; PROD_107 : `2, 1, 1` liste GESCOM ; PROD_108 : 3 × `t` ; PROD_109 : `action-method`,
-   `barre_totaux t` ; PROD_110 : `commandes_sans_duree 0`. (L'archive MIG_00 sur le serveur contient déjà RFA_ART et PRIX_NEGOC.)
+   `barre_totaux t` ; PROD_110 : `commandes_sans_duree 0` ; PROD_111 : `article_code_seul 0`, inconnu `archived t`. (L'archive MIG_00 sur le serveur contient déjà RFA_ART et PRIX_NEGOC.)
 6. Bascule du war (avec `~/axelor-config.prod.properties`), `sudo systemctl start axelor-tomcat && sudo systemctl restart nginx`.
 
 ---
