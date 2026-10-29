@@ -1,16 +1,19 @@
-# Déploiement prod LVME — RFA par produit (MIG_07) et prix négociés (MIG_08, PROD_105) du 28/10/2026
+# Déploiement prod LVME — RFA (MIG_07), prix négociés (MIG_08, PROD_105), liste Articles (PROD_107), listes sur 2 mois (PROD_108), totaux de l'État des stocks (PROD_109)
 
-Déjà en prod : jusqu'à PROD_104 et MIG_06. Code à déployer (recompiler) : modèle PrixNegocie, impression « Prix
-négociés » (Java + LvmePrixNegocies.rptdesign).
+Déjà en prod : jusqu'à PROD_104, PROD_106 et MIG_06. Code à déployer (recompiler) : modèle PrixNegocie, impression
+« Prix négociés », F2 nouvelle ligne et liste Articles en un clic (js/lvme.js, css/lvme.css), recherche d'article par
+désignation / référence fournisseur / gencode (Product.fullName), totaux de l'État des stocks par lots, impressions
+des listes en Excel (.xlsx) au lieu de PDF (les devis, commandes et bons d'arrivage restent en PDF).
 
 1. **PC** : `git push origin main`
 2. **Serveur** : `pg_dump -U axelor -Fc axelor > ~/sauvegarde_avant_mig08_$(date +%F_%H%M).dump`
 3. Re-clone et build comme d'habitude (`git clone …`, `./gradlew war -x test`) ; `git log --oneline -1`.
 4. `sudo systemctl stop axelor-tomcat`
 5. Depuis `~/src/axelor-LVME` :
-   `for f in livrables/migration/MIG_07_rfa_articles.sql livrables/migration/MIG_08_prix_negocies.sql livrables/PROD_105_prix_negocies.sql; do psql -U axelor -d axelor -v ON_ERROR_STOP=1 -f $f || break; done`
+   `for f in livrables/migration/MIG_07_rfa_articles.sql livrables/migration/MIG_08_prix_negocies.sql livrables/PROD_105_prix_negocies.sql livrables/PROD_107_liste_articles_gescom.sql livrables/PROD_108_listes_periode_2_mois.sql livrables/PROD_109_etat_stock_totaux_excel.sql; do psql -U axelor -d axelor -v ON_ERROR_STOP=1 -f $f || break; done`
    → `rfa_gescom = rfa_axelor = 50` ; `prix_gescom 2194 / prix_axelor 2193`, `avec_prix_negocie 1558` ; PROD_105 :
-   `vues 3, menu 1, actions 5`. (L'archive MIG_00 sur le serveur contient déjà RFA_ART et PRIX_NEGOC.)
+   `vues 3, menu 1, actions 5` ; PROD_107 : `2, 1, 1` liste GESCOM ; PROD_108 : 3 × `t` ; PROD_109 : `action-method`,
+   `barre_totaux t`. (L'archive MIG_00 sur le serveur contient déjà RFA_ART et PRIX_NEGOC.)
 6. Bascule du war (avec `~/axelor-config.prod.properties`), `sudo systemctl start axelor-tomcat && sudo systemctl restart nginx`.
 
 ---

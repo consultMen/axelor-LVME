@@ -9,7 +9,10 @@ import com.axelor.db.JPA;
 import com.axelor.meta.schema.actions.ActionView;
 import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
+import java.math.BigDecimal;
+import java.util.LinkedHashMap;
 import java.util.Map;
+import javax.persistence.Query;
 
 /**
  * Boutons d'impression des listes, comme GESCOM : « Imprimer » (achats fournisseurs, commandes
@@ -229,73 +232,144 @@ public class LvmeImpressionListesController {
   private void imprimerEtatStock(
       ActionRequest request, ActionResponse response, String modele, String fichier, String titre) {
     try {
-      Map<String, Object> c = request.getContext();
-      Product artDu = JPA.find(Product.class, id(c.get("articleDu")));
-      Product artAu = JPA.find(Product.class, id(c.get("articleAu")));
-      Partner fouDu = JPA.find(Partner.class, id(c.get("fournisseurDu")));
-      Partner fouAu = JPA.find(Partner.class, id(c.get("fournisseurAu")));
-      String artDuCode = artDu != null ? artDu.getCode() : "";
-      String artAuCode = artAu != null ? artAu.getCode() : artDuCode;
-      String fouDuNom = fouDu != null ? fouDu.getFullName() : "";
-      String fouAuNom = fouAu != null ? fouAu.getFullName() : fouDuNom;
-      String lot = texte(c.get("numeroLot")).trim().toLowerCase();
-      String etat = texte(c.get("etatLot"));
-      etat = etat.isEmpty() ? "1" : etat;
-      String dluo = texte(c.get("dluoFiltre"));
-      boolean dispoNegatif = Boolean.TRUE.equals(c.get("dispoNegatif"));
-      StringBuilder filtres =
-          new StringBuilder(
-              "2".equals(etat)
-                  ? "Lots soldés"
-                  : "3".equals(etat)
-                      ? "Lots négatifs"
-                      : "4".equals(etat)
-                          ? "Lots non soldés + négatifs"
-                          : "5".equals(etat) ? "Lots archivés" : "Lots non soldés");
-      ajouter(filtres, artDuCode.isEmpty() ? "" : "Article " + artDuCode + " à " + artAuCode);
-      ajouter(filtres, fouDuNom.isEmpty() ? "" : "Fournisseur " + fouDuNom + " à " + fouAuNom);
-      ajouter(filtres, lot.isEmpty() ? "" : "N° Lot " + lot);
-      ajouterPeriode(filtres, "Entrée", c.get("entreeDu"), c.get("entreeAu"));
-      ajouterPeriode(filtres, "D.D.M.", c.get("ddmDu"), c.get("ddmAu"));
-      ajouterPeriode(filtres, "Livraison", c.get("livrDu"), c.get("livrAu"));
-      ajouter(
-          filtres,
-          "1".equals(dluo)
-              ? "DLUO dépassées (périmés)"
-              : "2".equals(dluo)
-                  ? "DLUO dans moins de 30 jours"
-                  : "3".equals(dluo) ? "DLUO dépassées + moins de 30 jours" : "");
-      ajouter(filtres, dispoNegatif ? "Dispo négatifs" : "");
-      Object nature = c.get("natureArrivage");
-      ouvrir(
-          response,
-          ReportFactory.createReport(modele, fichier)
-              .addParam("ArtDu", artDuCode)
-              .addParam("ArtAu", artAuCode)
-              .addParam("FouDu", fouDuNom)
-              .addParam("FouAu", fouAuNom)
-              .addParam("Famille", String.valueOf(id(c.get("famille"))))
-              .addParam("Frigo", String.valueOf(id(c.get("frigo"))))
-              .addParam("Origine", texte(c.get("origine")))
-              .addParam("Lot", "%" + lot + "%")
-              .addParam("EntreeFiltre", filtre(c.get("entreeDu"), c.get("entreeAu")))
-              .addParam("EntreeDu", date(c.get("entreeDu"), DEBUT))
-              .addParam("EntreeAu", date(c.get("entreeAu"), FIN))
-              .addParam("DdmFiltre", filtre(c.get("ddmDu"), c.get("ddmAu")))
-              .addParam("DdmDu", date(c.get("ddmDu"), DEBUT))
-              .addParam("DdmAu", date(c.get("ddmAu"), FIN))
-              .addParam("LivrFiltre", filtre(c.get("livrDu"), c.get("livrAu")))
-              .addParam("LivrDu", date(c.get("livrDu"), DEBUT))
-              .addParam("LivrAu", date(c.get("livrAu"), FIN))
-              .addParam("Nature", nature != null ? nature.toString() : "0")
-              .addParam("Etat", etat)
-              .addParam("DispoNeg", dispoNegatif ? "1" : "0")
-              .addParam("Dluo", dluo.isEmpty() ? "0" : dluo)
-              .addParam("Filtres", filtres.toString()),
-          titre);
+      ReportSettings rapport = ReportFactory.createReport(modele, fichier);
+      for (Map.Entry<String, String> p : filtresEtatStock(request.getContext()).entrySet()) {
+        rapport.addParam(p.getKey(), p.getValue());
+      }
+      ouvrir(response, rapport, titre);
     } catch (Exception e) {
       TraceBackService.trace(response, e);
     }
+  }
+
+  /**
+   * « Lancer la recherche » de l'État des stocks par lots : totaux du bas de la liste, comme GESCOM,
+   * sur tous les lots filtrés (pas seulement la page affichée), puis rafraîchissement de la liste.
+   * Mêmes règles que la liste et que les impressions (filtresEtatStock).
+   */
+  public void totauxEtatStock(ActionRequest request, ActionResponse response) {
+    try {
+      Query query =
+          JPA.em()
+              .createNativeQuery(
+                  "SELECT SUM(e.nb_colis_in), SUM(e.nb_colis_out), SUM(e.nb_colis_cdes),"
+                      + " SUM(e.nb_colis_stock), SUM(e.stock_qty), SUM(e.stock_value),"
+                      + " SUM(COALESCE(e.nb_colis_stock, 0) - COALESCE(e.nb_colis_cdes, 0)),"
+                      + " SUM(e.dispo_qty)"
+                      + " FROM lvme_etat_stock_lot e"
+                      + " WHERE (:ArtDu = '' OR e.product_code >= :ArtDu)"
+                      + " AND (:ArtAu = '' OR e.product_code <= :ArtAu)"
+                      + " AND (:FouDu = '' OR e.supplier_name >= :FouDu)"
+                      + " AND (:FouAu = '' OR e.supplier_name <= :FouAu)"
+                      + " AND (CAST(:Famille AS bigint) = 0"
+                      + " OR e.product_category_id = CAST(:Famille AS bigint))"
+                      + " AND (CAST(:Frigo AS bigint) = 0"
+                      + " OR e.stock_location_id = CAST(:Frigo AS bigint))"
+                      + " AND (:Origine = '' OR e.origine = :Origine)"
+                      + " AND LOWER(COALESCE(e.lot_number, '')) LIKE :Lot"
+                      + " AND (:EntreeFiltre = '0'"
+                      + " OR e.entry_date BETWEEN CAST(:EntreeDu AS date) AND CAST(:EntreeAu AS date))"
+                      + " AND (:DdmFiltre = '0'"
+                      + " OR e.dluo BETWEEN CAST(:DdmDu AS date) AND CAST(:DdmAu AS date))"
+                      + " AND (:LivrFiltre = '0'"
+                      + " OR e.arrival_date BETWEEN CAST(:LivrDu AS date) AND CAST(:LivrAu AS date))"
+                      + " AND (CAST(:Nature AS integer) = 0"
+                      + " OR e.nature_arrivage = CAST(:Nature AS integer))"
+                      + " AND ((:Etat = '1' AND e.stock_qty > 0) OR (:Etat = '2' AND e.stock_qty = 0)"
+                      + " OR (:Etat = '3' AND e.stock_qty < 0) OR (:Etat = '4' AND e.stock_qty <> 0)"
+                      + " OR :Etat = '5')"
+                      + " AND ((:Etat = '5' AND e.lot_archive = true)"
+                      + " OR (:Etat <> '5' AND e.lot_archive = false))"
+                      + " AND (:DispoNeg = '0' OR e.dispo_qty < 0)"
+                      + " AND (:Dluo = '0' OR (:Dluo = '1' AND e.dluo < current_date)"
+                      + " OR (:Dluo = '2' AND e.dluo BETWEEN current_date AND current_date + 30)"
+                      + " OR (:Dluo = '3' AND e.dluo <= current_date + 30))");
+      for (Map.Entry<String, String> p : filtresEtatStock(request.getContext()).entrySet()) {
+        if (!"Filtres".equals(p.getKey())) {
+          query.setParameter(p.getKey(), p.getValue());
+        }
+      }
+      Object[] t = (Object[]) query.getSingleResult();
+      String[] champs = {
+        "$totColisIn", "$totColisOut", "$totColisCdes", "$totColisStock",
+        "$totQtyStock", "$totValeurStock", "$totColisDispo", "$totQtyDispo"
+      };
+      for (int i = 0; i < champs.length; i++) {
+        response.setValue(
+            champs[i], t[i] == null ? BigDecimal.ZERO : new BigDecimal(t[i].toString()));
+      }
+      response.setAttr("lotsDashlet", "refresh", true);
+    } catch (Exception e) {
+      TraceBackService.trace(response, e);
+    }
+  }
+
+  /**
+   * Filtres de l'écran État des stocks par lots, tels que les attendent les impressions (paramètres
+   * des rapports) et les totaux ; « Filtres » = phrase des filtres en tête d'impression.
+   */
+  private static Map<String, String> filtresEtatStock(Map<String, Object> c) {
+    Product artDu = JPA.find(Product.class, id(c.get("articleDu")));
+    Product artAu = JPA.find(Product.class, id(c.get("articleAu")));
+    Partner fouDu = JPA.find(Partner.class, id(c.get("fournisseurDu")));
+    Partner fouAu = JPA.find(Partner.class, id(c.get("fournisseurAu")));
+    String artDuCode = artDu != null ? artDu.getCode() : "";
+    String artAuCode = artAu != null ? artAu.getCode() : artDuCode;
+    String fouDuNom = fouDu != null ? fouDu.getFullName() : "";
+    String fouAuNom = fouAu != null ? fouAu.getFullName() : fouDuNom;
+    String lot = texte(c.get("numeroLot")).trim().toLowerCase();
+    String etat = texte(c.get("etatLot"));
+    etat = etat.isEmpty() ? "1" : etat;
+    String dluo = texte(c.get("dluoFiltre"));
+    boolean dispoNegatif = Boolean.TRUE.equals(c.get("dispoNegatif"));
+    StringBuilder filtres =
+        new StringBuilder(
+            "2".equals(etat)
+                ? "Lots soldés"
+                : "3".equals(etat)
+                    ? "Lots négatifs"
+                    : "4".equals(etat)
+                        ? "Lots non soldés + négatifs"
+                        : "5".equals(etat) ? "Lots archivés" : "Lots non soldés");
+    ajouter(filtres, artDuCode.isEmpty() ? "" : "Article " + artDuCode + " à " + artAuCode);
+    ajouter(filtres, fouDuNom.isEmpty() ? "" : "Fournisseur " + fouDuNom + " à " + fouAuNom);
+    ajouter(filtres, lot.isEmpty() ? "" : "N° Lot " + lot);
+    ajouterPeriode(filtres, "Entrée", c.get("entreeDu"), c.get("entreeAu"));
+    ajouterPeriode(filtres, "D.D.M.", c.get("ddmDu"), c.get("ddmAu"));
+    ajouterPeriode(filtres, "Livraison", c.get("livrDu"), c.get("livrAu"));
+    ajouter(
+        filtres,
+        "1".equals(dluo)
+            ? "DLUO dépassées (périmés)"
+            : "2".equals(dluo)
+                ? "DLUO dans moins de 30 jours"
+                : "3".equals(dluo) ? "DLUO dépassées + moins de 30 jours" : "");
+    ajouter(filtres, dispoNegatif ? "Dispo négatifs" : "");
+    Object nature = c.get("natureArrivage");
+    Map<String, String> p = new LinkedHashMap<>();
+    p.put("ArtDu", artDuCode);
+    p.put("ArtAu", artAuCode);
+    p.put("FouDu", fouDuNom);
+    p.put("FouAu", fouAuNom);
+    p.put("Famille", String.valueOf(id(c.get("famille"))));
+    p.put("Frigo", String.valueOf(id(c.get("frigo"))));
+    p.put("Origine", texte(c.get("origine")));
+    p.put("Lot", "%" + lot + "%");
+    p.put("EntreeFiltre", filtre(c.get("entreeDu"), c.get("entreeAu")));
+    p.put("EntreeDu", date(c.get("entreeDu"), DEBUT));
+    p.put("EntreeAu", date(c.get("entreeAu"), FIN));
+    p.put("DdmFiltre", filtre(c.get("ddmDu"), c.get("ddmAu")));
+    p.put("DdmDu", date(c.get("ddmDu"), DEBUT));
+    p.put("DdmAu", date(c.get("ddmAu"), FIN));
+    p.put("LivrFiltre", filtre(c.get("livrDu"), c.get("livrAu")));
+    p.put("LivrDu", date(c.get("livrDu"), DEBUT));
+    p.put("LivrAu", date(c.get("livrAu"), FIN));
+    p.put("Nature", nature != null ? nature.toString() : "0");
+    p.put("Etat", etat);
+    p.put("DispoNeg", dispoNegatif ? "1" : "0");
+    p.put("Dluo", dluo.isEmpty() ? "0" : dluo);
+    p.put("Filtres", filtres.toString());
+    return p;
   }
 
   /** « Synthèse » de l'écran Synthèse des Arrivages. */
@@ -412,7 +486,9 @@ public class LvmeImpressionListesController {
     }
   }
 
-  /** « Imprimer » de l'écran Prix négociés (PRIX_NEGOC de GESCOM) : par client, filtres de l'écran. */
+  /**
+   * « Imprimer » de l'écran Prix négociés (PRIX_NEGOC de GESCOM) : par client, filtres de l'écran.
+   */
   public void imprimerPrixNegocies(ActionRequest request, ActionResponse response) {
     try {
       Map<String, Object> c = request.getContext();
@@ -513,15 +589,19 @@ public class LvmeImpressionListesController {
     return valeur instanceof Map && ((Map<?, ?>) valeur).get("id") != null ? libelle.trim() : tous;
   }
 
-  private static void ouvrir(ActionResponse response, ReportSettings rapport, String titre)
+  /**
+   * Impression des listes en Excel (.xlsx, logo compris), téléchargée par le navigateur ; les
+   * documents (devis, commandes, bons d'arrivage) restent en PDF dans leurs propres contrôleurs.
+   */
+  static void ouvrir(ActionResponse response, ReportSettings rapport, String titre)
       throws Exception {
     String lien =
         rapport
             .addParam("__locale", ReportSettings.getPrintingLocale(null))
-            .addFormat("pdf")
+            .addFormat(ReportSettings.FORMAT_XLSX)
             .generate()
             .getFileLink();
-    response.setView(ActionView.define(titre).add("html", lien).map());
+    response.setView(ActionView.define(titre).add("html", lien).param("download", "true").map());
   }
 
   /** id d'un champ many-to-one du contexte (Map avec « id ») ; 0 si vide. */

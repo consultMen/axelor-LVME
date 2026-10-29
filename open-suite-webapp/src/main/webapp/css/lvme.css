@@ -738,16 +738,17 @@
 .lvme-ges-cadre [class*="_radio_"] [class*="_mb-1_"] {
   margin-bottom: 0 !important;
 }
-/* liste des lots : toute la hauteur restante de l'écran (elle défile seule) et lignes serrées comme GESCOM */
-[class*="_formView_"]:has(.lvme-ges-dates-jaune) [class*="_main_"] > :last-child {
-  height: calc(100vh - 330px) !important;
+/* liste des lots : toute la hauteur restante de l'écran (elle défile seule) au-dessus de la barre des totaux et des
+   boutons d'impression, sans zone vide en bas ; lignes serrées comme GESCOM */
+[class*="_formView_"]:has(.lvme-ges-dates-jaune) [class*="_main_"] > :has(+ .lvme-ges-totaux, + * .lvme-ges-totaux) {
+  height: calc(100vh - 420px) !important;
   min-height: 220px;
 }
-[class*="_formView_"]:has(.lvme-ges-dates-jaune) [class*="_main_"] > :last-child [class*="_row_6j3fy"] {
+[class*="_formView_"]:has(.lvme-ges-dates-jaune) [class*="_main_"] > :has(+ .lvme-ges-totaux, + * .lvme-ges-totaux) [class*="_row_6j3fy"] {
   height: 21px !important;
   min-height: 0 !important;
 }
-[class*="_formView_"]:has(.lvme-ges-dates-jaune) [class*="_main_"] > :last-child [class*="_column_"] {
+[class*="_formView_"]:has(.lvme-ges-dates-jaune) [class*="_main_"] > :has(+ .lvme-ges-totaux, + * .lvme-ges-totaux) [class*="_column_"] {
   font-size: 11.5px !important;
   padding-top: 1px !important;
   padding-bottom: 1px !important;
@@ -761,25 +762,54 @@
 [class*="_formView_"]:has(.lvme-ges-dates-jaune) [class*="_main_"] > [class*="_panel_"] [class*="_content_"]:not(.lvme-ges-dates-jaune [class*="_content_"]) {
   background-color: #c6daf0 !important;
 }
-[class*="_formView_"]:has(.lvme-ges-dates-jaune) [class*="_main_"] > :last-child [class*="_header_"] [class*="_column_"] {
+[class*="_formView_"]:has(.lvme-ges-dates-jaune) [class*="_main_"] > :has(+ .lvme-ges-totaux, + * .lvme-ges-totaux) [class*="_header_"] [class*="_column_"] {
   background-color: #b8d4f0 !important;
   color: #10204a !important;
   font-size: 11.5px !important;
   white-space: normal !important;
   line-height: 1.1;
 }
-[class*="_formView_"]:has(.lvme-ges-dates-jaune) [class*="_main_"] > :last-child [class*="_body_"] [class*="_row_6j3fy"] [class*="_column_"] {
+[class*="_formView_"]:has(.lvme-ges-dates-jaune) [class*="_main_"] > :has(+ .lvme-ges-totaux, + * .lvme-ges-totaux) [class*="_body_"] [class*="_row_6j3fy"] [class*="_column_"] {
   background-color: #ffffff;
 }
-[class*="_formView_"]:has(.lvme-ges-dates-jaune) [class*="_main_"] > :last-child [class*="_body_"] [class*="_row_6j3fy"]:nth-child(even) [class*="_column_"] {
+[class*="_formView_"]:has(.lvme-ges-dates-jaune) [class*="_main_"] > :has(+ .lvme-ges-totaux, + * .lvme-ges-totaux) [class*="_body_"] [class*="_row_6j3fy"]:nth-child(even) [class*="_column_"] {
   background-color: #ccffff;
 }
-[class*="_formView_"]:has(.lvme-ges-dates-jaune) [class*="_main_"] > :last-child [class*="_body_"] [class*="_row_6j3fy"]:nth-child(even):not([class*="_hilite-"]) [class*="_column_"] {
+[class*="_formView_"]:has(.lvme-ges-dates-jaune) [class*="_main_"] > :has(+ .lvme-ges-totaux, + * .lvme-ges-totaux) [class*="_body_"] [class*="_row_6j3fy"]:nth-child(even):not([class*="_hilite-"]) [class*="_column_"] {
   color: #b000b0;
 }
-[class*="_formView_"]:has(.lvme-ges-dates-jaune) [class*="_main_"] > :last-child [class*="_hilite-warning_"] {
+[class*="_formView_"]:has(.lvme-ges-dates-jaune) [class*="_main_"] > :has(+ .lvme-ges-totaux, + * .lvme-ges-totaux) [class*="_hilite-warning_"] {
   background-color: #ffff99 !important;
   color: #000000 !important;
+}
+/* barre des totaux sous la liste des lots, comme GESCOM : libellés des colonnes en petit, montants en gras à droite */
+.lvme-ges-totaux,
+.lvme-ges-totaux [class*="_panel"],
+.lvme-ges-totaux [class*="_body_"],
+.lvme-ges-totaux [class*="_content_"] {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+.lvme-ges-totaux label,
+.lvme-ges-totaux [class*="_labelText_"] {
+  font-size: 11px !important;
+  color: #10204a !important;
+  margin-bottom: 0 !important;
+  white-space: nowrap;
+}
+.lvme-ges-totaux input {
+  height: 24px !important;
+  padding: 0 4px !important;
+  text-align: right;
+  font-weight: bold;
+  background-color: #ffffc8 !important;
+  border: 1px solid #7f8fb0 !important;
+}
+.lvme-ges-totaux .lvme-ges-totaux-titre {
+  font-weight: bold;
+  color: #10204a;
+  text-align: right;
+  padding-top: 16px;
 }
 [class*="_formView_"]:has(.lvme-ges-dates-jaune) .lvme-ges-cadre button {
   background: linear-gradient(#ffffff, #dfe4ec) !important;

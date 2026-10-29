@@ -99,6 +99,20 @@
 
     action="action-lvme-etat-stock-lot-dashlet"/>
 
+  <!-- totaux en bas de la liste, comme GESCOM : tous les lots filtrés (pas seulement la page affichée), recalculés à
+       chaque recherche (LvmeImpressionListesController.totauxEtatStock) -->
+  <panel name="totauxPanel" showTitle="false" colSpan="12" css="lvme-ges-etat lvme-ges-totaux">
+    <label name="totauxTitre" title="Totaux" colSpan="4" css="lvme-ges-totaux-titre"/>
+    <field name="$totColisIn" title="Nb Colis Entrées" type="decimal" x-scale="3" readonly="true" colSpan="1"/>
+    <field name="$totColisOut" title="Nb Colis Sorties" type="decimal" x-scale="3" readonly="true" colSpan="1"/>
+    <field name="$totColisCdes" title="Nb colis Cdes" type="decimal" x-scale="3" readonly="true" colSpan="1"/>
+    <field name="$totColisStock" title="Nb colis Stock" type="decimal" x-scale="3" readonly="true" colSpan="1"/>
+    <field name="$totQtyStock" title="Unt/Poids Stock" type="decimal" x-scale="3" readonly="true" colSpan="1"/>
+    <field name="$totValeurStock" title="Montant ht Stock" type="decimal" x-scale="2" readonly="true" colSpan="1"/>
+    <field name="$totColisDispo" title="Nb colis Dispo" type="decimal" x-scale="3" readonly="true" colSpan="1"/>
+    <field name="$totQtyDispo" title="Unt/Poids Dispo" type="decimal" x-scale="3" readonly="true" colSpan="1"/>
+  </panel>
+
   <!-- boutons d'impression en bas, comme GESCOM : « Etat des Stocks sur une ligne », « Etat des Stocks / Fournisseur »,
        « Etat des Stocks » (mêmes filtres que la liste) -->
   <panel name="impressionsPanel" showTitle="false" colSpan="12" css="lvme-ges-etat">
