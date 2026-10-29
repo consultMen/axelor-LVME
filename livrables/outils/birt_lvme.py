@@ -189,7 +189,10 @@ def tableau(dataset, cols_ds, colonnes, couleurs, entete_style, sommes=(), group
                    + en_tete_g + '<footer><row id="%s">%s</row></footer></group>' % (nid(), pied_g))
     pied = ''.join(cellule(data('total_' + c, f, taille='6.5pt', gras=True, align='right') if c in sommes else '',
                            cell + entete_style) for _, c, _, f, _ in colonnes)
-    return ('<table id="%s">' % nid() + prop('width', '100%') + prop('marginTop', '4px') + prop('dataSet', dataset)
+    return ('<table id="%s">' % nid()
+            # pas de coupure toutes les 50 lignes : sinon l'en-tête revient dans l'export Excel (le PDF reste
+            # paginé à la hauteur de la page, en-tête en haut de chaque page)
+            + prop('pageBreakInterval', '0') + prop('width', '100%') + prop('marginTop', '4px') + prop('dataSet', dataset)
             + colonnes_liees(cols_ds, agg)
             + ''.join('<column id="%s">%s</column>' % (nid(), prop('width', '%scm' % w)) for _, _, w, _, _ in colonnes)
             + '<header><row id="%s">%s</row></header>' % (nid(), tete)
