@@ -4,7 +4,7 @@
     <button name="lvmeDesarchiverSelBtn" title="Désarchiver" icon="arrow-counterclockwise" onClick="action-lvme-desarchiver-selection"/>
   </toolbar>
   <!-- LVME : colonnes de la liste « Fournisseurs » GESCOM (Référence, Nom, Contact, Téléphone, Portable, Code Postal,
-       Ville ; + Email et Pays) -->
+       Ville ; + Type Europe / International à côté du nom, Email et Pays) -->
   <menubar>
     <menu name="partnerReportsMenu" title="Reports" showTitle="true" icon="fa-files-o">
       <item name="contactPhoneBookItem" title="Contact PhoneBook" action="action-print-phonebook"/>
@@ -17,6 +17,7 @@
   </menubar>
   <field name="partnerSeq" title="Référence" width="110"/>
   <field name="name" title="Nom" width="260"/>
+  <field name="lvmeZoneFournisseur" title="Type" width="110"/>
   <field name="lvmeContact" title="Contact" width="150"/>
   <field name="fixedPhone" title="Téléphone" width="120"/>
   <field name="mobilePhone" title="Portable" width="120"/>
