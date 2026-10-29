@@ -78,8 +78,9 @@ public class LvmeHistoriqueProduitController {
       }
       LocalDate du = toDate(context.get("entreeDu"), LocalDate.of(1900, 1, 1));
       LocalDate au = toDate(context.get("entreeAu"), LocalDate.of(2999, 12, 31));
-      // en Excel, comme les autres impressions de listes
+      // PDF ou Excel (bouton « Excel »), comme les autres impressions de listes
       LvmeImpressionListesController.ouvrir(
+          request,
           response,
           ReportFactory.createReport(
                   "LvmeHistoriqueProduit.rptdesign", "Historique produit-${date}")

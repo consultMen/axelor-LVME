@@ -42,6 +42,7 @@ public class LvmeImpressionListesController {
       String fouAuNom = fouAu != null ? fouAu.getName() : fouDuNom;
       ajouter(filtres, fouDuNom.isEmpty() ? "" : "Fournisseur " + fouDuNom + " à " + fouAuNom);
       ouvrir(
+          request,
           response,
           ReportFactory.createReport("LvmeListeAchats.rptdesign", "Liste des achats-${date}")
               .addParam("Alerte", alerte)
@@ -74,6 +75,7 @@ public class LvmeImpressionListesController {
       ajouterPeriode(filtres, "Date", c.get("dateDu"), c.get("dateAu"));
       ajouterPeriode(filtres, "Arrivée", c.get("arriveeDu"), c.get("arriveeAu"));
       ouvrir(
+          request,
           response,
           ReportFactory.createReport("LvmeListeArrivages.rptdesign", "Arrivages-${date}")
               .addParam("Numero", "%" + numero + "%")
@@ -114,6 +116,7 @@ public class LvmeImpressionListesController {
       ajouterPeriode(filtres, "Entrée", c.get("entreeDu"), c.get("entreeAu"));
       ajouter(filtres, transport.isEmpty() ? "" : "Transport " + transport);
       ouvrir(
+          request,
           response,
           ReportFactory.createReport("LvmeListeRotations.rptdesign", "Liste des rotations-${date}")
               .addParam("ArtDu", artDuCode)
@@ -152,6 +155,7 @@ public class LvmeImpressionListesController {
       ajouterPeriode(filtres, "Date", c.get("dateDu"), c.get("dateAu"));
       ajouterPeriode(filtres, "Livraison", c.get("livraisonDu"), c.get("livraisonAu"));
       ouvrir(
+          request,
           response,
           ReportFactory.createReport(
                   "LvmeListeCommandesClients.rptdesign", "Liste des commandes clients-${date}")
@@ -184,6 +188,7 @@ public class LvmeImpressionListesController {
           filtres, produit != null ? "Produit " + produit.getCode() + " " + produit.getName() : "");
       ajouterPeriode(filtres, "Période", c.get("dateDu"), c.get("dateAu"));
       ouvrir(
+          request,
           response,
           ReportFactory.createReport("LvmeHistoriquePrix.rptdesign", "Historique prix-${date}")
               .addParam("Produit", String.valueOf(produit != null ? produit.getId() : 0L))
@@ -236,7 +241,7 @@ public class LvmeImpressionListesController {
       for (Map.Entry<String, String> p : filtresEtatStock(request.getContext()).entrySet()) {
         rapport.addParam(p.getKey(), p.getValue());
       }
-      ouvrir(response, rapport, titre);
+      ouvrir(request, response, rapport, titre);
     } catch (Exception e) {
       TraceBackService.trace(response, e);
     }
@@ -391,6 +396,7 @@ public class LvmeImpressionListesController {
                   + (numAu.isEmpty() ? "…" : numAu));
       ajouterPeriode(filtres, "Arrivée", c.get("arriveeDu"), c.get("arriveeAu"));
       ouvrir(
+          request,
           response,
           ReportFactory.createReport(
                   "LvmeSyntheseArrivages.rptdesign", "Synthese des arrivages-${date}")
@@ -413,6 +419,7 @@ public class LvmeImpressionListesController {
       StringBuilder filtres = new StringBuilder();
       ajouterPeriode(filtres, "Factures", c.get("factureDu"), c.get("factureAu"));
       ouvrir(
+          request,
           response,
           ReportFactory.createReport("LvmeListeRfa.rptdesign", "Liste des RFA-${date}")
               .addParam("Du", date(c.get("factureDu"), DEBUT))
@@ -434,6 +441,7 @@ public class LvmeImpressionListesController {
     try {
       Map<String, Object> c = request.getContext();
       ouvrir(
+          request,
           response,
           filtresClientsProduits(
                   ReportFactory.createReport(
@@ -470,6 +478,7 @@ public class LvmeImpressionListesController {
               + " au "
               + jour(c.get("dateAuReappro"));
       ouvrir(
+          request,
           response,
           filtresClientsProduits(
                   ReportFactory.createReport(
@@ -504,6 +513,7 @@ public class LvmeImpressionListesController {
       ajouter(filtres, enVigueur ? "Prix en vigueur le " + jour(dateVigueur) : "");
       ajouterPeriode(filtres, "Période étudiée", c.get("statsDu"), c.get("statsAu"));
       ouvrir(
+          request,
           response,
           ReportFactory.createReport("LvmePrixNegocies.rptdesign", "Prix negocies-${date}")
               .addParam("Client", String.valueOf(client != null ? client.getId() : 0L))
@@ -592,18 +602,22 @@ public class LvmeImpressionListesController {
   }
 
   /**
-   * Impression des listes en Excel (.xlsx, logo compris), téléchargée par le navigateur ; les
+   * Impression des listes : PDF (bouton d'impression) ou Excel .xlsx téléchargé, logo compris (bouton
+   * « Excel » à côté, action au nom terminé par « -excel », même méthode et mêmes filtres). Les
    * documents (devis, commandes, bons d'arrivage) restent en PDF dans leurs propres contrôleurs.
    */
-  static void ouvrir(ActionResponse response, ReportSettings rapport, String titre)
+  static void ouvrir(
+      ActionRequest request, ActionResponse response, ReportSettings rapport, String titre)
       throws Exception {
+    boolean excel = request.getAction() != null && request.getAction().contains("-excel");
     String lien =
         rapport
             .addParam("__locale", ReportSettings.getPrintingLocale(null))
-            .addFormat(ReportSettings.FORMAT_XLSX)
+            .addFormat(excel ? ReportSettings.FORMAT_XLSX : ReportSettings.FORMAT_PDF)
             .generate()
             .getFileLink();
-    response.setView(ActionView.define(titre).add("html", lien).param("download", "true").map());
+    ActionView.ActionViewBuilder vue = ActionView.define(titre).add("html", lien);
+    response.setView(excel ? vue.param("download", "true").map() : vue.map());
   }
 
   /** id d'un champ many-to-one du contexte (Map avec « id ») ; 0 si vide. */

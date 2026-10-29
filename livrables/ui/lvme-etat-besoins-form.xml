@@ -31,7 +31,8 @@
           selection="lvme.etat.stock.periode.select" placeholder="Période prédéfinie"
           onChange="action-lvme-etat-besoins-periode-reappro"/>
       </panel>
-      <button name="validerBtn" title="Valider" icon="check_circle" onClick="action-lvme-etat-besoins-imprimer"/>
+      <button colSpan="8" name="validerBtn" title="Valider" icon="check_circle" onClick="action-lvme-etat-besoins-imprimer"/>
+    <button name="validerBtnExcel" title="Excel" icon="file-earmark-excel" css="btn-success" colSpan="4" onClick="action-lvme-etat-besoins-imprimer-excel"/>
     </panel>
     <panel name="clientPanel" colSpan="5" itemSpan="12" css="lvme-palm-client">
       <field name="$client" grid-view="lvme-client-selection-grid" title="Client" type="many-to-one" target="com.axelor.apps.base.db.Partner"

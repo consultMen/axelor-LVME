@@ -24,7 +24,8 @@
     action="action-lvme-historique-produit-dashlet"/>
   <panel name="totauxPanel" showTitle="false" colSpan="12">
     <!-- bouton « Imprimer » en bas à gauche comme GESCOM : impression LVME de l'historique (PROD_84) -->
-    <button name="imprimerBtn" title="Imprimer" icon="printer" colSpan="2" onClick="action-lvme-historique-produit-imprimer"/>
+    <button colSpan="1" name="imprimerBtn" title="Imprimer" icon="printer" onClick="action-lvme-historique-produit-imprimer"/>
+    <button name="imprimerBtnExcel" title="Excel" icon="file-earmark-excel" css="btn-success" colSpan="1" onClick="action-lvme-historique-produit-imprimer-excel"/>
     <field name="$totalColis" title="Total colis" type="decimal" readonly="true" colSpan="2" x-scale="0"/>
     <field name="$stockPeriode" title="Stock Période" type="decimal" readonly="true" colSpan="3" x-scale="3"/>
     <field name="$poidsEntrees" title="Poids Entrées" type="decimal" readonly="true" colSpan="3" x-scale="3"/>

@@ -25,7 +25,8 @@
     action="action-lvme-synthese-arrivage-dashlet"/>
   <panel name="syntheseBasPanel" showTitle="false" colSpan="12">
     <!-- bouton « Synthèse » en bas à droite comme GESCOM : impression LVME de la synthèse (PROD_91) -->
-    <spacer colSpan="10"/>
-    <button name="syntheseBtn" title="Synthèse" icon="printer" colSpan="2" onClick="action-lvme-synthese-arrivage-imprimer"/>
+    <spacer colSpan="8"/>
+    <button colSpan="2" name="syntheseBtn" title="Synthèse" icon="printer" onClick="action-lvme-synthese-arrivage-imprimer"/>
+    <button name="syntheseBtnExcel" title="Excel" icon="file-earmark-excel" css="btn-success" colSpan="2" onClick="action-lvme-synthese-arrivage-imprimer-excel"/>
   </panel>
 </form>

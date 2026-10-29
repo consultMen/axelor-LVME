@@ -101,7 +101,8 @@
     <panel name="filtreBoutonsPanel" colSpan="2" itemSpan="12">
       <button name="lvmeKanbanBtn" title="Suivi des commandes clients" icon="view_kanban" css="lvme-btn-kanban" onClick="action-lvme-cde-client-kanban"/>
       <button name="nouvelleCdeBtn" title="Nouvelle commande" icon="plus" css="lvme-btn-nouveau" onClick="action-lvme-cde-client-new"/>
-      <button name="imprimerListeBtn" title="Imprimer" icon="printer" onClick="action-lvme-cde-client-imprimer-liste"/>
+      <button colSpan="8" name="imprimerListeBtn" title="Imprimer" icon="printer" onClick="action-lvme-cde-client-imprimer-liste"/>
+    <button name="imprimerListeBtnExcel" title="Excel" icon="file-earmark-excel" css="btn-success" colSpan="4" onClick="action-lvme-cde-client-imprimer-liste-excel"/>
     </panel>
   </panel>
   <panel-dashlet canDelete="true" name="commandesDashlet" title="Commandes clients" colSpan="12" height="600" action="action-lvme-cde-client-dashlet"/>

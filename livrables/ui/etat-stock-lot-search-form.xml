@@ -118,13 +118,15 @@
   <!-- boutons d'impression en bas, comme GESCOM : « Etat des Stocks sur une ligne », « Etat des Stocks / Fournisseur »,
        « Etat des Stocks » (mêmes filtres que la liste) -->
   <panel name="impressionsPanel" showTitle="false" colSpan="12" css="lvme-ges-etat">
-    <spacer colSpan="3"/>
-    <button name="imprimerEtatLigneBtn" title="Etat des Stocks sur une ligne" icon="printer" colSpan="3"
+    <button colSpan="3" name="imprimerEtatLigneBtn" title="Etat des Stocks sur une ligne" icon="printer"
       onClick="action-lvme-etat-stock-lot-imprimer-ligne"/>
-    <button name="imprimerEtatFournisseurBtn" title="Etat des Stocks / Fournisseur" icon="printer" colSpan="3"
+    <button name="imprimerEtatLigneBtnExcel" title="Excel" icon="file-earmark-excel" css="btn-success" colSpan="1" onClick="action-lvme-etat-stock-lot-imprimer-ligne-excel"/>
+    <button colSpan="3" name="imprimerEtatFournisseurBtn" title="Etat des Stocks / Fournisseur" icon="printer"
       onClick="action-lvme-etat-stock-lot-imprimer-fournisseur"/>
-    <button name="imprimerEtatBtn" title="Etat des Stocks" icon="printer" colSpan="3"
+    <button name="imprimerEtatFournisseurBtnExcel" title="Excel" icon="file-earmark-excel" css="btn-success" colSpan="1" onClick="action-lvme-etat-stock-lot-imprimer-fournisseur-excel"/>
+    <button colSpan="3" name="imprimerEtatBtn" title="Etat des Stocks" icon="printer"
       onClick="action-lvme-etat-stock-lot-imprimer"/>
+    <button name="imprimerEtatBtnExcel" title="Excel" icon="file-earmark-excel" css="btn-success" colSpan="1" onClick="action-lvme-etat-stock-lot-imprimer-excel"/>
   </panel>
 
 </form>

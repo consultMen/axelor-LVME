@@ -14,8 +14,9 @@
       <button name="lancerRechercheBtn" title="Lancer la recherche" icon="search" onClick="action-lvme-rfa-facture-refresh"/>
     </panel>
     <panel name="filtreImprimerPanel" colSpan="7">
-      <spacer colSpan="9"/>
-      <button name="imprimerBtn" title="Imprimer" icon="printer" colSpan="3" onClick="action-lvme-rfa-facture-imprimer"/>
+      <spacer colSpan="6"/>
+    <button colSpan="3" name="imprimerBtn" title="Imprimer" icon="printer" onClick="action-lvme-rfa-facture-imprimer"/>
+    <button name="imprimerBtnExcel" title="Excel" icon="file-earmark-excel" css="btn-success" colSpan="3" onClick="action-lvme-rfa-facture-imprimer-excel"/>
     </panel>
   </panel>
   <panel-dashlet name="rfaDashlet" title="RFA par produit / facture" showTitle="false" colSpan="12" height="600"

@@ -22,7 +22,8 @@
     </panel>
     <panel name="boutonsPrixNegociePanel" colSpan="2" itemSpan="12">
       <button name="lancerRechercheBtn" title="Lancer la recherche" icon="search" onClick="action-lvme-prix-negocie-refresh"/>
-      <button name="imprimerBtn" title="Imprimer" icon="printer" onClick="action-lvme-prix-negocie-imprimer"/>
+      <button colSpan="8" name="imprimerBtn" title="Imprimer" icon="printer" onClick="action-lvme-prix-negocie-imprimer"/>
+    <button name="imprimerBtnExcel" title="Excel" icon="file-earmark-excel" css="btn-success" colSpan="4" onClick="action-lvme-prix-negocie-imprimer-excel"/>
       <button name="fermerBtn" title="Fermer(F12)" icon="cancel" css="lvme-btn-ges-rouge" onClick="close"/>
     </panel>
   </panel>

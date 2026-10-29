@@ -38,8 +38,9 @@
         canNew="false" canEdit="false" canView="false"/>
     </panel>
     <panel name="validerPanel" showTitle="false" colSpan="12">
-      <spacer colSpan="10"/>
-      <button name="validerBtn" title="Valider" icon="check_circle" colSpan="2" onClick="action-lvme-palmares-clients-imprimer"/>
+      <spacer colSpan="8"/>
+    <button colSpan="2" name="validerBtn" title="Valider" icon="check_circle" onClick="action-lvme-palmares-clients-imprimer"/>
+    <button name="validerBtnExcel" title="Excel" icon="file-earmark-excel" css="btn-success" colSpan="2" onClick="action-lvme-palmares-clients-imprimer-excel"/>
     </panel>
   </panel>
 </form>
