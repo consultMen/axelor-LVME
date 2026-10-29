@@ -79,9 +79,21 @@ public class PurchaseOrderSupplychainRepository extends PurchaseOrderManagementR
     return purchaseOrder;
   }
 
-  /** Ordre de carte = - n° de dossier (chiffres du numéro, « #52174 » d'un brouillon compris). */
+  /**
+   * Ordre de carte = - n° de dossier. N° GESCOM « AAMM + numéro » (260926 = 2026, septembre, dossier
+   * 26 ; quelques-uns sur 3 chiffres : 2106106) : classé par AAMM puis numéro, pour qu'un dossier à 7
+   * chiffres de 2021 ne passe pas devant ceux de 2026. Autres numéros (« #52174 » d'un brouillon) :
+   * leurs chiffres.
+   */
   public static Integer ordreKanban(String numero) {
     String chiffres = numero == null ? "" : numero.replaceAll("\\D", "");
-    return chiffres.isEmpty() || chiffres.length() > 9 ? null : -Integer.parseInt(chiffres);
+    if (chiffres.isEmpty() || chiffres.length() > 9) {
+      return null;
+    }
+    if (!numero.startsWith("#") && (chiffres.length() == 6 || chiffres.length() == 7)) {
+      return -(Integer.parseInt(chiffres.substring(0, 4)) * 1000
+          + Integer.parseInt(chiffres.substring(4)));
+    }
+    return -Integer.parseInt(chiffres);
   }
 }
