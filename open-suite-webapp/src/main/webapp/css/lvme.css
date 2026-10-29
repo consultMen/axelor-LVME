@@ -2058,3 +2058,12 @@ label.lvme-ges-totaux-titre {
   background-color: #14234f !important;
   color: #ffffff !important;
 }
+
+/*
+ * « Prix négociés » : filtres moins hauts que les autres écrans « lvme-ges-lots-verif » (Lots vérifiés, Interrogation…) :
+ * liste jusqu'en bas de l'écran, sans zone vide (panneau des boutons repéré par lvme-prix-negocie)
+ */
+[class*="_formView_"]:has(.lvme-prix-negocie) [class*="_main_"] > [class*="_container_"] {
+  height: calc(100vh - 165px) !important;
+  min-height: 220px;
+}

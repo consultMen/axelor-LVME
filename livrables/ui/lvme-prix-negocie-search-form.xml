@@ -20,7 +20,7 @@
       <field name="$statsDu" title="Période étudiée du" type="date"/>
       <field name="$statsAu" title="au" type="date"/>
     </panel>
-    <panel name="boutonsPrixNegociePanel" colSpan="2" itemSpan="12">
+    <panel name="boutonsPrixNegociePanel" colSpan="2" itemSpan="12" css="lvme-prix-negocie">
       <button name="lancerRechercheBtn" title="Lancer la recherche" icon="search" onClick="action-lvme-prix-negocie-refresh"/>
       <button colSpan="8" name="imprimerBtn" title="Imprimer" icon="printer" onClick="action-lvme-prix-negocie-imprimer"/>
     <button name="imprimerBtnExcel" title="Excel" icon="file-earmark-excel" css="btn-success" colSpan="4" onClick="action-lvme-prix-negocie-imprimer-excel"/>
