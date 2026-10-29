@@ -243,19 +243,21 @@ public class LvmeImpressionListesController {
   }
 
   /**
-   * « Lancer la recherche » de l'État des stocks par lots : totaux du bas de la liste, comme GESCOM,
-   * sur tous les lots filtrés (pas seulement la page affichée), puis rafraîchissement de la liste.
-   * Mêmes règles que la liste et que les impressions (filtresEtatStock).
+   * « Lancer la recherche » de l'État des stocks par lots : totaux du bas de la liste, comme
+   * GESCOM, sur tous les lots filtrés (pas seulement la page affichée), puis rafraîchissement de la
+   * liste. Mêmes règles que la liste et que les impressions (filtresEtatStock).
    */
   public void totauxEtatStock(ActionRequest request, ActionResponse response) {
     try {
       Query query =
           JPA.em()
               .createNativeQuery(
-                  "SELECT SUM(e.nb_colis_in), SUM(e.nb_colis_out), SUM(e.nb_colis_cdes),"
-                      + " SUM(e.nb_colis_stock), SUM(e.stock_qty), SUM(e.stock_value),"
-                      + " SUM(COALESCE(e.nb_colis_stock, 0) - COALESCE(e.nb_colis_cdes, 0)),"
-                      + " SUM(e.dispo_qty)"
+                  // un nom par total : Hibernate refuse plusieurs colonnes nommées « sum »
+                  "SELECT SUM(e.nb_colis_in) AS colis_in, SUM(e.nb_colis_out) AS colis_out,"
+                      + " SUM(e.nb_colis_cdes) AS colis_cdes, SUM(e.nb_colis_stock) AS colis_stock,"
+                      + " SUM(e.stock_qty) AS qty_stock, SUM(e.stock_value) AS valeur_stock,"
+                      + " SUM(COALESCE(e.nb_colis_stock, 0) - COALESCE(e.nb_colis_cdes, 0))"
+                      + " AS colis_dispo, SUM(e.dispo_qty) AS qty_dispo"
                       + " FROM lvme_etat_stock_lot e"
                       + " WHERE (:ArtDu = '' OR e.product_code >= :ArtDu)"
                       + " AND (:ArtAu = '' OR e.product_code <= :ArtAu)"
