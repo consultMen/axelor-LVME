@@ -1,7 +1,8 @@
 # Déploiement prod LVME — catalogue fournisseurs GESCOM (MIG_09, PROD_118) du 30/10/2026
 
 Déjà en prod : jusqu'à PROD_117 et MIG_08. Code à déployer (recompiler) : champs LVME du catalogue fournisseurs
-(SupplierCatalog : prix de revient, conditionnement, poids colis, origine, zone, marque, gencode).
+(SupplierCatalog : devise, prix de revient, conditionnement, poids colis, origine, zone, marque, gencode) et sa mise à
+jour à la validation des commandes d'achat et à la Saisie Réel des arrivages (LvmeCatalogueFournisseurService).
 
 1. **PC** : `git push origin main`
 2. **Serveur** : `pg_dump -U axelor -Fc axelor > ~/sauvegarde_avant_mig09_$(date +%F_%H%M).dump`
@@ -9,7 +10,7 @@ Déjà en prod : jusqu'à PROD_117 et MIG_08. Code à déployer (recompiler) : c
 4. `sudo systemctl stop axelor-tomcat`
 5. Depuis `~/src/axelor-LVME` :
    `for f in livrables/migration/MIG_09_catalogue_fournisseurs.sql livrables/PROD_118_catalogue_fournisseurs.sql; do psql -U axelor -d axelor -v ON_ERROR_STOP=1 -f $f || break; done`
-   → MIG_09 : `2785 | 2783 | 9 | 2102 | 2757` puis les 2 lignes sans article (GLOBAL, PASAPES) ; PROD_118 : `1 | 1 | 1`.
+   → MIG_09 : `2785 | 2783 | 9 | 2102 | 2757 | 744` puis les 2 lignes sans article (GLOBAL, PASAPES) ; PROD_118 : `1 | 1 | 1`.
    (FOUART est déjà dans l'archive GESCOM de la base prod.)
 6. Bascule du war (avec `~/axelor-config.prod.properties`), `sudo systemctl start axelor-tomcat && sudo systemctl restart nginx`.
 

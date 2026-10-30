@@ -1,6 +1,6 @@
 -- =====================================================================
 -- MIG_09 : catalogue fournisseurs GESCOM (table FOUART) -> catalogue fournisseurs Axelor (purchase_supplier_catalog)
---   Une ligne par fournisseur et article (2 785) : prix d'achat, unité, prix de revient, réf. fournisseur, date de
+--   Une ligne par fournisseur et article (2 785) : prix d'achat et devise (devise d'achat du fournisseur), unité, prix de revient, réf. fournisseur, date de
 --   dernière commande, origine, zone de pêche, conditionnement, poids colis, marque, gencode.
 --   Fournisseur : code GESCOM (REFCPT de FOU, comme les arrivages) ; 9 lignes sans code fournisseur dans GESCOM
 --   (2014-2015) sont rattachées au « FOURNISSEUR INCONNU (GESCOM) » (précisé en description). Les lignes
@@ -14,6 +14,7 @@
 BEGIN;
 
 ALTER TABLE purchase_supplier_catalog
+  ADD COLUMN IF NOT EXISTS currency bigint,
   ADD COLUMN IF NOT EXISTS prix_revient numeric(20, 4),
   ADD COLUMN IF NOT EXISTS conditionnement bigint,
   ADD COLUMN IF NOT EXISTS poids_colis numeric(20, 3),
@@ -23,7 +24,10 @@ ALTER TABLE purchase_supplier_catalog
   ADD COLUMN IF NOT EXISTS gencode varchar(255);
 
 CREATE TEMP TABLE mig_fournisseur ON COMMIT DROP AS
-SELECT DISTINCT ON (upper(btrim(f.refcpt))) upper(btrim(f.refcpt)) AS code, p.id
+SELECT DISTINCT ON (upper(btrim(f.refcpt))) upper(btrim(f.refcpt)) AS code, p.id,
+  -- devise d'achat du fournisseur dans GESCOM (TABLE_BASE : 65 = euro, 66 = dollar US)
+  (SELECT c.id FROM base_currency c WHERE c.codeiso = CASE btrim(f.devise_achat) WHEN '66' THEN 'USD' ELSE 'EUR' END
+   LIMIT 1) AS devise
 FROM gescom.fou f JOIN base_partner p ON p.import_id = 'GESCOM-FOU-' || btrim(f.focleunik)
 WHERE gescom.txt(f.refcpt) IS NOT NULL ORDER BY upper(btrim(f.refcpt)), p.id;
 CREATE TEMP TABLE mig_libelle ON COMMIT DROP AS
@@ -37,11 +41,12 @@ SELECT DISTINCT ON (upper(btrim(name))) upper(btrim(name)) AS code, id FROM base
 DELETE FROM purchase_supplier_catalog WHERE import_id LIKE 'GESCOM-FOUART-%';
 
 INSERT INTO purchase_supplier_catalog (id, version, created_on, import_id, import_origin, product, supplier_partner,
-  product_supplier_code, price, unit, update_date, prix_revient, conditionnement, poids_colis, origine, zone_peche,
+  product_supplier_code, price, currency, unit, update_date, prix_revient, conditionnement, poids_colis, origine, zone_peche,
   marque, gencode, description, is_take_product_multiple_qty, is_taking_product_purchase_price, min_qty)
 SELECT nextval('purchase_supplier_catalog_seq'), 0, now(), 'GESCOM-FOUART-' || btrim(f.idfouart), 'GESCOM', p.id,
   coalesce(fo.id, (SELECT id FROM base_partner WHERE import_id = 'GESCOM-FOU-INCONNU')),
-  gescom.txt(f.ref_fou), gescom.num(f.prx_ach), coalesce(u.id, p.unit), gescom.dt(f.dat_dern_cdf),
+  gescom.txt(f.ref_fou), gescom.num(f.prx_ach),
+  coalesce(fo.devise, (SELECT id FROM base_currency WHERE codeiso = 'EUR' LIMIT 1)), coalesce(u.id, p.unit), gescom.dt(f.dat_dern_cdf),
   NULLIF(gescom.num(f.prx_rev), 0), co.id, NULLIF(gescom.num(f.pdscolis), 0),
   coalesce((SELECT libelle FROM mig_libelle WHERE liste = 'ORI' AND code = upper(btrim(f.origine)) LIMIT 1), gescom.txt(f.origine)),
   coalesce((SELECT libelle FROM mig_libelle WHERE liste = 'ZON' AND code = upper(btrim(f.zpeche)) LIMIT 1), gescom.txt(f.zpeche)),
@@ -66,7 +71,9 @@ SELECT (SELECT count(*) FROM gescom.fouart) AS fouart_gescom,
   (SELECT count(*) FROM purchase_supplier_catalog c JOIN base_partner p ON p.id = c.supplier_partner
    WHERE c.import_id LIKE 'GESCOM-FOUART-%' AND p.import_id = 'GESCOM-FOU-INCONNU') AS fournisseur_inconnu,
   (SELECT count(*) FROM purchase_supplier_catalog WHERE import_id LIKE 'GESCOM-FOUART-%' AND price > 0) AS avec_prix_achat,
-  (SELECT count(*) FROM purchase_supplier_catalog WHERE import_id LIKE 'GESCOM-FOUART-%' AND conditionnement IS NOT NULL) AS avec_cond;
+  (SELECT count(*) FROM purchase_supplier_catalog WHERE import_id LIKE 'GESCOM-FOUART-%' AND conditionnement IS NOT NULL) AS avec_cond,
+  (SELECT count(*) FROM purchase_supplier_catalog c JOIN base_currency d ON d.id = c.currency
+   WHERE c.import_id LIKE 'GESCOM-FOUART-%' AND d.codeiso = 'USD') AS en_dollars;
 -- lignes GESCOM non reprises (article absent)
 SELECT btrim(f.ref_cpt) AS fournisseur, btrim(f.ref_art) AS article, f.prx_ach FROM gescom.fouart f
 WHERE NOT EXISTS (SELECT 1 FROM base_product p WHERE upper(p.code) = upper(btrim(f.ref_art)));

@@ -73,6 +73,9 @@ public class PurchaseOrderWorkflowServiceSupplychainImpl extends PurchaseOrderWo
       purchaseOrderStockService.createStockMoveFromPurchaseOrder(purchaseOrder);
     }
 
+    // LVME : catalogue fournisseurs à jour (prix, devise, date de commande, caractéristiques)
+    Beans.get(LvmeCatalogueFournisseurService.class).majDepuisCommande(purchaseOrder);
+
     int intercoPurchaseCreatingStatus =
         appSupplychainService.getAppSupplychain().getIntercoPurchaseCreatingStatusSelect();
     if (purchaseOrder.getInterco()

@@ -355,6 +355,11 @@ CLIENT_RESERV (239). Les morceaux sont regroupés en une table dans l'archive (`
 - 9 lignes sans code fournisseur dans GESCOM (FOUART n° 332 à 337, 598, 654, 1154 ; dernières commandes 2014-2015) :
   rattachées au « FOURNISSEUR INCONNU (GESCOM) », précisé en description.
 - Origine, zone et marque : libellé GESCOM ; code brut quand il n'a pas de libellé dans les tables de référence.
+- Devise du prix d'achat : devise d'achat du fournisseur dans GESCOM (65 = euro, 66 = dollar US) : 744 lignes en
+  dollars, les autres en euros.
+- Ensuite, LVME tient le catalogue à jour comme GESCOM : à la validation d'une commande d'achat (prix, devise, date,
+  réf. fournisseur, conditionnement, origine, zone, marque, poids colis) et à la « Saisie Réel » d'un arrivage
+  (prix de revient saisi, €/kg) ; ligne créée pour un nouveau couple fournisseur / article.
 - Écran Achats > Catalogue fournisseurs (consultation, filtres par colonne). Décision : le prix du catalogue n'est
   pas proposé sur les lignes de commande d'achat (saisie inchangée).
 
@@ -369,6 +374,9 @@ CLIENT_RESERV (239). Les morceaux sont regroupés en une table dans l'archive (`
 
 ## 4. Points ouverts à faire préciser par le client
 
+- **Prix de revient du catalogue fournisseurs (FOUART)** : souvent inférieur au prix d'achat (ex. CHINAMA, anneau
+  d'encornet : achat 3,70 $, revient 2,24). Champ peut-être plus tenu à jour dans GESCOM : sens à confirmer. Il est
+  remplacé par le PR réel saisi à chaque nouvel arrivage dans LVME.
 - **cdv** (931 articles, ex. 100 403 ; 210 322) : signification inconnue. Pas trouvé dans `table_base`. Gardé dans
   l'archive.
 - **CODE = ART / DEF / DIV** sur les articles : signification à confirmer. Tous sont repris.

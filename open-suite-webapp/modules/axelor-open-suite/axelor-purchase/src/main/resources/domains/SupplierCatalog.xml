@@ -20,6 +20,7 @@
     <string name="description" title="Description" large="true"/>
     <!-- LVME : catalogue fournisseur GESCOM (FOUART) : prix de revient et caractéristiques de l'article chez ce
       fournisseur (écran « Catalogue fournisseurs » du menu Achats, MIG_09) -->
+    <many-to-one name="currency" ref="com.axelor.apps.base.db.Currency" title="Devise"/>
     <decimal name="prixRevient" title="Prix de revient" precision="20" scale="4"/>
     <many-to-one name="conditionnement" ref="com.axelor.apps.purchase.db.Conditionnement"
       title="Conditionnement"/>

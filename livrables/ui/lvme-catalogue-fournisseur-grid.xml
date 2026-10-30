@@ -8,6 +8,7 @@
   <field name="product.name" title="Désignation" width="240"/>
   <field name="productSupplierCode" title="Réf. fournisseur" width="100"/>
   <field name="price" title="Prix d'achat" x-scale="2" width="80"/>
+  <field name="currency" title="Devise" width="60"/>
   <field name="unit" title="Unité" width="60"/>
   <field name="prixRevient" title="Prix de revient" x-scale="2" width="80"/>
   <field name="updateDate" title="Dern. commande" width="95"/>

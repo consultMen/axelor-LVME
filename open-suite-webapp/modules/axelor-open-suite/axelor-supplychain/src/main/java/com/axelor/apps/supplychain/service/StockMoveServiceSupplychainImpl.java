@@ -186,6 +186,9 @@ public class StockMoveServiceSupplychainImpl extends StockMoveServiceImpl
     LOG.debug("Stock move realization: {} ", stockMove.getStockMoveSeq());
     String newStockSeq = super.realizeStockMove(stockMove, check);
 
+    // LVME : « Saisie Réel » d'un arrivage : prix de revient saisi recopié dans le catalogue fournisseurs
+    Beans.get(LvmeCatalogueFournisseurService.class).majDepuisArrivage(stockMove);
+
     // LVME : livraison partielle, colis et marge de la ligne livrée au prorata de la qté réelle
     if (stockMove.getTypeSelect() == StockMoveRepository.TYPE_OUTGOING
         && stockMove.getStockMoveLineList() != null) {
