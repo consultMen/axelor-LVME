@@ -210,6 +210,9 @@
     <!-- LVME : réf. douanière saisie librement comme dans GESCOM (ex. 03048990) ; le « Code douanier
       » Axelor (table de nomenclature, DEB) reste à part -->
     <string name="refDouaniere" title="Réf. douanière"/>
+    <!-- LVME : sous-famille de l'article dans GESCOM (SFAMILLE_ARTICLES : tailles de crevette, filets de sole,
+      produits carnés…), code GESCOM ; liste lvme.product.sous.famille.select (MIG_11) -->
+    <string name="lvmeSousFamille" title="Sous-famille" selection="lvme.product.sous.famille.select"/>
     <decimal name="poidsColis" title="Poids Colis" precision="20" scale="3"/>
     <decimal name="salePriceTtc" title="P.Vente TTC" precision="20" scale="4"
       readonly="true" help="Calculé à l'enregistrement : P.Vente HT x (1 + TVA de vente)"/>

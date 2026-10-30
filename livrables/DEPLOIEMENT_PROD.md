@@ -1,3 +1,15 @@
+# Déploiement prod LVME — sous-familles d'articles (MIG_11) du 30/10/2026
+
+Déjà en prod : jusqu'à PROD_119 et MIG_10. Code à déployer (recompiler) : champ Product.lvmeSousFamille.
+
+1. **PC** : `git push origin main`
+2. **Serveur** : re-clone et build comme d'habitude ; `sudo systemctl stop axelor-tomcat`
+3. `cd ~/src/axelor-LVME && psql -U axelor -d axelor -v ON_ERROR_STOP=1 -f livrables/migration/MIG_11_sous_familles_articles.sql`
+   → `13 | 48` puis le détail par sous-famille. (SFAMILLE_ARTICLES est déjà dans l'archive GESCOM de la base prod.)
+4. Bascule du war (avec `~/axelor-config.prod.properties`), `sudo systemctl start axelor-tomcat && sudo systemctl restart nginx`.
+
+---
+
 # Déploiement prod LVME — catalogue fournisseurs (MIG_09, PROD_118) et réservations (MIG_10, PROD_119) du 30/10/2026
 
 Déjà en prod : jusqu'à PROD_117 et MIG_08. Code à déployer (recompiler) : champs LVME du catalogue fournisseurs

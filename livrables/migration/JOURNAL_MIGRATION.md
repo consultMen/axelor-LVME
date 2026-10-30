@@ -375,14 +375,21 @@ CLIENT_RESERV (239). Les morceaux sont regroupés en une table dans l'archive (`
   rattachés ; boutons Rattacher / Détacher. Les commandes GESCOM des comptes de réservation (525 depuis 2021) sont
   toutes terminées : visibles en décochant « seulement les réservations en cours ».
 
+## 3 decies ter. Étape 11 : sous-familles d'articles (`MIG_11_sous_familles_articles.sql`, 30/10/2026)
+
+- SFAMILLE_ARTICLES : 14 sous-familles (tailles de crevette 800 g, crevette BT 1 kg, filet de sole tropical,
+  seiche, sériole, produits carnés, préparation noix US). Reprises comme liste de choix « Sous-famille » (code et
+  libellé GESCOM), sans « NEANT » (= pas de sous-famille) : 13 sous-familles, dont « TEST » portée par aucun article.
+- 48 articles rattachés à leur sous-famille (8 articles « NEANT » laissés sans sous-famille).
+- La fiche Produit n'est pas modifiée (en attente des captures GESCOM) : le champ y sera ajouté à ce moment-là.
+
 ## 3 undecies. Tables GESCOM examinées, sans reprise nécessaire (30/10/2026)
 
 - REFDOUAN (217 références douanières par article) : déjà sur les fiches Produit (étape 01), toutes identiques
   (une référence vide dans GESCOM comme dans LVME).
 - GENCOD_ARTICLES (66) : copie exacte des familles d'articles, déjà reprises.
 - REMISE : 2 remises promotionnelles de janvier 2025, expirées.
-- Restent à décider : SFAMILLE_ARTICLES
-  (14 sous-familles sur 56 articles), et l'historique des ventes d'avant 2021 (HIS_VTE, à exporter de GESCOM).
+- Restent : l'historique des ventes d'avant 2021 (HIS_VTE, à exporter de GESCOM).
 
 ## 4. Points ouverts à faire préciser par le client
 
