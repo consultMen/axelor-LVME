@@ -1,0 +1,26 @@
+<form name="lvme-catalogue-fournisseur-form" title="Catalogue fournisseur" model="com.axelor.apps.purchase.db.SupplierCatalog"
+  width="large" canNew="false" canEdit="false" canCopy="false" canDelete="false">
+  <!-- LVME : fiche d'une ligne du catalogue fournisseurs (GESCOM FOUART), en consultation ; remplace la fiche Axelor
+       qui ne s'ouvre que depuis une fiche article ou tiers (__parent__) et n'affiche ni l'article ni les champs LVME -->
+  <panel name="cataloguePanel" title="Fournisseur / article">
+    <field name="supplierPartner" title="Fournisseur" colSpan="6" readonly="true"/>
+    <field name="productSupplierCode" title="Réf. fournisseur" colSpan="3" readonly="true"/>
+    <field name="updateDate" title="Dernière commande" colSpan="3" readonly="true"/>
+    <field name="product" title="Article" colSpan="6" readonly="true"/>
+    <field name="gencode" title="Gencode" colSpan="3" readonly="true"/>
+  </panel>
+  <panel name="prixPanel" title="Prix">
+    <field name="price" title="Prix d'achat" colSpan="3" x-scale="2" readonly="true"/>
+    <field name="currency" title="Devise" colSpan="3" readonly="true"/>
+    <field name="unit" title="Unité" colSpan="3" readonly="true"/>
+    <field name="prixRevient" title="Prix de revient (€/kg)" colSpan="3" x-scale="2" readonly="true"/>
+  </panel>
+  <panel name="caracteristiquesPanel" title="Caractéristiques">
+    <field name="origine" title="Origine" colSpan="3" readonly="true"/>
+    <field name="zonePeche" title="Zone de pêche" colSpan="3" readonly="true"/>
+    <field name="marque" title="Marque" colSpan="3" readonly="true"/>
+    <field name="conditionnement" title="Conditionnement" colSpan="2" readonly="true"/>
+    <field name="poidsColis" title="Poids colis" colSpan="1" x-scale="2" readonly="true"/>
+    <field name="description" title="Description" colSpan="12" readonly="true"/>
+  </panel>
+</form>
