@@ -4,7 +4,7 @@
        (« CASINO RESERVATIONS »…) pour un groupe de clients livrés (CLIENT_RESERV, MIG_10). En haut les comptes et
        leurs totaux en cours, en bas ce qui est réservé (lot, frigo, colis, poids) et les clients livrés rattachés -->
   <panel name="filtresPanel" showTitle="false" colSpan="12" css="lvme-gescom-liste">
-    <panel name="filtreComptePanel" colSpan="4" itemSpan="12">
+    <panel name="filtreComptePanel" colSpan="4" itemSpan="12" css="lvme-ges-resa">
       <field name="$compte" grid-view="lvme-client-selection-grid" title="Compte de réservation" type="many-to-one"
         target="com.axelor.apps.base.db.Partner" domain="self.lvmeEstCompteReservation = true"
         canNew="false" canEdit="false" canView="false" onChange="action-lvme-reservation-refresh"/>

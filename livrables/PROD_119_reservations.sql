@@ -9,11 +9,18 @@
 --     colis, poids, montant) ; une ligne s'ouvre en consultation ;
 --   - clients livrés rattachés au compte.
 --   Lignes affichées : commandes des comptes de réservation, et commandes marquées « Réservation » (REC-009).
--- Prérequis : MIG_10 ; code avec les champs Partner.lvmeEstCompteReservation / lvmeCompteReservation et
--- LvmeReservationController (recompiler). À lancer depuis la racine du dépôt, Tomcat arrêté, puis redémarrer.
+--   Lignes lues dans la vue SQL lvme_reservation_ligne (modèle ReservationLigne) : rapide, sans les colonnes de
+--   disponibilité de la ligne de commande qui relisent l'état des stocks (30 s pour 40 lignes).
+-- Prérequis : MIG_10 ; code avec les champs Partner.lvmeEstCompteReservation / lvmeCompteReservation, le modèle
+-- ReservationLigne et LvmeReservationController (recompiler). À lancer depuis la racine du dépôt, Tomcat arrêté et
+-- AVANT le premier démarrage du nouveau code (vue SQL), puis redémarrer.
 -- Sources : livrables/ui/lvme-reservation-search-form.xml, lvme-compte-reservation-grid.xml,
 -- lvme-reservation-ligne-grid.xml, lvme-reservation-client-grid.xml. Relançable.
 -- =====================================================================
+-- vue des lignes de réservation (avant le démarrage du code : sinon Hibernate crée une table du même nom)
+ALTER TABLE base_partner ADD COLUMN IF NOT EXISTS lvme_est_compte_reservation boolean;
+\i open-suite-webapp/modules/axelor-open-suite/axelor-supplychain/src/main/resources/sql/lvme_reservation_ligne.sql
+
 \set fResa `cat livrables/ui/lvme-reservation-search-form.xml`
 SELECT set_config('lvme.fResa', :'fResa', false) IS NOT NULL AS fiche_lue;
 \set gComptes `cat livrables/ui/lvme-compte-reservation-grid.xml`
@@ -33,7 +40,7 @@ INSERT INTO meta_view (id, version, created_on, name, title, type, model, priori
 (nextval('meta_view_seq'), 0, now(), 'lvme-compte-reservation-grid', 'Comptes de réservation', 'grid',
  'com.axelor.apps.base.db.Partner', 20, current_setting('lvme.gComptes'), false, false),
 (nextval('meta_view_seq'), 0, now(), 'lvme-reservation-ligne-grid', 'Réservé', 'grid',
- 'com.axelor.apps.sale.db.SaleOrderLine', 20, current_setting('lvme.gLignes'), false, false),
+ 'com.axelor.apps.supplychain.db.ReservationLigne', 20, current_setting('lvme.gLignes'), false, false),
 (nextval('meta_view_seq'), 0, now(), 'lvme-reservation-client-grid', 'Clients livrés rattachés', 'grid',
  'com.axelor.apps.base.db.Partner', 20, current_setting('lvme.gClients'), false, false);
 
@@ -71,19 +78,16 @@ INSERT INTO meta_action (id, version, created_on, name, type, model, xml, home, 
   <domain>self.lvmeEstCompteReservation = true AND (:_compte = 0 OR self.id = :_compte)</domain>
   <context name="_compte" expr="eval: (compte?.id ?: 0) as Long"/>
 </action-view>', false, false, 0),
-(nextval('meta_action_seq'), 0, now(), 'action-lvme-reservation-lignes-dashlet', 'action-view', 'com.axelor.apps.sale.db.SaleOrderLine',
-'<action-view name="action-lvme-reservation-lignes-dashlet" title="Réservé" model="com.axelor.apps.sale.db.SaleOrderLine">
+(nextval('meta_action_seq'), 0, now(), 'action-lvme-reservation-lignes-dashlet', 'action-view', 'com.axelor.apps.supplychain.db.ReservationLigne',
+'<action-view name="action-lvme-reservation-lignes-dashlet" title="Réservé" model="com.axelor.apps.supplychain.db.ReservationLigne">
   <view type="grid" name="lvme-reservation-ligne-grid"/>
-  <view type="form" name="sale-order-line-form"/>
   <view-param name="popup" value="true"/>
   <view-param name="forceReadonly" value="true"/>
-  <domain>self.saleOrder.template = false AND self.saleOrder.statusSelect != 5 AND self.product IS NOT NULL
-    AND ((:_compte = 0 AND (self.saleOrder.clientPartner.lvmeEstCompteReservation = true OR self.saleOrder.isReservation = true))
-      OR self.saleOrder.clientPartner.id = :_compte)
-    AND (:_client = 0 OR self.saleOrder.clientPartner.id = :_client OR self.saleOrder.clientPartner.id = :_clientCompte)
+  <domain>(:_compte = 0 OR self.compte.id = :_compte)
+    AND (:_client = 0 OR self.compte.id = :_client OR self.compte.id = :_clientCompte)
     AND (:_produit = 0 OR self.product.id = :_produit)
-    AND (:_enCours = false OR (self.saleOrder.statusSelect IN (1, 2, 3) AND COALESCE(self.deliveryState, 1) != 3))
-    AND COALESCE(self.saleOrder.orderDate, self.saleOrder.creationDate) BETWEEN :_dateDu AND :_dateAu</domain>
+    AND (:_enCours = false OR self.enCours = true)
+    AND self.orderDate BETWEEN :_dateDu AND :_dateAu</domain>
   <context name="_compte" expr="eval: (compte?.id ?: 0) as Long"/>
   <context name="_client" expr="eval: (client?.id ?: 0) as Long"/>
   <context name="_clientCompte" expr="eval: client?.id ? ((__repo__(Partner).find(client.id as Long)?.lvmeCompteReservation?.id ?: 0) as Long) : 0L"/>
@@ -91,6 +95,12 @@ INSERT INTO meta_action (id, version, created_on, name, type, model, xml, home, 
   <context name="_enCours" expr="eval: enCours ? true : false"/>
   <context name="_dateDu" expr="eval: dateDu ? java.time.LocalDate.parse(dateDu.toString().substring(0, 10)) : java.time.LocalDate.of(1900, 1, 1)"/>
   <context name="_dateAu" expr="eval: dateAu ? java.time.LocalDate.parse(dateAu.toString().substring(0, 10)) : java.time.LocalDate.of(2999, 12, 31)"/>
+</action-view>', false, false, 0),
+(nextval('meta_action_seq'), 0, now(), 'action-lvme-reservation-ouvrir-commande', 'action-view', 'com.axelor.apps.sale.db.SaleOrder',
+'<action-view name="action-lvme-reservation-ouvrir-commande" title="Commande client" model="com.axelor.apps.sale.db.SaleOrder">
+  <view type="form" name="sale-order-form"/>
+  <view type="grid" name="sale-order-grid"/>
+  <context name="_showRecord" expr="eval: saleOrder?.id"/>
 </action-view>', false, false, 0),
 (nextval('meta_action_seq'), 0, now(), 'action-lvme-reservation-clients-dashlet', 'action-view', 'com.axelor.apps.base.db.Partner',
 '<action-view name="action-lvme-reservation-clients-dashlet" title="Clients livrés rattachés" model="com.axelor.apps.base.db.Partner">
@@ -121,8 +131,9 @@ SELECT nextval('meta_menu_seq'), 0, now(), 'lvme-menu-reservations', 'Réservati
 
 COMMIT;
 
--- contrôle : 4 | 9 | 1
+-- contrôle : 4 | 10 | 1 | 2423 (lignes de réservation après MIG_10)
 SELECT (SELECT count(*) FROM meta_view WHERE module IS NULL AND name IN ('lvme-reservation-search-form',
           'lvme-compte-reservation-grid', 'lvme-reservation-ligne-grid', 'lvme-reservation-client-grid')) AS vues,
   (SELECT count(*) FROM meta_action WHERE module IS NULL AND name LIKE 'action-lvme-reservation-%') AS actions,
-  (SELECT count(*) FROM meta_menu WHERE name = 'lvme-menu-reservations' AND action IS NOT NULL) AS menu;
+  (SELECT count(*) FROM meta_menu WHERE name = 'lvme-menu-reservations' AND action IS NOT NULL) AS menu,
+  (SELECT count(*) FROM lvme_reservation_ligne) AS lignes_reservation;

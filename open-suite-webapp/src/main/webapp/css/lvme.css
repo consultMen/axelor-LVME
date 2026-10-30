@@ -1562,8 +1562,8 @@ label.lvme-ges-totaux-titre {
  * sur GESCOM, sur un seul écran à 100 % : libellés à gauche, cadres gris, boutons gris, en-têtes gris dégradé, lignes
  * serrées, ligne sélectionnée bleu nuit, liste sur toute la hauteur restante (elle défile seule).
  */
-[class*="_formView_"]:is(:has(.lvme-ges-dossiers), :has(.lvme-ges-lots-verif)),
-[class*="_formView_"]:is(:has(.lvme-ges-dossiers), :has(.lvme-ges-lots-verif)) * {
+[class*="_formView_"]:is(:has(.lvme-ges-dossiers), :has(.lvme-ges-lots-verif), :has(.lvme-ges-resa)),
+[class*="_formView_"]:is(:has(.lvme-ges-dossiers), :has(.lvme-ges-lots-verif), :has(.lvme-ges-resa)) * {
   --ax-form-row-gap: .1rem !important;
   --ax-theme-form-row-gap: .1rem !important;
   --ax-form-padding: .25rem !important;
@@ -1582,12 +1582,12 @@ label.lvme-ges-totaux-titre {
 }
 /* cadre « Recherche » (Listes Dossiers), cadres Entrées et Sélection (Lots Vérifiés) bordés de gris */
 .lvme-ges-cadre-gris,
-[class*="_formView_"]:is(:has(.lvme-ges-dossiers), :has(.lvme-ges-lots-verif)) [class*="_main_"] [class*="_panel_"]:has(> [class*="_header_"]):not([class*="_main_"] > *) {
+[class*="_formView_"]:is(:has(.lvme-ges-dossiers), :has(.lvme-ges-lots-verif), :has(.lvme-ges-resa)) [class*="_main_"] [class*="_panel_"]:has(> [class*="_header_"]):not([class*="_main_"] > *) {
   border: 1px solid #8c96a8 !important;
   border-radius: 3px;
 }
-[class*="_formView_"]:is(:has(.lvme-ges-dossiers), :has(.lvme-ges-lots-verif)) [class*="_panel_"] > [class*="_header_"],
-[class*="_formView_"]:is(:has(.lvme-ges-dossiers), :has(.lvme-ges-lots-verif)) [class*="_panel_"] > [class*="_header_"] * {
+[class*="_formView_"]:is(:has(.lvme-ges-dossiers), :has(.lvme-ges-lots-verif), :has(.lvme-ges-resa)) [class*="_panel_"] > [class*="_header_"],
+[class*="_formView_"]:is(:has(.lvme-ges-dossiers), :has(.lvme-ges-lots-verif), :has(.lvme-ges-resa)) [class*="_panel_"] > [class*="_header_"] * {
   background: transparent !important;
   padding-top: 0 !important;
   padding-bottom: 0 !important;
@@ -1597,28 +1597,28 @@ label.lvme-ges-totaux-titre {
   color: #10204a !important;
   border: 0 !important;
 }
-[class*="_formView_"]:is(:has(.lvme-ges-dossiers), :has(.lvme-ges-lots-verif)) [class*="_main_"] > [class*="_panel_"] [class*="_container_"]:has(> [class*="_title_"]) {
+[class*="_formView_"]:is(:has(.lvme-ges-dossiers), :has(.lvme-ges-lots-verif), :has(.lvme-ges-resa)) [class*="_main_"] > [class*="_panel_"] [class*="_container_"]:has(> [class*="_title_"]) {
   flex-direction: row !important;
   align-items: center;
   gap: 6px;
 }
-[class*="_formView_"]:is(:has(.lvme-ges-dossiers), :has(.lvme-ges-lots-verif)) [class*="_main_"] > [class*="_panel_"] [class*="_container_"]:has(> [class*="_title_"]) > [class*="_title_"] {
+[class*="_formView_"]:is(:has(.lvme-ges-dossiers), :has(.lvme-ges-lots-verif), :has(.lvme-ges-resa)) [class*="_main_"] > [class*="_panel_"] [class*="_container_"]:has(> [class*="_title_"]) > [class*="_title_"] {
   flex: 0 0 auto;
   min-width: 78px;
 }
-[class*="_formView_"]:is(:has(.lvme-ges-dossiers), :has(.lvme-ges-lots-verif)) [class*="_main_"] > [class*="_panel_"] [class*="_container_"]:has(> [class*="_title_"]) > :not([class*="_title_"]) {
+[class*="_formView_"]:is(:has(.lvme-ges-dossiers), :has(.lvme-ges-lots-verif), :has(.lvme-ges-resa)) [class*="_main_"] > [class*="_panel_"] [class*="_container_"]:has(> [class*="_title_"]) > :not([class*="_title_"]) {
   flex: 1 1 auto;
   min-width: 0;
 }
-[class*="_formView_"]:is(:has(.lvme-ges-dossiers), :has(.lvme-ges-lots-verif)) [class*="_main_"] > [class*="_panel_"] label,
-[class*="_formView_"]:is(:has(.lvme-ges-dossiers), :has(.lvme-ges-lots-verif)) [class*="_main_"] > [class*="_panel_"] [class*="_labelText_"] {
+[class*="_formView_"]:is(:has(.lvme-ges-dossiers), :has(.lvme-ges-lots-verif), :has(.lvme-ges-resa)) [class*="_main_"] > [class*="_panel_"] label,
+[class*="_formView_"]:is(:has(.lvme-ges-dossiers), :has(.lvme-ges-lots-verif), :has(.lvme-ges-resa)) [class*="_main_"] > [class*="_panel_"] [class*="_labelText_"] {
   font-size: 12px !important;
   color: #10204a !important;
   white-space: nowrap !important;
   margin-bottom: 0 !important;
 }
-[class*="_formView_"]:is(:has(.lvme-ges-dossiers), :has(.lvme-ges-lots-verif)) [class*="_main_"] > [class*="_panel_"] input:not([type="checkbox"]):not([type="radio"]),
-[class*="_formView_"]:is(:has(.lvme-ges-dossiers), :has(.lvme-ges-lots-verif)) [class*="_main_"] > [class*="_panel_"] select {
+[class*="_formView_"]:is(:has(.lvme-ges-dossiers), :has(.lvme-ges-lots-verif), :has(.lvme-ges-resa)) [class*="_main_"] > [class*="_panel_"] input:not([type="checkbox"]):not([type="radio"]),
+[class*="_formView_"]:is(:has(.lvme-ges-dossiers), :has(.lvme-ges-lots-verif), :has(.lvme-ges-resa)) [class*="_main_"] > [class*="_panel_"] select {
   font-size: 12px !important;
   min-height: 0 !important;
   height: 22px;
@@ -1626,7 +1626,7 @@ label.lvme-ges-totaux-titre {
   padding-bottom: 0 !important;
   background-color: #ffffff !important;
 }
-[class*="_formView_"]:is(:has(.lvme-ges-dossiers), :has(.lvme-ges-lots-verif)) [class*="_main_"] > [class*="_panel_"] button {
+[class*="_formView_"]:is(:has(.lvme-ges-dossiers), :has(.lvme-ges-lots-verif), :has(.lvme-ges-resa)) [class*="_main_"] > [class*="_panel_"] button {
   background: linear-gradient(#ffffff, #dfe4ec) !important;
   color: #10204a !important;
   border: 1px solid #8c96a8 !important;
@@ -1636,8 +1636,8 @@ label.lvme-ges-totaux-titre {
   padding-bottom: 2px !important;
   min-height: 0 !important;
 }
-[class*="_formView_"]:is(:has(.lvme-ges-dossiers), :has(.lvme-ges-lots-verif)) [class*="_radio_"],
-[class*="_formView_"]:is(:has(.lvme-ges-dossiers), :has(.lvme-ges-lots-verif)) [class*="_radio_"] * {
+[class*="_formView_"]:is(:has(.lvme-ges-dossiers), :has(.lvme-ges-lots-verif), :has(.lvme-ges-resa)) [class*="_radio_"],
+[class*="_formView_"]:is(:has(.lvme-ges-dossiers), :has(.lvme-ges-lots-verif), :has(.lvme-ges-resa)) [class*="_radio_"] * {
   font-size: 12px !important;
   line-height: 16px !important;
 }
@@ -1664,18 +1664,18 @@ label.lvme-ges-totaux-titre {
   height: calc(100vh - 278px) !important;
   min-height: 220px;
 }
-[class*="_formView_"]:is(:has(.lvme-ges-dossiers), :has(.lvme-ges-lots-verif)) [class*="_main_"] > [class*="_container_"] [class*="_header_"] [class*="_column_"] {
+[class*="_formView_"]:is(:has(.lvme-ges-dossiers), :has(.lvme-ges-lots-verif), :has(.lvme-ges-resa)) [class*="_main_"] > [class*="_container_"] [class*="_header_"] [class*="_column_"] {
   background: linear-gradient(#f4f4f4, #cdcdcd) !important;
   color: #222222 !important;
   font-size: 11.5px !important;
   white-space: normal !important;
   line-height: 1.1;
 }
-[class*="_formView_"]:is(:has(.lvme-ges-dossiers), :has(.lvme-ges-lots-verif)) [class*="_main_"] > [class*="_container_"] [class*="_body_"] [class*="_row_6j3fy"] {
+[class*="_formView_"]:is(:has(.lvme-ges-dossiers), :has(.lvme-ges-lots-verif), :has(.lvme-ges-resa)) [class*="_main_"] > [class*="_container_"] [class*="_body_"] [class*="_row_6j3fy"] {
   height: 20px !important;
   min-height: 0 !important;
 }
-[class*="_formView_"]:is(:has(.lvme-ges-dossiers), :has(.lvme-ges-lots-verif)) [class*="_main_"] > [class*="_container_"] [class*="_body_"] [class*="_row_"] [class*="_column_"] {
+[class*="_formView_"]:is(:has(.lvme-ges-dossiers), :has(.lvme-ges-lots-verif), :has(.lvme-ges-resa)) [class*="_main_"] > [class*="_container_"] [class*="_body_"] [class*="_row_"] [class*="_column_"] {
   background-color: #ffffff;
   color: #000000;
   font-size: 11.5px !important;
@@ -1689,7 +1689,7 @@ label.lvme-ges-totaux-titre {
 [class*="_formView_"]:has(.lvme-ges-lots-verif) [class*="_main_"] > [class*="_container_"] [class*="_body_"] [class*="_row_"]:nth-child(even) [class*="_column_"] {
   background-color: #e3e3e3;
 }
-[class*="_formView_"]:is(:has(.lvme-ges-dossiers), :has(.lvme-ges-lots-verif)) [class*="_main_"] > [class*="_container_"] [class*="_body_"] [class*="_row_"][class*="_selected_"] [class*="_column_"] {
+[class*="_formView_"]:is(:has(.lvme-ges-dossiers), :has(.lvme-ges-lots-verif), :has(.lvme-ges-resa)) [class*="_main_"] > [class*="_container_"] [class*="_body_"] [class*="_row_"][class*="_selected_"] [class*="_column_"] {
   background-color: #14234f !important;
   color: #ffffff !important;
 }
@@ -2066,4 +2066,43 @@ label.lvme-ges-totaux-titre {
 [class*="_formView_"]:has(.lvme-prix-negocie) [class*="_main_"] > [class*="_container_"] {
   height: calc(100vh - 165px) !important;
   min-height: 220px;
+}
+
+/*
+ * « Réservations » (repère css="lvme-ges-resa", style compact des Listes Dossiers ci-dessus) : tout sur un écran sans
+ * défiler : filtres serrés, comptes de réservation en haut, lignes réservées et clients rattachés côte à côte en bas
+ * jusqu'au bas de l'écran.
+ */
+[class*="_formView_"]:has(.lvme-ges-resa) [class*="_main_"] {
+  display: grid !important;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 1fr);
+  column-gap: 6px;
+  row-gap: 6px !important;
+  background-color: #f1f5fb !important;
+}
+[class*="_formView_"]:has(.lvme-ges-resa) [class*="_main_"] > :nth-child(-n+2) {
+  grid-column: 1 / -1;
+}
+[class*="_formView_"]:has(.lvme-ges-resa) [class*="_main_"] > :nth-child(2) {
+  height: 165px !important;
+}
+[class*="_formView_"]:has(.lvme-ges-resa) [class*="_main_"] > :nth-child(n+3) {
+  height: calc(100vh - 320px) !important;
+  min-height: 160px;
+}
+[class*="_formView_"]:has(.lvme-ges-resa) [class*="_main_"] > [class*="_container_"] [class*="_body_"] [class*="_row_"]:nth-child(even) [class*="_column_"] {
+  background-color: #eef3fb;
+}
+/* titres des listes serrés (le compteur « 1 à 40 sur 53 » et les flèches restent) */
+[class*="_formView_"]:has(.lvme-ges-resa) [class*="_main_"] > [class*="_container_"] > [class*="_header_j6avv"] {
+  min-height: 0 !important;
+  padding-top: 1px !important;
+  padding-bottom: 1px !important;
+}
+[class*="_formView_"]:has(.lvme-ges-resa) [class*="_main_"] > [class*="_container_"] > [class*="_header_j6avv"] * {
+  font-size: 12.5px !important;
+  line-height: 20px !important;
+  min-height: 0 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
 }

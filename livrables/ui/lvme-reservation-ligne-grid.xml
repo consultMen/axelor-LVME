@@ -1,16 +1,20 @@
-<grid name="lvme-reservation-ligne-grid" title="Réservé" model="com.axelor.apps.sale.db.SaleOrderLine"
-  orderBy="-saleOrder.orderDate,saleOrder.saleOrderSeq" canNew="false" canEdit="false" canDelete="false">
-  <!-- LVME : lignes des commandes de réservation (écran Réservations) : article, lot, frigo, colis, poids -->
-  <field name="saleOrder.saleOrderSeq" title="N° Cde" width="85"/>
-  <field name="saleOrder.orderDate" title="Date" width="85"/>
-  <field name="saleOrder.clientPartner.partnerSeq" title="Compte" width="85"/>
-  <field name="saleOrder.statusSelect" title="Statut" selection="sale.order.status.select" width="105"/>
-  <field name="product.code" title="Produit" width="110"/>
+<grid name="lvme-reservation-ligne-grid" title="Réservé" model="com.axelor.apps.supplychain.db.ReservationLigne"
+  orderBy="-orderDate,orderSeq" canNew="false" canEdit="false" canDelete="false">
+  <!-- LVME : lignes des commandes de réservation (écran Réservations, vue SQL lvme_reservation_ligne) : article, lot,
+       frigo, D.D.M., colis, poids ; le bouton ouvre la commande -->
+  <button name="ouvrirCommandeBtn" title="Ouvrir la commande" icon="box-arrow-up-right"
+    onClick="action-lvme-reservation-ouvrir-commande"/>
+  <field name="orderSeq" title="N° Cde" width="85"/>
+  <field name="orderDate" title="Date" width="85"/>
+  <field name="compteCode" title="Compte" width="85"/>
+  <field name="statusSelect" title="Statut" width="105"/>
+  <field name="productCode" title="Produit" width="110"/>
   <field name="productName" title="Désignation" width="200"/>
-  <field name="lvmeLots" title="N° Lot" width="110"/>
-  <field name="lvmeFrigo" title="Frigo" width="100"/>
-  <field name="lvmeDdm" title="D.D.M." width="85"/>
-  <field name="nbColis" title="Colis" width="65"/>
+  <field name="lots" title="N° Lot" width="110"/>
+  <field name="frigo" title="Frigo" width="100"/>
+  <field name="ddm" title="D.D.M." width="85"/>
+  <field name="nbColis" title="Colis" x-scale="0" width="65"/>
   <field name="qty" title="Poids (kg)" x-scale="3" width="85"/>
   <field name="exTaxTotal" title="Montant HT" x-scale="2" width="90"/>
+  <field name="saleOrder" hidden="true"/>
 </grid>

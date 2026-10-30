@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<domain-models xmlns="http://axelor.com/xml/ns/domain-models"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://axelor.com/xml/ns/domain-models http://axelor.com/xml/ns/domain-models/domain-models_7.4.xsd">
+
+  <module name="supplychain" package="com.axelor.apps.supplychain.db"/>
+
+  <!-- LVME : lignes des commandes de réservation (écran Ventes > Réservations). Modèle en lecture seule adossé à la
+    vue SQL lvme_reservation_ligne (sql/lvme_reservation_ligne.sql). -->
+  <entity name="ReservationLigne" table="lvme_reservation_ligne" cacheable="false">
+    <many-to-one name="saleOrderLine" ref="com.axelor.apps.sale.db.SaleOrderLine"
+      column="sale_order_line_id" title="Ligne de commande"/>
+    <many-to-one name="saleOrder" ref="com.axelor.apps.sale.db.SaleOrder" column="sale_order_id"
+      title="Commande"/>
+    <string name="orderSeq" column="order_seq" title="N° Cde"/>
+    <date name="orderDate" column="order_date" title="Date"/>
+    <integer name="statusSelect" column="status_select" title="Statut"
+      selection="sale.order.status.select"/>
+    <many-to-one name="compte" ref="com.axelor.apps.base.db.Partner" column="compte_id"
+      title="Compte"/>
+    <string name="compteCode" column="compte_code" title="Compte"/>
+    <boolean name="isReservation" column="is_reservation" title="Réservation"/>
+    <many-to-one name="product" ref="com.axelor.apps.base.db.Product" column="product_id"
+      title="Produit"/>
+    <string name="productCode" column="product_code" title="Produit"/>
+    <string name="productName" column="product_name" title="Désignation"/>
+    <string name="lots" column="lots" title="N° Lot"/>
+    <string name="frigo" column="frigo" title="Frigo"/>
+    <date name="ddm" column="ddm" title="D.D.M."/>
+    <decimal name="nbColis" column="nb_colis" title="Colis" precision="20" scale="3"/>
+    <decimal name="qty" column="qty" title="Poids (kg)" precision="20" scale="3"/>
+    <decimal name="exTaxTotal" column="ex_tax_total" title="Montant HT" precision="20" scale="2"/>
+    <boolean name="enCours" column="en_cours" title="En cours"/>
+  </entity>
+
+</domain-models>

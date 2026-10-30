@@ -12,7 +12,7 @@ comptes de réservation (Partner.lvmeEstCompteReservation / lvmeCompteReservatio
 5. Depuis `~/src/axelor-LVME` :
    `for f in livrables/migration/MIG_09_catalogue_fournisseurs.sql livrables/PROD_118_catalogue_fournisseurs.sql livrables/migration/MIG_10_comptes_reservation.sql livrables/PROD_119_reservations.sql; do psql -U axelor -d axelor -v ON_ERROR_STOP=1 -f $f || break; done`
    → MIG_09 : `2785 | 2783 | 9 | 2102 | 2757 | 744` puis les 2 lignes sans article (GLOBAL, PASAPES) ; PROD_118 : `2 | 1 | 1` ; MIG_10 : `239 | 53 | 235` puis 4 liens non repris
-   (PECHTRO, GUIGEL, C.K.A, CASIN06) ; PROD_119 : `4 | 9 | 1`.
+   (PECHTRO, GUIGEL, C.K.A, CASIN06) ; PROD_119 : `4 | 10 | 1 | 2423`.
    (FOUART est déjà dans l'archive GESCOM de la base prod.)
 6. Bascule du war (avec `~/axelor-config.prod.properties`), `sudo systemctl start axelor-tomcat && sudo systemctl restart nginx`.
 
