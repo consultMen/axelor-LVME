@@ -352,8 +352,8 @@ CLIENT_RESERV (239). Les morceaux sont regroupés en une table dans l'archive (`
   commande (jusqu'au 18/09/2026), origine, zone de pêche, conditionnement, poids colis, marque et gencode : 319
   fournisseurs, 719 articles. 2 783 lignes reprises sur 2 785, dont 2 102 avec un prix d'achat.
 - Non reprises : 2 lignes sans code article dans GESCOM (fournisseurs GLOBAL et PASAPES).
-- 9 lignes dont le code fournisseur n'existe plus dans GESCOM : rattachées au « FOURNISSEUR INCONNU (GESCOM) »,
-  code d'origine noté en description.
+- 9 lignes sans code fournisseur dans GESCOM (FOUART n° 332 à 337, 598, 654, 1154 ; dernières commandes 2014-2015) :
+  rattachées au « FOURNISSEUR INCONNU (GESCOM) », précisé en description.
 - Origine, zone et marque : libellé GESCOM ; code brut quand il n'a pas de libellé dans les tables de référence.
 - Écran Achats > Catalogue fournisseurs (consultation, filtres par colonne). Décision : le prix du catalogue n'est
   pas proposé sur les lignes de commande d'achat (saisie inchangée).

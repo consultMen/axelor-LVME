@@ -2,8 +2,8 @@
 -- MIG_09 : catalogue fournisseurs GESCOM (table FOUART) -> catalogue fournisseurs Axelor (purchase_supplier_catalog)
 --   Une ligne par fournisseur et article (2 785) : prix d'achat, unité, prix de revient, réf. fournisseur, date de
 --   dernière commande, origine, zone de pêche, conditionnement, poids colis, marque, gencode.
---   Fournisseur : code GESCOM (REFCPT de FOU, comme les arrivages) ; 9 lignes dont le code fournisseur n'existe plus
---   dans GESCOM sont rattachées au « FOURNISSEUR INCONNU (GESCOM) » (code d'origine en description). Les lignes
+--   Fournisseur : code GESCOM (REFCPT de FOU, comme les arrivages) ; 9 lignes sans code fournisseur dans GESCOM
+--   (2014-2015) sont rattachées au « FOURNISSEUR INCONNU (GESCOM) » (précisé en description). Les lignes
 --   sans code article dans GESCOM (2) ne sont pas reprises : listées par le contrôle. Origine, zone et marque : libellé
 --   GESCOM, ou le code brut quand il n'a pas de libellé dans les tables de référence.
 --   Consultation : écran « Catalogue fournisseurs » (menu Achats, PROD_118). L'option Axelor « gérer le catalogue
@@ -47,7 +47,8 @@ SELECT nextval('purchase_supplier_catalog_seq'), 0, now(), 'GESCOM-FOUART-' || b
   coalesce((SELECT libelle FROM mig_libelle WHERE liste = 'ZON' AND code = upper(btrim(f.zpeche)) LIMIT 1), gescom.txt(f.zpeche)),
   coalesce((SELECT libelle FROM mig_libelle WHERE liste = 'MAR' AND code = upper(btrim(f.marque)) LIMIT 1), gescom.txt(f.marque)),
   gescom.txt(f.gencod),
-  CASE WHEN fo.id IS NULL THEN 'Fournisseur GESCOM ' || coalesce(gescom.txt(f.ref_cpt), '(vide)') || ' absent de GESCOM' END,
+  CASE WHEN fo.id IS NULL THEN coalesce('Fournisseur GESCOM ' || gescom.txt(f.ref_cpt) || ' absent de GESCOM',
+    'Sans fournisseur dans GESCOM (FOUART n° ' || btrim(f.idfouart) || ')') END,
   false, false, 1
 FROM gescom.fouart f
 JOIN base_product p ON upper(p.code) = upper(btrim(f.ref_art))
