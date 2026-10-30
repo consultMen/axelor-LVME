@@ -346,6 +346,27 @@ CLIENT_RESERV (239). Les morceaux sont regroupés en une table dans l'archive (`
 - Écran Ventes > Prix négociés (liste, fiche, impression). Décision : le prix négocié n'est pas encore proposé
   automatiquement sur la ligne de commande client (à décider plus tard).
 
+## 3 decies. Étape 09 : catalogue fournisseurs (`MIG_09_catalogue_fournisseurs.sql`, 30/10/2026)
+
+- FOUART : par fournisseur et article, prix d'achat, unité, prix de revient, réf. fournisseur, date de dernière
+  commande (jusqu'au 18/09/2026), origine, zone de pêche, conditionnement, poids colis, marque et gencode : 319
+  fournisseurs, 719 articles. 2 783 lignes reprises sur 2 785, dont 2 102 avec un prix d'achat.
+- Non reprises : 2 lignes sans code article dans GESCOM (fournisseurs GLOBAL et PASAPES).
+- 9 lignes dont le code fournisseur n'existe plus dans GESCOM : rattachées au « FOURNISSEUR INCONNU (GESCOM) »,
+  code d'origine noté en description.
+- Origine, zone et marque : libellé GESCOM ; code brut quand il n'a pas de libellé dans les tables de référence.
+- Écran Achats > Catalogue fournisseurs (consultation, filtres par colonne). Décision : le prix du catalogue n'est
+  pas proposé sur les lignes de commande d'achat (saisie inchangée).
+
+## 3 undecies. Tables GESCOM examinées, sans reprise nécessaire (30/10/2026)
+
+- REFDOUAN (217 références douanières par article) : déjà sur les fiches Produit (étape 01), toutes identiques
+  (une référence vide dans GESCOM comme dans LVME).
+- GENCOD_ARTICLES (66) : copie exacte des familles d'articles, déjà reprises.
+- REMISE : 2 remises promotionnelles de janvier 2025, expirées.
+- Restent à décider : CLIENT_RESERV (239 liens client livré → compte de réservation), SFAMILLE_ARTICLES
+  (14 sous-familles sur 56 articles), et l'historique des ventes d'avant 2021 (HIS_VTE, à exporter de GESCOM).
+
 ## 4. Points ouverts à faire préciser par le client
 
 - **cdv** (931 articles, ex. 100 403 ; 210 322) : signification inconnue. Pas trouvé dans `table_base`. Gardé dans

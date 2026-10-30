@@ -18,6 +18,17 @@
     <many-to-one name="unit" ref="com.axelor.apps.base.db.Unit" title="Unit"/>
     <date name="updateDate" title="Last update"/>
     <string name="description" title="Description" large="true"/>
+    <!-- LVME : catalogue fournisseur GESCOM (FOUART) : prix de revient et caractéristiques de l'article chez ce
+      fournisseur (écran « Catalogue fournisseurs » du menu Achats, MIG_09) -->
+    <decimal name="prixRevient" title="Prix de revient" precision="20" scale="4"/>
+    <many-to-one name="conditionnement" ref="com.axelor.apps.purchase.db.Conditionnement"
+      title="Conditionnement"/>
+    <decimal name="poidsColis" title="Poids colis" precision="20" scale="3"/>
+    <string name="origine" title="Origine" selection="purchase.purchase.order.line.origine.select"/>
+    <string name="zonePeche" title="Zone de pêche"
+      selection="purchase.purchase.order.line.zonePeche.select"/>
+    <string name="marque" title="Marque" selection="purchase.purchase.order.line.marque.select"/>
+    <string name="gencode" title="Gencode"/>
     <decimal name="calculatedPrice" title="Calculated price/Qty"/>
     <one-to-many name="shippingCoefList" mappedBy="supplierCatalog"
       title="Shipping Coefficients" ref="com.axelor.apps.base.db.ShippingCoef"/>

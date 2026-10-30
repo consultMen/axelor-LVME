@@ -1,3 +1,20 @@
+# Déploiement prod LVME — catalogue fournisseurs GESCOM (MIG_09, PROD_118) du 30/10/2026
+
+Déjà en prod : jusqu'à PROD_117 et MIG_08. Code à déployer (recompiler) : champs LVME du catalogue fournisseurs
+(SupplierCatalog : prix de revient, conditionnement, poids colis, origine, zone, marque, gencode).
+
+1. **PC** : `git push origin main`
+2. **Serveur** : `pg_dump -U axelor -Fc axelor > ~/sauvegarde_avant_mig09_$(date +%F_%H%M).dump`
+3. Re-clone et build comme d'habitude ; `git log --oneline -1`.
+4. `sudo systemctl stop axelor-tomcat`
+5. Depuis `~/src/axelor-LVME` :
+   `for f in livrables/migration/MIG_09_catalogue_fournisseurs.sql livrables/PROD_118_catalogue_fournisseurs.sql; do psql -U axelor -d axelor -v ON_ERROR_STOP=1 -f $f || break; done`
+   → MIG_09 : `2785 | 2783 | 9 | 2102 | 2757` puis les 2 lignes sans article (GLOBAL, PASAPES) ; PROD_118 : `1 | 1 | 1`.
+   (FOUART est déjà dans l'archive GESCOM de la base prod.)
+6. Bascule du war (avec `~/axelor-config.prod.properties`), `sudo systemctl start axelor-tomcat && sudo systemctl restart nginx`.
+
+---
+
 # Déploiement prod LVME — RFA (MIG_07), prix négociés (MIG_08, PROD_105), liste Articles (PROD_107), listes sur 2 mois (PROD_108), totaux de l'État des stocks (PROD_109)
 
 Déjà en prod : jusqu'à PROD_104, PROD_106 et MIG_06. Code à déployer (recompiler) : modèle PrixNegocie, impression

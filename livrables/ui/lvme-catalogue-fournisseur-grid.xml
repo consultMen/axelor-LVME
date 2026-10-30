@@ -1,0 +1,20 @@
+<grid name="lvme-catalogue-fournisseur-grid" title="Catalogue fournisseurs" model="com.axelor.apps.purchase.db.SupplierCatalog"
+  orderBy="supplierPartner.name,product.code" canNew="false" canEdit="false" canDelete="false">
+  <!-- LVME : catalogue fournisseurs repris de GESCOM (FOUART, MIG_09) : par fournisseur et article, prix d'achat,
+       prix de revient, réf. fournisseur, dernière commande et caractéristiques ; consultation seule (filtres et tri
+       dans les en-têtes de colonnes) -->
+  <field name="supplierPartner" title="Fournisseur" width="190"/>
+  <field name="product.code" title="Article" width="115"/>
+  <field name="product.name" title="Désignation" width="240"/>
+  <field name="productSupplierCode" title="Réf. fournisseur" width="100"/>
+  <field name="price" title="Prix d'achat" x-scale="2" width="80"/>
+  <field name="unit" title="Unité" width="60"/>
+  <field name="prixRevient" title="Prix de revient" x-scale="2" width="80"/>
+  <field name="updateDate" title="Dern. commande" width="95"/>
+  <field name="origine" title="Origine" width="90"/>
+  <field name="zonePeche" title="Zone" width="90"/>
+  <field name="conditionnement" title="Cond." width="70"/>
+  <field name="poidsColis" title="Poids colis" x-scale="2" width="70"/>
+  <field name="marque" title="Marque" width="100"/>
+  <field name="gencode" title="Gencode" width="110"/>
+</grid>
