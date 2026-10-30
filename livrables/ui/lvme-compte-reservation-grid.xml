@@ -1,0 +1,13 @@
+<grid name="lvme-compte-reservation-grid" title="Comptes de réservation" model="com.axelor.apps.base.db.Partner" orderBy="name"
+  canNew="false" canEdit="false" canDelete="false">
+  <!-- LVME : comptes de réservation (écran Réservations) : clients rattachés et réservations en cours (commande non
+       terminée, ligne non livrée) -->
+  <field name="partnerSeq" title="Code" width="100"/>
+  <field name="name" title="Compte de réservation" width="300"/>
+  <field name="lvmeNbClientsRattaches" title="Clients rattachés" width="110"/>
+  <field name="lvmeResaCommandes" title="Réservations en cours" width="130"/>
+  <field name="lvmeResaColis" title="Colis réservés" x-scale="0" width="110"/>
+  <field name="lvmeResaPoids" title="Poids réservé (kg)" x-scale="3" width="130"/>
+  <field name="lvmeResaValeur" title="Valeur HT" x-scale="2" width="120"/>
+  <field name="commercial" title="Commercial" width="150"/>
+</grid>

@@ -25,6 +25,48 @@
     <!-- LVME : fournisseur Europe ou International (colonne « Type » de la liste Fournisseurs), saisi
       par le client sur la fiche ; liste lvme.partner.zone.select (PROD_112) -->
     <string name="lvmeZoneFournisseur" title="Type" selection="lvme.partner.zone.select"/>
+    <!-- LVME : comptes de réservation de GESCOM (CLIENT_RESERV, MIG_10) : client « … RESERVATION » qui passe les
+      commandes de réservation pour un groupe de clients livrés ; écran Ventes > Réservations -->
+    <boolean name="lvmeEstCompteReservation" title="Compte de réservation"/>
+    <many-to-one name="lvmeCompteReservation" ref="com.axelor.apps.base.db.Partner"
+      title="Compte de réservation"/>
+    <!-- totaux du compte de réservation : clients rattachés, réservations en cours (commande non terminée,
+      ligne non livrée) -->
+    <integer name="lvmeNbClientsRattaches" title="Clients rattachés" formula="true">
+      <![CDATA[
+      (SELECT count(*) FROM base_partner WHERE base_partner.lvme_compte_reservation = id)
+      ]]>
+    </integer>
+    <integer name="lvmeResaCommandes" title="Réservations en cours" formula="true">
+      <![CDATA[
+      (SELECT count(*) FROM sale_sale_order WHERE sale_sale_order.client_partner = id
+        AND sale_sale_order.status_select IN (1, 2, 3))
+      ]]>
+    </integer>
+    <decimal name="lvmeResaColis" title="Colis réservés" formula="true">
+      <![CDATA[
+      (SELECT COALESCE(SUM(sale_sale_order_line.nb_colis), 0) FROM sale_sale_order_line
+        WHERE COALESCE(sale_sale_order_line.delivery_state, 1) <> 3 AND sale_sale_order_line.sale_order IN
+        (SELECT sale_sale_order.id FROM sale_sale_order WHERE sale_sale_order.client_partner = id
+          AND sale_sale_order.status_select IN (1, 2, 3)))
+      ]]>
+    </decimal>
+    <decimal name="lvmeResaPoids" title="Poids réservé" formula="true">
+      <![CDATA[
+      (SELECT COALESCE(SUM(sale_sale_order_line.qty), 0) FROM sale_sale_order_line
+        WHERE COALESCE(sale_sale_order_line.delivery_state, 1) <> 3 AND sale_sale_order_line.sale_order IN
+        (SELECT sale_sale_order.id FROM sale_sale_order WHERE sale_sale_order.client_partner = id
+          AND sale_sale_order.status_select IN (1, 2, 3)))
+      ]]>
+    </decimal>
+    <decimal name="lvmeResaValeur" title="Valeur HT" formula="true">
+      <![CDATA[
+      (SELECT COALESCE(SUM(sale_sale_order_line.ex_tax_total), 0) FROM sale_sale_order_line
+        WHERE COALESCE(sale_sale_order_line.delivery_state, 1) <> 3 AND sale_sale_order_line.sale_order IN
+        (SELECT sale_sale_order.id FROM sale_sale_order WHERE sale_sale_order.client_partner = id
+          AND sale_sale_order.status_select IN (1, 2, 3)))
+      ]]>
+    </decimal>
     <!-- LVME : colonne « Contact » des listes Clients / Fournisseurs / Transporteurs GESCOM : premier
       contact du tiers -->
     <string name="lvmeContact" title="Contact" formula="true">

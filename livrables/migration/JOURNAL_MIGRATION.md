@@ -363,13 +363,25 @@ CLIENT_RESERV (239). Les morceaux sont regroupés en une table dans l'archive (`
 - Écran Achats > Catalogue fournisseurs (consultation, filtres par colonne). Décision : le prix du catalogue n'est
   pas proposé sur les lignes de commande d'achat (saisie inchangée).
 
+## 3 decies bis. Étape 10 : comptes de réservation (`MIG_10_comptes_reservation.sql`, 30/10/2026)
+
+- CLIENT_RESERV : dans GESCOM, une réservation est une commande passée au nom d'un compte de réservation (« CASINO
+  RESERVATIONS », « SYSCO - RESERVATION »…) pour un groupe de clients livrés : 239 liens, 53 comptes.
+- Repris : les 53 comptes repérés « compte de réservation », 235 clients livrés rattachés à leur compte.
+- Non repris : 3 comptes rattachés à eux-mêmes dans GESCOM (PECHTRO, GUIGEL, C.K.A : restent des comptes) ; 1 client
+  livré absent du fichier clients GESCOM (CASIN06 « HYPER CASINO STE ANNE CS856 » ; le même nom existe sous le code
+  CASIMIC : à rattacher depuis l'écran si c'est le même magasin).
+- Écran Ventes > Réservations : comptes et totaux en cours, lignes réservées (lot, frigo, colis, poids), clients
+  rattachés ; boutons Rattacher / Détacher. Les commandes GESCOM des comptes de réservation (525 depuis 2021) sont
+  toutes terminées : visibles en décochant « seulement les réservations en cours ».
+
 ## 3 undecies. Tables GESCOM examinées, sans reprise nécessaire (30/10/2026)
 
 - REFDOUAN (217 références douanières par article) : déjà sur les fiches Produit (étape 01), toutes identiques
   (une référence vide dans GESCOM comme dans LVME).
 - GENCOD_ARTICLES (66) : copie exacte des familles d'articles, déjà reprises.
 - REMISE : 2 remises promotionnelles de janvier 2025, expirées.
-- Restent à décider : CLIENT_RESERV (239 liens client livré → compte de réservation), SFAMILLE_ARTICLES
+- Restent à décider : SFAMILLE_ARTICLES
   (14 sous-familles sur 56 articles), et l'historique des ventes d'avant 2021 (HIS_VTE, à exporter de GESCOM).
 
 ## 4. Points ouverts à faire préciser par le client

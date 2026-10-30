@@ -1,0 +1,41 @@
+<form name="lvme-reservation-search-form" css="lvme-gescom-liste" title="Réservations" model="com.axelor.utils.db.Wizard" width="large"
+  canNew="false" canSave="false" canCopy="false" canDelete="false" onNew="action-lvme-reservation-group-onnew">
+  <!-- LVME : réservations comme GESCOM : une réservation est une commande passée au nom d'un compte de réservation
+       (« CASINO RESERVATIONS »…) pour un groupe de clients livrés (CLIENT_RESERV, MIG_10). En haut les comptes et
+       leurs totaux en cours, en bas ce qui est réservé (lot, frigo, colis, poids) et les clients livrés rattachés -->
+  <panel name="filtresPanel" showTitle="false" colSpan="12" css="lvme-gescom-liste">
+    <panel name="filtreComptePanel" colSpan="4" itemSpan="12">
+      <field name="$compte" grid-view="lvme-client-selection-grid" title="Compte de réservation" type="many-to-one"
+        target="com.axelor.apps.base.db.Partner" domain="self.lvmeEstCompteReservation = true"
+        canNew="false" canEdit="false" canView="false" onChange="action-lvme-reservation-refresh"/>
+      <field name="$client" grid-view="lvme-client-selection-grid" title="Client livré" type="many-to-one"
+        target="com.axelor.apps.base.db.Partner" domain="self.isCustomer = true AND self.isContact = false"
+        canNew="false" canEdit="false" canView="false"/>
+      <field name="$produit" grid-view="lvme-article-selection-grid" title="Produit" type="many-to-one"
+        target="com.axelor.apps.base.db.Product" canNew="false" canEdit="false" canView="false"/>
+    </panel>
+    <panel name="filtrePeriodePanel" colSpan="3" itemSpan="12">
+      <field name="$dateDu" title="Commande du" type="date"/>
+      <field name="$dateAu" title="au" type="date"/>
+      <field name="$enCours" title="Seulement les réservations en cours" type="boolean"/>
+    </panel>
+    <panel name="rattacherPanel" colSpan="3" itemSpan="12">
+      <button name="rattacherBtn" title="Rattacher le client au compte" icon="link-45deg"
+        onClick="action-lvme-reservation-rattacher"/>
+      <button name="detacherBtn" title="Détacher le client" icon="x-circle"
+        prompt="Détacher le client livré choisi de son compte de réservation ?"
+        onClick="action-lvme-reservation-detacher"/>
+    </panel>
+    <panel name="rechercherPanel" colSpan="2" itemSpan="12">
+      <button name="lancerRechercheBtn" title="Lancer la recherche" icon="search" css="btn-primary"
+        onClick="action-lvme-reservation-refresh"/>
+      <button name="fermerBtn" title="Fermer(F12)" icon="cancel" css="lvme-btn-ges-rouge" onClick="close"/>
+    </panel>
+  </panel>
+  <panel-dashlet name="comptesDashlet" title="Comptes de réservation" colSpan="12" height="190"
+    action="action-lvme-reservation-comptes-dashlet"/>
+  <panel-dashlet name="lignesDashlet" title="Réservé" colSpan="9" height="330"
+    action="action-lvme-reservation-lignes-dashlet"/>
+  <panel-dashlet name="clientsDashlet" title="Clients livrés rattachés" colSpan="3" height="330"
+    action="action-lvme-reservation-clients-dashlet"/>
+</form>
