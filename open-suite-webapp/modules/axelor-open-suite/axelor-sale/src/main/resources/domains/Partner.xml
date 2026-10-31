@@ -25,8 +25,20 @@
     <!-- LVME : fournisseur Europe ou International (colonne « Type » de la liste Fournisseurs), saisi
       par le client sur la fiche ; liste lvme.partner.zone.select (PROD_112) -->
     <string name="lvmeZoneFournisseur" title="Type" selection="lvme.partner.zone.select"/>
-    <!-- LVME : comptes de réservation de GESCOM (CLIENT_RESERV, MIG_10) : client « … RESERVATION » qui passe les
-      commandes de réservation pour un groupe de clients livrés ; écran Ventes > Réservations -->
+    <!-- LVME : comptes de réservation de GESCOM (CLIENT_RESERV, MIG_10) : client « … RESERVATION » qui
+      passe les commandes de réservation pour un groupe de clients livrés ; écran Ventes > Réservations -->
+    <!-- LVME : conditions du client dans GESCOM (CLIENTS, MIG_12), pour information : le plafond ne bloque pas les
+      commandes (la gestion du crédit Axelor reste sans plafond) -->
+    <many-to-one name="lvmeClientPayeur" ref="com.axelor.apps.base.db.Partner" title="Client payeur"/>
+    <decimal name="lvmePlafondCredit" title="Plafond de crédit (GESCOM)" precision="20" scale="2"/>
+    <string name="lvmeModeFacturation" title="Mode de facturation"
+      selection="lvme.partner.mode.facturation.select"/>
+    <string name="lvmePeriodiciteFacturation" title="Périodicité de facturation"
+      selection="lvme.partner.periodicite.facturation.select"/>
+    <string name="lvmeReleveFactures" title="Relevé de factures"
+      selection="lvme.partner.releve.factures.select"/>
+    <string name="lvmeTarif" title="Tarif" selection="lvme.partner.tarif.select"/>
+    <string name="lvmeGroupe2" title="Groupe 2 (GESCOM)"/>
     <boolean name="lvmeEstCompteReservation" title="Compte de réservation"/>
     <many-to-one name="lvmeCompteReservation" ref="com.axelor.apps.base.db.Partner"
       title="Compte de réservation"/>

@@ -132,8 +132,7 @@ colonnes sont presque vides dans GESCOM.
 **Chaque client et fournisseur** est rattaché à la société LVME, avec les comptes client / fournisseur par défaut de
 la configuration comptable.
 
-**Restent dans l'archive :** encours, plafond de crédit, client payeur / central, RIB / IBAN / BIC, domiciliation,
-tournée, tarif, type de BL, périodicité de facturation, GROUP_2, % frais congélation (2 clients, 1,5 % : le taux se
+**Restent dans l'archive :** encours (31 clients, recalculé par LVME), client central (vide), % frais congélation (2 clients, 1,5 % : le taux se
 règle sur la commande).
 
 **Contrôle (essai local, annulé) :**
@@ -383,6 +382,19 @@ CLIENT_RESERV (239). Les morceaux sont regroupés en une table dans l'archive (`
 - 48 articles rattachés à leur sous-famille (8 articles « NEANT » laissés sans sous-famille).
 - La fiche Produit n'est pas modifiée (en attente des captures GESCOM) : le champ y sera ajouté à ce moment-là.
 
+## 3 decies quater. Étape 12 : coordonnées bancaires et conditions des clients (`MIG_12_tiers_banque_conditions.sql`, 31/10/2026)
+
+- Coordonnées bancaires : 945 tiers (clients et 3 fournisseurs). IBAN de GESCOM, sinon IBAN calculé depuis le RIB
+  français à 23 chiffres ; les 754 IBAN français ont tous une clé valide (contrôle modulo 97). 55 banques créées par
+  BIC ; le BIC manquant est pris chez un autre client de la même banque (5 premiers chiffres du RIB), sinon banque
+  « BIC A COMPLETER (GESCOM) » (225 tiers, à compléter).
+- Non repris : RIB « 000… » (vides), et 212 numéros qui ne sont pas des RIB français (207 de la forme
+  « 0007602218-166030168897 » : 22 chiffres et un tiret, aucune clé RIB valide). Sens à demander au client.
+- Client payeur (274 clients payés par un autre client), plafond de crédit (1 521, pour information : aucun blocage
+  des commandes), mode de facturation (Facture immédiate 1 934, BL chiffré 2, BL obligatoire chiffré 1),
+  périodicité de facturation (Fin de mois, À la demande, Affacturage), relevé de factures, tarif (Prix public / Prix
+  de revient), GROUP_2 (codes 099, 101 à 107… : sens à demander).
+
 ## 3 undecies. Tables GESCOM examinées, sans reprise nécessaire (30/10/2026)
 
 - REFDOUAN (217 références douanières par article) : déjà sur les fiches Produit (étape 01), toutes identiques
@@ -393,6 +405,9 @@ CLIENT_RESERV (239). Les morceaux sont regroupés en une table dans l'archive (`
 
 ## 4. Points ouverts à faire préciser par le client
 
+- **207 numéros bancaires** de la forme « 0007602218-166030168897 » dans la fiche client GESCOM (colonne RIB) : ce ne
+  sont pas des RIB français. Que sont-ils ? Et **GROUP_2** (codes 099, 101 à 107) : à quoi sert ce groupe ?
+- **225 coordonnées bancaires** dont la banque n'a pas de BIC connu : BIC à compléter (banque « BIC A COMPLETER »).
 - **Prix de revient du catalogue fournisseurs (FOUART)** : souvent inférieur au prix d'achat (ex. CHINAMA, anneau
   d'encornet : achat 3,70 $, revient 2,24). Champ peut-être plus tenu à jour dans GESCOM : sens à confirmer. Il est
   remplacé par le PR réel saisi à chaque nouvel arrivage dans LVME.
