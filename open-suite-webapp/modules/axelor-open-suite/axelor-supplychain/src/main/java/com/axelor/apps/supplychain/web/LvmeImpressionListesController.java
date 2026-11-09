@@ -602,9 +602,10 @@ public class LvmeImpressionListesController {
   }
 
   /**
-   * Impression des listes : PDF (bouton d'impression) ou Excel .xlsx téléchargé, logo compris (bouton
-   * « Excel » à côté, action au nom terminé par « -excel », même méthode et mêmes filtres). Les
-   * documents (devis, commandes, bons d'arrivage) restent en PDF dans leurs propres contrôleurs.
+   * Impression des listes : PDF (bouton d'impression) ou Excel .xlsx téléchargé, logo compris
+   * (bouton « Excel » à côté, action au nom terminé par « -excel », même méthode et mêmes filtres).
+   * Les documents (devis, commandes, bons d'arrivage) restent en PDF dans leurs propres
+   * contrôleurs.
    */
   static void ouvrir(
       ActionRequest request, ActionResponse response, ReportSettings rapport, String titre)

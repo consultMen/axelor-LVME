@@ -72,7 +72,8 @@ public class PurchaseOrderSupplychainRepository extends PurchaseOrderManagementR
       throw new PersistenceException(e.getMessage(), e);
     }
     purchaseOrder = super.save(purchaseOrder);
-    // LVME : Kanban « Suivi des commandes d'achat » classé par n° de dossier, le plus récent en haut
+    // LVME : Kanban « Suivi des commandes d'achat » classé par n° de dossier, le plus récent en
+    // haut
     // (Axelor ne trie le Kanban que sur l'ordre des cartes) ; recalculé après la numérotation et
     // après chaque déplacement de carte
     purchaseOrder.setLvmeKanbanSeq(ordreKanban(purchaseOrder.getPurchaseOrderSeq()));
@@ -80,10 +81,10 @@ public class PurchaseOrderSupplychainRepository extends PurchaseOrderManagementR
   }
 
   /**
-   * Ordre de carte = - n° de dossier. N° GESCOM « AAMM + numéro » (260926 = 2026, septembre, dossier
-   * 26 ; quelques-uns sur 3 chiffres : 2106106) : classé par AAMM puis numéro, pour qu'un dossier à 7
-   * chiffres de 2021 ne passe pas devant ceux de 2026. Autres numéros (« #52174 » d'un brouillon) :
-   * leurs chiffres.
+   * Ordre de carte = - n° de dossier. N° GESCOM « AAMM + numéro » (260926 = 2026, septembre,
+   * dossier 26 ; quelques-uns sur 3 chiffres : 2106106) : classé par AAMM puis numéro, pour qu'un
+   * dossier à 7 chiffres de 2021 ne passe pas devant ceux de 2026. Autres numéros (« #52174 » d'un
+   * brouillon) : leurs chiffres.
    */
   public static Integer ordreKanban(String numero) {
     String chiffres = numero == null ? "" : numero.replaceAll("\\D", "");

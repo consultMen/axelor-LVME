@@ -101,7 +101,8 @@ public class LvmeCatalogueFournisseurService {
         catalogue.setOrigine(ligne.getOrigine());
         catalogue.setZonePeche(ligne.getZonePeche());
         catalogue.setMarque(ligne.getMarque());
-        catalogue.setPoidsColis(positif(ligne.getPoidsParColis()) ? ligne.getPoidsParColis() : null);
+        catalogue.setPoidsColis(
+            positif(ligne.getPoidsParColis()) ? ligne.getPoidsParColis() : null);
         catalogue.setUpdateDate(
             arrivage.getRealDate() != null ? arrivage.getRealDate() : LocalDate.now());
       }
