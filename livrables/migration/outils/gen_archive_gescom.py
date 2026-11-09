@@ -20,6 +20,8 @@ NOMS = {
     'gencode_articles': 'gencod_articles',
     'modepeche': 'modepeche',
     'zonepeche': 'zone_peche',
+    'supp_cmd': 'suppr_cde',
+    'cde_lignerecept': 'cde_ligne_recept',
 }
 
 
@@ -29,6 +31,8 @@ def nom_table(fichier):
     base = re.sub(r'[^a-z0-9_]+', '_', base)
     # gros fichiers exportés en morceaux (CCE1..CCE4, CCD1..CCD7, CCD5a…) : une seule table
     base = re.sub(r'^(cce|ccd)_?[0-9]+[a-z]?$', r'\1', base)
+    # HIS_VTE exporté en 5 morceaux (his-vtes1, his-vts2, his_vtes3… : orthographes variables)
+    base = re.sub(r'^his_?vte?s?_?[0-9]+[a-z]?$', 'his_vte', base)
     return NOMS.get(base, base)
 
 

@@ -395,13 +395,30 @@ CLIENT_RESERV (239). Les morceaux sont regroupés en une table dans l'archive (`
   périodicité de facturation (Fin de mois, À la demande, Affacturage), relevé de factures, tarif (Prix public / Prix
   de revient), GROUP_2 (codes 099, 101 à 107… : sens à demander).
 
+## 3 decies quinquies. Étape 13 : historique des ventes (`MIG_13_historique_ventes.sql`, 09/11/2026)
+
+- HIS_VTE : 403 976 lignes de vente (une par article vendu), 2013 à 2026, exportées en 5 morceaux.
+- 154 758 lignes sont reliées à une ligne de commande (ID_CCD) : déjà dans LVME par l'étape 06, ou anciennes versions
+  de lignes de commandes reprises (318 lignes dont la ligne CCD n'existe plus : 279 dans une commande reprise, 205 avec
+  le même article) : non reprises, pour ne pas compter deux fois.
+- 249 218 lignes reprises (2013-2021, 8 commandes en 2022) : une commande client « Terminée » par client et par jour
+  (HIS_VTE n'a ni n° de commande ni n° de BL), n° « HV-<code client>-<aaaammjj> » : 41 340 commandes, 169,3 M€ HT.
+  Aucun BL, aucun mouvement de stock, aucune facture Axelor : historique consultable (Historique prix, Lignes
+  commandes clients, Palmarès, listes).
+- Ligne : article, poids (tout est en kg), colis, poids colis, prix de vente, TVA 5,5 %, prix de revient GESCOM, lot
+  vendu (204 464 lignes ; sinon n° de lot en description), arrivage, origine, conditionnement ; marge avec la formule
+  LVME (15 à 19 % par an).
+- 26 dates aberrantes corrigées avec l'année du n° d'arrivage : 22/06/2001 et 2002 (arrivages 21…, 22…) -> 2021 /
+  2022 ; 29/07/2012 (arrivage 210772) -> 2021 ; 01/07/2033 (arrivages 20922, 30519) -> 2002 / 2003 (à confirmer).
+
 ## 3 undecies. Tables GESCOM examinées, sans reprise nécessaire (30/10/2026)
 
 - REFDOUAN (217 références douanières par article) : déjà sur les fiches Produit (étape 01), toutes identiques
   (une référence vide dans GESCOM comme dans LVME).
 - GENCOD_ARTICLES (66) : copie exacte des familles d'articles, déjà reprises.
 - REMISE : 2 remises promotionnelles de janvier 2025, expirées.
-- Restent : l'historique des ventes d'avant 2021 (HIS_VTE, à exporter de GESCOM).
+- Restent : BANQUE, BL_ENTETE / BL_LIGNE, MISE_DISPO, SUPPR_CDE, CDE_LIGNE_RECEPT, ARRFLT, ARTICLES_GAMME (exportées,
+  à analyser), CORRESP et ARTICLES_LOT_MVTS (à exporter), facturation et comptabilité.
 
 ## 4. Points ouverts à faire préciser par le client
 
