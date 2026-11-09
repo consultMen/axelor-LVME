@@ -143,6 +143,10 @@ SELECT nextval('supplychain_sale_order_line_lot_seq'), 0, now(), 'GESCOM-HVLOT-'
   g.ligne_id, g.lot_id, t.lot_fournisseur, g.qte, 0, t.perishable_expiration_date
 FROM mig_ligne g JOIN stock_tracking_number t ON t.id = g.lot_id;
 
+-- poids total de la ligne (colonne « Poids » de l'Historique prix) = poids vendu (tout est en kg)
+UPDATE sale_sale_order_line SET poids_total_net = qty, version = version + 1
+WHERE import_id LIKE 'GESCOM-HVL-%' AND poids_total_net IS NULL;
+
 -- ---------- marge : formule LVME inchangée (comme MIG_06) ----------
 UPDATE sale_sale_order_line l SET sub_total_cost_price = x.cout, sub_total_gross_margin = x.marge,
   sub_margin_rate = CASE WHEN coalesce(l.ex_tax_total, 0) <> 0 THEN round(x.marge * 100 / l.ex_tax_total, 2) ELSE 0 END,

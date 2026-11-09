@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<domain-models xmlns="http://axelor.com/xml/ns/domain-models"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://axelor.com/xml/ns/domain-models http://axelor.com/xml/ns/domain-models/domain-models_7.4.xsd">
+
+  <module name="supplychain" package="com.axelor.apps.supplychain.db"/>
+
+  <!-- LVME : lignes de l'écran « Historique prix » (F1 de la ligne de commande client). Modèle en lecture seule
+    adossé à la vue SQL lvme_historique_prix_ligne (sql/lvme_historique_prix_ligne.sql). -->
+  <entity name="HistoriquePrixLigne" table="lvme_historique_prix_ligne" cacheable="false">
+    <many-to-one name="saleOrderLine" ref="com.axelor.apps.sale.db.SaleOrderLine"
+      column="sale_order_line_id" title="Ligne de commande"/>
+    <many-to-one name="saleOrder" ref="com.axelor.apps.sale.db.SaleOrder"
+      column="sale_order_id" title="Commande"/>
+    <many-to-one name="client" ref="com.axelor.apps.base.db.Partner" column="client_id"
+      title="Client"/>
+    <many-to-one name="product" ref="com.axelor.apps.base.db.Product"
+      column="product_id" title="Produit"/>
+    <string name="productCode" column="product_code" title="Référence"/>
+    <date name="orderDate" column="order_date" title="Date commande"/>
+    <string name="piece" column="piece" title="Désignation"/>
+    <date name="histoDate" column="histo_date" title="Date"/>
+    <string name="origine" column="origine" title="Origine"/>
+    <many-to-one name="conditionnement" ref="com.axelor.apps.purchase.db.Conditionnement"
+      column="conditionnement_id" title="Conditionnement"/>
+    <decimal name="poidsParColis" column="poids_par_colis" title="Poids Unitaire"
+      precision="20" scale="3"/>
+    <decimal name="nbColis" column="nb_colis" title="Nbre Colis" precision="20" scale="3"/>
+    <decimal name="poidsTotalNet" column="poids_total_net" title="Poids" precision="20"
+      scale="3"/>
+    <decimal name="priceDiscounted" column="price_discounted" title="P.Vente Net"
+      precision="20" scale="10"/>
+    <decimal name="exTaxTotal" column="ex_tax_total" title="Montant H.T." precision="20"
+      scale="2"/>
+  </entity>
+
+</domain-models>

@@ -1,4 +1,4 @@
-# Déploiement prod LVME — nouvelle archive GESCOM (MIG_00), sous-familles (MIG_11), banques et conditions des clients (MIG_12), historique des ventes (MIG_13) du 09/11/2026
+# Déploiement prod LVME — nouvelle archive GESCOM (MIG_00), sous-familles (MIG_11), banques et conditions des clients (MIG_12), historique des ventes (MIG_13), Historique prix rapide (PROD_120) du 09/11/2026
 
 Déjà en prod : jusqu'à PROD_119 et MIG_10. Code à déployer (recompiler) : champ Product.lvmeSousFamille ; champs client LVME (payeur, plafond, mode et
 périodicité de facturation, relevé, tarif, groupe 2).
@@ -7,10 +7,11 @@ périodicité de facturation, relevé, tarif, groupe 2).
    tables) dans `/home/axelor/` (remplace l'ancienne).
 2. **Serveur** : `pg_dump -U axelor -Fc axelor > ~/sauvegarde_avant_mig13_$(date +%F_%H%M).dump` ; re-clone et build comme
    d'habitude ; `sudo systemctl stop axelor-tomcat`
-3. `cd ~/src/axelor-LVME && psql -U axelor -d axelor -v ON_ERROR_STOP=1 -f ~/MIG_00_archive_gescom.sql && for f in livrables/migration/MIG_11_sous_familles_articles.sql livrables/migration/MIG_12_tiers_banque_conditions.sql livrables/migration/MIG_13_historique_ventes.sql; do psql -U axelor -d axelor -v ON_ERROR_STOP=1 -f $f || break; done`
+3. `cd ~/src/axelor-LVME && psql -U axelor -d axelor -v ON_ERROR_STOP=1 -f ~/MIG_00_archive_gescom.sql && for f in livrables/migration/MIG_11_sous_familles_articles.sql livrables/migration/MIG_12_tiers_banque_conditions.sql livrables/migration/MIG_13_historique_ventes.sql livrables/PROD_120_historique_prix_rapide.sql; do psql -U axelor -d axelor -v ON_ERROR_STOP=1 -f $f || break; done`
    (MIG_13 : quelques minutes, ne pas interrompre)
    → MIG_11 : `13 | 48` puis le détail ; MIG_12 : `945 | 225 | 55 | 274 | 1521 | 1937` puis `212` ; MIG_13 :
-   `403976 | 154758 | 249218 | 41340 | 204464 | 169254112` puis le CA par année (2013 à 2022). (SFAMILLE_ARTICLES est déjà dans l'archive GESCOM de la base prod.)
+   `403976 | 154758 | 249218 | 41340 | 204464 | 169254112` puis le CA par année (2013 à 2022) ; PROD_120 :
+   `com.axelor.apps.supplychain.db.HistoriquePrixLigne | <nombre de lignes de vente>` (vue SQL : avant le démarrage). (SFAMILLE_ARTICLES est déjà dans l'archive GESCOM de la base prod.)
 4. Bascule du war (avec `~/axelor-config.prod.properties`), `sudo systemctl start axelor-tomcat && sudo systemctl restart nginx`.
 
 ---

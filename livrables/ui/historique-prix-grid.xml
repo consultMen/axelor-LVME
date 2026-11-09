@@ -1,11 +1,12 @@
-<grid name="lvme-historique-prix-grid" title="Historique prix" model="com.axelor.apps.sale.db.SaleOrderLine"
-  orderBy="-saleOrder.orderDate,-id" canNew="false" canEdit="false" canDelete="false">
+<grid name="lvme-historique-prix-grid" title="Historique prix" model="com.axelor.apps.supplychain.db.HistoriquePrixLigne"
+  orderBy="-orderDate,-id" canNew="false" canEdit="false" canDelete="false">
   <!-- LVME : écran « Historique prix » GESCOM (F1 de la ligne de commande client) : ventes passées de l'article
-       au client, livrées (B.L.) ou non (Cde), colonnes dans l'ordre GESCOM -->
-  <field name="product.code" title="Référence" width="110"/>
-  <field name="lvmeHistoPiece" title="Désignation" width="270"/>
-  <field name="lvmeHistoDate" title="Date" width="85"/>
-  <field name="lvmeOrigine" title="Origine" width="85"/>
+       au client, livrées (B.L.) ou non (Cde), colonnes dans l'ordre GESCOM ; lues dans la vue
+       lvme_historique_prix_ligne (rapide, avec l'historique GESCOM) -->
+  <field name="productCode" title="Référence" width="110"/>
+  <field name="piece" title="Désignation" width="270"/>
+  <field name="histoDate" title="Date" width="85"/>
+  <field name="origine" title="Origine" width="85"/>
   <field name="conditionnement" title="Conditionnement" width="200"/>
   <field name="poidsParColis" title="Poids Unitaire" width="75" x-scale="3"/>
   <field name="nbColis" title="Nbre Colis" width="65"/>
